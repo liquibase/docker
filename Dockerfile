@@ -18,4 +18,4 @@ RUN curl -L https://repo1.maven.org/maven2/org/liquibase/liquibase-core/${LIQUIB
 RUN chmod 777 /liquibase
 
 ENTRYPOINT ["/liquibase/liquibase"]
-CMD ["-?"]
+CMD ["--help"]
