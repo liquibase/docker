@@ -11,7 +11,7 @@ USER liquibase
 
 ENV LIQUIBASE_VERSION 3.8.1
 
-RUN curl -L https://repo1.maven.org/maven2/org/liquibase/liquibase-core/${LIQUIBASE_VERSION}/liquibase-core-${LIQUIBASE_VERSION}-bin.tar.gz -o liquibase-core-${LIQUIBASE_VERSION}-bin.tar.gz \
+RUN curl -L https://github.com/liquibase/liquibase/releases/download/v${LIQUIBASE_VERSION}/liquibase-${LIQUIBASE_VERSION}.tar.gz -o liquibase-core-${LIQUIBASE_VERSION}-bin.tar.gz \
   && tar -xzf liquibase-core-${LIQUIBASE_VERSION}-bin.tar.gz \
   && rm liquibase-core-${LIQUIBASE_VERSION}-bin.tar.gz
 
