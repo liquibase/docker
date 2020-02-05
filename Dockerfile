@@ -9,7 +9,7 @@ WORKDIR /liquibase
 # Change to the liquibase user
 USER liquibase
 
-ENV LIQUIBASE_VERSION 3.8.1
+ENV LIQUIBASE_VERSION 3.8.5
 
 RUN curl -L https://github.com/liquibase/liquibase/releases/download/v${LIQUIBASE_VERSION}/liquibase-${LIQUIBASE_VERSION}.tar.gz -o liquibase-core-${LIQUIBASE_VERSION}-bin.tar.gz \
   && tar -xzf liquibase-core-${LIQUIBASE_VERSION}-bin.tar.gz \
