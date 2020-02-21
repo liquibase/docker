@@ -6,7 +6,10 @@ MAINTAINER Datical <liquibase@datical.com>
 RUN apt-get update \
   && apt-get install -yq --no-install-recommends \
       libmariadb-java \
-      libpostgresql-jdbc-java 
+      libpostgresql-jdbc-java \
+  && apt-get autoclean \
+  && apt-get clean \
+  && rm -rf /var/*/apt/*
 # /usr/share/java/mariadb-java-client.jar
 # /usr/share/java/postgresql.jar
 
@@ -19,16 +22,14 @@ WORKDIR /liquibase
 USER liquibase
 
 # Latest Liquibase Release Version
-ENV LIQUIBASE_VERSION 3.8.6
+ARG LIQUIBASE_VERSION=3.8.6
 
 # Download, install, clean up
 RUN set -x \
-  && curl -L https://github.com/liquibase/liquibase/releases/download/v${LIQUIBASE_VERSION}/liquibase-${LIQUIBASE_VERSION}.tar.gz -o liquibase-core-${LIQUIBASE_VERSION}-bin.tar.gz \
-  && tar -xzf liquibase-core-${LIQUIBASE_VERSION}-bin.tar.gz \
-  && rm liquibase-core-${LIQUIBASE_VERSION}-bin.tar.gz 
+  && curl -L https://github.com/liquibase/liquibase/releases/download/v${LIQUIBASE_VERSION}/liquibase-${LIQUIBASE_VERSION}.tar.gz | tar -xzf -
 
 # Set liquibase to executable
-RUN chmod 777 /liquibase
+RUN chmod 755 /liquibase
 
 ENTRYPOINT ["/liquibase/liquibase"]
 CMD ["--help"]
