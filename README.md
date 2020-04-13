@@ -1,6 +1,6 @@
 # Official Liquibase Docker images
 
-[![Docker Auto Build](http://staging.liquibase.org/documentation/assets/LiquibaseDockerTextIcon.png)][docker]
+[![Docker Auto Build](https://img.shields.io/docker/cloud/automated/liquibase/liquibase)][docker]
 
 [docker]: https://hub.docker.com/r/liquibase/liquibase
 
