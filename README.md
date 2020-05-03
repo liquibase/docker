@@ -8,13 +8,33 @@ This is the official repository for [Liquibase Command-line](https://download.li
 
 # docker
 
+## MSSQL (SQL Server)
+
+`docker run --rm -v <PATH TO CHANGELOG DIR>:/liquibase/changelog liquibase/liquibase --url="jdbc:sqlserver://<IP OR HOSTNAME>:1433;database=<DATABASE>;" --changeLogFile=/liquibase/changelog/<CHANGELOG NAME ie: "changelog.xml"> --username=<USERNAME> --password=<PASSWORD> --liquibaseProLicenseKey="<PASTE LB PRO LICENSE KEY HERE>" generateChangeLog`
+
+
 ## PostgreSQL
 
-`docker run liquibase/liquibase --driver=org.postgresql.Driver --classpath=/usr/share/java/postgresql.jar --url="jdbc:postgresql://<IP OR HOSTNAME>:<PORT>/<DATABASE>" --changeLogFile=changelog.xml --username=<USERNAME> --password=<PASSWORD> generateChangeLog`
+`docker run --rm -v <PATH TO CHANGELOG DIR>:/liquibase/changelog liquibase/liquibase --url="jdbc:postgresql://<IP OR HOSTNAME>:5432/<DATABASE>?currentSchema=<SCHEMA NAME>" --changeLogFile=/liquibase/changelog/<CHANGELOG NAME ie: "changelog.xml"> --username=<USERNAME> --password=<PASSWORD> generateChangeLog`
 
 ## MariaDB (MySQL)
 
-`docker run liquibase/liquibase --driver=org.mariadb.jdbc.Driver --classpath=/usr/share/java/mariadb-java-client.jar --url="jdbc:mariadb://<IP OR HOSTNAME>:<PORT>/<SCHEMA NAME>" --changeLogFile=changelog.xml --username=<USERNAME> --password=<PASSWORD> generateChangeLog`
+`docker run --rm -v <PATH TO CHANGELOG DIR>:/liquibase/changelog liquibase/liquibase --url="jdbc:mariadb://<IP OR HOSTNAME>:3306/<DATABASE>" --changeLogFile=/liquibase/changelog/<CHANGELOG NAME ie: "changelog.xml"> --username=<USERNAME> --password=<PASSWORD> generateChangeLog`
 
-## Using Host Located JDBC Libraries
-`docker run -v <JDBC DIR>:/liquibase/jdbc -v <CHANGELOG DIR>:/liquibase/changelog liquibase/liquibase --driver=org.postgresql.Driver --classpath=<JDBC JAR> --url=”<JDBC URL>” --changeLogFile=/liquibase/changelog/changelog.xml --username=<USERNAME> --password=<PASSWORD>`
+## DB2
+
+`docker run --rm -v <PATH TO CHANGELOG DIR>:/liquibase/changelog liquibase/liquibase --url="jdbc:db2://<IP OR HOSTNAME>:50000/<DATABASE>" --changeLogFile=/liquibase/changelog/<CHANGELOG NAME ie: "changelog.xml"> --username=<USERNAME> --password=<PASSWORD> generateChangeLog`
+
+## Snowflake
+
+`docker run --rm -v <PATH TO CHANGELOG DIR>:/liquibase/changelog liquibase/liquibase --url="jdbc:snowflake://<IP OR HOSTNAME>/?db=<DATABASE>&schema=<SCHEMA NAME>" --changeLogFile=/liquibase/changelog/<CHANGELOG NAME ie: "changelog.xml"> --username=<USERNAME> --password=<PASSWORD> generateChangeLog`
+
+## Sybase
+
+`docker run --rm -v <PATH TO CHANGELOG DIR>:/liquibase/changelog liquibase/liquibase --url="jdbc:jtds:sybase://<IP OR HOSTNAME>:/<DATABASE>" --changeLogFile=/liquibase/changelog/<CHANGELOG NAME ie: "changelog.xml"> --username=<USERNAME> --password=<PASSWORD> generateChangeLog`
+
+
+
+## Using Oracle or any other Host Located JDBC Libraries
+
+`docker run --rm -v <JDBC LOCAL DIR>:/liquibase/lib -v <PATH TO CHANGELOG LOCAL DIR>:/liquibase/changelog liquibase/liquibase --classpath=/liquibase/lib/<JDBC JAR FILE> --url=<JDBC URL> --changeLogFile=/liquibase/changelog/<CHANGELOG NAME ie: "changelog.xml"> --username=<USERNAME> --password=<PASSWORD> generateChangeLog`
