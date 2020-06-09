@@ -1,6 +1,6 @@
 FROM openjdk:13
 
-MAINTAINER Datical <liquibase@datical.com>
+MAINTAINER Liquibase <answers@liquibase.org>
 
 # Install MariaDB (MySQL) and PostgreSQL JDBC Drivers for users that would like have them in the container
 #RUN apt-get update \
