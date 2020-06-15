@@ -33,7 +33,9 @@ This is the official repository for [Liquibase Command-line](https://download.li
 
 `docker run --rm -v <PATH TO CHANGELOG DIR>:/liquibase/changelog liquibase/liquibase --url="jdbc:jtds:sybase://<IP OR HOSTNAME>:/<DATABASE>" --changeLogFile=/liquibase/changelog/<CHANGELOG NAME ie: "changelog.xml"> --username=<USERNAME> --password=<PASSWORD> generateChangeLog`
 
+## SQLite
 
+`docker run --rm -v <PATH TO DB FILE>:/liquibase/<DB FILE NAME>.db -v <PATH TO CHANGELOG DIR>:/liquibase/changelog liquibase/liquibase --url="jdbc:sqlite:/liquibase/<DB FILE NAME>.db" --changeLogFile=/liquibase/changelog/<CHANGELOG NAME ie: "changelog.xml"> generateChangeLog`
 
 ## Using Oracle or any other Host Located JDBC Libraries
 

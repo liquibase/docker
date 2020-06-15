@@ -42,6 +42,7 @@ RUN curl -o /liquibase/lib/db2.jar https://repo1.maven.org/maven2/com/ibm/db2/jc
 RUN curl -o /liquibase/lib/snowflake.jar https://repo1.maven.org/maven2/net/snowflake/snowflake-jdbc/3.12.3/snowflake-jdbc-3.12.3.jar
 RUN curl -o /liquibase/lib/sybase.jar https://repo1.maven.org/maven2/net/sf/squirrel-sql/plugins/sybase/3.5.0/sybase-3.5.0.jar
 RUN curl -o /liquibase/lib/firebird.jar https://repo1.maven.org/maven2/net/sf/squirrel-sql/plugins/firebird/3.5.0/firebird-3.5.0.jar
+RUN curl -o /liquibase/lib/sqlite.jar https://repo1.maven.org/maven2/org/xerial/sqlite-jdbc/3.31.1/sqlite-jdbc-3.31.1.jar
 
 ENTRYPOINT ["/liquibase/liquibase"]
 CMD ["--help"]
