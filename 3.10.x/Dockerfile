@@ -12,7 +12,7 @@ WORKDIR /liquibase
 USER liquibase
 
 # Latest Liquibase Release Version
-ARG LIQUIBASE_VERSION=3.10.0
+ARG LIQUIBASE_VERSION=3.10.1
 
 # Download, install, clean up
 RUN set -x \
