@@ -2,20 +2,6 @@ FROM openjdk:13
 
 MAINTAINER Liquibase <answers@liquibase.org>
 
-# Install MariaDB (MySQL) and PostgreSQL JDBC Drivers for users that would like have them in the container
-#RUN apt-get update \
-#  && apt-get install -yq --no-install-recommends \
-#      libmariadb-java \
-#      libpostgresql-jdbc-java \
-#  && apt-get autoclean \
-#  && apt-get clean \
-#  && rm -rf /var/*/apt/*
-# /usr/share/java/mariadb-java-client.jar
-# /usr/share/java/postgresql.jar
-
-
-
-
 # Add the liquibase user and step in the directory
 RUN adduser liquibase
 # Make /liquibase directory and change owner to liquibase
@@ -26,7 +12,7 @@ WORKDIR /liquibase
 USER liquibase
 
 # Latest Liquibase Release Version
-ARG LIQUIBASE_VERSION=3.10.0
+ARG LIQUIBASE_VERSION=4.0.0
 
 # Download, install, clean up
 RUN set -x \
