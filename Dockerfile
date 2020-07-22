@@ -3,11 +3,8 @@ FROM openjdk:8-jre-alpine
 # Change to the root user
 USER root
 
-# Install bash
-RUN apk add --update --no-cache bash
-
-# Install GPG for package vefification
-RUN apk add --update --no-cache gnupg
+# Install BASH support and GPG for package vefification
+RUN apk add --update --no-cache bash gnupg
 
 # Add the liquibase user and step in the directory
 RUN addgroup -g 1001 liquibase
