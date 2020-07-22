@@ -1,6 +1,6 @@
 FROM openjdk:8-jre-alpine
 
-# Change to the root
+# Change to the root user
 USER root
 
 # Install BASH support and GPG for package vefification
