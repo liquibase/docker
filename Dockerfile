@@ -3,12 +3,15 @@ FROM openjdk:8-jre-alpine
 # Change to the root user
 USER root
 
-# Install BASH support and GPG for package vefification
-RUN apk add --update --no-cache bash gnupg
+# Install bash
+RUN apk add --update --no-cache bash
+
+# Install GPG for package vefification
+RUN apk add --update --no-cache gnupg
 
 # Add the liquibase user and step in the directory
-RUN addgroup --gid 1001 liquibase
-RUN adduser --disabled-password --uid 1001 --ingroup liquibase liquibase
+RUN addgroup -g 1001 liquibase
+RUN adduser -D -u 1001 -G liquibase liquibase
 
 # Make /liquibase directory and change owner to liquibase
 RUN mkdir /liquibase && chown liquibase /liquibase
