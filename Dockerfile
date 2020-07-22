@@ -1,6 +1,6 @@
 FROM openjdk:8-jre-alpine
 
-# Install BASH and GPG for package vefification
+# Install BASH support and GPG for package vefification
 RUN apk add --update --no-cache bash gnupg
 
 # Add the liquibase user and step in the directory
