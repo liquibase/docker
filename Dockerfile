@@ -1,5 +1,8 @@
 FROM openjdk:8-jre-alpine
 
+# Change to the root
+USER root
+
 # Install BASH support and GPG for package vefification
 RUN apk add --update --no-cache bash gnupg
 
