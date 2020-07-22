@@ -1,11 +1,12 @@
-FROM openjdk:8-jre-alpine
+FROM openjdk:11-jre-slim-buster
 
 # Install GPG for package vefification
-RUN apk add --update gnupg
+RUN apt-get update \
+	&& apt-get -y install gnupg wget
 
 # Add the liquibase user and step in the directory
-RUN addgroup -g 1001 liquibase
-RUN adduser -D -u 1001 -G liquibase liquibase
+RUN addgroup --gid 1001 liquibase
+RUN adduser --disabled-password --uid 1001 --ingroup liquibase liquibase
 
 # Make /liquibase directory and change owner to liquibase
 RUN mkdir /liquibase && chown liquibase /liquibase
