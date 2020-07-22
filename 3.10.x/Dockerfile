@@ -82,4 +82,7 @@ ARG MYSQL_SHA256=f93c6d717fff1bdc8941f0feba66ac13692e58dc382ca4b543cabbdb150d8bf
 RUN wget -O /liquibase/lib/mysql.jar https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.19/mysql-connector-java-8.0.19.jar \
 	&& echo "$MYSQL_SHA256  /liquibase/lib/mysql.jar" | sha256sum -c - 
 
-CMD ["/liquibase/liquibase"]
+
+ENTRYPOINT ["/liquibase/liquibase"]
+
+CMD ["--help"]

@@ -83,4 +83,6 @@ RUN wget -O /liquibase/lib/mysql.jar https://repo1.maven.org/maven2/mysql/mysql-
 	&& echo "$MYSQL_SHA256  /liquibase/lib/mysql.jar" | sha256sum -c - 
 
 
-CMD ["/liquibase/liquibase"]
+ENTRYPOINT ["/liquibase/liquibase"]
+
+CMD ["--help"]
