@@ -1,11 +1,10 @@
-FROM openjdk:11-jre-slim-buster
+FROM openjdk:8-jre-alpine
 
 # Change to the root user
 USER root
 
-# Install GPG for package vefification
-RUN apt-get update \
-	&& apt-get -y install gnupg wget
+# Install BASH support and GPG for package vefification
+RUN apk add --update --no-cache bash gnupg
 
 # Add the liquibase user and step in the directory
 RUN addgroup --gid 1001 liquibase
@@ -31,9 +30,7 @@ RUN set -x \
 # Setup GPG
 RUN GNUPGHOME="$(mktemp -d)" 
 
-
 # Download JDBC libraries, verify
-
 RUN wget -O /liquibase/lib/postgresql.jar https://repo1.maven.org/maven2/org/postgresql/postgresql/42.2.12/postgresql-42.2.12.jar \
 	&& wget -O /liquibase/lib/postgresql.jar.asc https://repo1.maven.org/maven2/org/postgresql/postgresql/42.2.12/postgresql-42.2.12.jar.asc \
     && gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys 38F47D3E410C47B1 \
