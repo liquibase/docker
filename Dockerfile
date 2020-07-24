@@ -30,9 +30,7 @@ RUN set -x \
 # Setup GPG
 RUN GNUPGHOME="$(mktemp -d)" 
 
-
 # Download JDBC libraries, verify
-
 RUN wget -O /liquibase/lib/postgresql.jar https://repo1.maven.org/maven2/org/postgresql/postgresql/42.2.12/postgresql-42.2.12.jar \
 	&& wget -O /liquibase/lib/postgresql.jar.asc https://repo1.maven.org/maven2/org/postgresql/postgresql/42.2.12/postgresql-42.2.12.jar.asc \
     && gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys 38F47D3E410C47B1 \
@@ -79,8 +77,8 @@ RUN wget -O /liquibase/lib/sqlite.jar https://repo1.maven.org/maven2/org/xerial/
     && gpg --batch --verify -fSLo /liquibase/lib/sqlite.jar.asc /liquibase/lib/sqlite.jar 
 
 # No key published to Maven Central, using SHA256SUM
-
 ARG MYSQL_SHA256=f93c6d717fff1bdc8941f0feba66ac13692e58dc382ca4b543cabbdb150d8bf7
+
 RUN wget -O /liquibase/lib/mysql.jar https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.19/mysql-connector-java-8.0.19.jar \
 	&& echo "$MYSQL_SHA256  /liquibase/lib/mysql.jar" | sha256sum -c - 
 
