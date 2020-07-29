@@ -36,8 +36,8 @@ RUN wget -O /liquibase/lib/postgresql.jar https://repo1.maven.org/maven2/org/pos
     && gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys 38F47D3E410C47B1 \
     && gpg --batch --verify -fSLo /liquibase/lib/postgresql.jar.asc /liquibase/lib/postgresql.jar
 
-RUN wget -O /liquibase/lib/mssql.jar https://repo1.maven.org/maven2/com/microsoft/sqlserver/mssql-jdbc/8.2.2.jre13/mssql-jdbc-8.2.2.jre13.jar \
-	&& wget -O /liquibase/lib/mssql.jar.asc https://repo1.maven.org/maven2/com/microsoft/sqlserver/mssql-jdbc/8.2.2.jre13/mssql-jdbc-8.2.2.jre13.jar.asc \
+RUN wget -O /liquibase/lib/mssql.jar https://repo1.maven.org/maven2/com/microsoft/sqlserver/mssql-jdbc/8.2.2.jre11/mssql-jdbc-8.2.2.jre11.jar \
+	&& wget -O /liquibase/lib/mssql.jar.asc https://repo1.maven.org/maven2/com/microsoft/sqlserver/mssql-jdbc/8.2.2.jre11/mssql-jdbc-8.2.2.jre11.jar.asc \
     && gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys 01B0B092A6925976 \
     && gpg --batch --verify -fSLo /liquibase/lib/mssql.jar.asc /liquibase/lib/mssql.jar 
 
@@ -82,4 +82,4 @@ ARG MYSQL_SHA256=f93c6d717fff1bdc8941f0feba66ac13692e58dc382ca4b543cabbdb150d8bf
 RUN wget -O /liquibase/lib/mysql.jar https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.19/mysql-connector-java-8.0.19.jar \
 	&& echo "$MYSQL_SHA256  /liquibase/lib/mysql.jar" | sha256sum -c - 
 
-CMD ["/liquibase/liquibase"]
+ENTRYPOINT ["/liquibase/liquibase"]
