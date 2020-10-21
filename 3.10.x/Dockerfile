@@ -16,7 +16,7 @@ WORKDIR /liquibase
 USER liquibase
 
 # Latest Liquibase Release Version
-ARG LIQUIBASE_VERSION=3.10.2
+ARG LIQUIBASE_VERSION=3.10.3
 
 # Download, verify, extract
 ARG LB_SHA256=429e07a4274c2b0ea74ac3aee2ca6ac9cd42d17b2ad249896e17587227758da7
