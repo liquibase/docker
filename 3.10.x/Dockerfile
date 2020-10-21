@@ -19,7 +19,7 @@ USER liquibase
 ARG LIQUIBASE_VERSION=3.10.3
 
 # Download, verify, extract
-ARG LB_SHA256=429e07a4274c2b0ea74ac3aee2ca6ac9cd42d17b2ad249896e17587227758da7
+ARG LB_SHA256=b34b0dbf35fba557d8f3cbf9ae08e0027e288ef2a35c6fa9dbe16536d070f7a8
 RUN set -x \
   && wget -O liquibase-${LIQUIBASE_VERSION}.tar.gz "https://github.com/liquibase/liquibase/releases/download/v${LIQUIBASE_VERSION}/liquibase-${LIQUIBASE_VERSION}.tar.gz" \
   && echo "$LB_SHA256  liquibase-${LIQUIBASE_VERSION}.tar.gz" | sha256sum -c - \
