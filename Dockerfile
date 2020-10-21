@@ -16,10 +16,10 @@ WORKDIR /liquibase
 USER liquibase
 
 # Latest Liquibase Release Version
-ARG LIQUIBASE_VERSION=4.0.0
+ARG LIQUIBASE_VERSION=4.1.1
 
 # Download, verify, extract
-ARG LB_SHA256=b51e852d81f19ed2146d8bdf55d755616772ce0defef66074de4f0b33dde971b
+ARG LB_SHA256=ef8e0b8f7f0cabc34a61b8a1e7f4feac46652b6f5e62b58a9f2d2cfc98f0033f
 RUN set -x \
   && wget -O liquibase-${LIQUIBASE_VERSION}.tar.gz "https://github.com/liquibase/liquibase/releases/download/v${LIQUIBASE_VERSION}/liquibase-${LIQUIBASE_VERSION}.tar.gz" \
   && echo "$LB_SHA256  liquibase-${LIQUIBASE_VERSION}.tar.gz" | sha256sum -c - \
