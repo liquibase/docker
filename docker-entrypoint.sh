@@ -1,9 +1,16 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
-# first arg is `-*` (picks up `--*`, too)
-if [ "${1#-}" != "$1" ]; then
-	set -- /liquibase/liquibase "$@"
-fi
+cp liquibase.base.properties liquibase.properties
+printf "\n" >> liquibase.properties
 
-exec "$@"
+
+for varname in "${!LIQUIBASE_@}"; do
+  propName="${varname/LIQUIBASE_/}"
+  propName="${propName/_/}"
+  propValue="${!varname}"
+
+  printf "${propName}: ${propValue}\n" >> liquibase.properties
+done
+
+/liquibase/liquibase "$@"
