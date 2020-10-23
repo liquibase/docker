@@ -3,7 +3,6 @@ FROM openjdk:11-jre-slim-buster
 # Install GNUPG for package vefification and WGET for file download
 RUN apt-get update \
     && apt-get -y install gnupg wget \
-    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 # Add the liquibase user and step in the directory
