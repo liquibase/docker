@@ -1,16 +1,15 @@
 #!/bin/bash
 set -e
 
-cp liquibase.base.properties liquibase.properties
-printf "\n" >> liquibase.properties
+#if [[ "$*" == *--defaultsFile* ]] && [[ -f "/liquibase/liquibase.properties" ]]; then
+#    ## Move standard liquibase.properties file out of the way so there is no conflict with the passed version
+#    mv /liquibase/liquibase.properties /liquibase/liquibase.properties.bak
+#fi
 
-
-for varname in "${!LIQUIBASE_@}"; do
-  propName="${varname/LIQUIBASE_/}"
-  propName="${propName/_/}"
-  propValue="${!varname}"
-
-  printf "${propName}: ${propValue}\n" >> liquibase.properties
-done
-
-/liquibase/liquibase "$@"
+if [[ "$*" == *--defaultsFile* ]]; then
+  ## Just run as-is
+  /liquibase/liquibase "$@"
+else
+  ## Include standard defaultsFile
+  /liquibase/liquibase "--defaultsFile=/liquibase/liquibase.docker.properties" "$@"
+fi
