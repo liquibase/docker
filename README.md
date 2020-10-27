@@ -5,45 +5,89 @@
 
 [docker]: https://hub.docker.com/r/liquibase/liquibase
 
-This is the official repository for [Liquibase Command-line](https://download.liquibase.org/) images.
+This is the official repository for [Liquibase](https://download.liquibase.org/) images.
 
-# Supported Tags
+## Supported Tags
 
 The following tags are officially supported:
 
--	[`latest` (*Dockerfile*)](https://github.com/liquibase/docker/blob/main/Dockerfile)
--	[`3.10.x` (*3.10.x/Dockerfile*)](https://github.com/liquibase/docker/blob/main/3.10.x/Dockerfile)
+#### Overall Most Recent Build
 
-## Examples
+The latest tag will be kept up to date with the most advanced Liquibase release.
 
-# MSSQL (SQL Server)
+-	`latest`
 
-`docker run --rm -v <PATH TO CHANGELOG DIR>:/liquibase/changelog liquibase/liquibase --url="jdbc:sqlserver://<IP OR HOSTNAME>:1433;database=<DATABASE>;" --changeLogFile=/liquibase/changelog/<CHANGELOG NAME ie: "changelog.xml"> --username=<USERNAME> --password=<PASSWORD> --liquibaseProLicenseKey="<PASTE LB PRO LICENSE KEY HERE>" generateChangeLog`
+#### Latest Major/Minor Builds
 
-# PostgreSQL
+These tags are kept up to date with the most recent patch release of each X.Y stream
 
-`docker run --rm -v <PATH TO CHANGELOG DIR>:/liquibase/changelog liquibase/liquibase --url="jdbc:postgresql://<IP OR HOSTNAME>:5432/<DATABASE>?currentSchema=<SCHEMA NAME>" --changeLogFile=/liquibase/changelog/<CHANGELOG NAME ie: "changelog.xml"> --username=<USERNAME> --password=<PASSWORD> generateChangeLog`
+-	`4.1`
+-	`3.10`
 
-# MariaDB (MySQL)
+#### Specific Releases
 
-`docker run --rm -v <PATH TO CHANGELOG DIR>:/liquibase/changelog liquibase/liquibase --url="jdbc:mariadb://<IP OR HOSTNAME>:3306/<DATABASE>" --changeLogFile=/liquibase/changelog/<CHANGELOG NAME ie: "changelog.xml"> --username=<USERNAME> --password=<PASSWORD> generateChangeLog`
+Each specific release has an associated tag
 
-# DB2
+-	`4.1.1`
+-	`4.1.0`
+-	`3.10.3`
 
-`docker run --rm -v <PATH TO CHANGELOG DIR>:/liquibase/changelog liquibase/liquibase --url="jdbc:db2://<IP OR HOSTNAME>:50000/<DATABASE>" --changeLogFile=/liquibase/changelog/<CHANGELOG NAME ie: "changelog.xml"> --username=<USERNAME> --password=<PASSWORD> generateChangeLog`
+## Changelog Files
 
-# Snowflake
+The docker image has a /liquibase/changelog volume in which the directory containing the root of your changelog tree can be mounted. Your `--changeLogFile` argument should list paths relative to this.
 
-`docker run --rm -v <PATH TO CHANGELOG DIR>:/liquibase/changelog liquibase/liquibase --url="jdbc:snowflake://<IP OR HOSTNAME>/?db=<DATABASE>&schema=<SCHEMA NAME>" --changeLogFile=/liquibase/changelog/<CHANGELOG NAME ie: "changelog.xml"> --username=<USERNAME> --password=<PASSWORD> generateChangeLog`
+The /liquibase/changelog volume can also be used for commands that write output, such as `generateChangeLog`
 
-# Sybase
+#### Example
 
-`docker run --rm -v <PATH TO CHANGELOG DIR>:/liquibase/changelog liquibase/liquibase --url="jdbc:jtds:sybase://<IP OR HOSTNAME>:/<DATABASE>" --changeLogFile=/liquibase/changelog/<CHANGELOG NAME ie: "changelog.xml"> --username=<USERNAME> --password=<PASSWORD> generateChangeLog`
+If you have a local `c:\projects\my-project\src\main\resources\com\example\changelogs\root.changelog.xml` file, you would run `docker run --rm -v c:\projects\my-project\src\main\resources:/liquibase/changelog --changeLogFile=com/example/root.changelog.xml update`   
 
-# SQLite
+## Configuration File
 
-`docker run --rm -v <PATH TO DB FILE>:/liquibase/<DB FILE NAME>.db -v <PATH TO CHANGELOG DIR>:/liquibase/changelog liquibase/liquibase --url="jdbc:sqlite:/liquibase/<DB FILE NAME>.db" --changeLogFile=/liquibase/changelog/<CHANGELOG NAME ie: "changelog.xml"> generateChangeLog`
+If you would like to use a "default file" to specify arguments rather than passing them on the command line, include it in your changelog volume mount and reference it.
 
-# Oracle (or any other host located JDBC libraries)
+If specifying a custom liquibase.properties file, make sure you include `classpath=/liquibase/changelog` so Liquibase will continue to look for your changelog files there.   
 
-`docker run --rm -v <JDBC LOCAL DIR>:/liquibase/lib -v <PATH TO CHANGELOG LOCAL DIR>:/liquibase/changelog liquibase/liquibase --classpath=/liquibase/lib/<JDBC JAR FILE> --url=<JDBC URL> --changeLogFile=/liquibase/changelog/<CHANGELOG NAME ie: "changelog.xml"> --username=<USERNAME> --password=<PASSWORD> generateChangeLog`
+#### Example
+
+If you have a local `c:\projects\my-project\src\main\resources\liquibase.properties` file, you would run `docker run --rm -v c:\projects\my-project\src\main\resources:/liquibase/changelog --defaultsFile=/liquibase/changelog/liquibase.properties update`
+
+## Drivers and Extensions
+
+The Liquibase docker container ships with drivers for many popular databases. If your driver is not included or if you have an extension, you can mount a local dirctory containing the jars to `/liquibase/classpath` and add the jars to your `classpath` setting.   
+
+#### Example
+
+If you have a local `c:\projects\my-project\lib\my-driver.jar` file, `docker run --rm -v c:\projects\my-project\src\main\resources:/liquibase/changelog -v c:\projects\my-project\lib:/liquibase/changelog:/liquibase/classpath --classpath=liquibase/changelog:liquibase/classpath/my-driver.jar update`
+
+## Complete Examples
+
+#### Specify everything via arguments 
+
+`docker run --rm -v <PATH TO CHANGELOG DIR>:/liquibase/changelog liquibase/liquibase --url="jdbc:sqlserver://<IP OR HOSTNAME>:1433;database=<DATABASE>;" --changeLogFile=com/example/changelog.xml --username=<USERNAME> --password=<PASSWORD> --liquibaseProLicenseKey="<PASTE LB PRO LICENSE KEY HERE>" update`
+
+#### Using a properties file
+
+*liquibase.docker.properties file:*
+```
+classpath: /liquibase/changelog
+url: jdbc:postgresql://<IP OR HOSTNAME>:5432/<DATABASE>?currentSchema=<SCHEMA NAME>
+changeLogFile: changelog.xml
+username: <USERNAME>
+password: <PASSWORD>
+liquibaseProLicenseKey=<PASTE LB PRO LICENSE KEY HERE> 
+```
+
+*CLI:*
+`docker run --rm -v <PATH TO CHANGELOG DIR>:/liquibase/changelog liquibase/liquibase --defaultsFile=/liquibase/changelogs/liquibase.docker.properties update`
+
+#### Example JDBC Urls:
+
+- MS SQL Server: jdbc:sqlserver://<IP OR HOSTNAME>:1433;database=<DATABASE>
+- PostgreSQL: jdbc:postgresql://<IP OR HOSTNAME>:5432/<DATABASE>?currentSchema=<SCHEMA NAME>
+- MySQL: jdbc:mysql://<IP OR HOSTNAME>:3306/<DATABASE>
+- MariaDB: jdbc:mariadb://<IP OR HOSTNAME>:3306/<DATABASE>
+- DB2: jdbc:db2://<IP OR HOSTNAME>:50000/<DATABASE>
+- Snowflake: jdbc:snowflake://<IP OR HOSTNAME>/?db=<DATABASE>&schema=<SCHEMA NAME>
+- Sybase jdbc:jtds:sybase://<IP OR HOSTNAME>:/<DATABASE>
+- SQLite: jdbc:sqlite:/tmp/<DB FILE NAME>.db

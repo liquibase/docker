@@ -1,9 +1,15 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
-# first arg is `-*` (picks up `--*`, too)
-if [ "${1#-}" != "$1" ]; then
-	set -- /liquibase/liquibase "$@"
-fi
+#if [[ "$*" == *--defaultsFile* ]] && [[ -f "/liquibase/liquibase.properties" ]]; then
+#    ## Move standard liquibase.properties file out of the way so there is no conflict with the passed version
+#    mv /liquibase/liquibase.properties /liquibase/liquibase.properties.bak
+#fi
 
-exec "$@"
+if [[ "$*" == *--defaultsFile* ]] || [[ "$*" == *--version* ]]; then
+  ## Just run as-is
+  /liquibase/liquibase "$@"
+else
+  ## Include standard defaultsFile
+  /liquibase/liquibase "--defaultsFile=/liquibase/liquibase.docker.properties" "$@"
+fi
