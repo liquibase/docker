@@ -6,7 +6,7 @@ set -e
 #    mv /liquibase/liquibase.properties /liquibase/liquibase.properties.bak
 #fi
 
-if [[ "$*" == *--defaultsFile* ]]; then
+if [[ "$*" == *--defaultsFile* ]] || [ "$#" -eq 1 ]; then
   ## Just run as-is
   /liquibase/liquibase "$@"
 else
