@@ -79,7 +79,7 @@ liquibaseProLicenseKey=<PASTE LB PRO LICENSE KEY HERE>
 ```
 
 *CLI:*
-`docker run --rm -v <PATH TO CHANGELOG DIR>:/liquibase/changelog liquibase/liquibase --defaultsFile=/liquibase/changelogs/liquibase.docker.properties update`
+`docker run --rm -v <PATH TO CHANGELOG DIR>:/liquibase/changelog liquibase/liquibase --defaultsFile=/liquibase/changelog/liquibase.docker.properties update`
 
 #### Example JDBC Urls:
 
