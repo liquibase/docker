@@ -40,7 +40,7 @@ The /liquibase/changelog volume can also be used for commands that write output,
 
 #### Example
 
-If you have a local `c:\projects\my-project\src\main\resources\com\example\changelogs\root.changelog.xml` file, you would run `docker run --rm -v c:\projects\my-project\src\main\resources:/liquibase/changelog --changeLogFile=com/example/root.changelog.xml update`   
+If you have a local `c:\projects\my-project\src\main\resources\com\example\changelogs\root.changelog.xml` file, you would run `docker run --rm -v c:\projects\my-project\src\main\resources:/liquibase/changelog --changeLogFile=com/example/changelogs/root.changelog.xml update`   
 
 ## Configuration File
 
@@ -58,7 +58,7 @@ The Liquibase docker container ships with drivers for many popular databases. If
 
 #### Example
 
-If you have a local `c:\projects\my-project\lib\my-driver.jar` file, `docker run --rm -v c:\projects\my-project\src\main\resources:/liquibase/changelog -v c:\projects\my-project\lib:/liquibase/changelog:/liquibase/classpath --classpath=liquibase/changelog:liquibase/classpath/my-driver.jar update`
+If you have a local `c:\projects\my-project\lib\my-driver.jar` file, `docker run --rm -v c:\projects\my-project\src\main\resources:/liquibase/changelog -v c:\projects\my-project\lib:/liquibase/classpath --classpath=liquibase/changelog:liquibase/classpath/my-driver.jar update`
 
 ## Complete Examples
 
@@ -79,7 +79,7 @@ liquibaseProLicenseKey=<PASTE LB PRO LICENSE KEY HERE>
 ```
 
 *CLI:*
-`docker run --rm -v <PATH TO CHANGELOG DIR>:/liquibase/changelog liquibase/liquibase --defaultsFile=/liquibase/changelogs/liquibase.docker.properties update`
+`docker run --rm -v <PATH TO CHANGELOG DIR>:/liquibase/changelog liquibase/liquibase --defaultsFile=/liquibase/changelog/liquibase.docker.properties update`
 
 #### Example JDBC Urls:
 
