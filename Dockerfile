@@ -13,14 +13,18 @@ RUN adduser --disabled-password --uid 1001 --ingroup liquibase liquibase
 RUN mkdir /liquibase && chown liquibase /liquibase
 WORKDIR /liquibase
 
+#Symbolic link will be broken until later
+RUN ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh \
+  && ln -s /liquibase/docker-entrypoint.sh /docker-entrypoint.sh
+
 # Change to the liquibase user
 USER liquibase
 
 # Latest Liquibase Release Version
-ARG LIQUIBASE_VERSION=4.2.0
+ARG LIQUIBASE_VERSION=4.2.2
 
 # Download, verify, extract
-ARG LB_SHA256=c70f40bfefabca6050ca373787be8f306f883887e52f9db1222ed0f4c37b4276
+ARG LB_SHA256=807ef4b514d01fc62f7aaf4150a8435c90ccb5986f3272d3cfd1bd26c2cf7b4c
 RUN set -x \
   && wget -O liquibase-${LIQUIBASE_VERSION}.tar.gz "https://github.com/liquibase/liquibase/releases/download/v${LIQUIBASE_VERSION}/liquibase-${LIQUIBASE_VERSION}.tar.gz" \
   && echo "$LB_SHA256  liquibase-${LIQUIBASE_VERSION}.tar.gz" | sha256sum -c - \
