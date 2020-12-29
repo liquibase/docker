@@ -21,6 +21,7 @@ The latest tag will be kept up to date with the most advanced Liquibase release.
 
 These tags are kept up to date with the most recent patch release of each X.Y stream
 
+-	`4.2`
 -	`4.1`
 -	`3.10`
 
@@ -28,6 +29,8 @@ These tags are kept up to date with the most recent patch release of each X.Y st
 
 Each specific release has an associated tag
 
+-	`4.2.2`
+-	`4.2.0`
 -	`4.1.1`
 -	`4.1.0`
 -	`3.10.3`
@@ -83,11 +86,11 @@ liquibaseProLicenseKey=<PASTE LB PRO LICENSE KEY HERE>
 
 #### Example JDBC Urls:
 
-- MS SQL Server: jdbc:sqlserver://<IP OR HOSTNAME>:1433;database=<DATABASE>
-- PostgreSQL: jdbc:postgresql://<IP OR HOSTNAME>:5432/<DATABASE>?currentSchema=<SCHEMA NAME>
-- MySQL: jdbc:mysql://<IP OR HOSTNAME>:3306/<DATABASE>
-- MariaDB: jdbc:mariadb://<IP OR HOSTNAME>:3306/<DATABASE>
-- DB2: jdbc:db2://<IP OR HOSTNAME>:50000/<DATABASE>
-- Snowflake: jdbc:snowflake://<IP OR HOSTNAME>/?db=<DATABASE>&schema=<SCHEMA NAME>
-- Sybase jdbc:jtds:sybase://<IP OR HOSTNAME>:/<DATABASE>
-- SQLite: jdbc:sqlite:/tmp/<DB FILE NAME>.db
+- MS SQL Server: `jdbc:sqlserver://<IP OR HOSTNAME>:1433;database=<DATABASE>`
+- PostgreSQL: `jdbc:postgresql://<IP OR HOSTNAME>:5432/<DATABASE>?currentSchema=<SCHEMA NAME>`
+- MySQL: `jdbc:mysql://<IP OR HOSTNAME>:3306/<DATABASE>`
+- MariaDB: `jdbc:mariadb://<IP OR HOSTNAME>:3306/<DATABASE>`
+- DB2: `jdbc:db2://<IP OR HOSTNAME>:50000/<DATABASE>`
+- Snowflake: `jdbc:snowflake://<IP OR HOSTNAME>/?db=<DATABASE>&schema=<SCHEMA NAME>`
+- Sybase `jdbc:jtds:sybase://<IP OR HOSTNAME>:/<DATABASE>`
+- SQLite: `jdbc:sqlite:/tmp/<DB FILE NAME>.db`
