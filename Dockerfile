@@ -17,7 +17,7 @@ WORKDIR /liquibase
 USER liquibase
 
 # Latest Liquibase Release Version
-ARG LIQUIBASE_VERSION=4.2.0
+ARG LIQUIBASE_VERSION=4.2.2
 
 # Download, verify, extract
 ARG LB_SHA256=c70f40bfefabca6050ca373787be8f306f883887e52f9db1222ed0f4c37b4276
@@ -83,7 +83,9 @@ RUN wget --no-verbose -O /liquibase/lib/mysql.jar https://repo1.maven.org/maven2
 COPY --chown=liquibase:liquibase docker-entrypoint.sh /liquibase/
 COPY --chown=liquibase:liquibase liquibase.docker.properties /liquibase/
 
-RUN chmod 0755 /liquibase/docker-entrypoint.sh
+RUN chmod 0755 /liquibase/docker-entrypoint.sh \
+  && ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh \
+  && ln -s /liquibase/docker-entrypoint.sh /docker-entrypoint.sh
 
 VOLUME /liquibase/classpath
 VOLUME /liquibase/changelog
