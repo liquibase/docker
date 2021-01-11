@@ -95,7 +95,7 @@ RUN wget --no-verbose -O /liquibase/lib/mysql.jar https://repo1.maven.org/maven2
 COPY --chown=liquibase:liquibase docker-entrypoint.sh /liquibase/
 COPY --chown=liquibase:liquibase liquibase.docker.properties /liquibase/
 
-#RUN chmod 0755 /liquibase/docker-entrypoint.sh
+RUN chmod 0755 /liquibase/docker-entrypoint.sh
 
 VOLUME /liquibase/classpath
 VOLUME /liquibase/changelog
