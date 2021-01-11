@@ -15,7 +15,8 @@ WORKDIR /liquibase
 
 #Symbolic link will be broken until later
 RUN ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh \
-  && ln -s /liquibase/docker-entrypoint.sh /docker-entrypoint.sh
+  && ln -s /liquibase/docker-entrypoint.sh /docker-entrypoint.sh \
+  && ln -s /liquibase/liquibase /usr/local/bin/liquibase
 
 # Change to the liquibase user
 USER liquibase
@@ -94,7 +95,7 @@ RUN wget --no-verbose -O /liquibase/lib/mysql.jar https://repo1.maven.org/maven2
 COPY --chown=liquibase:liquibase docker-entrypoint.sh /liquibase/
 COPY --chown=liquibase:liquibase liquibase.docker.properties /liquibase/
 
-RUN chmod 0755 /liquibase/docker-entrypoint.sh
+#RUN chmod 0755 /liquibase/docker-entrypoint.sh
 
 VOLUME /liquibase/classpath
 VOLUME /liquibase/changelog

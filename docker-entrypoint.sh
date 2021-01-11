@@ -7,9 +7,9 @@ if type "$1" > /dev/null 2>&1; then
 else
   if [[ "$*" == *--defaultsFile* ]] || [[ "$*" == *--version* ]]; then
     ## Just run as-is
-    /liquibase/liquibase "$@"
+    liquibase "$@"
   else
     ## Include standard defaultsFile
-    /liquibase/liquibase "--defaultsFile=/liquibase/liquibase.docker.properties" "$@"
+    liquibase "--defaultsFile=/liquibase/liquibase.docker.properties" "$@"
   fi
 fi
