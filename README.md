@@ -61,7 +61,7 @@ The Liquibase docker container ships with drivers for many popular databases. If
 
 #### Example
 
-If you have a local `c:\projects\my-project\lib\my-driver.jar` file, `docker run --rm -v c:\projects\my-project\src\main\resources:/liquibase/changelog -v c:\projects\my-project\lib:/liquibase/classpath --classpath=liquibase/changelog:liquibase/classpath/my-driver.jar update`
+If you have a local `c:\projects\my-project\lib\my-driver.jar` file, `docker run --rm -v c:\projects\my-project\src\main\resources:/liquibase/changelog -v c:\projects\my-project\lib:/liquibase/classpath --classpath=/liquibase/changelog:/liquibase/classpath/my-driver.jar update`
 
 ## Complete Examples
 
