@@ -13,3 +13,4 @@ else
     liquibase "--defaultsFile=/liquibase/liquibase.docker.properties" "$@"
   fi
 fi
+
