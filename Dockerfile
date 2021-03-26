@@ -63,7 +63,7 @@ RUN wget --no-verbose -O wget -O /liquibase/lib/db2.jar https://repo1.maven.org/
     && gpg --auto-key-locate keyserver --keyserver ha.pool.sks-keyservers.net --keyserver-options auto-key-retrieve --verify /liquibase/lib/db2.jar.asc /liquibase/lib/db2.jar \
 	&& echo "$DB2_SHA1 /liquibase/lib/db2.jar" | sha1sum -c - 
 
-ARG SNOWFLAKE_SHA1=ea2280f496bbd8e31c628edca2cfff6ee0aa4c24
+ARG SNOWFLAKE_SHA1=33d436d13eacdd34d78d5089fae29e31a3e3abb5
 RUN wget --no-verbose -O /liquibase/lib/snowflake.jar https://repo1.maven.org/maven2/net/snowflake/snowflake-jdbc/3.13.1/snowflake-jdbc-3.13.1.jar \
 	&& wget --no-verbose -O wget -O /liquibase/lib/snowflake.jar.asc https://repo1.maven.org/maven2/net/snowflake/snowflake-jdbc/3.13.1/snowflake-jdbc-3.13.1.jar.asc \
     && gpg --auto-key-locate keyserver --keyserver ha.pool.sks-keyservers.net --keyserver-options auto-key-retrieve --verify /liquibase/lib/snowflake.jar.asc /liquibase/lib/snowflake.jar \
