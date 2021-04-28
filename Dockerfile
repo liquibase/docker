@@ -23,10 +23,10 @@ RUN ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh \
 USER liquibase
 
 # Latest Liquibase Release Version
-ARG LIQUIBASE_VERSION=4.3.3
+ARG LIQUIBASE_VERSION=4.3.4
 
 # Download, verify, extract
-ARG LB_SHA256=9ea12540f76a8fd77a7fa3bcfbaf65fdc6f7bddab5ae9f12850e64b42f43d388
+ARG LB_SHA256=b56938016d85d6ffb90bb1a3f48e9ce0955f6900d711531d3e868a69f6bb3a01
 RUN set -x \
   && wget -O liquibase-${LIQUIBASE_VERSION}.tar.gz "https://github.com/liquibase/liquibase/releases/download/v${LIQUIBASE_VERSION}/liquibase-${LIQUIBASE_VERSION}.tar.gz" \
   && echo "$LB_SHA256  liquibase-${LIQUIBASE_VERSION}.tar.gz" | sha256sum -c - \
@@ -34,9 +34,10 @@ RUN set -x \
   && rm liquibase-${LIQUIBASE_VERSION}.tar.gz
 
 # Download JDBC libraries, verify via GPG and checksum
-ARG PG_SHA1=a0a9c1d43c7727eeaf1b729477891185d3c71751
-RUN wget --no-verbose -O /liquibase/lib/postgresql.jar https://repo1.maven.org/maven2/org/postgresql/postgresql/42.2.18/postgresql-42.2.18.jar \
-	&& wget --no-verbose -O /liquibase/lib/postgresql.jar.asc https://repo1.maven.org/maven2/org/postgresql/postgresql/42.2.18/postgresql-42.2.18.jar.asc \
+ARG PG_VERSION=42.2.19
+ARG PG_SHA1=85cb20fe8151b6d90900d5ae5cfe0ad7c3e8f921
+RUN wget --no-verbose -O /liquibase/lib/postgresql.jar https://repo1.maven.org/maven2/org/postgresql/postgresql/${PG_VERSION}/postgresql-${PG_VERSION}.jar \
+	&& wget --no-verbose -O /liquibase/lib/postgresql.jar.asc https://repo1.maven.org/maven2/org/postgresql/postgresql/${PG_VERSION}/postgresql-${PG_VERSION}.jar.asc \
     && gpg --auto-key-locate keyserver --keyserver ha.pool.sks-keyservers.net --keyserver-options auto-key-retrieve --verify /liquibase/lib/postgresql.jar.asc /liquibase/lib/postgresql.jar \
 	&& echo "$PG_SHA1  /liquibase/lib/postgresql.jar" | sha1sum -c - 
 
