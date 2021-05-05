@@ -45,11 +45,13 @@ Each specific release has an associated tag
 
 The docker image has a /liquibase/changelog volume in which the directory containing the root of your changelog tree can be mounted. Your `--changeLogFile` argument should list paths relative to this.
 
-The /liquibase/changelog volume can also be used for commands that write output, such as `generateChangeLog`
+The /liquibase/changelog volume can also be used for commands that write output, such as `generateChangeLog`. Note that in this case (where liquibase should write a new file) you need to specify the absolute path to the changelog, i.e. prefix the path with `/liquibase/changelog/<PATH TO CHANGELOG FILE>`.
 
 #### Example
 
-If you have a local `c:\projects\my-project\src\main\resources\com\example\changelogs\root.changelog.xml` file, you would run `docker run --rm -v c:\projects\my-project\src\main\resources:/liquibase/changelog --changeLogFile=com/example/changelogs/root.changelog.xml update`   
+If you have a local `c:\projects\my-project\src\main\resources\com\example\changelogs\root.changelog.xml` file, you would run `docker run --rm -v c:\projects\my-project\src\main\resources:/liquibase/changelog --changeLogFile=com/example/changelogs/root.changelog.xml update`
+
+To genereate a new changelog file at this location, run `docker run --rm -v c:\projects\my-project\src\main\resources:/liquibase/changelog --changeLogFile=/liquibase/changelog/com/example/changelogs/root.changelog.xml generateChangeLog`
 
 ## Configuration File
 
@@ -88,7 +90,9 @@ liquibaseProLicenseKey=<PASTE LB PRO LICENSE KEY HERE>
 ```
 
 *CLI:*
-`docker run --rm -v <PATH TO CHANGELOG DIR>:/liquibase/changelog liquibase/liquibase --defaultsFile=/liquibase/changelog/liquibase.docker.properties update`
+`docker run --rm -v <PATH TO CHANGELOG DIR>:/liquibase/changelog liquibase/liquibase --defaultsFile=/liquibase/changelog/liquibase.docker.properties update`  
+
+or `docker run --rm -v <PATH TO CHANGELOG DIR>:/liquibase/changelog liquibase/liquibase --defaultsFile=/liquibase/changelog/liquibase.docker.properties --changeLogFile=/liquibase/changelog/changelog.xml generateChangeLog` (the argument `--changeLogFile` wins against the defaultsFile)
 
 #### Example JDBC Urls:
 
