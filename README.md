@@ -30,6 +30,7 @@ These tags are kept up to date with the most recent patch release of each X.Y st
 
 Each specific release has an associated tag
 
+-	`4.3.5`
 -	`4.3.4`
 -	`4.3.3`
 -	`4.3.2`
