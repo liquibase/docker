@@ -1,5 +1,6 @@
 version: 2
-update_configs:
+updates:
+
   # Keep Dockerfile up to date, batching pull requests as updated
   - package_manager: "docker"
     directory: "/"
