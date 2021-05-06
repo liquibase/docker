@@ -3,4 +3,4 @@ update_configs:
   # Keep Dockerfile up to date, batching pull requests as updated
   - package_manager: "docker"
     directory: "/"
-    update_schedule: "live"
+    update_schedule: "daily"
