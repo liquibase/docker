@@ -2,7 +2,7 @@ version: 2
 updates:
 
   # Keep Dockerfile up to date, batching pull requests as updated
-  - package_manager: "docker"
+  - package-ecosystem: "docker"
     directory: "/"
     schedule:
       interval: "daily"
