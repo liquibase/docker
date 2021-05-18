@@ -34,8 +34,8 @@ RUN set -x \
   && rm liquibase-${LIQUIBASE_VERSION}.tar.gz
 
 # Download JDBC libraries, verify via GPG and checksum
-ARG PG_VERSION=42.2.19
-ARG PG_SHA1=85cb20fe8151b6d90900d5ae5cfe0ad7c3e8f921
+ARG PG_VERSION=42.2.20
+ARG PG_SHA1=36cc2142f46e8f4b77ffc1840ada1ba33d96324f
 RUN wget --no-verbose -O /liquibase/lib/postgresql.jar https://repo1.maven.org/maven2/org/postgresql/postgresql/${PG_VERSION}/postgresql-${PG_VERSION}.jar \
 	&& wget --no-verbose -O /liquibase/lib/postgresql.jar.asc https://repo1.maven.org/maven2/org/postgresql/postgresql/${PG_VERSION}/postgresql-${PG_VERSION}.jar.asc \
     && gpg --auto-key-locate keyserver --keyserver ha.pool.sks-keyservers.net --keyserver-options auto-key-retrieve --verify /liquibase/lib/postgresql.jar.asc /liquibase/lib/postgresql.jar \
