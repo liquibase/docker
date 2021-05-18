@@ -47,9 +47,9 @@ RUN wget --no-verbose -O /liquibase/lib/mssql.jar https://repo1.maven.org/maven2
     && gpg --auto-key-locate keyserver --keyserver ha.pool.sks-keyservers.net --keyserver-options auto-key-retrieve --verify /liquibase/lib/mssql.jar.asc /liquibase/lib/mssql.jar \
 	&& echo "$MSSQL_SHA1 /liquibase/lib/mssql.jar" | sha1sum -c - 
 
-ARG MARIADB_SHA1=7ada3fc7b30ae8fa4616f47ef6d505bdda933605
-RUN wget --no-verbose -O /liquibase/lib/mariadb.jar https://repo1.maven.org/maven2/org/mariadb/jdbc/mariadb-java-client/2.6.0/mariadb-java-client-2.6.0.jar \
-	&& wget --no-verbose -O wget -O /liquibase/lib/mariadb.jar.asc https://repo1.maven.org/maven2/org/mariadb/jdbc/mariadb-java-client/2.6.0/mariadb-java-client-2.6.0.jar.asc \
+ARG MARIADB_SHA1=4a2edc05bd882ad19371d2615c2635dccf8d74f0
+RUN wget --no-verbose -O /liquibase/lib/mariadb.jar https://repo1.maven.org/maven2/org/mariadb/jdbc/mariadb-java-client/2.7.3/mariadb-java-client-2.7.3.jar \
+	&& wget --no-verbose -O wget -O /liquibase/lib/mariadb.jar.asc https://repo1.maven.org/maven2/org/mariadb/jdbc/mariadb-java-client/2.7.3/mariadb-java-client-2.7.3.jar.asc \
     && gpg --auto-key-locate keyserver --keyserver ha.pool.sks-keyservers.net --keyserver-options auto-key-retrieve --verify /liquibase/lib/mariadb.jar.asc /liquibase/lib/mariadb.jar \
 	&& echo "$MARIADB_SHA1 /liquibase/lib/mariadb.jar" | sha1sum -c - 
 
