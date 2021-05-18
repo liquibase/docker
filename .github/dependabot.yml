@@ -2,7 +2,7 @@ version: 2
 updates:
 
   # Keep Dockerfile up to date, batching pull requests as updated
-  - package-ecosystem: "docker"
+  - package-ecosystem: "maven"
     directory: "/"
     schedule:
       interval: "daily"
