@@ -19,6 +19,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.liquibase.ext</groupId>
+            <artifactId>liquibase-snowflake</artifactId>
+            <version>4.3.5</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>42.2.20</version>
