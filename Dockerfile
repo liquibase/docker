@@ -59,10 +59,11 @@ RUN wget --no-verbose -O /liquibase/lib/h2.jar https://repo1.maven.org/maven2/co
     && gpg --auto-key-locate keyserver --keyserver ha.pool.sks-keyservers.net --keyserver-options auto-key-retrieve --verify /liquibase/lib/h2.jar.asc /liquibase/lib/h2.jar \
 	&& echo "$H2_SHA1 /liquibase/lib/h2.jar" | sha1sum -c - 
 
-# IBM no longer publishing their public key. Sad.
-ARG DB2_SHA256=968942198159eac5bebf0d40b73926de55688728ded85850b48d8531759495c1
+ARG DB2_SHA1=902856c6b9f979facc6f75fad40da6b048df5df8
 RUN wget --no-verbose -O /liquibase/lib/db2.jar https://repo1.maven.org/maven2/com/ibm/db2/jcc/11.5.5.0/jcc-11.5.5.0.jar \
-	&& echo "$DB2_SHA256  /liquibase/lib/db2.jar" | sha256sum -c -
+	&& wget --no-verbose -O wget -O /liquibase/lib/db2.jar.asc https://repo1.maven.org/maven2/com/ibm/db2/jcc/11.5.5.0/jcc-11.5.5.0.jar.asc \
+    && gpg --auto-key-locate keyserver --keyserver keyserver.ubuntu.com --keyserver-options auto-key-retrieve --verify /liquibase/lib/db2.jar.asc /liquibase/lib/db2.jar \
+	&& echo "$DB2_SHA1 /liquibase/lib/db2.jar" | sha1sum -c -
 
 ARG SNOWFLAKE_SHA1=b391b3d6b760bd0408e327793288782d28dc211e
 RUN wget --no-verbose -O /liquibase/lib/snowflake.jar https://repo1.maven.org/maven2/net/snowflake/snowflake-jdbc/3.13.3/snowflake-jdbc-3.13.3.jar \
