@@ -52,7 +52,7 @@ The /liquibase/changelog volume can also be used for commands that write output,
 
 If you have a local `c:\projects\my-project\src\main\resources\com\example\changelogs\root.changelog.xml` file, you would run `docker run --rm -v c:\projects\my-project\src\main\resources:/liquibase/changelog --changeLogFile=com/example/changelogs/root.changelog.xml update`
 
-To genereate a new changelog file at this location, run `docker run --rm -v c:\projects\my-project\src\main\resources:/liquibase/changelog --changeLogFile=/liquibase/changelog/com/example/changelogs/root.changelog.xml generateChangeLog`
+To generate a new changelog file at this location, run `docker run --rm -v c:\projects\my-project\src\main\resources:/liquibase/changelog --changeLogFile=/liquibase/changelog/com/example/changelogs/root.changelog.xml generateChangeLog`
 
 ## Configuration File
 
@@ -66,7 +66,7 @@ If you have a local `c:\projects\my-project\src\main\resources\liquibase.propert
 
 ## Drivers and Extensions
 
-The Liquibase docker container ships with drivers for many popular databases. If your driver is not included or if you have an extension, you can mount a local dirctory containing the jars to `/liquibase/classpath` and add the jars to your `classpath` setting.   
+The Liquibase docker container ships with drivers for many popular databases. If your driver is not included or if you have an extension, you can mount a local directory containing the jars to `/liquibase/classpath` and add the jars to your `classpath` setting.   
 
 #### Example
 
