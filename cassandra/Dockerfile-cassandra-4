@@ -1,0 +1,7 @@
+FROM cassandra:4.0
+
+COPY test.cql /docker-entrypoint-initdb.d/test.cql
+
+COPY cql.sh /cql.sh
+
+ENTRYPOINT ["/cql.sh"]
