@@ -11,4 +11,4 @@ for f in docker-entrypoint-initdb.d/*; do
     echo
 done
 
-exec /docker-entrypoint.sh "$@"
+exec docker-entrypoint.sh "$@"
