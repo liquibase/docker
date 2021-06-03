@@ -7,7 +7,6 @@ if type "$1" > /dev/null 2>&1; then
 else
   if [[ "$*" == *--defaultsFile* ]] || [[ "$*" == *--defaults-file* ]] || [[ "$*" == *--version* ]]; then
     ## Just run as-is
-    echo AS-IS
     liquibase "$@"
   else
     ## Include standard defaultsFile
