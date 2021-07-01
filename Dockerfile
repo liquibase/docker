@@ -95,9 +95,10 @@ RUN wget --no-verbose -O /liquibase/lib/ojdbc8.jar https://repo1.maven.org/maven
     && gpg --auto-key-locate keyserver --keyserver keyserver.ubuntu.com --keyserver-options auto-key-retrieve --verify /liquibase/lib/ojdbc8.jar.asc /liquibase/lib/ojdbc8.jar \
 	&& echo "$ORACLE_SHA1 /liquibase/lib/ojdbc8.jar" | sha1sum -c - 
 
-# No key published to Maven Central, using SHA256SUM
 ARG MYSQL_SHA256=a0a1be0389e541dad8841b326e79c51d39abbe1ca52267304d76d1cf4801ce96
 RUN wget --no-verbose -O /liquibase/lib/mysql.jar https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.25/mysql-connector-java-8.0.25.jar \
+	&& wget --no-verbose -O /liquibase/lib/mysql.jar.asc https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.25/mysql-connector-java-8.0.25.jar.asc \
+    && gpg --auto-key-locate keyserver --keyserver keyserver.ubuntu.com --keyserver-options auto-key-retrieve --verify /liquibase/lib/mysql.jar.asc /liquibase/lib/mysql.jar \
 	&& echo "$MYSQL_SHA256  /liquibase/lib/mysql.jar" | sha256sum -c - 
 
 COPY --chown=liquibase:liquibase docker-entrypoint.sh /liquibase/
