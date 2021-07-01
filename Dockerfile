@@ -65,9 +65,10 @@ RUN wget --no-verbose -O /liquibase/lib/db2.jar https://repo1.maven.org/maven2/c
     && gpg --auto-key-locate keyserver --keyserver keyserver.ubuntu.com --keyserver-options auto-key-retrieve --verify /liquibase/lib/db2.jar.asc /liquibase/lib/db2.jar \
 	&& echo "$DB2_SHA1 /liquibase/lib/db2.jar" | sha1sum -c -
 
-ARG SNOWFLAKE_SHA1=bb31bc46f2023910bc71fb12fa0b24ee20ffea25
-RUN wget --no-verbose -O /liquibase/lib/snowflake.jar https://repo1.maven.org/maven2/net/snowflake/snowflake-jdbc/3.13.4/snowflake-jdbc-3.13.4.jar \
-	&& wget --no-verbose -O wget -O /liquibase/lib/snowflake.jar.asc https://repo1.maven.org/maven2/net/snowflake/snowflake-jdbc/3.13.4/snowflake-jdbc-3.13.4.jar.asc \
+ARG SNOWFLAKE_VERSION=3.13.5
+ARG SNOWFLAKE_SHA1=5cf0b933bc7125894138bdf9befd7547e0783553
+RUN wget --no-verbose -O /liquibase/lib/snowflake.jar https://repo1.maven.org/maven2/net/snowflake/snowflake-jdbc/${SNOWFLAKE_VERSION}/snowflake-jdbc-${SNOWFLAKE_VERSION}.jar \
+	&& wget --no-verbose -O wget -O /liquibase/lib/snowflake.jar.asc https://repo1.maven.org/maven2/net/snowflake/snowflake-jdbc/${SNOWFLAKE_VERSION}/snowflake-jdbc-${SNOWFLAKE_VERSION}.jar.asc \
     && gpg --auto-key-locate keyserver --keyserver keyserver.ubuntu.com --keyserver-options auto-key-retrieve --verify /liquibase/lib/snowflake.jar.asc /liquibase/lib/snowflake.jar \
 	&& echo "$SNOWFLAKE_SHA1 /liquibase/lib/snowflake.jar" | sha1sum -c -
 
