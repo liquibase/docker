@@ -59,9 +59,10 @@ RUN wget --no-verbose -O /liquibase/lib/h2.jar https://repo1.maven.org/maven2/co
     && gpg --auto-key-locate keyserver --keyserver keyserver.ubuntu.com --keyserver-options auto-key-retrieve --verify /liquibase/lib/h2.jar.asc /liquibase/lib/h2.jar \
 	&& echo "$H2_SHA1 /liquibase/lib/h2.jar" | sha1sum -c - 
 
-ARG DB2_SHA1=902856c6b9f979facc6f75fad40da6b048df5df8
-RUN wget --no-verbose -O /liquibase/lib/db2.jar https://repo1.maven.org/maven2/com/ibm/db2/jcc/11.5.5.0/jcc-11.5.5.0.jar \
-	&& wget --no-verbose -O wget -O /liquibase/lib/db2.jar.asc https://repo1.maven.org/maven2/com/ibm/db2/jcc/11.5.5.0/jcc-11.5.5.0.jar.asc \
+ARG DB2_VERSION=11.5.6.0
+ARG DB2_SHA1=34704e47398c467e256fd181c75ffb85d1fac9a9
+RUN wget --no-verbose -O /liquibase/lib/db2.jar https://repo1.maven.org/maven2/com/ibm/db2/jcc/${DB2_VERSION}/jcc-${DB2_VERSION}.jar \
+	&& wget --no-verbose -O wget -O /liquibase/lib/db2.jar.asc https://repo1.maven.org/maven2/com/ibm/db2/jcc/${DB2_VERSION}/jcc-${DB2_VERSION}.jar.asc \
     && gpg --auto-key-locate keyserver --keyserver keyserver.ubuntu.com --keyserver-options auto-key-retrieve --verify /liquibase/lib/db2.jar.asc /liquibase/lib/db2.jar \
 	&& echo "$DB2_SHA1 /liquibase/lib/db2.jar" | sha1sum -c -
 
