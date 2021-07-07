@@ -36,7 +36,7 @@ RUN set -x \
 # Download JDBC libraries, verify via GPG and checksum
 ARG PG_VERSION=42.2.22
 ARG PG_SHA1=9edcdd5bb2acfbb4354c92e0b9a67fc6a6ab9046
-RUN wget --no-verbose -O /liquibase/lib/postgresql.jar https://repo1.maven.org/maven2/org/postgresql/postgresql/${PG_VERSION}/postgresql-${PG_VERSION}.jar \
+RUN wget --no-verbose -O /liquibase/lib/postgresql.jar "https://repo1.maven.org/maven2/org/postgresql/postgresql/${PG_VERSION}/postgresql-${PG_VERSION}.jar" \
 	&& wget --no-verbose -O /liquibase/lib/postgresql.jar.asc https://repo1.maven.org/maven2/org/postgresql/postgresql/${PG_VERSION}/postgresql-${PG_VERSION}.jar.asc \
     && gpg --auto-key-locate keyserver --keyserver keyserver.ubuntu.com --keyserver-options auto-key-retrieve --verify /liquibase/lib/postgresql.jar.asc /liquibase/lib/postgresql.jar \
 	&& echo "$PG_SHA1  /liquibase/lib/postgresql.jar" | sha1sum -c - 
@@ -61,15 +61,15 @@ RUN wget --no-verbose -O /liquibase/lib/h2.jar https://repo1.maven.org/maven2/co
 
 ARG DB2_VERSION=11.5.6.0
 ARG DB2_SHA1=34704e47398c467e256fd181c75ffb85d1fac9a9
-RUN wget --no-verbose -O /liquibase/lib/db2.jar https://repo1.maven.org/maven2/com/ibm/db2/jcc/${DB2_VERSION}/jcc-${DB2_VERSION}.jar \
-	&& wget --no-verbose -O wget -O /liquibase/lib/db2.jar.asc https://repo1.maven.org/maven2/com/ibm/db2/jcc/${DB2_VERSION}/jcc-${DB2_VERSION}.jar.asc \
+RUN wget --no-verbose -O /liquibase/lib/db2.jar "https://repo1.maven.org/maven2/com/ibm/db2/jcc/${DB2_VERSION}/jcc-${DB2_VERSION}.jar" \
+	&& wget --no-verbose -O wget -O /liquibase/lib/db2.jar.asc "https://repo1.maven.org/maven2/com/ibm/db2/jcc/${DB2_VERSION}/jcc-${DB2_VERSION}.jar.asc" \
     && gpg --auto-key-locate keyserver --keyserver keyserver.ubuntu.com --keyserver-options auto-key-retrieve --verify /liquibase/lib/db2.jar.asc /liquibase/lib/db2.jar \
 	&& echo "$DB2_SHA1 /liquibase/lib/db2.jar" | sha1sum -c -
 
 ARG SNOWFLAKE_VERSION=3.13.5
 ARG SNOWFLAKE_SHA1=5cf0b933bc7125894138bdf9befd7547e0783553
-RUN wget --no-verbose -O /liquibase/lib/snowflake.jar https://repo1.maven.org/maven2/net/snowflake/snowflake-jdbc/${SNOWFLAKE_VERSION}/snowflake-jdbc-${SNOWFLAKE_VERSION}.jar \
-	&& wget --no-verbose -O wget -O /liquibase/lib/snowflake.jar.asc https://repo1.maven.org/maven2/net/snowflake/snowflake-jdbc/${SNOWFLAKE_VERSION}/snowflake-jdbc-${SNOWFLAKE_VERSION}.jar.asc \
+RUN wget --no-verbose -O /liquibase/lib/snowflake.jar "https://repo1.maven.org/maven2/net/snowflake/snowflake-jdbc/${SNOWFLAKE_VERSION}/snowflake-jdbc-${SNOWFLAKE_VERSION}.jar" \
+	&& wget --no-verbose -O wget -O /liquibase/lib/snowflake.jar.asc "https://repo1.maven.org/maven2/net/snowflake/snowflake-jdbc/${SNOWFLAKE_VERSION}/snowflake-jdbc-${SNOWFLAKE_VERSION}.jar.asc" \
     && gpg --auto-key-locate keyserver --keyserver keyserver.ubuntu.com --keyserver-options auto-key-retrieve --verify /liquibase/lib/snowflake.jar.asc /liquibase/lib/snowflake.jar \
 	&& echo "$SNOWFLAKE_SHA1 /liquibase/lib/snowflake.jar" | sha1sum -c -
 
@@ -87,8 +87,8 @@ RUN wget --no-verbose -O /liquibase/lib/firebird.jar https://repo1.maven.org/mav
 
 ARG SQLITE_VERSION=3.36.0.1
 ARG SQLITE_SHA1=7bd89ad11392210f8e86282004519b36d53cb9ee
-RUN wget --no-verbose -O /liquibase/lib/sqlite.jar https://repo1.maven.org/maven2/org/xerial/sqlite-jdbc/${SQLITE_VERSION}/sqlite-jdbc-${SQLITE_VERSION}.jar \
-	&& wget --no-verbose -O /liquibase/lib/sqlite.jar.asc https://repo1.maven.org/maven2/org/xerial/sqlite-jdbc/${SQLITE_VERSION}/sqlite-jdbc-${SQLITE_VERSION}.jar.asc \
+RUN wget --no-verbose -O /liquibase/lib/sqlite.jar "https://repo1.maven.org/maven2/org/xerial/sqlite-jdbc/${SQLITE_VERSION}/sqlite-jdbc-${SQLITE_VERSION}.jar" \
+	&& wget --no-verbose -O /liquibase/lib/sqlite.jar.asc "https://repo1.maven.org/maven2/org/xerial/sqlite-jdbc/${SQLITE_VERSION}/sqlite-jdbc-${SQLITE_VERSION}.jar.asc" \
     && gpg --auto-key-locate keyserver --keyserver keyserver.ubuntu.com --keyserver-options auto-key-retrieve --verify /liquibase/lib/sqlite.jar.asc /liquibase/lib/sqlite.jar \
 	&& echo "$SQLITE_SHA1 /liquibase/lib/sqlite.jar" | sha1sum -c - 
 
