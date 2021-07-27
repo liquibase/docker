@@ -1,4 +1,4 @@
-FROM cassandra:3
+FROM cassandra:3.11.0
 
 COPY test.cql /docker-entrypoint-initdb.d/test.cql
 
