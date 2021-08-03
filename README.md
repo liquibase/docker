@@ -1,4 +1,3 @@
-gt
 ## Official Liquibase Docker images
 
 [![Docker Auto Build](https://img.shields.io/docker/cloud/automated/liquibase/liquibase)][docker]
