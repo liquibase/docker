@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-if [[ "INSTALL_MYSQL" ]]; then
+if [[ "$INSTALL_MYSQL" ]]; then
   lpm add mysql --global
 fi
 
