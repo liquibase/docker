@@ -42,7 +42,7 @@ RUN rm lpm.zip
 RUN export LIQUIBASE_HOME=/liquibase
 
 # Install Drivers
-RUN lpm add postgresql mssql mariadb db2 snowflake sybase firebird sqlite oracle mysql --global
+RUN lpm add postgresql mssql mariadb db2 snowflake sybase firebird sqlite oracle --global
 
 COPY --chown=liquibase:liquibase docker-entrypoint.sh /liquibase/
 COPY --chown=liquibase:liquibase liquibase.docker.properties /liquibase/
