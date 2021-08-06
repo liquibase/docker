@@ -1,8 +1,6 @@
-#action.yml
-
 # action.yml
-name: 'Run Liquibase'
-description: 'Executes Liquibase in Docker container'
+name: 'Hello World'
+description: 'Greet someone and record the time'
 inputs:
   who-to-greet:  # id of input
     description: 'Who to greet'
@@ -13,6 +11,6 @@ outputs:
     description: 'The time we greeted you'
 runs:
   using: 'docker'
-  image: '/Dockerfile'
+  image: 'Dockerfile'
   args:
     - ${{ inputs.who-to-greet }}
