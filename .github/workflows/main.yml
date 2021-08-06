@@ -31,6 +31,6 @@ jobs:
           changelog: "--changelog-file changelog.xml"
           generatechangelog: "generatechangelog"
 
-      # Use the output from the `hello` step
-#      - name: Get the output time
-#        run: echo "The time was ${{ steps.hello.outputs.time }}"
+      # Use the output from the `liquibase-generatechangelog` step
+      - name: Get the output time
+        run: echo "The time was ${{ steps.liquibase-generatechangelog.outputs.output }}"
