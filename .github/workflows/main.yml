@@ -20,18 +20,16 @@ jobs:
       # you must check out the repository
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Hello world action step
+
+      - name: Liquibase Generate Changelog
         uses: ./ # Uses an action in the root directory
-        id: hello
+        id: liquibase.generatechangelog
         with:
-          who-to-greet: 'Mona the Octocat'
           username: "--username lbtest"
           password: "--password lbtest"
           url: "--url jdbc:postgresql://172.17.0.2:5432/postgres"
           changelog: "--changelog-file changelog.xml"
           generatechangelog: "generatechangelog"
-
-
 
       # Use the output from the `hello` step
 #      - name: Get the output time
