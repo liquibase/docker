@@ -1,16 +1,43 @@
 # action.yml
-name: 'Hello World'
-description: 'Greet someone and record the time'
+name: 'Generate Liquibase Changelog'
+description: 'Executes Liquibase to Generate Postgres Changelog'
 inputs:
-  who-to-greet:  # id of input
-    description: 'Who to greet'
+
+  username:
+    description: postgres username
     required: true
-    default: 'World'
+    default: "--username lbtest"
+
+  password:
+    description: postgres password
+    required: true
+    default: "  --password lbtest"
+
+  url:
+    description: postgres url
+    required: true
+    default: "--url jdbc:postgresql://172.17.0.2:5432/postgres"
+
+  changelog:
+    description: liquibase changelog
+    required: true
+    default: "--changelog-file changelog.xml"
+
+  generatechangelog:
+    description: liquibase generatechangelog
+    required: true
+    default: "generatechangelog"
+
 outputs:
-  time: # id of output
-    description: 'The time we greeted you'
+  output: # Liquibase output
+    description: 'Liquibase output'
+
 runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
-    - ${{ inputs.who-to-greet }}
+    - ${{ inputs.username }}
+    - ${{ inputs.password }}
+    - ${{ inputs.url }}
+    - ${{ inputs.changelog }}
+    - ${{ inputs.generatechangelog }}

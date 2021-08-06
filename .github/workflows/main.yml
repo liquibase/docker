@@ -1,9 +1,20 @@
 on: [push]
 
 jobs:
-  hello_world_job:
+  test_liquibase_docker_job:
     runs-on: ubuntu-latest
-    name: A job to say hello
+    name: Test Liquibase Docker Container
+
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: lbtest
+          POSTGRES_PASSWORD: lbtest
+        ports:
+          - 5432:5432
+
+
     steps:
       # To use this repository's private action,
       # you must check out the repository
@@ -14,6 +25,14 @@ jobs:
         id: hello
         with:
           who-to-greet: 'Mona the Octocat'
+          username: "--username lbtest"
+          password: "--password lbtest"
+          url: "--url jdbc:postgresql://172.17.0.2:5432/postgres"
+          changelog: "--changelog-file changelog.xml"
+          generatechangelog: "generatechangelog"
+
+
+
       # Use the output from the `hello` step
-      - name: Get the output time
-        run: echo "The time was ${{ steps.hello.outputs.time }}"
+#      - name: Get the output time
+#        run: echo "The time was ${{ steps.hello.outputs.time }}"
