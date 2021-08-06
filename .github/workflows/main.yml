@@ -23,7 +23,7 @@ jobs:
 
       - name: Liquibase Generate Changelog
         uses: ./ # Uses an action in the root directory
-        id: liquibase.generatechangelog
+        id: liquibase-generatechangelog
         with:
           username: "--username lbtest"
           password: "--password lbtest"
