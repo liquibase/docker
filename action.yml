@@ -3,30 +3,10 @@ name: 'Generate Liquibase Changelog'
 description: 'Executes Liquibase to Generate Postgres Changelog'
 inputs:
 
-  username:
-    description: postgres username
+  lbargs:
+    description: liquibase arguments
     required: true
-    default: "--username lbtest"
-
-  password:
-    description: postgres password
-    required: true
-    default: "  --password lbtest"
-
-  url:
-    description: postgres url
-    required: true
-    default: "--url jdbc:postgresql://172.17.0.2:5432/postgres"
-
-  changelog:
-    description: liquibase changelog
-    required: true
-    default: "--changelog-file changelog.xml"
-
-  generatechangelog:
-    description: liquibase generatechangelog
-    required: true
-    default: "generatechangelog"
+    default: "--username lbtest --password lbtest --url jdbc:postgresql://172.17.0.2:5432/postgres --changelog-file changelog.xml generatechangelog"
 
 outputs:
   output: # Liquibase output
@@ -36,8 +16,4 @@ runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
-    - ${{ inputs.username }}
-    - ${{ inputs.password }}
-    - ${{ inputs.url }}
-    - ${{ inputs.changelog }}
-    - ${{ inputs.generatechangelog }}
+    - ${{ inputs.args }}

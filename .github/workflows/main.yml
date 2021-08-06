@@ -25,11 +25,7 @@ jobs:
         uses: ./ # Uses an action in the root directory
         id: liquibase-generatechangelog
         with:
-          username: "--username lbtest"
-          password: "--password lbtest"
-          url: "--url jdbc:postgresql://172.17.0.2:5432/postgres"
-          changelog: "--changelog-file changelog.xml"
-          generatechangelog: "generatechangelog"
+          lbargs: "--username lbtest --password lbtest --url jdbc:postgresql://172.17.0.2:5432/postgres --changelog-file changelog.xml generatechangelog"
 
       # Use the output from the `liquibase-generatechangelog` step
       - name: Get the output time
