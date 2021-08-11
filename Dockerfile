@@ -24,10 +24,10 @@ RUN ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh \
 USER liquibase
 
 # Latest Liquibase Release Version
-ARG LIQUIBASE_VERSION=4.4.2
+ARG LIQUIBASE_VERSION=4.4.3
 
 # Download, verify, extract
-ARG LB_SHA256=a8e28ccaa7f7297ee95a3b2556070f8869538b0bcc64bbe6ec389ab6648b7755
+ARG LB_SHA256=b5dfa605ffc9853c39bef96ea72965a59d9ee12a3bcb59040b539d4782d4bff9
 RUN set -x \
   && wget -O liquibase-${LIQUIBASE_VERSION}.tar.gz "https://github.com/liquibase/liquibase/releases/download/v${LIQUIBASE_VERSION}/liquibase-${LIQUIBASE_VERSION}.tar.gz" \
   && echo "$LB_SHA256  liquibase-${LIQUIBASE_VERSION}.tar.gz" | sha256sum -c - \
@@ -43,6 +43,7 @@ RUN export LIQUIBASE_HOME=/liquibase
 
 # Install Drivers
 RUN lpm add postgresql mssql mariadb db2 snowflake sybase firebird sqlite oracle --global
+RUN ls -alh /liquibase/lib
 
 COPY --chown=liquibase:liquibase docker-entrypoint.sh /liquibase/
 COPY --chown=liquibase:liquibase liquibase.docker.properties /liquibase/
