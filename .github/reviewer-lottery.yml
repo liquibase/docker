@@ -6,4 +6,5 @@ groups:
       - ap-liquibase
       - molivasdat
       - r2liquibase
-      - jnewton03remote
+      - jnewton03
+      

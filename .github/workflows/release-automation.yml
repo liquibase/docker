@@ -121,3 +121,4 @@ jobs:
           github_token: ${{ secrets.BOT_TOKEN }}
           create_annotated_tag: true
           custom_tag : ${{env.SNOWFLAKE_TARGET_VERSION}}
+          
