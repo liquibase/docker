@@ -5,6 +5,5 @@ groups:
     usernames: # github usernames of the reviewers
       - ap-liquibase
       - molivasdat
-      - r2liquibase
       - jnewton03
       
