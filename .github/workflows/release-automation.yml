@@ -60,6 +60,7 @@ jobs:
           sed -i 's/^ARG LB_SHA256=.*/ARG LB_SHA256='"$CORE_TARGET_SHA"'/' ${{ github.workspace }}/Dockerfile
 
       - name: push Dockerfile edit back to PR
+        if: ${{ steps.metadata.outputs.dependency-name == 'org.liquibase:liquibase-core' }}
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
@@ -91,6 +92,7 @@ jobs:
           GITHUB_TOKEN: ${{secrets.BOT_TOKEN}} 
           
       - name: Compute sha1 for snowflake-extension.jar
+        if: ${{ steps.metadata.outputs.dependency-name == 'org.liquibase.ext:liquibase-snowflake' }} 
         run: |
           echo 'SNOWFLAKE_TARGET_SHA<<EOF' >> $GITHUB_ENV
           curl -LsS https://repo1.maven.org/maven2/org/liquibase/ext/liquibase-snowflake/$SNOWFLAKE_TARGET_VERSION/liquibase-snowflake-$SNOWFLAKE_TARGET_VERSION.jar  | sha1sum | awk '{ print $1 }' >> $GITHUB_ENV
@@ -99,6 +101,7 @@ jobs:
       - name: edit liquibase-snowflake Dockerfile
         if: ${{ steps.metadata.outputs.dependency-name == 'org.liquibase.ext:liquibase-snowflake' }} 
         run: |
+          sed -i 's/^FROM liquibase/liquibase:.*/FROM liquibase/liquibase:'"$SNOWFLAKE_TARGET_VERSION"'/' ${{ github.workspace }}/snowflake/Dockerfile
           sed -i 's/^ARG SNOWFLAKE_EXTENSION_VERSION=.*/ARG SNOWFLAKE_EXTENSION_VERSION='"$SNOWFLAKE_TARGET_VERSION"'/' ${{ github.workspace }}/snowflake/Dockerfile
           sed -i 's/^ARG SNOWFLAKE_EXTENSION_SHA1=.*/ARG SNOWFLAKE_EXTENSION_SHA1='"$SNOWFLAKE_TARGET_SHA"'/' ${{ github.workspace }}/snowflake/Dockerfile
 
