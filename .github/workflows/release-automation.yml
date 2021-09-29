@@ -118,7 +118,7 @@ jobs:
 
       - name: Bump version and push tag
         if: ${{ steps.metadata.outputs.dependency-name == 'org.liquibase.ext:liquibase-snowflake' }} 
-        id: tag_version
+        id: tag_version2
         uses: mathieudutour/github-tag-action@v5.6
         with:
           github_token: ${{ secrets.BOT_TOKEN }}
