@@ -56,9 +56,9 @@ The /liquibase/changelog volume can also be used for commands that write output,
 
 #### Example
 
-If you have a local `c:\projects\my-project\src\main\resources\com\example\changelogs\root.changelog.xml` file, you would run `docker run liquibase/liquibase --rm -v c:\projects\my-project\src\main\resources:/liquibase/changelog --changeLogFile=com/example/changelogs/root.changelog.xml update`
+If you have a local `c:\projects\my-project\src\main\resources\com\example\changelogs\root.changelog.xml` file, you would run `docker run --rm -v c:\projects\my-project\src\main\resources:/liquibase/changelog liquibase/liquibase --changeLogFile=com/example/changelogs/root.changelog.xml update`
 
-To generate a new changelog file at this location, run `docker run liquibase/liquibase --rm -v c:\projects\my-project\src\main\resources:/liquibase/changelog --changeLogFile=com/example/changelogs/root.changelog.xml generateChangeLog`
+To generate a new changelog file at this location, run `docker run --rm -v c:\projects\my-project\src\main\resources:/liquibase/changelog liquibase/liquibase --changeLogFile=com/example/changelogs/root.changelog.xml generateChangeLog`
 
 ## Configuration File
 
@@ -68,7 +68,7 @@ If specifying a custom liquibase.properties file, make sure you include `classpa
 
 #### Example
 
-If you have a local `c:\projects\my-project\src\main\resources\liquibase.properties` file, you would run `docker run liquibase/liquibase --rm -v c:\projects\my-project\src\main\resources:/liquibase/changelog --defaultsFile=liquibase.properties update`
+If you have a local `c:\projects\my-project\src\main\resources\liquibase.properties` file, you would run `docker run --rm -v c:\projects\my-project\src\main\resources:/liquibase/changelog liquibase/liquibase --defaultsFile=liquibase.properties update`
 
 ## Drivers and Extensions
 
@@ -76,7 +76,7 @@ The Liquibase docker container ships with drivers for many popular databases. If
 
 #### Example
 
-If you have a local `c:\projects\my-project\lib\my-driver.jar` file, `docker run liquibase/liquibase --rm -v c:\projects\my-project\src\main\resources:/liquibase/changelog -v c:\projects\my-project\lib:/liquibase/classpath --classpath=/liquibase/changelog:/liquibase/classpath/my-driver.jar update`
+If you have a local `c:\projects\my-project\lib\my-driver.jar` file, `docker run --rm -v c:\projects\my-project\src\main\resources:/liquibase/changelog -v c:\projects\my-project\lib:/liquibase/classpath liquibase/liquibase --classpath=/liquibase/changelog:/liquibase/classpath/my-driver.jar update`
 
 ### Notice for MySQL Users
 Due to licensing restrictions for the MySQL driver, this container does not ship with the MySQL driver installed. Two options exist for loading this driver: 1. Create a new container from the `liquibase/liquibase` image. 2. Load this driver during runtime via an environment variable. 
@@ -102,7 +102,7 @@ docker run -e INSTALL_MYSQL=true liquibase/liquibase update
 
 #### Specify everything via arguments 
 
-`docker run liquibase/liquibase --rm -v <PATH TO CHANGELOG DIR>:/liquibase/changelog --url="jdbc:sqlserver://<IP OR HOSTNAME>:1433;database=<DATABASE>;" --changeLogFile=com/example/changelog.xml --username=<USERNAME> --password=<PASSWORD> --liquibaseProLicenseKey="<PASTE LB PRO LICENSE KEY HERE>" update`
+`docker run --rm -v <PATH TO CHANGELOG DIR>:/liquibase/changelog liquibase/liquibase --url="jdbc:sqlserver://<IP OR HOSTNAME>:1433;database=<DATABASE>;" --changeLogFile=com/example/changelog.xml --username=<USERNAME> --password=<PASSWORD> --liquibaseProLicenseKey="<PASTE LB PRO LICENSE KEY HERE>" update`
 
 #### Using a properties file
 
@@ -117,9 +117,9 @@ liquibaseProLicenseKey=<PASTE LB PRO LICENSE KEY HERE>
 ```
 
 *CLI:*
-`docker run liquibase/liquibase --rm -v <PATH TO CHANGELOG DIR>:/liquibase/changelog --defaultsFile=liquibase.docker.properties update`  
+`docker run --rm -v <PATH TO CHANGELOG DIR>:/liquibase/changelog liquibase/liquibase --defaultsFile=liquibase.docker.properties update`  
 
-or `docker run liquibase/liquibase --rm -v <PATH TO CHANGELOG DIR>:/liquibase/changelog --defaultsFile=liquibase.docker.properties --changeLogFile=changelog.xml generateChangeLog` (the argument `--changeLogFile` wins against the defaultsFile)
+or `docker run --rm -v <PATH TO CHANGELOG DIR>:/liquibase/changelog liquibase/liquibase --defaultsFile=liquibase.docker.properties --changeLogFile=changelog.xml generateChangeLog` (the argument `--changeLogFile` wins against the defaultsFile)
 
 
 #### Example JDBC Urls:
@@ -132,3 +132,5 @@ or `docker run liquibase/liquibase --rm -v <PATH TO CHANGELOG DIR>:/liquibase/ch
 - Snowflake: `jdbc:snowflake://<IP OR HOSTNAME>/?db=<DATABASE>&schema=<SCHEMA NAME>`
 - Sybase `jdbc:jtds:sybase://<IP OR HOSTNAME>:/<DATABASE>`
 - SQLite: `jdbc:sqlite:/tmp/<DB FILE NAME>.db`
+
+Note: If the database IP refers to a locally running docker container then one needs to specify host networking like `docker run --network=host -rm -v ...`
