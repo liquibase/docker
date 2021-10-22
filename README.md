@@ -20,7 +20,7 @@ The latest tag will be kept up to date with the most advanced Liquibase release.
 
 These tags are kept up to date with the most recent patch release of each X.Y stream
 
--       `4.5`
+-   `4.5`
 -	`4.4`
 -	`4.3`
 -	`4.2`
@@ -31,7 +31,7 @@ These tags are kept up to date with the most recent patch release of each X.Y st
 
 Each specific release has an associated tag
 
--       `4.5.0`
+-   `4.5.0`
 -	`4.4.3`
 -	`4.4.2`
 -	`4.4.1`
@@ -58,7 +58,7 @@ The /liquibase/changelog volume can also be used for commands that write output,
 
 If you have a local `c:\projects\my-project\src\main\resources\com\example\changelogs\root.changelog.xml` file, you would run `docker run liquibase/liquibase --rm -v c:\projects\my-project\src\main\resources:/liquibase/changelog --changeLogFile=com/example/changelogs/root.changelog.xml update`
 
-To generate a new changelog file at this location, run `docker run liquibase/liquibase --rm -v c:\projects\my-project\src\main\resources:/liquibase/changelog --changeLogFile=/liquibase/changelog/com/example/changelogs/root.changelog.xml generateChangeLog`
+To generate a new changelog file at this location, run `docker run liquibase/liquibase --rm -v c:\projects\my-project\src\main\resources:/liquibase/changelog --changeLogFile=com/example/changelogs/root.changelog.xml generateChangeLog`
 
 ## Configuration File
 
@@ -68,7 +68,7 @@ If specifying a custom liquibase.properties file, make sure you include `classpa
 
 #### Example
 
-If you have a local `c:\projects\my-project\src\main\resources\liquibase.properties` file, you would run `docker run liquibase/liquibase --rm -v c:\projects\my-project\src\main\resources:/liquibase/changelog --defaultsFile=/liquibase/changelog/liquibase.properties update`
+If you have a local `c:\projects\my-project\src\main\resources\liquibase.properties` file, you would run `docker run liquibase/liquibase --rm -v c:\projects\my-project\src\main\resources:/liquibase/changelog --defaultsFile=liquibase.properties update`
 
 ## Drivers and Extensions
 
@@ -102,7 +102,7 @@ docker run -e INSTALL_MYSQL=true liquibase/liquibase update
 
 #### Specify everything via arguments 
 
-`docker run liquibase/liquibase --rm -v <PATH TO CHANGELOG DIR>:/liquibase/changelog liquibase/liquibase --url="jdbc:sqlserver://<IP OR HOSTNAME>:1433;database=<DATABASE>;" --changeLogFile=com/example/changelog.xml --username=<USERNAME> --password=<PASSWORD> --liquibaseProLicenseKey="<PASTE LB PRO LICENSE KEY HERE>" update`
+`docker run liquibase/liquibase --rm -v <PATH TO CHANGELOG DIR>:/liquibase/changelog --url="jdbc:sqlserver://<IP OR HOSTNAME>:1433;database=<DATABASE>;" --changeLogFile=com/example/changelog.xml --username=<USERNAME> --password=<PASSWORD> --liquibaseProLicenseKey="<PASTE LB PRO LICENSE KEY HERE>" update`
 
 #### Using a properties file
 
@@ -117,9 +117,10 @@ liquibaseProLicenseKey=<PASTE LB PRO LICENSE KEY HERE>
 ```
 
 *CLI:*
-`docker run --rm -v <PATH TO CHANGELOG DIR>:/liquibase/changelog liquibase/liquibase --defaultsFile=/liquibase/changelog/liquibase.docker.properties update`  
+`docker run liquibase/liquibase --rm -v <PATH TO CHANGELOG DIR>:/liquibase/changelog --defaultsFile=liquibase.docker.properties update`  
 
-or `docker run --rm -v <PATH TO CHANGELOG DIR>:/liquibase/changelog liquibase/liquibase --defaultsFile=/liquibase/changelog/liquibase.docker.properties --changeLogFile=/liquibase/changelog/changelog.xml generateChangeLog` (the argument `--changeLogFile` wins against the defaultsFile)
+or `docker run liquibase/liquibase --rm -v <PATH TO CHANGELOG DIR>:/liquibase/changelog --defaultsFile=liquibase.docker.properties --changeLogFile=changelog.xml generateChangeLog` (the argument `--changeLogFile` wins against the defaultsFile)
+
 
 #### Example JDBC Urls:
 
