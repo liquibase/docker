@@ -1,0 +1,105 @@
+name: Release Extension (v2)
+on:
+  repository_dispatch:
+    types: [liquibase-release]
+  workflow_dispatch:
+    inputs:
+      liquibaseVersion:
+        description: 'Liquibase Version'
+        required: true
+      extensionVersion:
+        description: 'Docker Version (Defaults to Liquibase Version)'
+        required: false
+
+jobs:
+  setup:
+    name: Setup
+    runs-on: ubuntu-latest
+    outputs:
+      liquibaseVersion: ${{ steps.collect-data.outputs.liquibaseVersion }}
+      extensionVersion: ${{ steps.collect-data.outputs.extensionVersion }}
+    steps:
+      - name: Collect Data
+        id: collect-data
+        uses: actions/github-script@v4
+        with:
+          script: |
+            if (context.payload.client_payload) {
+                core.setOutput("liquibaseVersion", context.payload.client_payload.liquibaseVersion);
+                core.setOutput("extensionVersion", context.payload.client_payload.liquibaseVersion);
+            } else if (context.payload.inputs) {
+                core.setOutput("liquibaseVersion", context.payload.inputs.liquibaseVersion);
+                core.setOutput("extensionVersion", context.payload.inputs.extensionVersion || context.payload.inputs.liquibaseVersion);
+            } else {
+              core.setFailed('Unknown event type')
+            }
+
+      - run: |
+          echo "Saw Liquibase version ${{ steps.collect-data.outputs.liquibaseVersion }}"
+          echo "Saw Extension version ${{ steps.collect-data.outputs.extensionVersion }}"
+
+  build:
+    name: "Build and Test"
+    runs-on: ubuntu-latest
+    needs: setup
+    outputs:
+      releaseSha: ${{ steps.get-release-sha.outputs.releaseSha }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal token
+          fetch-depth: 0 # otherwise, you will fail to push refs to dest repo
+
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '8'
+          distribution: 'adopt'
+
+      - name: Configure git user
+        run: |
+          git config user.name "liquibot"
+          git config user.email "liquibot@liquibase.org"
+
+      - name: Update Dockerfile and commit changes
+        run: |
+          LIQUIBASE_SHA=`curl -LsS https://github.com/liquibase/liquibase/releases/download/v${{ needs.setup.outputs.liquibaseVersion }}/liquibase-${{ needs.setup.outputs.liquibaseVersion }}.tar.gz | sha256sum | awk '{ print $1 }'`
+          sed -i 's/^ARG LIQUIBASE_VERSION=.*/ARG LIQUIBASE_VERSION='"${{ needs.setup.outputs.liquibaseVersion }}"'/' ${{ github.workspace }}/Dockerfile
+          sed -i 's/^ARG LB_SHA256=.*/ARG LB_SHA256='"$LIQUIBASE_SHA"'/' ${{ github.workspace }}/Dockerfile
+
+      - name: Update pom.xml with release versions and commit changes
+        run: |
+          if git diff-index --cached --quiet HEAD --
+          then
+            echo "Nothing new to commit"
+          else
+            git add Dockerfile
+            git commit -m "Liquibase Version Bumped to ${{ needs.setup.outputs.extensionVersion }}"
+          fi
+          git tag -a -m "Version Bumped to ${{ needs.setup.outputs.extensionVersion }}" v${{ needs.setup.outputs.extensionVersion }}
+          git push "https://liquibot:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git" HEAD:${{ github.ref }} --follow-tags --tags
+
+        env:
+          GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
+
+      - name: Get release SHA
+        id: get-release-sha
+        run: echo ::set-output name=releaseSha::$(git rev-parse HEAD)
+
+  draft-release:
+    needs: [ setup, build, integration-tests ]
+    name: Draft Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          target_commitish: ${{ needs.build.outputs.releaseSha }}
+          name: v${{ needs.setup.outputs.extensionVersion }}
+          tag_name: v${{ needs.setup.outputs.extensionVersion }}
+          draft: true
+          body: Support for Liquibase ${{ needs.setup.outputs.liquibaseVersion }}.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

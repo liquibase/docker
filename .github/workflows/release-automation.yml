@@ -35,51 +35,6 @@ jobs:
         with:
           repo-token: ${{ secrets.BOT_TOKEN }}
 
-      # automation steps for liquibase-core
-      - name: Get CORE_TARGET_VERSION from PR
-        if: ${{ steps.metadata.outputs.dependency-name == 'org.liquibase:liquibase-core' }}   
-        run: |
-          echo 'CORE_TARGET_VERSION<<EOF' >> $GITHUB_ENV
-          gh pr view "$PR_URL" | grep "Bump liquibase-core" | awk '{ print $7 }' >> $GITHUB_ENV
-          echo 'EOF' >> $GITHUB_ENV
-        env:
-          PR_URL: ${{github.event.pull_request.html_url}}
-          GITHUB_TOKEN: ${{secrets.BOT_TOKEN}} 
-          
-      - name: Compute sha256 for liquibase-$CORE_TARGET_VERSION.tar.gz 
-        if: ${{ steps.metadata.outputs.dependency-name == 'org.liquibase:liquibase-core' }}  
-        run: |
-          echo 'CORE_TARGET_SHA<<EOF' >> $GITHUB_ENV
-          curl -LsS https://github.com/liquibase/liquibase/releases/download/v$CORE_TARGET_VERSION/liquibase-$CORE_TARGET_VERSION.tar.gz | sha256sum | awk '{ print $1 }' >> $GITHUB_ENV
-          echo 'EOF' >> $GITHUB_ENV
-          
-      - name: edit core Dockerfile
-        if: ${{ steps.metadata.outputs.dependency-name == 'org.liquibase:liquibase-core' }}  
-        run: |
-          sed -i 's/^ARG LIQUIBASE_VERSION=.*/ARG LIQUIBASE_VERSION='"$CORE_TARGET_VERSION"'/' ${{ github.workspace }}/Dockerfile
-          sed -i 's/^ARG LB_SHA256=.*/ARG LB_SHA256='"$CORE_TARGET_SHA"'/' ${{ github.workspace }}/Dockerfile
-
-      - name: push Dockerfile edit back to PR
-        if: ${{ steps.metadata.outputs.dependency-name == 'org.liquibase:liquibase-core' }}
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
-          git add .
-          git commit -m "auto-update liquibase-core Dockerfile"
-          git push -u origin HEAD:"$GITHUB_HEAD_REF"
-        env:
-          GITHUB_HEAD_REF: ${{github.head_ref}}
-
-      - name: Bump version and push tag
-        if: ${{ steps.metadata.outputs.dependency-name == 'org.liquibase:liquibase-core' }} 
-        id: tag_version
-        uses: mathieudutour/github-tag-action@v5.6
-        with:
-          github_token: ${{ secrets.BOT_TOKEN }}
-          create_annotated_tag: true
-          custom_tag : ${{env.CORE_TARGET_VERSION}}
-
-
       # automation steps for liquibase-snowflake extension
       - name: Get SNOWFLAKE_TARGET_VERSION from PR
         if: ${{ steps.metadata.outputs.dependency-name == 'org.liquibase.ext:liquibase-snowflake' }} 
