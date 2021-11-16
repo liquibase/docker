@@ -15,7 +15,7 @@
         <dependency>
             <groupId>org.liquibase.ext</groupId>
             <artifactId>liquibase-snowflake</artifactId>
-            <version>4.4.3</version>
+            <version>4.6.1</version>
         </dependency>
 
     </dependencies>
