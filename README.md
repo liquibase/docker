@@ -104,6 +104,10 @@ docker run -e INSTALL_MYSQL=true liquibase/liquibase update
 
 `docker run --rm -v <PATH TO CHANGELOG DIR>:/liquibase/changelog liquibase/liquibase --url="jdbc:sqlserver://<IP OR HOSTNAME>:1433;database=<DATABASE>;" --changeLogFile=com/example/changelog.xml --username=<USERNAME> --password=<PASSWORD> --liquibaseProLicenseKey="<PASTE LB PRO LICENSE KEY HERE>" update`
 
+Using with [Liquibase Pro Environment Variables](https://docs.liquibase.com/concepts/basic/liquibase-environment-variables.html) example:
+` docker run --env LIQUIBASE_COMMAND_USERNAME --env LIQUIBASE_COMMAND_PASSWORD --env LIQUIBASE_COMMAND_URL --env LIQUIBASE_PRO_LICENSE_KEY --env LIQUIBASE_COMMAND_CHANGELOG_FILE --rm -v <PATH TO CHANGELOG DIR>/changelogs:/liquibase/changelog liquibase/liquibase --log-level=info update`
+
+
 #### Using a properties file
 
 *liquibase.docker.properties file:*
