@@ -25,6 +25,7 @@ USER liquibase
 
 # Latest Liquibase Release Version
 ARG LIQUIBASE_VERSION=4.7.1
+ARG LPM_VERSION=0.1.3
 
 # Download, verify, extract
 ARG LB_SHA256=70732c0643f947baf1459833cca68726b16adfac42f4f06ecd3cdcd641ca7385
@@ -36,12 +37,13 @@ RUN set -x \
 
 # Download and Install lpm \
 RUN mkdir /liquibase/bin
-RUN wget -q -O lpm.zip https://github.com/liquibase/liquibase-package-manager/releases/download/v0.1.0/lpm-0.1.0-linux.zip
+RUN wget -q -O lpm.zip https://github.com/liquibase/liquibase-package-manager/releases/download/v${LPM_VERSION}/lpm-${LPM_VERSION}-linux.zip
 RUN unzip lpm.zip -d bin/
 RUN rm lpm.zip
 RUN export LIQUIBASE_HOME=/liquibase
 
 # Install Drivers
+RUN lpm update
 RUN lpm add snowflake --global
 RUN ls -alh /liquibase/lib
 
