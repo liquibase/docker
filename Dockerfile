@@ -37,7 +37,7 @@ RUN set -x \
 
 # Download and Install lpm \
 RUN mkdir /liquibase/bin
-RUN wget -q -O lpm.zip https://github.com/liquibase/liquibase-package-manager/releases/download/v${LPM_VERSION}/lpm-${LPM_VERSION}-linux.zip
+RUN wget -q -O lpm.zip "https://github.com/liquibase/liquibase-package-manager/releases/download/v${LPM_VERSION}/lpm-${LPM_VERSION}-linux.zip"
 RUN unzip lpm.zip -d bin/
 RUN rm lpm.zip
 RUN export LIQUIBASE_HOME=/liquibase
