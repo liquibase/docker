@@ -2,6 +2,7 @@ FROM openjdk:11-jre-slim-buster
 
 # Install GNUPG for package vefification and WGET for file download
 RUN apt-get update \
+    && apt-get upgrade \
     && apt-get -yqq install krb5-user libpam-krb5 \
     && apt-get -y install gnupg wget unzip \
     && rm -rf /var/lib/apt/lists/*
@@ -45,7 +46,7 @@ RUN export LIQUIBASE_HOME=/liquibase
 # Install Drivers
 RUN lpm update
 RUN lpm add snowflake liquibase-snowflake --global
-RUN ls -alh /liquibase/lib
+RUN /liquibase/liquibase --version
 
 COPY --chown=liquibase:liquibase docker-entrypoint.sh /liquibase/
 COPY --chown=liquibase:liquibase liquibase.docker.properties /liquibase/
