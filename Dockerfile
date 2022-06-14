@@ -2,7 +2,7 @@ FROM openjdk:11-jre-slim-buster
 
 # Install GNUPG for package vefification and WGET for file download
 RUN apt-get update \
-    && apt-get upgrade \
+    && apt-get upgrade -y \
     && apt-get -yqq install krb5-user libpam-krb5 \
     && apt-get -y install gnupg wget unzip \
     && rm -rf /var/lib/apt/lists/*
