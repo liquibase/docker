@@ -20,6 +20,7 @@ The latest tag will be kept up to date with the most advanced Liquibase release.
 
 These tags are kept up to date with the most recent patch release of each X.Y stream
 
+- `4.12`
 - `4.11`
 - `4.10`
 - `4.9`
@@ -79,7 +80,7 @@ To generate a new changelog file at this location, run `docker run --rm -v c:\pr
 
 If you would like to use a "default file" to specify arguments rather than passing them on the command line, include it in your changelog volume mount and reference it.
 
-If specifying a custom liquibase.properties file, make sure you include `classpath=/liquibase/changelog` so Liquibase will continue to look for your changelog files there.   
+If specifying a custom liquibase.properties file, make sure you include `classpath=/liquibase/changelog` so Liquibase will continue to look for your changelog files there.
 
 #### Example
 
@@ -87,14 +88,14 @@ If you have a local `c:\projects\my-project\src\main\resources\liquibase.propert
 
 ## Drivers and Extensions
 
-The Liquibase docker container ships with drivers for many popular databases. If your driver is not included or if you have an extension, you can mount a local directory containing the jars to `/liquibase/classpath` and add the jars to your `classpath` setting. 
+The Liquibase docker container ships with drivers for many popular databases. If your driver is not included or if you have an extension, you can mount a local directory containing the jars to `/liquibase/classpath` and add the jars to your `classpath` setting.
 
 #### Example
 
 If you have a local `c:\projects\my-project\lib\my-driver.jar` file, `docker run --rm -v c:\projects\my-project\src\main\resources:/liquibase/changelog -v c:\projects\my-project\lib:/liquibase/classpath liquibase/liquibase --classpath=/liquibase/changelog:/liquibase/classpath/my-driver.jar update`
 
 ### Notice for MySQL Users
-Due to licensing restrictions for the MySQL driver, this container does not ship with the MySQL driver installed. Two options exist for loading this driver: 1. Create a new container from the `liquibase/liquibase` image. 2. Load this driver during runtime via an environment variable. 
+Due to licensing restrictions for the MySQL driver, this container does not ship with the MySQL driver installed. Two options exist for loading this driver: 1. Create a new container from the `liquibase/liquibase` image. 2. Load this driver during runtime via an environment variable.
 
 #### New Container Example
 Dockerfile
@@ -115,7 +116,7 @@ docker run -e INSTALL_MYSQL=true liquibase/liquibase update
 
 ## Complete Examples
 
-#### Specify everything via arguments 
+#### Specify everything via arguments
 
 `docker run --rm -v <PATH TO CHANGELOG DIR>:/liquibase/changelog liquibase/liquibase --url="jdbc:sqlserver://<IP OR HOSTNAME>:1433;database=<DATABASE>;" --changeLogFile=com/example/changelog.xml --username=<USERNAME> --password=<PASSWORD> --liquibaseProLicenseKey="<PASTE LB PRO LICENSE KEY HERE>" update`
 
@@ -132,11 +133,11 @@ url: jdbc:postgresql://<IP OR HOSTNAME>:5432/<DATABASE>?currentSchema=<SCHEMA NA
 changeLogFile: changelog.xml
 username: <USERNAME>
 password: <PASSWORD>
-liquibaseProLicenseKey=<PASTE LB PRO LICENSE KEY HERE> 
+liquibaseProLicenseKey=<PASTE LB PRO LICENSE KEY HERE>
 ```
 
 *CLI:*
-`docker run --rm -v <PATH TO CHANGELOG DIR>:/liquibase/changelog liquibase/liquibase --defaultsFile=liquibase.docker.properties update`  
+`docker run --rm -v <PATH TO CHANGELOG DIR>:/liquibase/changelog liquibase/liquibase --defaultsFile=liquibase.docker.properties update`
 
 or `docker run --rm -v <PATH TO CHANGELOG DIR>:/liquibase/changelog liquibase/liquibase --defaultsFile=liquibase.docker.properties --changeLogFile=changelog.xml generateChangeLog` (the argument `--changeLogFile` wins against the defaultsFile)
 
