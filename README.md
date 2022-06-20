@@ -38,6 +38,7 @@ These tags are kept up to date with the most recent patch release of each X.Y st
 
 Each specific release has an associated tag
 
+- `4.12.0`
 - `4.11.0`
 - `4.10.0`
 - `4.9.1`
