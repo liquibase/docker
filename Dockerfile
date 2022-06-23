@@ -26,7 +26,7 @@ USER liquibase
 
 # Latest Liquibase Release Version
 ARG LIQUIBASE_VERSION=4.11.0
-ARG LPM_VERSION=0.1.3
+ARG LPM_VERSION=0.1.7
 
 # Download, verify, extract
 ARG LB_SHA256=5ba5d7c155e9d6b3dace1a5290abc3adba26ea2199f54aae82f98507845b1b1b
