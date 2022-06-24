@@ -45,7 +45,6 @@ RUN export LIQUIBASE_HOME=/liquibase
 
 # Install Drivers
 RUN lpm update
-RUN lpm add snowflake liquibase-snowflake --global
 RUN /liquibase/liquibase --version
 
 COPY --chown=liquibase:liquibase docker-entrypoint.sh /liquibase/
