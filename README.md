@@ -6,6 +6,9 @@
 
 This is the official repository for [Liquibase](https://download.liquibase.org/) images.
 
+## BREAKING CHANGE
+Support for Snowflake database has been moved from the external extension liquibase-snowflake into the main Liquibase artifact. If you are using the snowflake extension remove it from your lib directory or however you are including it in your project. If you are using the Docker image, use v4.12+ as the snowflake docker image will no longer be updated as of v4.11. You need to update your reference to either latest to use the main one that includes Snowflake or the version tag you prefer.  https://github.com/liquibase/liquibase/pull/2841
+
 ## Supported Tags
 
 The following tags are officially supported:
@@ -20,6 +23,7 @@ The latest tag will be kept up to date with the most advanced Liquibase release.
 
 These tags are kept up to date with the most recent patch release of each X.Y stream
 
+- `4.12`
 - `4.11`
 - `4.10`
 - `4.9`
@@ -37,6 +41,7 @@ These tags are kept up to date with the most recent patch release of each X.Y st
 
 Each specific release has an associated tag
 
+- `4.12.0`
 - `4.11.0`
 - `4.10.0`
 - `4.9.1`
