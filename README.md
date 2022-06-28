@@ -7,7 +7,7 @@
 This is the official repository for [Liquibase](https://download.liquibase.org/) images.
 
 ## BREAKING CHANGE
-Support for Snowflake database has been moved from the external extension liquibase-snowflake into the main Liquibase artifact. If you are using the snowflake extension remove it from your lib directory or however you are including it in your project. If you are using the Docker image, use v4.12+ as the snowflake docker image will no longer be updated as of v4.11. You need to update your reference to either latest to use the main one that includes Snowflake or the version tag you prefer.  https://github.com/liquibase/liquibase/pull/2841
+Support for Snowflake database has been moved from the external extension liquibase-snowflake into the main Liquibase artifact. This means that Snowflake is now included in the main docker image. If you are using the snowflake extension remove it from your lib directory or however you are including it in your project. If you are using the Docker image, use the main v4.12+ as there will no longer be a snowflake separate docker image produced.  The latest separate Snowflake image will be v4.11. You need to update your reference to either latest to use the main one that includes Snowflake or the version tag you prefer.  https://github.com/liquibase/liquibase/pull/2841
 
 ## Supported Tags
 
