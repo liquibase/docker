@@ -23,6 +23,7 @@ The latest tag will be kept up to date with the most advanced Liquibase release.
 
 These tags are kept up to date with the most recent patch release of each X.Y stream
 
+- `4.13`
 - `4.12`
 - `4.11`
 - `4.10`
@@ -41,6 +42,7 @@ These tags are kept up to date with the most recent patch release of each X.Y st
 
 Each specific release has an associated tag
 
+- `4.13.0`
 - `4.12.0`
 - `4.11.0`
 - `4.10.0`
