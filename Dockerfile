@@ -1,4 +1,4 @@
-FROM openjdk:11-jre-slim-buster
+FROM eclipse-temurin:17-jre-focal
 
 # Install GNUPG for package vefification and WGET for file download
 RUN apt-get update \
