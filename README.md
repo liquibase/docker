@@ -165,3 +165,7 @@ or `docker run --rm -v <PATH TO CHANGELOG DIR>:/liquibase/changelog liquibase/li
 - SQLite: `jdbc:sqlite:/tmp/<DB FILE NAME>.db`
 
 Note: If the database IP refers to a locally running docker container then one needs to specify host networking like `docker run --network=host -rm -v ...`
+
+#### Adding Native Executors
+
+The recommended path for adding native executors such as Oracle SQL*Plus, Microsoft SQLCMD, or Postgres PSQL is to extend the liquibase/liquibase Dockerfile.  Examples are provided in the [Examples](/examples) Directory.
