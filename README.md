@@ -82,13 +82,13 @@ Each specific release has an associated tag
 - `4.1.0`
 - `3.10.3`
 
-## Changelog Files
+## Changelog File
 
 The docker image has a /liquibase/changelog volume in which the directory containing the root of your changelog tree can be mounted. Your `--changeLogFile` argument should list paths relative to this.
 
 The /liquibase/changelog volume can also be used for commands that write output, such as `generateChangeLog`. Note that in this case (where liquibase should write a new file) you need to specify the absolute path to the changelog, i.e. prefix the path with `/liquibase/changelog/<PATH TO CHANGELOG FILE>`.
 
-### Example
+### Changelog File Example
 
 If you have a local `c:\projects\my-project\src\main\resources\com\example\changelogs\root.changelog.xml` file, you would run `docker run --rm -v c:\projects\my-project\src\main\resources:/liquibase/changelog liquibase/liquibase --changeLogFile=changelog/com/example/changelogs/root.changelog.xml update`
 
