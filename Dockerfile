@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17-jre-focal
+FROM eclipse-temurin:17-jre-jammy
 
 # Install GNUPG for package vefification and WGET for file download
 RUN apt-get update \
