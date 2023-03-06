@@ -16,7 +16,7 @@ jobs:
     steps:
       - name: Fetch Dependabot metadata
         id: metadata
-        uses: dependabot/fetch-metadata@v1.1.1
+        uses: dependabot/fetch-metadata@v1.3.6
         with:
           github-token: "${{ secrets.BOT_TOKEN }}"
       # The following properties are now available:
@@ -24,14 +24,14 @@ jobs:
       #  - steps.metadata.outputs.dependency-type
       #  - steps.metadata.outputs.update-type 
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           persist-credentials: true
           token: ${{ secrets.BOT_TOKEN }}
 
       # assign a reviewer from folks listed in reviewer-lottery.yml    
-      - uses: uesteibar/reviewer-lottery@v2
+      - uses: uesteibar/reviewer-lottery@v3
         with:
           repo-token: ${{ secrets.BOT_TOKEN }}
 
