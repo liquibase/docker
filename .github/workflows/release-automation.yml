@@ -29,9 +29,3 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
           persist-credentials: true
           token: ${{ secrets.BOT_TOKEN }}
-
-      # assign a reviewer from folks listed in reviewer-lottery.yml    
-      - uses: uesteibar/reviewer-lottery@v3
-        with:
-          repo-token: ${{ secrets.BOT_TOKEN }}
-
