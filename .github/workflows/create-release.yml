@@ -5,10 +5,10 @@ on:
   workflow_dispatch:
     inputs:
       liquibaseVersion:
-        description: 'Liquibase Version'
+        description: "Liquibase Version"
         required: true
       extensionVersion:
-        description: 'Container Version (Defaults to Liquibase Version)'
+        description: "Container Version (Defaults to Liquibase Version)"
         required: false
 
 env:
@@ -21,18 +21,29 @@ jobs:
     outputs:
       liquibaseVersion: ${{ steps.collect-data.outputs.liquibaseVersion }}
       extensionVersion: ${{ steps.collect-data.outputs.extensionVersion }}
+      minorVersion: ${{ steps.collect-data.outputs.minorVersion }}
     steps:
       - name: Collect Data
         id: collect-data
         uses: actions/github-script@v4
         with:
           script: |
+            const getMinorVersion = (liquibaseVersion) => {
+              const arr = liquibaseVersion.split(".")
+              return `${arr[0]}.${arr[1]}`
+            }
             if (context.payload.client_payload) {
-                core.setOutput("liquibaseVersion", context.payload.client_payload.liquibaseVersion);
-                core.setOutput("extensionVersion", context.payload.client_payload.liquibaseVersion);
+                const liquibaseVersion = context.payload.client_payload.liquibaseVersion
+                const minorVersion = getMinorVersion(liquibaseVersion)
+                core.setOutput("liquibaseVersion", liquibaseVersion);
+                core.setOutput("extensionVersion", liquibaseVersion);
+                core.setOutput("minorVersion", minorVersion);
             } else if (context.payload.inputs) {
-                core.setOutput("liquibaseVersion", context.payload.inputs.liquibaseVersion);
-                core.setOutput("extensionVersion", context.payload.inputs.extensionVersion || context.payload.inputs.liquibaseVersion);
+                const liquibaseVersion = context.payload.inputs.liquibaseVersion
+                const minorVersion = getMinorVersion(liquibaseVersion)
+                core.setOutput("liquibaseVersion", liquibaseVersion);
+                core.setOutput("extensionVersion", context.payload.inputs.extensionVersion || liquibaseVersion);
+                core.setOutput("minorVersion", minorVersion);
             } else {
               core.setFailed('Unknown event type')
             }
@@ -56,8 +67,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: '8'
-          distribution: 'adopt'
+          java-version: "8"
+          distribution: "adopt"
 
       - name: Configure git user
         run: |
@@ -88,7 +99,7 @@ jobs:
         run: echo ::set-output name=releaseSha::$(git rev-parse HEAD)
 
   draft-release:
-    needs: [ setup, update ]
+    needs: [setup, update]
     name: Draft Release
     runs-on: ubuntu-latest
     steps:
@@ -106,7 +117,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-and-push:
-    needs: [ setup, draft-release ]
+    needs: [setup, draft-release]
     runs-on: ubuntu-latest
     name: Build and Push
     steps:
@@ -121,4 +132,4 @@ jobs:
         with:
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ${{ env.IMAGE_NAME }}:latest,${{ env.IMAGE_NAME }}:${{ needs.setup.outputs.extensionVersion }}
+          tags: ${{ env.IMAGE_NAME }}:latest,${{ env.IMAGE_NAME }}:${{ needs.setup.outputs.extensionVersion }},${{ env.IMAGE_NAME }}:${{ needs.setup.outputs.minorVersion }}
