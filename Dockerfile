@@ -25,11 +25,11 @@ RUN ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh \
 USER liquibase
 
 # Latest Liquibase Release Version
-ARG LIQUIBASE_VERSION=4.19.1
+ARG LIQUIBASE_VERSION=4.20.0
 ARG LPM_VERSION=0.2.0
 
 # Download, verify, extract
-ARG LB_SHA256=8717278fead471222fe503dfe71756eda31ea4d0b494182819bad14dcd9bc333
+ARG LB_SHA256=cd1b5004d1d9c19f367eb973443204e85938e25e39a1ccf3860046d720874626
 RUN set -x \
   && wget -q -O liquibase-${LIQUIBASE_VERSION}.tar.gz "https://github.com/liquibase/liquibase/releases/download/v${LIQUIBASE_VERSION}/liquibase-${LIQUIBASE_VERSION}.tar.gz" \
   && echo "$LB_SHA256  liquibase-${LIQUIBASE_VERSION}.tar.gz" | sha256sum -c - \
