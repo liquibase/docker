@@ -121,6 +121,8 @@ jobs:
     runs-on: ubuntu-latest
     name: Build and Push
     steps:
+      - uses: actions/checkout@v3 # Checkout the SHA of the updated Dockerfile from the setup step
+        ref: ${{ needs.update.outputs.releaseSha }}
       - uses: docker/setup-qemu-action@v2
       - uses: docker/setup-buildx-action@v2
       - uses: docker/login-action@v2
@@ -130,6 +132,7 @@ jobs:
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v4
         with:
+          context: .
           push: true
           platforms: linux/amd64,linux/arm64
           tags: ${{ env.IMAGE_NAME }}:latest,${{ env.IMAGE_NAME }}:${{ needs.setup.outputs.extensionVersion }},${{ env.IMAGE_NAME }}:${{ needs.setup.outputs.minorVersion }}
