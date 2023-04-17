@@ -1,5 +1,7 @@
 FROM eclipse-temurin:17-jre-jammy
 
+ARG TARGETARCH
+
 # Install GNUPG for package vefification and WGET for file download
 RUN apt-get update \
     && apt-get upgrade -y \
@@ -26,7 +28,7 @@ USER liquibase
 
 # Latest Liquibase Release Version
 ARG LIQUIBASE_VERSION=4.21.1
-ARG LPM_VERSION=0.2.0
+ARG LPM_VERSION=0.2.2
 
 # Download, verify, extract
 ARG LB_SHA256=c04542865e5ece8b7b1ee9bd6beaefc5315e350620288d6ac1a2d32c3b1f7d8b
@@ -38,7 +40,12 @@ RUN set -x \
 
 # Download and Install lpm \
 RUN mkdir /liquibase/bin
-RUN wget -q -O lpm.zip "https://github.com/liquibase/liquibase-package-manager/releases/download/v${LPM_VERSION}/lpm-${LPM_VERSION}-linux.zip"
+
+RUN case ${TARGETARCH} in \
+      "amd64")  DOWNLOAD_ARCH=""  ;; \
+      "arm64")  DOWNLOAD_ARCH="-arm64"  ;; \
+    esac
+RUN wget -q -O lpm.zip "https://github.com/liquibase/liquibase-package-manager/releases/download/v${LPM_VERSION}/lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip"
 RUN unzip lpm.zip -d bin/
 RUN rm lpm.zip
 RUN export LIQUIBASE_HOME=/liquibase
