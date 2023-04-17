@@ -44,8 +44,8 @@ RUN mkdir /liquibase/bin
 RUN case ${TARGETARCH} in \
       "amd64")  DOWNLOAD_ARCH=""  ;; \
       "arm64")  DOWNLOAD_ARCH="-arm64"  ;; \
-    esac
-RUN wget -q -O lpm.zip "https://github.com/liquibase/liquibase-package-manager/releases/download/v${LPM_VERSION}/lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip"
+    esac &&  wget -v -O lpm.zip "https://github.com/liquibase/liquibase-package-manager/releases/download/v${LPM_VERSION}/lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip"
+
 RUN unzip lpm.zip -d bin/
 RUN rm lpm.zip
 RUN export LIQUIBASE_HOME=/liquibase
