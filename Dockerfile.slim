@@ -1,39 +1,17 @@
-FROM alpine:3.17.3
+# Use multi-stage build
+FROM alpine:3.17.3 as builder
 
 ARG TARGETARCH
-
-# Install GNUPG for package verification and WGET for file download
-RUN apk update && \
-    apk upgrade && \
-    apk add --virtual --no-cache bash gnupg openjdk17-jre-headless wget unzip && \
-    rm -rf /var/cache/apk/*
-
-# Add the liquibase user and step in the directory
-RUN addgroup --gid 1001 liquibase && \
-    adduser --disabled-password --uid 1001 --ingroup liquibase liquibase
-
-# Make /liquibase directory and change owner to liquibase
-RUN mkdir /liquibase && chown liquibase /liquibase
-WORKDIR /liquibase
-
-# Symbolic link will be broken until later
-RUN ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \
-    ln -s /liquibase/docker-entrypoint.sh /docker-entrypoint.sh && \
-    ln -s /liquibase/liquibase /usr/local/bin/liquibase && \
-    ln -s /liquibase/bin/lpm /usr/local/bin/lpm
-
-# Change to the liquibase user
-USER liquibase
-
-# Set LIQUIBASE_HOME environment variable
-ENV LIQUIBASE_HOME=/liquibase
-
-# Latest Liquibase Release Version
 ARG LIQUIBASE_VERSION=4.21.1
 ARG LPM_VERSION=0.2.2
+ARG LB_SHA256=c04542865e5ece8b7b1ee9bd6beaefc5315e350620288d6ac1a2d32c3b1f7d8b
+
+# Install tools for downloading and verifying packages
+RUN apk add --no-cache wget unzip gnupg
+
+WORKDIR /liquibase
 
 # Download, verify, extract
-ARG LB_SHA256=c04542865e5ece8b7b1ee9bd6beaefc5315e350620288d6ac1a2d32c3b1f7d8b
 RUN set -x && \
     wget -q -O liquibase-${LIQUIBASE_VERSION}.tar.gz "https://github.com/liquibase/liquibase/releases/download/v${LIQUIBASE_VERSION}/liquibase-${LIQUIBASE_VERSION}.tar.gz" && \
     echo "$LB_SHA256  liquibase-${LIQUIBASE_VERSION}.tar.gz" | sha256sum -c - && \
@@ -49,9 +27,33 @@ RUN mkdir /liquibase/bin && \
     unzip lpm.zip -d bin/ && \
     rm lpm.zip
 
-# Install Drivers
-RUN lpm update && \
-    /liquibase/liquibase --version
+# Final Image
+FROM alpine:3.17.3
+
+# Install smaller JRE, if available and acceptable
+RUN apk add --no-cache openjdk17-jre-headless bash
+
+# Add the liquibase user and step in the directory
+RUN addgroup --gid 1001 liquibase && \
+    adduser --disabled-password --uid 1001 --ingroup liquibase liquibase
+
+# Make /liquibase directory and change owner to liquibase
+RUN mkdir /liquibase && chown liquibase /liquibase
+WORKDIR /liquibase
+
+# Copy the /liquibase directory from builder stage into final image
+COPY --from=builder /liquibase /liquibase
+
+# Set LIQUIBASE_HOME environment variable
+ENV LIQUIBASE_HOME=/liquibase
+
+# Symbolic links
+RUN ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \
+    ln -s /liquibase/docker-entrypoint.sh /docker-entrypoint.sh && \
+    ln -s /liquibase/liquibase /usr/local/bin/liquibase && \
+    ln -s /liquibase/bin/lpm /usr/local/bin/lpm
+
+USER liquibase
 
 COPY --chown=liquibase:liquibase docker-entrypoint.sh /liquibase/
 COPY --chown=liquibase:liquibase liquibase.docker.properties /liquibase/
