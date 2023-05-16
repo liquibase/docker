@@ -11,16 +11,13 @@ on:
         description: "Container Version (Defaults to Liquibase Version)"
         required: false
 
+env:
+  IMAGE_NAME: liquibase/liquibase
+
 jobs:
   setup:
     name: Setup
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        image: [ 
-          {dockerfile: Dockerfile, name: liquibase/liquibase},
-          {dockerfile: Dockerfile.slim, name: liquibase/liquibase-slim}
-          ]
     outputs:
       liquibaseVersion: ${{ steps.collect-data.outputs.liquibaseVersion }}
       extensionVersion: ${{ steps.collect-data.outputs.extensionVersion }}
@@ -81,17 +78,17 @@ jobs:
       - name: Update Dockerfile and commit changes
         run: |
           LIQUIBASE_SHA=`curl -LsS https://github.com/liquibase/liquibase/releases/download/v${{ needs.setup.outputs.liquibaseVersion }}/liquibase-${{ needs.setup.outputs.liquibaseVersion }}.tar.gz | sha256sum | awk '{ print $1 }'`
-          sed -i 's/^ARG LIQUIBASE_VERSION=.*/ARG LIQUIBASE_VERSION='"${{ needs.setup.outputs.liquibaseVersion }}"'/' ${{ github.workspace }}/${{ matrix.image.dockerfile }}
-          sed -i 's/^ARG LB_SHA256=.*/ARG LB_SHA256='"$LIQUIBASE_SHA"'/' ${{ github.workspace }}/${{ matrix.image.dockerfile }}
+          sed -i 's/^ARG LIQUIBASE_VERSION=.*/ARG LIQUIBASE_VERSION='"${{ needs.setup.outputs.liquibaseVersion }}"'/' ${{ github.workspace }}/Dockerfile
+          sed -i 's/^ARG LB_SHA256=.*/ARG LB_SHA256='"$LIQUIBASE_SHA"'/' ${{ github.workspace }}/Dockerfile
 
-          git add ${{ matrix.image.dockerfile }}
+          git add Dockerfile
           if git diff-index --cached --quiet HEAD --
           then
             echo "Nothing new to commit"
           else
-            git commit -m "Liquibase Version Bumped to ${{ needs.setup.outputs.extensionVersion }} for ${{ matrix.image.name }}"
+            git commit -m "Liquibase Version Bumped to ${{ needs.setup.outputs.extensionVersion }}"
           fi
-          git tag -fa -m "Version Bumped to ${{ needs.setup.outputs.extensionVersion }}" v${{ needs.setup.outputs.extensionVersion }}
+          git tag -a -m "Version Bumped to ${{ needs.setup.outputs.extensionVersion }}" v${{ needs.setup.outputs.extensionVersion }}
           git push "https://liquibot:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git" HEAD:${{ github.ref }} --follow-tags --tags
 
         env:
@@ -139,4 +136,4 @@ jobs:
           context: .
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ${{ matrix.image.name }}:latest,${{ matrix.image.name }}:${{ needs.setup.outputs.extensionVersion }},${{ matrix.image.name }}:${{ needs.setup.outputs.minorVersion }}
+          tags: ${{ env.IMAGE_NAME }}:latest,${{ env.IMAGE_NAME }}:${{ needs.setup.outputs.extensionVersion }},${{ env.IMAGE_NAME }}:${{ needs.setup.outputs.minorVersion }}
