@@ -1,54 +1,53 @@
-FROM eclipse-temurin:17-jre-jammy
+# Builder Stage
+FROM eclipse-temurin:17-jre-jammy as builder
 
 ARG TARGETARCH
-
-# Install GNUPG for package verification and WGET for file download
-RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get -yqq install krb5-user libpam-krb5 --no-install-recommends && \
-    apt-get -y install gnupg wget unzip --no-install-recommends && \
-    rm -rf /var/lib/apt/lists/*
-
-# Add the liquibase user and step in the directory
-RUN addgroup --gid 1001 liquibase && \
-    adduser --disabled-password --uid 1001 --ingroup liquibase liquibase
-
-# Make /liquibase directory and change owner to liquibase
-RUN mkdir /liquibase && chown liquibase /liquibase
-WORKDIR /liquibase
-
-# Symbolic link will be broken until later
-RUN ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \
-    ln -s /liquibase/docker-entrypoint.sh /docker-entrypoint.sh && \
-    ln -s /liquibase/liquibase /usr/local/bin/liquibase && \
-    ln -s /liquibase/bin/lpm /usr/local/bin/lpm
-
-# Change to the liquibase user
-USER liquibase
-
-# Set LIQUIBASE_HOME environment variable
-ENV LIQUIBASE_HOME=/liquibase
-
-# Latest Liquibase Release Version
 ARG LIQUIBASE_VERSION=4.22.0
 ARG LPM_VERSION=0.2.2
-
-# Download, verify, extract
 ARG LB_SHA256=caa019320608313709593762409a70943f9678fcc8e1ba19b5b84927f53de457
-RUN set -x && \
-    wget -q -O liquibase-${LIQUIBASE_VERSION}.tar.gz "https://github.com/liquibase/liquibase/releases/download/v${LIQUIBASE_VERSION}/liquibase-${LIQUIBASE_VERSION}.tar.gz" && \
+
+# Install necessary dependencies
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get -yqq install krb5-user libpam-krb5 gnupg wget unzip --no-install-recommends && \
+    rm -rf /var/lib/apt/lists/*
+
+# Download and install Liquibase
+WORKDIR /liquibase
+RUN wget -q -O liquibase-${LIQUIBASE_VERSION}.tar.gz "https://github.com/liquibase/liquibase/releases/download/v${LIQUIBASE_VERSION}/liquibase-${LIQUIBASE_VERSION}.tar.gz" && \
     echo "$LB_SHA256  liquibase-${LIQUIBASE_VERSION}.tar.gz" | sha256sum -c - && \
     tar -xzf liquibase-${LIQUIBASE_VERSION}.tar.gz && \
     rm liquibase-${LIQUIBASE_VERSION}.tar.gz
 
 # Download and Install lpm
-RUN mkdir /liquibase/bin && \
+RUN mkdir bin && \
     case ${TARGETARCH} in \
       "amd64")  DOWNLOAD_ARCH=""  ;; \
       "arm64")  DOWNLOAD_ARCH="-arm64"  ;; \
     esac &&  wget -v -O lpm.zip "https://github.com/liquibase/liquibase-package-manager/releases/download/v${LPM_VERSION}/lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip" && \
     unzip lpm.zip -d bin/ && \
     rm lpm.zip
+
+# Production Stage
+FROM eclipse-temurin:17-jre-jammy as production
+
+# Create liquibase user
+RUN addgroup --gid 1001 liquibase && \
+    adduser --disabled-password --uid 1001 --ingroup liquibase liquibase && \
+    mkdir /liquibase && chown liquibase /liquibase
+
+# Setup symbolic links
+RUN ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \
+    ln -s /liquibase/docker-entrypoint.sh /docker-entrypoint.sh && \
+    ln -s /liquibase/liquibase /usr/local/bin/liquibase && \
+    ln -s /liquibase/bin/lpm /usr/local/bin/lpm
+
+WORKDIR /liquibase
+USER liquibase
+ENV LIQUIBASE_HOME=/liquibase
+
+# Copy from builder stage
+COPY --from=builder /liquibase /liquibase
 
 # Install Drivers
 RUN lpm update && \
