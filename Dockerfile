@@ -30,7 +30,7 @@ USER liquibase
 ENV LIQUIBASE_HOME=/liquibase
 
 # Latest Liquibase Release Version
-ARG LIQUIBASE_VERSION=4.22.0
+ARG LIQUIBASE_VERSION=4.21.1
 ARG LPM_VERSION=0.2.3
 
 # Download, verify, extract
