@@ -56,8 +56,11 @@ RUN lpm update && \
 COPY --chown=liquibase:liquibase docker-entrypoint.sh /liquibase/
 COPY --chown=liquibase:liquibase liquibase.docker.properties /liquibase/
 
+## This is not used for anything beyond an alternative location for "/liquibase/changelog", but remains for backwards compatibility
 VOLUME /liquibase/classpath
+
 VOLUME /liquibase/changelog
+VOLUME /liquibase/lib
 
 ENTRYPOINT ["/liquibase/docker-entrypoint.sh"]
 CMD ["--help"]
