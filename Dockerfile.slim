@@ -3,7 +3,7 @@ FROM alpine:3.17.3 as builder
 
 ARG TARGETARCH
 ARG LIQUIBASE_VERSION=4.21.1
-ARG LPM_VERSION=0.2.2
+ARG LPM_VERSION=0.2.3
 ARG LB_SHA256=c04542865e5ece8b7b1ee9bd6beaefc5315e350620288d6ac1a2d32c3b1f7d8b
 
 # Install tools for downloading and verifying packages
@@ -59,7 +59,9 @@ COPY --chown=liquibase:liquibase docker-entrypoint.sh /liquibase/
 COPY --chown=liquibase:liquibase liquibase.docker.properties /liquibase/
 
 VOLUME /liquibase/classpath
+
 VOLUME /liquibase/changelog
+VOLUME /liquibase/lib
 
 ENTRYPOINT ["/liquibase/docker-entrypoint.sh"]
 CMD ["--help"]
