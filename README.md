@@ -24,6 +24,7 @@ The latest tag will be kept up to date with the most advanced Liquibase release.
 
 These tags are kept up to date with the most recent patch release of each X.Y stream
 
+- `4.22`
 - `4.21`
 - `4.20`
 - `4.19`
@@ -51,6 +52,7 @@ These tags are kept up to date with the most recent patch release of each X.Y st
 
 Each specific release has an associated tag
 
+- `4.22.0`
 - `4.21.1`
 - `4.21.0`
 - `4.20.0`
@@ -108,7 +110,7 @@ To generate a new changelog file at this location, run `docker run --rm -v c:\pr
 
 If you would like to use a "default file" to specify arguments rather than passing them on the command line, include it in your changelog volume mount and reference it.
 
-If specifying a custom liquibase.properties file, make sure you include `classpath=/liquibase/changelog` so Liquibase will continue to look for your changelog files there.
+If specifying a custom liquibase.properties file, make sure you include `searchPath=/liquibase/changelog` so Liquibase will continue to look for your changelog files there.
 
 ### Configuration File Example
 
@@ -116,11 +118,11 @@ If you have a local `c:\projects\my-project\src\main\resources\liquibase.propert
 
 ## Drivers and Extensions
 
-The Liquibase docker container ships with drivers for many popular databases. If your driver is not included or if you have an extension, you can mount a local directory containing the jars to `/liquibase/classpath` and add the jars to your `classpath` setting.
+The Liquibase docker container ships with drivers for many popular databases. If your driver is not included or if you have an extension, you can mount a local directory containing the jars to `/liquibase/lib`.
 
 ### Driver and Extensions Example
 
-If you have a local `c:\projects\my-project\lib\my-driver.jar` file, `docker run --rm -v c:\projects\my-project\src\main\resources:/liquibase/changelog -v c:\projects\my-project\lib:/liquibase/classpath liquibase/liquibase --classpath=/liquibase/changelog:/liquibase/classpath/my-driver.jar update`
+If you have a local `c:\projects\my-project\lib\my-driver.jar` file, `docker run --rm -v c:\projects\my-project\src\main\resources:/liquibase/changelog -v c:\projects\my-project\lib:/liquibase/lib liquibase/liquibase update`
 
 ### Notice for MySQL Users
 
@@ -162,7 +164,7 @@ Using with [Liquibase Pro Environment Variables](https://docs.liquibase.com/conc
 *liquibase.docker.properties file:*
 
 ```dockerfile
-classpath: /liquibase/changelog
+searchPath: /liquibase/changelog
 url: jdbc:postgresql://<IP OR HOSTNAME>:5432/<DATABASE>?currentSchema=<SCHEMA NAME>
 changeLogFile: changelog.xml
 username: <USERNAME>
