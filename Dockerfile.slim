@@ -1,26 +1,25 @@
-# Builder Stage
-FROM eclipse-temurin:17-jre-jammy as builder
+# Use multi-stage build
+FROM alpine:3.17.3 as builder
 
 ARG TARGETARCH
 ARG LIQUIBASE_VERSION=4.21.1
 ARG LPM_VERSION=0.2.3
 ARG LB_SHA256=caa019320608313709593762409a70943f9678fcc8e1ba19b5b84927f53de457
 
-# Install necessary dependencies
-RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get -yqq install krb5-user libpam-krb5 gnupg wget unzip --no-install-recommends && \
-    rm -rf /var/lib/apt/lists/*
+# Install tools for downloading and verifying packages
+RUN apk add --no-cache wget unzip gnupg
 
-# Download and install Liquibase
 WORKDIR /liquibase
-RUN wget -q -O liquibase-${LIQUIBASE_VERSION}.tar.gz "https://github.com/liquibase/liquibase/releases/download/v${LIQUIBASE_VERSION}/liquibase-${LIQUIBASE_VERSION}.tar.gz" && \
+
+# Download, verify, extract
+RUN set -x && \
+    wget -q -O liquibase-${LIQUIBASE_VERSION}.tar.gz "https://github.com/liquibase/liquibase/releases/download/v${LIQUIBASE_VERSION}/liquibase-${LIQUIBASE_VERSION}.tar.gz" && \
     echo "$LB_SHA256  liquibase-${LIQUIBASE_VERSION}.tar.gz" | sha256sum -c - && \
     tar -xzf liquibase-${LIQUIBASE_VERSION}.tar.gz && \
     rm liquibase-${LIQUIBASE_VERSION}.tar.gz
 
 # Download and Install lpm
-RUN mkdir bin && \
+RUN mkdir /liquibase/bin && \
     case ${TARGETARCH} in \
       "amd64")  DOWNLOAD_ARCH=""  ;; \
       "arm64")  DOWNLOAD_ARCH="-arm64"  ;; \
@@ -28,35 +27,37 @@ RUN mkdir bin && \
     unzip lpm.zip -d bin/ && \
     rm lpm.zip
 
-# Production Stage
-FROM eclipse-temurin:17-jre-jammy as production
+# Final Image
+FROM alpine:3.17.3
 
-# Create liquibase user
+# Install smaller JRE, if available and acceptable
+RUN apk add --no-cache openjdk17-jre-headless bash
+
+# Add the liquibase user and step in the directory
 RUN addgroup --gid 1001 liquibase && \
-    adduser --disabled-password --uid 1001 --ingroup liquibase liquibase && \
-    mkdir /liquibase && chown liquibase /liquibase
+    adduser --disabled-password --uid 1001 --ingroup liquibase liquibase
 
-# Setup symbolic links
+# Make /liquibase directory and change owner to liquibase
+RUN mkdir /liquibase && chown liquibase /liquibase
+WORKDIR /liquibase
+
+# Copy the /liquibase directory from builder stage into final image
+COPY --from=builder /liquibase /liquibase
+
+# Set LIQUIBASE_HOME environment variable
+ENV LIQUIBASE_HOME=/liquibase
+
+# Symbolic links
 RUN ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \
     ln -s /liquibase/docker-entrypoint.sh /docker-entrypoint.sh && \
     ln -s /liquibase/liquibase /usr/local/bin/liquibase && \
     ln -s /liquibase/bin/lpm /usr/local/bin/lpm
 
-WORKDIR /liquibase
 USER liquibase
-ENV LIQUIBASE_HOME=/liquibase
-
-# Copy from builder stage
-COPY --from=builder /liquibase /liquibase
-
-# Install Drivers
-RUN lpm update && \
-    /liquibase/liquibase --version
 
 COPY --chown=liquibase:liquibase docker-entrypoint.sh /liquibase/
 COPY --chown=liquibase:liquibase liquibase.docker.properties /liquibase/
 
-## This is not used for anything beyond an alternative location for "/liquibase/changelog", but remains for backwards compatibility
 VOLUME /liquibase/classpath
 
 VOLUME /liquibase/changelog
