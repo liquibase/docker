@@ -80,7 +80,7 @@ jobs:
             git commit -m "Liquibase Version Bumped to ${{ steps.collect-data.outputs.extensionVersion }} for ${{ matrix.image.name }}"
           fi
           git tag -fa -m "Version Bumped to ${{ steps.collect-data.outputs.extensionVersion }}" v${{ steps.collect-data.outputs.extensionVersion }}
-          git push "https://liquibot:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git" HEAD:${{ github.ref }} --follow-tags --tags
+          git push -f "https://liquibot:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git" HEAD:${{ github.ref }} --follow-tags --tags
         env:
           GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
       
