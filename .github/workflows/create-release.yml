@@ -13,7 +13,7 @@ on:
 
 jobs:
   setup-update-draft-build:
-    name: Setup, Update, Draft Release, Build and Push
+    name: Release ${{ matrix.image.name }}} Version ${{ inputs.liquibaseVersion}}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -86,7 +86,7 @@ jobs:
       
       - name: Get release SHA
         id: get-release-sha
-        run: echo ::set-output name=releaseSha::$(git rev-parse HEAD)
+        run: echo "{releaseSha}=$(git rev-parse HEAD)" >> GITHUB_OUPUT
       
       - uses: actions/checkout@v3
       - name: Release
