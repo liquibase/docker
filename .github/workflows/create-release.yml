@@ -78,9 +78,9 @@ jobs:
             echo "Nothing new to commit"
           else
             git commit -m "Liquibase Version Bumped to ${{ steps.collect-data.outputs.extensionVersion }} for ${{ matrix.image.name }} ${{ matrix.image.suffix }}"
+            git tag -fa -m "Version Bumped to ${{ steps.collect-data.outputs.extensionVersion }}" v${{ steps.collect-data.outputs.extensionVersion }}
+            git push -f "https://liquibot:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git" HEAD:${{ github.ref }} --follow-tags --tags
           fi
-          git tag -fa -m "Version Bumped to ${{ steps.collect-data.outputs.extensionVersion }}" v${{ steps.collect-data.outputs.extensionVersion }}
-          git push -f "https://liquibot:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git" HEAD:${{ github.ref }} --follow-tags --tags
         env:
           GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
       
