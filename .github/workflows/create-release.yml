@@ -13,13 +13,13 @@ on:
 
 jobs:
   setup-update-draft-build:
-    name: Release ${{ matrix.image.name }}} Version ${{ inputs.liquibaseVersion}}
+    name: Release ${{ matrix.image.name }} Version ${{ inputs.liquibaseVersion}} ${{ matrix.image.suffix }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
         image: [ 
-          {dockerfile: Dockerfile, name: liquibase/liquibase},
-          {dockerfile: Dockerfile.slim, name: liquibase/liquibase-slim}
+          {dockerfile: Dockerfile, name: liquibase/liquibase, suffix: ""},
+          {dockerfile: Dockerfile.slim, name: liquibase/liquibase, suffix: "-alpine"},
           ]
     steps:
       - name: Collect Data
@@ -77,10 +77,10 @@ jobs:
           then
             echo "Nothing new to commit"
           else
-            git commit -m "Liquibase Version Bumped to ${{ steps.collect-data.outputs.extensionVersion }} for ${{ matrix.image.name }}"
+            git commit -m "Liquibase Version Bumped to ${{ steps.collect-data.outputs.extensionVersion }} for ${{ matrix.image.name }} ${{ matrix.image.suffix }}"
+            git tag -fa -m "Version Bumped to ${{ steps.collect-data.outputs.extensionVersion }}" v${{ steps.collect-data.outputs.extensionVersion }}
+            git push -f "https://liquibot:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git" HEAD:${{ github.ref }} --follow-tags --tags
           fi
-          git tag -fa -m "Version Bumped to ${{ steps.collect-data.outputs.extensionVersion }}" v${{ steps.collect-data.outputs.extensionVersion }}
-          git push -f "https://liquibot:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git" HEAD:${{ github.ref }} --follow-tags --tags
         env:
           GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
       
@@ -113,6 +113,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
+          file: ${{ matrix.image.dockerfile }}
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ${{ matrix.image.name }}:latest,${{ matrix.image.name }}:${{ steps.collect-data.outputs.extensionVersion }},${{ matrix.image.name }}:${{ steps.collect-data.outputs.minorVersion }}
+          tags: ${{ matrix.image.name }}:latest${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ steps.collect-data.outputs.extensionVersion }}${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ steps.collect-data.outputs.minorVersion }}${{ matrix.image.suffix }}
