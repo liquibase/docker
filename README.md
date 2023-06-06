@@ -18,9 +18,9 @@ https://hub.docker.com/r/liquibase/liquibase/tags
 
 ### liquibase:<version>
 
-This `liquibase:<version>` image is considered the standard choice. If you're uncertain about your specific requirements, it's recommended to opt for this image. It is designed to serve as a disposable container (simply mount your source code and initiate the container to launch your application), as well as a foundational building block for creating other images.
+This `liquibase:<version>` image is considered the standard choice. If you're uncertain about your specific requirements, it's recommended to opt for this image. It is designed to serve as a disposable container as well as a foundational building block for creating other images.
 
-### liquibase-alpine:<version>
+### liquibase:<version>-alpine
 
 The `liquibase:<version>-alpine` image is a slimmed-down version of the Liquibase Docker container (`liquibase:<version>`). It is designed to be lightweight and have a smaller footprint, making it suitable for environments with limited resources or when only the essential functionality is required. This image is built upon the popular [Alpine Linux](https://alpinelinux.org/) project, which can be found in the official Alpine image. Alpine Linux stands out for its significantly smaller size compared to other distribution base images, typically around **5MB**. As a result, it enables the creation of overall slimmer images.
 
@@ -28,16 +28,10 @@ If your main concern is minimizing the final image size, this flavor proves to b
 
 To keep the image size to a minimum, additional tools such as `git` or `bash` are not commonly included in Alpine-based images. Instead, you can utilize this image as a foundation and add the necessary components in your own Dockerfile.
 
-#### Extending liquibase-alpine:<version>
+#### Extending liquibase:<version>-alpine
 
-To extend the functionality of the `liquibase-alpine:<version>` image and include additional tools that are not included by default, you can follow these examples:
+To extend the functionality of the `liquibase:<version>-alpine` image and include additional tools that are not included by default. Examples are provided in the [examples](/examples) directory as `Dockerfile.slim.<EXAMPLE>`.
 
-```Dockerfile
-FROM liquibase-alpine:latest
-RUN apk add --no-cache bash git python3 py3-pip 
-```
-
-In this example, we start with the `liquibase-alpine:latest` base image and use the `apk` package manager to install `bash` and `git`. The `python3` package provides Python 3, and `py3-pip` installs pip for managing Python package. The `--no-cache` flag ensures that the package index is not saved in the final image, reducing its size.
 ## Changelog File
 
 The docker image has a /liquibase/changelog volume in which the directory containing the root of your changelog tree can be mounted. Your `--changeLogFile` argument should list paths relative to this.
@@ -137,4 +131,4 @@ Note: If the database IP refers to a locally running docker container then one n
 
 ### Adding Native Executors
 
-The recommended path for adding native executors/binaries such as Oracle SQL*Plus, Microsoft SQLCMD, Postgres PSQL, or the AWS CLI is to extend the liquibase/liquibase Dockerfile.  Examples are provided in the [Examples](/examples) Directory.
+The recommended path for adding native executors/binaries such as Oracle SQL*Plus, Microsoft SQLCMD, Postgres PSQL, or the AWS CLI is to extend the liquibase/liquibase Dockerfile. Examples are provided in the [Examples](/examples) Directory.

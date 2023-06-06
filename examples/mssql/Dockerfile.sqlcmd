@@ -2,6 +2,7 @@ FROM liquibase/liquibase:latest
 
 # Install SQLCMD
 USER root
+
 RUN wget -qO - https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
   wget -qO - https://packages.microsoft.com/config/ubuntu/20.04/prod.list | tee /etc/apt/sources.list.d/msprod.list && \
   apt-get update -y && \
