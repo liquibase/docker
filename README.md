@@ -10,52 +10,34 @@ This is the official repository for [Liquibase](https://download.liquibase.org/)
 
 Support for Snowflake database has been moved from the external extension liquibase-snowflake into the main Liquibase artifact. This means that Snowflake is now included in the main docker image. If you are using the snowflake extension remove it from your lib directory or however you are including it in your project. If you are using the Docker image, use the main v4.12+ as there will no longer be a snowflake separate docker image produced.  The latest separate Snowflake image will be v4.11. You need to update your reference to either latest to use the main one that includes Snowflake or the version tag you prefer. <https://github.com/liquibase/liquibase/pull/2841>
 
-## Supported Tags
+## Image Flavours
 
 The following tags are officially supported:
 
 https://hub.docker.com/r/liquibase/liquibase/tags
 
-### liquibase alpine
+### liquibase:<version>
 
-The `liquibase:<version>-alpine` tag is a slimmed-down version of the Liquibase Docker container. It is designed to be lightweight and have a smaller footprint, making it suitable for environments with limited resources or when only the essential functionality is required.
+This `liquibase:<version>` image is considered the standard choice. If you're uncertain about your specific requirements, it's recommended to opt for this image. It is designed to serve as a disposable container (simply mount your source code and initiate the container to launch your application), as well as a foundational building block for creating other images.
 
-#### Functionality and Purpose
+### liquibase-alpine:<version>
 
-The `liquibase:<version>-alpine` container provides the core functionality of Liquibase, which includes database change management and version control. It allows you to define and manage database schemas, apply and roll back changes, and track the evolution of your database over time.
+The `liquibase:<version>-alpine` image is a slimmed-down version of the Liquibase Docker container (`liquibase:<version>`). It is designed to be lightweight and have a smaller footprint, making it suitable for environments with limited resources or when only the essential functionality is required. This image is built upon the popular [Alpine Linux](https://alpinelinux.org/) project, which can be found in the official Alpine image. Alpine Linux stands out for its significantly smaller size compared to other distribution base images, typically around **5MB**. As a result, it enables the creation of overall slimmer images.
 
-#### Usage and Prerequisites
+If your main concern is minimizing the final image size, this flavor proves to be quite useful. However, it is important to note that certain software may encounter issues depending on their specific `libc` requirements or assumptions.
 
-To use the `liquibase:<version>-alpine` container, you need to have Docker installed on your system. Please refer to the official Docker documentation for instructions on how to install Docker: [https://docs.docker.com/get-docker/](https://docs.docker.com/get-docker/)
+To keep the image size to a minimum, additional tools such as `git` or `bash` are not commonly included in Alpine-based images. Instead, you can utilize this image as a foundation and add the necessary components in your own Dockerfile.
 
-#### Examples and Usage Scenarios
+#### Extending liquibase-alpine:<version>
 
-Here are some examples to demonstrate the capabilities of `liquibase-slim`:
+To extend the functionality of the `liquibase-alpine:<version>` image and include additional tools that are not included by default, you can follow these examples:
 
-1. **Initializing a new Liquibase project**:
-
-```shell
-docker run --rm -v $(pwd):/liquibase/changelog liquibase/liquibase:<version>-alpine \
-  --classpath=/liquibase/changelog \
-  --changeLogFile=changelog.xml \
-  --url="jdbc:postgresql://localhost:5432/mydb" \
-  --username=myuser \
-  --password=mypassword \
-  generateChangeLog
+```Dockerfile
+FROM liquibase-alpine:latest
+RUN apk add --no-cache bash git python3 py3-pip 
 ```
 
-2. **Applying database changes**:
-
-```shell
-docker run --rm -v $(pwd):/liquibase/changelog liquibase/liquibase:<version>-alpine \
-  --classpath=/liquibase/changelog \
-  --changeLogFile=changelog.xml \
-  --url="jdbc:postgresql://localhost:5432/mydb" \
-  --username=myuser \
-  --password=mypassword \
-  update
-```
-
+In this example, we start with the `liquibase-alpine:latest` base image and use the `apk` package manager to install `bash` and `git`. The `python3` package provides Python 3, and `py3-pip` installs pip for managing Python package. The `--no-cache` flag ensures that the package index is not saved in the final image, reducing its size.
 ## Changelog File
 
 The docker image has a /liquibase/changelog volume in which the directory containing the root of your changelog tree can be mounted. Your `--changeLogFile` argument should list paths relative to this.
@@ -156,4 +138,3 @@ Note: If the database IP refers to a locally running docker container then one n
 ### Adding Native Executors
 
 The recommended path for adding native executors/binaries such as Oracle SQL*Plus, Microsoft SQLCMD, Postgres PSQL, or the AWS CLI is to extend the liquibase/liquibase Dockerfile.  Examples are provided in the [Examples](/examples) Directory.
-
