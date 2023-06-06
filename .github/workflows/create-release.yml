@@ -19,7 +19,7 @@ jobs:
       matrix:
         image: [ 
           {dockerfile: Dockerfile, name: liquibase/liquibase, suffix: ""},
-          {dockerfile: Dockerfile.slim, name: liquibase/liquibase, suffix: "-alpine"},
+          {dockerfile: Dockerfile.alpine, name: liquibase/liquibase, suffix: "-alpine"},
           ]
     steps:
       - name: Collect Data
