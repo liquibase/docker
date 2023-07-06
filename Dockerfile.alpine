@@ -1,5 +1,5 @@
 # Use multi-stage build
-FROM alpine:3.17.3 as builder
+FROM alpine:3.18.2 as builder
 
 ARG TARGETARCH
 ARG LIQUIBASE_VERSION=4.23.0
@@ -28,10 +28,11 @@ RUN mkdir /liquibase/bin && \
     rm lpm.zip
 
 # Final Image
-FROM alpine:3.17.3
+FROM alpine:3.18.2
 
 # Install smaller JRE, if available and acceptable
-RUN apk add --no-cache openjdk17-jre-headless bash
+RUN apk --no-cache update && apk --no-cache upgrade && \
+    apk add --no-cache openjdk17-jre-headless bash
 
 # Add the liquibase user and step in the directory
 RUN addgroup --gid 1001 liquibase && \
