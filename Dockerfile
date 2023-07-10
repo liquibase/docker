@@ -2,9 +2,9 @@
 FROM eclipse-temurin:17-jre-jammy as builder
 
 ARG TARGETARCH
-ARG LIQUIBASE_VERSION=4.21.1
+ARG LIQUIBASE_VERSION=4.23.0
 ARG LPM_VERSION=0.2.3
-ARG LB_SHA256=c04542865e5ece8b7b1ee9bd6beaefc5315e350620288d6ac1a2d32c3b1f7d8b
+ARG LB_SHA256=988b8734da3f2f987646fa533748d9b7aae2f889741fd6922f86ae3a321ea635
 
 # Install necessary dependencies
 RUN apt-get update && \
