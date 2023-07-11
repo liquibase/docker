@@ -109,8 +109,19 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
+          
+      - name: Login to ECR Registry
+        uses: docker/login-action@v2
+        env:
+          AWS_REGION: us-east-1
+        with:
+          registry: public.ecr.aws
+          username: ${{ secrets.PUBLIC_ECR_ACCESS_KEY_ID }}
+          password: ${{ secrets.PUBLIC_ECR_SECRET_ACCESS_KEY }}
+              
       - name: Build and Push Docker Image
+        env:
+          ECR_REGISTRY: public.ecr.aws/liquibase/docker
         uses: docker/build-push-action@v4
         with:
           context: .
@@ -118,27 +129,5 @@ jobs:
           no-cache: true
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ${{ matrix.image.name }}:latest${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ steps.collect-data.outputs.extensionVersion }}${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ steps.collect-data.outputs.minorVersion }}${{ matrix.image.suffix }}
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-            aws-access-key-id: ${{ secrets.PUBLIC_ECR_ACCESS_KEY_ID }}
-            aws-secret-access-key: ${{ secrets.PUBLIC_ECR_SECRET_ACCESS_KEY }}
-            aws-region: us-east-1
-
-      - name: Login to Amazon ECR Public
-        id: login-ecr-public
-        uses: aws-actions/amazon-ecr-login@v1
-        with:
-          registry-type: public
-
-      - name: Build, tag, and push docker image to Amazon ECR Public
-        env:
-          REGISTRY: ${{ steps.login-ecr-public.outputs.registry }}
-          REGISTRY_ALIAS: liquibase # verification of the alias takes a few days 
-          REPOSITORY: docker
-          IMAGE_TAG: ${{ matrix.image.name }}:latest${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ steps.collect-data.outputs.extensionVersion }}${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ steps.collect-data.outputs.minorVersion }}${{ matrix.image.suffix }}
-        run: |
-          docker build -t $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG .
-          docker push $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG
+          tags: ${{ matrix.image.name }}:latest${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ steps.collect-data.outputs.extensionVersion }}${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ steps.collect-data.outputs.minorVersion }}${{ matrix.image.suffix }},${{ env.ECR_REGISTRY }}:latest${{ matrix.image.suffix }},${{ env.ECR_REGISTRY }}:${{ steps.collect-data.outputs.extensionVersion }}${{ matrix.image.suffix }},${{ env.ECR_REGISTRY }}:${{ steps.collect-data.outputs.minorVersion }}${{ matrix.image.suffix }}
+          
