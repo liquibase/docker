@@ -123,6 +123,8 @@ jobs:
         uses: docker/build-push-action@v4
         env:
           ECR_REGISTRY: public.ecr.aws/liquibase/docker
+        run: |
+          echo "ECR_REGISTRY: $ECR_REGISTRY"
         with:
           context: .
           file: ${{ matrix.image.dockerfile }}
