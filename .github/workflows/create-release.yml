@@ -125,7 +125,7 @@ jobs:
         with:
             aws-access-key-id: ${{ secrets.PUBLIC_ECR_ACCESS_KEY_ID }}
             aws-secret-access-key: ${{ secrets.PUBLIC_ECR_SECRET_ACCESS_KEY }}
-            role-to-assume: arn:aws:iam::812559712860:role/docker-liquibase-role
+#             role-to-assume: arn:aws:iam::812559712860:role/docker-liquibase-role
             aws-region: us-east-1
 
       - name: Login to Amazon ECR Public
