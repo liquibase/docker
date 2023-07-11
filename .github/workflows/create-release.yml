@@ -109,7 +109,16 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
+          
+      - name: Login to ECR Registry
+        uses: docker/login-action@v2
+        env:
+          AWS_REGION: us-east-1
+        with:
+          registry: ${{ steps.login-ecr-public.outputs.registry }}
+          username: ${{ secrets.PUBLIC_ECR_ACCESS_KEY_ID }}
+          password: ${{ secrets.PUBLIC_ECR_SECRET_ACCESS_KEY }}
+          
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v4
         with:
@@ -119,26 +128,4 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           tags: ${{ matrix.image.name }}:latest${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ steps.collect-data.outputs.extensionVersion }}${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ steps.collect-data.outputs.minorVersion }}${{ matrix.image.suffix }}
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-            aws-access-key-id: ${{ secrets.PUBLIC_ECR_ACCESS_KEY_ID }}
-            aws-secret-access-key: ${{ secrets.PUBLIC_ECR_SECRET_ACCESS_KEY }}
-#             role-to-assume: arn:aws:iam::812559712860:role/docker-liquibase-role
-            aws-region: us-east-1
-
-      - name: Login to Amazon ECR Public
-        id: login-ecr-public
-        uses: aws-actions/amazon-ecr-login@v1
-        with:
-          registry-type: public
-
-      - name: Build, tag, and push docker image to Amazon ECR Public
-        env:
-          REGISTRY: ${{ steps.login-ecr-public.outputs.registry }}
-          REPOSITORY: docker
-          IMAGE_TAG: ${{ matrix.image.name }}:latest${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ steps.collect-data.outputs.extensionVersion }}${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ steps.collect-data.outputs.minorVersion }}${{ matrix.image.suffix }}
-        run: |
-          docker build -t $REGISTRY/liquibase/$REPOSITORY:$IMAGE_TAG .
-          docker push $REGISTRY/liquibase/$REPOSITORY:$IMAGE_TAG
+          
