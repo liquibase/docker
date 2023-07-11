@@ -121,7 +121,7 @@ jobs:
               
       - name: Build and Push Docker Image
         env:
-          ECR_REGISTRY: public.ecr.aws/liquibase/docker
+          ECR_REGISTRY: public.ecr.aws/liquibase/liquibase
         uses: docker/build-push-action@v4
         with:
           context: .
