@@ -115,7 +115,7 @@ jobs:
         env:
           AWS_REGION: us-east-1
         with:
-          registry: ${{ steps.login-ecr-public.outputs.registry }}
+          registry: public.ecr.aws/liquibase/docker
           username: ${{ secrets.PUBLIC_ECR_ACCESS_KEY_ID }}
           password: ${{ secrets.PUBLIC_ECR_SECRET_ACCESS_KEY }}
           
