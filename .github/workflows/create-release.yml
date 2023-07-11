@@ -137,9 +137,8 @@ jobs:
       - name: Build, tag, and push docker image to Amazon ECR Public
         env:
           REGISTRY: ${{ steps.login-ecr-public.outputs.registry }}
-          REGISTRY_ALIAS: liquibase # verification of the alias takes a few days 
           REPOSITORY: docker
           IMAGE_TAG: ${{ matrix.image.name }}:latest${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ steps.collect-data.outputs.extensionVersion }}${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ steps.collect-data.outputs.minorVersion }}${{ matrix.image.suffix }}
         run: |
-          docker build -t $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG .
-          docker push $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG
+          docker build -t $REGISTRY/liquibase/$REPOSITORY:$IMAGE_TAG .
+          docker push $REGISTRY/liquibase/$REPOSITORY:$IMAGE_TAG
