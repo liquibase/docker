@@ -120,14 +120,14 @@ jobs:
           password: ${{ secrets.PUBLIC_ECR_SECRET_ACCESS_KEY }}
               
       - name: Build and Push Docker Image
-        uses: docker/build-push-action@v4
         env:
           ECR_REGISTRY: public.ecr.aws/liquibase/docker
+        uses: docker/build-push-action@v4
         with:
           context: .
           file: ${{ matrix.image.dockerfile }}
           no-cache: true
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ${{ matrix.image.name }}:latest${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ steps.collect-data.outputs.extensionVersion }}${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ steps.collect-data.outputs.minorVersion }}${{ matrix.image.suffix }},public.ecr.aws/liquibase/docker:latest${{ matrix.image.suffix }},public.ecr.aws/liquibase/docker:${{ steps.collect-data.outputs.extensionVersion }}${{ matrix.image.suffix }},public.ecr.aws/liquibase/docker:${{ steps.collect-data.outputs.minorVersion }}${{ matrix.image.suffix }}
+          tags: ${{ matrix.image.name }}:latest${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ steps.collect-data.outputs.extensionVersion }}${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ steps.collect-data.outputs.minorVersion }}${{ matrix.image.suffix }},${ECR_REGISTRY}:latest${{ matrix.image.suffix }},${ECR_REGISTRY}:${{ steps.collect-data.outputs.extensionVersion }}${{ matrix.image.suffix }},${ECR_REGISTRY}:${{ steps.collect-data.outputs.minorVersion }}${{ matrix.image.suffix }}
           
