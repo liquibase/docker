@@ -123,13 +123,11 @@ jobs:
         uses: docker/build-push-action@v4
         env:
           ECR_REGISTRY: public.ecr.aws/liquibase/docker
-        run: |
-          echo "ECR_REGISTRY: $ECR_REGISTRY"
         with:
           context: .
           file: ${{ matrix.image.dockerfile }}
           no-cache: true
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ${{ matrix.image.name }}:latest${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ steps.collect-data.outputs.extensionVersion }}${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ steps.collect-data.outputs.minorVersion }}${{ matrix.image.suffix }},$ECR_REGISTRY/${{ matrix.image.name }}:latest${{ matrix.image.suffix }},$ECR_REGISTRY/${{ matrix.image.name }}:${{ steps.collect-data.outputs.extensionVersion }}${{ matrix.image.suffix }},$ECR_REGISTRY/${{ matrix.image.name }}:${{ steps.collect-data.outputs.minorVersion }}${{ matrix.image.suffix }}
+          tags: ${{ matrix.image.name }}:latest${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ steps.collect-data.outputs.extensionVersion }}${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ steps.collect-data.outputs.minorVersion }}${{ matrix.image.suffix }},public.ecr.aws/liquibase/docker/${{ matrix.image.name }}:latest${{ matrix.image.suffix }},public.ecr.aws/liquibase/docker/${{ matrix.image.name }}:${{ steps.collect-data.outputs.extensionVersion }}${{ matrix.image.suffix }},public.ecr.aws/liquibase/docker/${{ matrix.image.name }}:${{ steps.collect-data.outputs.minorVersion }}${{ matrix.image.suffix }}
           
