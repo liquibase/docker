@@ -48,10 +48,6 @@ ENV LIQUIBASE_HOME=/liquibase
 # Copy from builder stage
 COPY --from=builder /liquibase /liquibase
 
-# Install Drivers
-RUN lpm update && \
-    /liquibase/liquibase --version
-
 COPY --chown=liquibase:liquibase docker-entrypoint.sh /liquibase/
 COPY --chown=liquibase:liquibase liquibase.docker.properties /liquibase/
 
