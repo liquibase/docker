@@ -8,7 +8,6 @@ ARG LB_SHA256=b9667d97a0ba425547aa9fe66bafeccf4ef3b821e91ae732ec684d0eaf2fd7f5
 
 # Install necessary dependencies
 RUN apt-get update && \
-    apt-get upgrade -y && \
     apt-get -yqq install krb5-user libpam-krb5 gnupg wget unzip --no-install-recommends && \
     rm -rf /var/lib/apt/lists/*
 
@@ -17,7 +16,8 @@ WORKDIR /liquibase
 RUN wget -q -O liquibase-${LIQUIBASE_VERSION}.tar.gz "https://github.com/liquibase/liquibase/releases/download/v${LIQUIBASE_VERSION}/liquibase-${LIQUIBASE_VERSION}.tar.gz" && \
     echo "$LB_SHA256  liquibase-${LIQUIBASE_VERSION}.tar.gz" | sha256sum -c - && \
     tar -xzf liquibase-${LIQUIBASE_VERSION}.tar.gz && \
-    rm liquibase-${LIQUIBASE_VERSION}.tar.gz
+    rm liquibase-${LIQUIBASE_VERSION}.tar.gz && \
+    liquibase --version
 
 # Download and Install lpm
 RUN mkdir bin && \
@@ -26,7 +26,8 @@ RUN mkdir bin && \
       "arm64")  DOWNLOAD_ARCH="-arm64"  ;; \
     esac &&  wget -v -O lpm.zip "https://github.com/liquibase/liquibase-package-manager/releases/download/v${LPM_VERSION}/lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip" && \
     unzip lpm.zip -d bin/ && \
-    rm lpm.zip
+    rm lpm.zip && \
+    lpm help
 
 # Production Stage
 FROM eclipse-temurin:17-jre-jammy as production

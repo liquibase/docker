@@ -2,9 +2,9 @@
 FROM alpine:3.18.2 as builder
 
 ARG TARGETARCH
-ARG LIQUIBASE_VERSION=4.23.0
+ARG LIQUIBASE_VERSION=4.23.1
 ARG LPM_VERSION=0.2.3
-ARG LB_SHA256=988b8734da3f2f987646fa533748d9b7aae2f889741fd6922f86ae3a321ea635
+ARG LB_SHA256=b9667d97a0ba425547aa9fe66bafeccf4ef3b821e91ae732ec684d0eaf2fd7f5
 
 # Install tools for downloading and verifying packages
 RUN apk add --no-cache wget unzip gnupg
@@ -16,7 +16,8 @@ RUN set -x && \
     wget -q -O liquibase-${LIQUIBASE_VERSION}.tar.gz "https://github.com/liquibase/liquibase/releases/download/v${LIQUIBASE_VERSION}/liquibase-${LIQUIBASE_VERSION}.tar.gz" && \
     echo "$LB_SHA256  liquibase-${LIQUIBASE_VERSION}.tar.gz" | sha256sum -c - && \
     tar -xzf liquibase-${LIQUIBASE_VERSION}.tar.gz && \
-    rm liquibase-${LIQUIBASE_VERSION}.tar.gz
+    rm liquibase-${LIQUIBASE_VERSION}.tar.gz && \
+    liquibase --version
 
 # Download and Install lpm
 RUN mkdir /liquibase/bin && \
@@ -25,7 +26,8 @@ RUN mkdir /liquibase/bin && \
       "arm64")  DOWNLOAD_ARCH="-arm64"  ;; \
     esac &&  wget -v -O lpm.zip "https://github.com/liquibase/liquibase-package-manager/releases/download/v${LPM_VERSION}/lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip" && \
     unzip lpm.zip -d bin/ && \
-    rm lpm.zip
+    rm lpm.zip && \
+    lpm help
 
 # Final Image
 FROM alpine:3.18.2
