@@ -16,8 +16,7 @@ WORKDIR /liquibase
 RUN wget -q -O liquibase-${LIQUIBASE_VERSION}.tar.gz "https://github.com/liquibase/liquibase/releases/download/v${LIQUIBASE_VERSION}/liquibase-${LIQUIBASE_VERSION}.tar.gz" && \
     echo "$LB_SHA256  liquibase-${LIQUIBASE_VERSION}.tar.gz" | sha256sum -c - && \
     tar -xzf liquibase-${LIQUIBASE_VERSION}.tar.gz && \
-    rm liquibase-${LIQUIBASE_VERSION}.tar.gz && \
-    liquibase --version
+    rm liquibase-${LIQUIBASE_VERSION}.tar.gz
 
 # Download and Install lpm
 RUN mkdir bin && \
@@ -26,9 +25,8 @@ RUN mkdir bin && \
       "arm64")  DOWNLOAD_ARCH="-arm64"  ;; \
     esac &&  wget -v -O lpm.zip "https://github.com/liquibase/liquibase-package-manager/releases/download/v${LPM_VERSION}/lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip" && \
     unzip lpm.zip -d bin/ && \
-    rm lpm.zip && \
-    lpm help
-
+    rm lpm.zip
+    
 # Production Stage
 FROM eclipse-temurin:17-jre-jammy as production
 
