@@ -11,10 +11,10 @@ if [[ "$1" != "history" ]] && type "$1" > /dev/null 2>&1; then
 else
   if [[ "$*" == *--defaultsFile* ]] || [[ "$*" == *--defaults-file* ]] || [[ "$*" == *--version* ]]; then
     ## Just run as-is
-    /liquibase/liquibase "$@"
+    exec /liquibase/liquibase "$@"
   else
     ## Include standard defaultsFile
-    /liquibase/liquibase "--defaultsFile=/liquibase/liquibase.docker.properties" "$@"
+    exec /liquibase/liquibase "--defaultsFile=/liquibase/liquibase.docker.properties" "$@"
   fi
 fi
 
