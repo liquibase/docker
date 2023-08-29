@@ -130,4 +130,3 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           tags: ${{ matrix.image.name }}:latest${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ steps.collect-data.outputs.extensionVersion }}${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ steps.collect-data.outputs.minorVersion }}${{ matrix.image.suffix }},${{ env.ECR_REGISTRY }}:latest${{ matrix.image.suffix }},${{ env.ECR_REGISTRY }}:${{ steps.collect-data.outputs.extensionVersion }}${{ matrix.image.suffix }},${{ env.ECR_REGISTRY }}:${{ steps.collect-data.outputs.minorVersion }}${{ matrix.image.suffix }}
-          
