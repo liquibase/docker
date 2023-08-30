@@ -50,6 +50,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           outputDir: ./reports/
+          sarifReportDir: .
 
       - name: Upload Security Report
         uses: actions/upload-artifact@v3
