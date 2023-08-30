@@ -44,3 +44,15 @@ jobs:
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: 'trivy-results.sarif'
+
+      - name: Generate Security Report
+        uses: rsdmike/github-security-report-action@v3.0.4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          outputDir: ./reports/
+
+      - name: Upload Security Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: security-report
+          path: ./reports/summary.pdf
