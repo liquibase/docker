@@ -1,10 +1,10 @@
 # Use multi-stage build
-FROM alpine:3.17.3 as builder
+FROM alpine:3.18.3 as builder
 
 ARG TARGETARCH
-ARG LIQUIBASE_VERSION=4.21.1
+ARG LIQUIBASE_VERSION=4.23.2
 ARG LPM_VERSION=0.2.3
-ARG LB_SHA256=c04542865e5ece8b7b1ee9bd6beaefc5315e350620288d6ac1a2d32c3b1f7d8b
+ARG LB_SHA256=fc7d2a9fa97d91203d639b664715d40953c6c9155a5225a0ddc4c8079b9a3641
 
 # Install tools for downloading and verifying packages
 RUN apk add --no-cache wget unzip gnupg
@@ -28,7 +28,7 @@ RUN mkdir /liquibase/bin && \
     rm lpm.zip
 
 # Final Image
-FROM alpine:3.17.3
+FROM alpine:3.18.3
 
 # Install smaller JRE, if available and acceptable
 RUN apk add --no-cache openjdk17-jre-headless bash

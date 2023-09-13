@@ -1,4 +1,4 @@
-FROM liquibase/liquibase:latest-alpine
+FROM liquibase/liquibase:latest
 
 # Install PSQL
 USER root
