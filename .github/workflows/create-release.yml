@@ -12,15 +12,14 @@ on:
         required: false
 
 jobs:
-  setup-update-draft-build:
-    name: "${{ matrix.image.name }}:${{ inputs.liquibaseVersion}}-${{ matrix.image.suffix }}"
+
+  update-dockerfiles:
+    name: "Update Dockerfiles"
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        image: [ 
-          {dockerfile: Dockerfile, name: liquibase/liquibase, suffix: ""},
-          {dockerfile: Dockerfile.slim, name: liquibase/liquibase, suffix: "-alpine"},
-          ]
+    outputs:
+      liquibaseVersion: ${{ steps.collect-data.outputs.liquibaseVersion }}
+      extensionVersion: ${{ steps.collect-data.outputs.extensionVersion }}
+      minorVersion: ${{ steps.collect-data.outputs.minorVersion }}
     steps:
       - name: Collect Data
         id: collect-data
@@ -46,11 +45,11 @@ jobs:
             } else {
               core.setFailed('Unknown event type')
             }
-      
+
       - run: |
           echo "Saw Liquibase version ${{ steps.collect-data.outputs.liquibaseVersion }}"
           echo "Saw Extension version ${{ steps.collect-data.outputs.extensionVersion }}"
-      
+
       - uses: actions/checkout@v3
         with:
           persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal token
@@ -69,28 +68,53 @@ jobs:
           
       - name: Update Dockerfile and commit changes
         run: |
+          file_list=("Dockerfile" "Dockerfile.slim")
           LIQUIBASE_SHA=`curl -LsS https://github.com/liquibase/liquibase/releases/download/v${{ steps.collect-data.outputs.liquibaseVersion }}/liquibase-${{ steps.collect-data.outputs.liquibaseVersion }}.tar.gz | sha256sum | awk '{ print $1 }'`
-          sed -i 's/^ARG LIQUIBASE_VERSION=.*/ARG LIQUIBASE_VERSION='"${{ steps.collect-data.outputs.liquibaseVersion }}"'/' ${{ github.workspace }}/${{ matrix.image.dockerfile }}
-          sed -i 's/^ARG LB_SHA256=.*/ARG LB_SHA256='"$LIQUIBASE_SHA"'/' ${{ github.workspace }}/${{ matrix.image.dockerfile }}
-          git add ${{ matrix.image.dockerfile }}
+          for file in "${file_list[@]}"; do
+            sed -i 's/^ARG LIQUIBASE_VERSION=.*/ARG LIQUIBASE_VERSION='"${{ steps.collect-data.outputs.liquibaseVersion }}"'/' "${{ github.workspace }}/${file}"
+            sed -i 's/^ARG LB_SHA256=.*/ARG LB_SHA256='"$LIQUIBASE_SHA"'/' "${{ github.workspace }}/${file}"
+            git add "${file}"
+          done
           if git diff-index --cached --quiet HEAD --
           then
             echo "Nothing new to commit"
           else
-            git commit -m "Liquibase Version Bumped to ${{ steps.collect-data.outputs.extensionVersion }} for ${{ matrix.image.name }} ${{ matrix.image.suffix }}"
+            git commit -m "Liquibase Version Bumped to ${{ steps.collect-data.outputs.extensionVersion }}"
             git tag -fa -m "Version Bumped to ${{ steps.collect-data.outputs.extensionVersion }}" v${{ steps.collect-data.outputs.extensionVersion }}
             git push -f "https://liquibot:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git" HEAD:${{ github.ref }} --follow-tags --tags
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
 
+  setup-update-draft-build:
+    name: "${{ matrix.image.name }}:${{ inputs.liquibaseVersion}}-${{ matrix.image.suffix }}"
+    needs: update-dockerfiles
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        image: [ 
+          {dockerfile: Dockerfile, name: liquibase/liquibase, suffix: ""},
+          {dockerfile: Dockerfile.slim, name: liquibase/liquibase, suffix: "-alpine"},
+          ]
+    steps:      
+      - uses: actions/checkout@v3
+        with:
+          persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal token
+          fetch-depth: 0 # otherwise, you will fail to push refs to dest repo
+          
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: "8"
+          distribution: "adopt"
+
       - name: Release Notes
         uses: softprops/action-gh-release@v1
         with:
-          name: v${{ steps.collect-data.outputs.extensionVersion }}
-          tag_name: v${{ steps.collect-data.outputs.extensionVersion }}
+          name: v${{ needs.update-dockerfiles.outputs.extensionVersion}}
+          tag_name: v${{ needs.update-dockerfiles.outputs.extensionVersion }}
           draft: true
-          body: Support for Liquibase ${{ steps.collect-data.outputs.liquibaseVersion }}.
+          body: Support for Liquibase ${{ needs.update-dockerfiles.outputs.liquibaseVersion }}.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -107,4 +131,4 @@ jobs:
           file: ${{ matrix.image.dockerfile }}
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ${{ matrix.image.name }}:latest${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ steps.collect-data.outputs.extensionVersion }}${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ steps.collect-data.outputs.minorVersion }}${{ matrix.image.suffix }}
+          tags: ${{ matrix.image.name }}:latest${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ needs.update-dockerfiles.outputs.extensionVersion }}${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ needs.update-dockerfiles.outputs.minorVersion }}${{ matrix.image.suffix }}
