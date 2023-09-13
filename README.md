@@ -30,7 +30,7 @@ To keep the image size to a minimum, additional tools such as `git` or `bash` ar
 
 #### Extending liquibase:<version>-alpine
 
-To extend the functionality of the `liquibase:<version>-alpine` image and include additional tools that are not included by default. Examples are provided in the [examples](/examples) directory as `Dockerfile.slim.<EXAMPLE>`.
+To extend the functionality of the `liquibase:<version>-alpine` image and include additional tools that are not included by default. Examples are provided in the [examples](/examples) directory as `Dockerfile.alpine.<EXAMPLE>`.
 
 ## Changelog File
 

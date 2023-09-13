@@ -2,13 +2,12 @@
 FROM eclipse-temurin:17-jre-jammy as builder
 
 ARG TARGETARCH
-ARG LIQUIBASE_VERSION=4.21.1
+ARG LIQUIBASE_VERSION=4.23.2
 ARG LPM_VERSION=0.2.3
-ARG LB_SHA256=c04542865e5ece8b7b1ee9bd6beaefc5315e350620288d6ac1a2d32c3b1f7d8b
+ARG LB_SHA256=fc7d2a9fa97d91203d639b664715d40953c6c9155a5225a0ddc4c8079b9a3641
 
 # Install necessary dependencies
 RUN apt-get update && \
-    apt-get upgrade -y && \
     apt-get -yqq install krb5-user libpam-krb5 gnupg wget unzip --no-install-recommends && \
     rm -rf /var/lib/apt/lists/*
 
@@ -27,7 +26,7 @@ RUN mkdir bin && \
     esac &&  wget -v -O lpm.zip "https://github.com/liquibase/liquibase-package-manager/releases/download/v${LPM_VERSION}/lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip" && \
     unzip lpm.zip -d bin/ && \
     rm lpm.zip
-
+    
 # Production Stage
 FROM eclipse-temurin:17-jre-jammy as production
 
