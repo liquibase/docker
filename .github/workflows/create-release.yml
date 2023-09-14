@@ -87,7 +87,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
 
   setup-update-draft-build:
-    name: "${{ matrix.image.name }}:${{ inputs.liquibaseVersion}}-${{ matrix.image.suffix }}"
+    name: "${{ matrix.image.name }}:${{ inputs.liquibaseVersion}}${{ matrix.image.suffix }}"
     needs: update-dockerfiles
     runs-on: ubuntu-latest
     strategy:
@@ -144,4 +144,4 @@ jobs:
           no-cache: true
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ${{ matrix.image.name }}:latest${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ steps.collect-data.outputs.extensionVersion }}${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ steps.collect-data.outputs.minorVersion }}${{ matrix.image.suffix }},${{ env.ECR_REGISTRY }}:latest${{ matrix.image.suffix }},${{ env.ECR_REGISTRY }}:${{ steps.collect-data.outputs.extensionVersion }}${{ matrix.image.suffix }},${{ env.ECR_REGISTRY }}:${{ steps.collect-data.outputs.minorVersion }}${{ matrix.image.suffix }}
+          tags: ${{ matrix.image.name }}:latest${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ needs.update-dockerfiles.outputs.extensionVersion }}${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ needs.update-dockerfiles.outputs.minorVersion }}${{ matrix.image.suffix }},${{ env.ECR_REGISTRY }}:latest${{ matrix.image.suffix }},${{ env.ECR_REGISTRY }}:${{ needs.update-dockerfiles.outputs.extensionVersion }}${{ matrix.image.suffix }},${{ env.ECR_REGISTRY }}:${{ needs.update-dockerfiles.outputs.minorVersion }}${{ matrix.image.suffix }}
