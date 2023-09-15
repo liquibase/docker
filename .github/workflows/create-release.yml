@@ -50,7 +50,7 @@ jobs:
           echo "Saw Liquibase version ${{ steps.collect-data.outputs.liquibaseVersion }}"
           echo "Saw Extension version ${{ steps.collect-data.outputs.extensionVersion }}"
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal token
           ref: ${{ github.ref }}
@@ -97,7 +97,7 @@ jobs:
           {dockerfile: Dockerfile.alpine, name: liquibase/liquibase, suffix: "-alpine"},
           ]
     steps:      
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal token
           ref: ${{ github.ref }}
