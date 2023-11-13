@@ -2,9 +2,9 @@
 FROM alpine:3.18.4 as builder
 
 ARG TARGETARCH
-ARG LIQUIBASE_VERSION=4.24.0
+ARG LIQUIBASE_VERSION=4.25.0
 ARG LPM_VERSION=0.2.4
-ARG LB_SHA256=6ecf638a75b501b798189da824e167f29db93477186109f2549508c6266d0b2a
+ARG LB_SHA256=362174965cd8c2c74f1026201f911afc1a323c822828bf3fd04bcefa3aa45c49
 
 # Install tools for downloading and verifying packages
 RUN apk add --no-cache wget unzip gnupg
