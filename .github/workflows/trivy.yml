@@ -37,7 +37,7 @@ jobs:
 
       - name: Build an image from Dockerfile
         run: |
-          docker build -t liquibase/liquibase${{ matrix.image.suffix }}:${{ github.sha }} ${{ matrix.image.dockerfile }}
+          docker build -t liquibase/liquibase${{ matrix.image.suffix }}:${{ github.sha }} -f ${{ matrix.image.dockerfile }} .
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@b77b85c0254bba6789e787844f0585cde1e56320
