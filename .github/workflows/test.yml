@@ -37,7 +37,7 @@ jobs:
 
       - name: Start H2 test instance
         run: |
-          docker run -d liquibase/liquibase:${{ github.sha }} init start-h2
+          docker run -d -p 9090:9090 liquibase/liquibase:${{ github.sha }} init start-h2
           # get container ip
           export CONTAINER_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -q --filter ancestor=liquibase/liquibase:${{ github.sha }}))
           echo "Container IP: $CONTAINER_IP"
