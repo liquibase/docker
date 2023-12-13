@@ -16,7 +16,7 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  test:
     permissions:
       contents: read # for actions/checkout to fetch code
     name: Build
