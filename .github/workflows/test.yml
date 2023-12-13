@@ -45,6 +45,7 @@ jobs:
           echo "CONTAINER_IP=$CONTAINER_IP" >> $GITHUB_ENV
           # set the liquibase.command.url=jdbc:h2:tcp://localhost:9090/mem:dev from .github/test/liquibase.properties to the CONTAINER_IP
           sed -i "s/localhost/$CONTAINER_IP/g" .github/test/liquibase.properties
+          cat .github/test/liquibase.properties
 
       - name: Run Liquibase tests
         run: |
