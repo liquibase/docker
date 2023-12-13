@@ -35,10 +35,9 @@ jobs:
 
       - name: Start H2 test instance
         run: |
-          docker run --network=host -d -p 9090:9090 liquibase/liquibase:${{ github.sha }} init start-h2
-
+          docker run --network host -d -p 9090:9090 liquibase/liquibase:${{ github.sha }} init start-h2
 
       - name: Run Liquibase tests
         run: |
           # mount the .github/test directory to /liquibase/changelog in the container
-          docker run -v $(pwd)/.github/test:/liquibase/changelog liquibase/liquibase:${{ github.sha }} --defaultsFile=/liquibase/changelog/liquibase.properties --changeLogFile=/liquibase/changelog/example-changelog.xml --logLevel=debug update
+          docker run --network host -v $(pwd)/.github/test:/liquibase/changelog liquibase/liquibase:${{ github.sha }} --defaultsFile=/liquibase/changelog/liquibase.properties --changeLogFile=/liquibase/changelog/example-changelog.xml --logLevel=debug update
