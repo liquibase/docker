@@ -1,0 +1,58 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: test
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    permissions:
+      contents: read # for actions/checkout to fetch code
+      security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
+      actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
+    name: Build
+    runs-on: "ubuntu-20.04"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build an image from Dockerfile
+        run: |
+          docker build -f Dockerfile -t liquibase/liquibase:${{ github.sha }} .
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@91713af97dc80187565512baba96e4364e983601
+        with:
+          image-ref: 'liquibase/liquibase:${{ github.sha }}'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Build an image from Dockerfile (alpine)
+        run: |
+          docker build -f Dockerfile.alpine -t liquibase/liquibase-alpine:${{ github.sha }} .
+
+      - name: Start H2 test instance
+        run: |
+          docker run -d liquibase/liquibase:${{ github.sha }} init start-h2
+          # get container ip
+          export CONTAINER_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -q --filter ancestor=liquibase/liquibase:${{ github.sha }}))
+          echo "Container IP: $CONTAINER_IP"
+          # store container ip in env var
+          echo "CONTAINER_IP=$CONTAINER_IP" >> $GITHUB_ENV
+          # set the liquibase.command.url=jdbc:h2:tcp://localhost:9090/mem:dev from .github/test/liquibase.properties to the CONTAINER_IP
+          sed -i "s/localhost/$CONTAINER_IP/g" .github/test/liquibase.properties
+
+      - name: Run Liquibase tests
+        run: |
+          docker run -v .github/test:/liquibase/changelog liquibase/liquibase:${{ github.sha }} --defaultsFile=/liquibase/changelog/liquibase.properties --changeLogFile=/liquibase/changelog/example-changelog.xml --logLevel=debug update
