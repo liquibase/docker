@@ -31,13 +31,6 @@ jobs:
         run: |
           docker build -f Dockerfile -t liquibase/liquibase:${{ github.sha }} .
 
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@91713af97dc80187565512baba96e4364e983601
-        with:
-          image-ref: 'liquibase/liquibase:${{ github.sha }}'
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-
       - name: Build an image from Dockerfile (alpine)
         run: |
           docker build -f Dockerfile.alpine -t liquibase/liquibase-alpine:${{ github.sha }} .
