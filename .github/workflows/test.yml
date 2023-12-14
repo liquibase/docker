@@ -39,8 +39,8 @@ jobs:
 
       - name: Run Liquibase version
         run: |
-          docker exec -it liquibase liquibase --version
+          docker exec -t liquibase liquibase --version
 
       - name: Run Liquibase update
         run: |
-          docker exec -it liquibase liquibase update --defaultsFile=/liquibase/changelog/liquibase.properties --changeLogFile=/liquibase/changelog/example-changelog.xml
+          docker exec -t liquibase liquibase update --defaultsFile=/liquibase/changelog/liquibase.properties --changeLogFile=/liquibase/changelog/example-changelog.xml
