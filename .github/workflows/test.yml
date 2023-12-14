@@ -36,9 +36,11 @@ jobs:
       - name: Start H2 test instance
         run: |
           docker run --name liquibase -d -v $(pwd)/.github/test:/liquibase/changelog liquibase/liquibase:${{ github.sha }} init start-h2
+          docker stats --no-stream
 
       - name: Run Liquibase version
         run: |
+          free -m
           docker exec liquibase liquibase --version
 
       - name: Run Liquibase update
