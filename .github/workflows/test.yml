@@ -36,7 +36,6 @@ jobs:
         run: |
           docker build -f ${{ matrix.dockerfile }} -t liquibase/liquibase:${{ github.sha }} .
 
-
       - name: Test liquibase version
         run: |
           LOG_STRING="Liquibase Version:"
