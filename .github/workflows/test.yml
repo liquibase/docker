@@ -24,7 +24,7 @@ jobs:
       matrix:
         dockerfile: [Dockerfile, Dockerfile.alpine]
     permissions:
-      contents: read # for actions/checkout to fetch code
+      contents: read
     name: Build
     runs-on: ubuntu-latest
     steps:
@@ -37,9 +37,9 @@ jobs:
 
       - name: Start H2 test instance
         run: |
-          docker run --name liquibase -d -v $(pwd)/.github/test:/liquibase/changelog liquibase/liquibase:${{ github.sha }} init start-h2
+          docker run --name $CONTAINER_NAME -d -v $(pwd)/.github/test:/liquibase/changelog liquibase/liquibase:${{ github.sha }} init start-h2
           sleep 5
-          docker logs liquibase
+          docker logs $CONTAINER_NAME
           LOG_STRING="jdbc:h2:tcp://localhost:9090/mem:dev"
           # Check if the container is running
           if docker inspect -f '{{.State.Running}}' "$CONTAINER_NAME" 2>/dev/null | grep -q "true"; then
@@ -57,8 +57,8 @@ jobs:
 
       - name: Run Liquibase version
         run: |
-          docker exec liquibase liquibase --version
-          docker logs liquibase
+          docker exec $CONTAINER_NAME liquibase --version
+          docker logs $CONTAINER_NAME
           LOG_STRING="Liquibase Version:"
           # Check if the container is running
           if docker inspect -f '{{.State.Running}}' "$CONTAINER_NAME" 2>/dev/null | grep -q "true"; then
