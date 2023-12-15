@@ -76,14 +76,11 @@ jobs:
 
       - name: Test Liquibase update
         run: |
-          docker exec $CONTAINER_NAME liquibase update --defaultsFile=/liquibase/changelog/liquibase.properties --changelog-file=/changelog/example-changelog.xml
-          sleep 5
-          docker logs $CONTAINER_NAME
           LOG_STRING="Update has been successful"
           # Check if the container is running
           if docker inspect -f '{{.State.Running}}' "$CONTAINER_NAME" 2>/dev/null | grep -q "true"; then
               # Get the logs and check if the desired string is present
-              if docker logs "$CONTAINER_NAME" 2>&1 | grep -q "$LOG_STRING"; then
+              if docker exec $CONTAINER_NAME liquibase update --defaultsFile=/liquibase/changelog/liquibase.properties --changelog-file=/changelog/example-changelog.xml 2>&1 | grep -q "$LOG_STRING"; then
                   echo "The log contains the string: $LOG_STRING"
               else
                   echo "The log does not contain the string: $LOG_STRING"
