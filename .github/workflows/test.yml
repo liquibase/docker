@@ -3,7 +3,7 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: test
+name: Test Dockerfiles
 
 on:
   push:
@@ -17,15 +17,16 @@ permissions:
 
 jobs:
   test:
+
     env:
       CONTAINER_NAME: "liquibase"
+
     strategy:
       fail-fast: false
       matrix:
         dockerfile: [Dockerfile, Dockerfile.alpine]
-    permissions:
-      contents: read
-    name: Build
+
+    name: Build & Test ${{ matrix.dockerfile }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
