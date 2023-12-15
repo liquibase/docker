@@ -38,10 +38,10 @@ jobs:
 
       - name: Test liquibase init start-h2
         run: |
+          LOG_STRING="jdbc:h2:tcp://localhost:9090/mem:dev"
           docker run --name $CONTAINER_NAME -d -v $(pwd)/.github/test:/liquibase/changelog liquibase/liquibase:${{ github.sha }} init start-h2
           sleep 5
           docker logs $CONTAINER_NAME
-          LOG_STRING="jdbc:h2:tcp://localhost:9090/mem:dev"
           # Check if the container is running
           if docker inspect -f '{{.State.Running}}' "$CONTAINER_NAME" 2>/dev/null | grep -q "true"; then
               # Get the logs and check if the desired string is present
