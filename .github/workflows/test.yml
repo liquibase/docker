@@ -35,7 +35,7 @@ jobs:
         run: |
           docker build -f ${{ matrix.dockerfile }} -t liquibase/liquibase:${{ github.sha }} .
 
-      - name: Start H2 test instance
+      - name: Test init start-h2
         run: |
           docker run --name $CONTAINER_NAME -d -v $(pwd)/.github/test:/liquibase/changelog liquibase/liquibase:${{ github.sha }} init start-h2
           sleep 5
@@ -55,7 +55,7 @@ jobs:
               exit 2
           fi
 
-      - name: Run Liquibase version
+      - name: Test Liquibase version
         run: |
           docker exec $CONTAINER_NAME liquibase --version
           docker logs $CONTAINER_NAME
@@ -74,9 +74,10 @@ jobs:
               exit 2
           fi
 
-      - name: Run Liquibase update
+      - name: Test Liquibase update
         run: |
-          docker exec liquibase liquibase update --defaultsFile=/liquibase/changelog/liquibase.properties --changelog-file=/changelog/example-changelog.xml
+          docker exec $CONTAINER_NAME liquibase update --defaultsFile=/liquibase/changelog/liquibase.properties --changelog-file=/changelog/example-changelog.xml
+          sleep 5
           docker logs $CONTAINER_NAME
           LOG_STRING="Update has been successful"
           # Check if the container is running
