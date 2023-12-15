@@ -7,7 +7,7 @@ ARG LPM_VERSION=0.2.4
 ARG LB_SHA256=e984b936c6b351da92d701103db5e944234348b5ac938176a4a4297afcc780f2
 
 # Install tools for downloading and verifying packages
-RUN apk add --no-cache wget unzip gnupg
+RUN apk add --no-cache wget unzip gnupg openrc
 
 WORKDIR /liquibase
 
