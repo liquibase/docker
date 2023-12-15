@@ -33,7 +33,7 @@ FROM eclipse-temurin:17-jre-jammy as production
 # Create liquibase user
 RUN addgroup --gid 1001 liquibase && \
     adduser --disabled-password --uid 1001 --ingroup liquibase liquibase && \
-    mkdir /liquibase && chown liquibase /liquibase
+    mkdir /liquibase && chown root:root /liquibase
 
 # Setup symbolic links
 RUN ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \
