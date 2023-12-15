@@ -31,7 +31,7 @@ jobs:
 
       - name: Build an image from Dockerfile (alpine)
         run: |
-          docker build -f Dockerfile.alpine -t liquibase/liquibase-alpine:${{ github.sha }} .
+          #docker build -f Dockerfile.alpine -t liquibase/liquibase-alpine:${{ github.sha }} .
 
       - name: Start H2 test instance
         run: |
