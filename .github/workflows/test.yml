@@ -61,4 +61,4 @@ jobs:
 
       - name: Run Liquibase update
         run: |
-          docker exec liquibase liquibase update --defaultsFile=/liquibase/changelog/liquibase.properties
+          docker exec liquibase liquibase update --defaultsFile=/liquibase/changelog/liquibase.properties --changelog-file=/changelog/example-changelog.xml
