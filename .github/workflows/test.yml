@@ -17,6 +17,10 @@ permissions:
 
 jobs:
   test:
+    strategy:
+      fail-fast: false
+      matrix:
+        dockerfile: [Dockerfile, Dockerfile.alpine]
     permissions:
       contents: read # for actions/checkout to fetch code
     name: Build
@@ -25,17 +29,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build an image from Dockerfile
+      - name: Build an image from ${{ matrix.dockerfile }}
         run: |
-          docker build -f Dockerfile -t liquibase/liquibase:${{ github.sha }} .
-
-      - name: Build an image from Dockerfile (alpine)
-        run: |
-          #docker build -f Dockerfile.alpine -t liquibase/liquibase-alpine:${{ github.sha }} .
+          docker build -f ${{ matrix.dockerfile }} -t liquibase/liquibase:${{ github.sha }} .
 
       - name: Start H2 test instance
         run: |
           docker run --name liquibase -d -v $(pwd)/.github/test:/liquibase/changelog liquibase/liquibase:${{ github.sha }} init start-h2
+          sleep 5
           docker logs liquibase
           CONTAINER_NAME="liquibase"
           LOG_STRING="jdbc:h2:tcp://localhost:9090/mem:dev"
