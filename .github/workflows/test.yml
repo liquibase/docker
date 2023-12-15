@@ -37,15 +37,12 @@ jobs:
         run: |
           docker run --name liquibase -d -v $(pwd)/.github/test:/liquibase/changelog liquibase/liquibase:${{ github.sha }} init start-h2
           docker logs liquibase
-          sleep 5
-          docker logs liquibase
-          docker ps -a
-          docker stats --no-stream
 
       - name: Run Liquibase version
         run: |
           docker exec liquibase liquibase --version
+          docker logs liquibase
 
       - name: Run Liquibase update
         run: |
-          docker exec liquibase liquibase update --defaultsFile=/liquibase/changelog/liquibase.properties --changeLogFile=/liquibase/changelog/example-changelog.xml
+          docker exec liquibase liquibase update --defaultsFile=/liquibase/changelog/liquibase.properties
