@@ -89,3 +89,49 @@ jobs:
               echo "Error: Container $CONTAINER_NAME is not running."
               exit 2
           fi
+
+      - name: Test liquibase wrong ENV variable
+        run: |
+          LOG_STRING="Error: Unable to access jarfile wrong_path/internal/lib/"
+          # Stop docker container and remove it
+          docker stop $CONTAINER_NAME
+          docker rm $CONTAINER_NAME
+          # Start docker container with wrong ENV
+          docker run --name $CONTAINER_NAME -d -v $(pwd)/.github/test:/liquibase/changelog -e LIQUIBASE_HOME="wrong_path" liquibase/liquibase:${{ github.sha }} init start-h2
+          # Check if the container is running
+          if docker inspect -f '{{.State.Running}}' "$CONTAINER_NAME" 2>/dev/null | grep -q "true"; then
+              # Get the logs and check if the desired string is present
+              if docker exec $CONTAINER_NAME liquibase update --defaultsFile=/liquibase/changelog/liquibase.properties --changelog-file=/changelog/example-changelog.xml 2>&1 | grep -q "$LOG_STRING"; then
+                  echo "The log contains the string: $LOG_STRING"
+              else
+                  echo "The log does not contain the string: $LOG_STRING"
+                  exit 1
+              fi
+          else
+              echo "Error: Container $CONTAINER_NAME is not running."
+              exit 2
+          fi
+
+      - name: Test liquibase good ENV variable
+        run: |
+          LOG_STRING="jdbc:h2:tcp://localhost:9090/mem:dev"
+          # Stop docker container and remove it
+          docker stop $CONTAINER_NAME
+          docker rm $CONTAINER_NAME
+          # Start docker container with good ENV
+          docker run --name $CONTAINER_NAME -d -v $(pwd)/.github/test:/liquibase/changelog -e LIQUIBASE_HOME="/liquibase" liquibase/liquibase:${{ github.sha }} init start-h2
+          sleep 5
+          docker logs $CONTAINER_NAME
+          # Check if the container is running
+          if docker inspect -f '{{.State.Running}}' "$CONTAINER_NAME" 2>/dev/null | grep -q "true"; then
+              # Get the logs and check if the desired string is present
+              if docker logs "$CONTAINER_NAME" 2>&1 | grep -q "$LOG_STRING"; then
+                  echo "The log contains the string: $LOG_STRING"
+              else
+                  echo "The log does not contain the string: $LOG_STRING"
+                  exit 1
+              fi
+          else
+              echo "Error: Container $CONTAINER_NAME is not running."
+              exit 2
+          fi
