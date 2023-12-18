@@ -99,10 +99,10 @@ jobs:
           # Start docker container with wrong ENV
           # Get the logs and check if the desired string is present
           if docker run --name $CONTAINER_NAME -d -v $(pwd)/.github/test:/liquibase/changelog -e LIQUIBASE_HOME="wrong_path" liquibase/liquibase:${{ github.sha }} init start-h2 2>&1 | grep -q "$LOG_STRING"; then
-              echo "The log contains the string: $LOG_STRING"
+            echo "The log does not contain the string: $LOG_STRING"
+            exit 1
           else
-              echo "The log does not contain the string: $LOG_STRING"
-              exit 1
+            echo "The log contains the string: $LOG_STRING"
           fi
 
       - name: Test liquibase good ENV variable
