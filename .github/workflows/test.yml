@@ -156,6 +156,7 @@ jobs:
           LOG_STRING="Update has been successful"
           # Stop docker container
           docker stop $CONTAINER_NAME
+          docker rm $CONTAINER_NAME
           # Start docker container
           docker run --name $CONTAINER_NAME -d -v $(pwd)/.github/test:/liquibase/changelog -v $(pwd)/.github/test/extensions:/liquibase/classpath liquibase/liquibase:${{ github.sha }} init start-h2
           sleep 5
@@ -163,7 +164,8 @@ jobs:
           # Check if the container is running
           if docker inspect -f '{{.State.Running}}' "$CONTAINER_NAME" 2>/dev/null | grep -q "true"; then
               # Get the logs and check if the desired string is present
-              if docker logs "$CONTAINER_NAME" 2>&1 | grep -q "$LOG_STRING"; then
+              docker exec $CONTAINER_NAME liquibase --version
+              if docker exec $CONTAINER_NAME liquibase --version 2>&1 | grep -q "$LOG_STRING"; then
                   echo "The log contains the string: $LOG_STRING"
               else
                   echo "The log does not contain the string: $LOG_STRING"
