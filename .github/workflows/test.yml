@@ -128,3 +128,25 @@ jobs:
               echo "Error: Container $CONTAINER_NAME is not running."
               exit 2
           fi
+
+      - name: Test volume persistence
+        run: |
+          LOG_STRING="Update has been successful"
+          # Stop docker container
+          docker stop $CONTAINER_NAME
+          # Start docker container
+          docker start $CONTAINER_NAME
+          sleep 5
+          # Check if the container is running
+          if docker inspect -f '{{.State.Running}}' "$CONTAINER_NAME" 2>/dev/null | grep -q "true"; then
+              # Get the logs and check if the desired string is present
+              if docker exec $CONTAINER_NAME liquibase update --defaultsFile=/liquibase/changelog/liquibase.properties --changelog-file=/changelog/example-changelog.xml 2>&1 | grep -q "$LOG_STRING"; then
+                  echo "The log contains the string: $LOG_STRING"
+              else
+                  echo "The log does not contain the string: $LOG_STRING"
+                  exit 1
+              fi
+          else
+              echo "Error: Container $CONTAINER_NAME is not running."
+              exit 2
+          fi
