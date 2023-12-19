@@ -48,7 +48,7 @@ jobs:
         run: |
           LOG_STRING="jdbc:h2:tcp://localhost:9090/mem:dev"
           docker run --name $CONTAINER_NAME -d -v $(pwd)/.github/test:/liquibase/changelog liquibase/liquibase:${{ github.sha }} init start-h2
-          sleep 5
+          sleep 10
           docker ps -a
           docker logs $CONTAINER_NAME
           # Check if the container is running
