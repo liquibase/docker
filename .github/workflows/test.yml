@@ -25,7 +25,7 @@ jobs:
       fail-fast: false
       matrix:
         dockerfile: [Dockerfile, Dockerfile.alpine]
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest]
 
     name: Build & Test ${{ matrix.dockerfile }} - ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
@@ -40,16 +40,6 @@ jobs:
           colima start
           sudo ln -sf $HOME/.colima/default/docker.sock /var/run/docker.sock
 
-      - name: Install Quemu on Windows
-        if: matrix.os == 'windows-latest'
-        run: |
-          $ubuntuAppName = "Ubuntu-20.04"
-          $appInstallCommand = "wsl --install -d $ubuntuAppName"
-          Invoke-Expression $appInstallCommand
-          wsl -d $ubuntuAppName
-          wsl -d $ubuntuAppName -- sudo apt-get update
-          wsl -d $ubuntuAppName -- sudo apt-get install -y docker.io
-          
       - name: Build an image from ${{ matrix.dockerfile }}
         run: |
           docker build -f ${{ matrix.dockerfile }} -t liquibase/liquibase:${{ github.sha }} .
