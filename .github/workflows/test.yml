@@ -33,6 +33,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # If operating system is macOS, install Docker Desktop
+      - name: Install Docker Desktop on macOS
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew install --cask docker
+          open /Applications/Docker.app
+
       - name: Build an image from ${{ matrix.dockerfile }}
         run: |
           docker build -f ${{ matrix.dockerfile }} -t liquibase/liquibase:${{ github.sha }} .
