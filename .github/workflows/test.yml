@@ -27,7 +27,7 @@ jobs:
         dockerfile: [Dockerfile, Dockerfile.alpine]
         os: [ubuntu-latest, macos-latest, windows-latest]
 
-    name: Build & Test ${{ matrix.dockerfile }}
+    name: Build & Test ${{ matrix.dockerfile }} - ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
