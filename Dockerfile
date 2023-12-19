@@ -1,5 +1,5 @@
 # Builder Stage
-FROM eclipse-temurin:17-jre-jammy as builder
+FROM eclipse-temurin:17.0.9_9-jre as builder
 
 ARG TARGETARCH
 ARG LIQUIBASE_VERSION=4.25.0
