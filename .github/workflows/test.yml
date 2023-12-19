@@ -40,6 +40,21 @@ jobs:
           colima start
           sudo ln -sf $HOME/.colima/default/docker.sock /var/run/docker.sock
 
+      - name: Install Quemu on Windows
+        if: matrix.os == 'windows-latest'
+        run: |
+          Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+          choco --version
+          choco install qemu
+          wsl --install
+          wsl -- sudo apt-get update && sudo apt-get install -y docker.io
+          choco install docker-machine
+          docker-machine create --driver qemu --engine-env DOCKER_CLI_BUILD=1 linux-docker-machine
+          docker-machine start linux-docker-machine
+          $env:DOCKER_HOST = (docker-machine env linux-docker-machine | Out-String) -replace '\r?\n', ''
+          docker version
+
+
       - name: Build an image from ${{ matrix.dockerfile }}
         run: |
           docker build --platform linux -f ${{ matrix.dockerfile }} -t liquibase/liquibase:${{ github.sha }} .
