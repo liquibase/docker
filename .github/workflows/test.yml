@@ -49,15 +49,15 @@ jobs:
           wsl --install
           wsl -- sudo apt-get update && sudo apt-get install -y docker.io
           choco install docker-machine
+          choco install docker-machine-driver-qemu
           docker-machine create --driver qemu --engine-env DOCKER_CLI_BUILD=1 linux-docker-machine
           docker-machine start linux-docker-machine
           $env:DOCKER_HOST = (docker-machine env linux-docker-machine | Out-String) -replace '\r?\n', ''
           docker version
 
-
       - name: Build an image from ${{ matrix.dockerfile }}
         run: |
-          docker build --platform linux -f ${{ matrix.dockerfile }} -t liquibase/liquibase:${{ github.sha }} .
+          docker build -f ${{ matrix.dockerfile }} -t liquibase/liquibase:${{ github.sha }} .
 
       - name: Test liquibase init start-h2
         run: |
