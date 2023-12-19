@@ -42,7 +42,7 @@ jobs:
 
       - name: Build an image from ${{ matrix.dockerfile }}
         run: |
-          docker build -f ${{ matrix.dockerfile }} -t liquibase/liquibase:${{ github.sha }} .
+          docker build --platform linux/amd64 -f ${{ matrix.dockerfile }} -t liquibase/liquibase:${{ github.sha }} .
 
       - name: Test liquibase init start-h2
         run: |
