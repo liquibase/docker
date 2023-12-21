@@ -193,8 +193,6 @@ jobs:
           docker build -f ${{ matrix.dockerfile }} -t liquibase:test-entrypoint .
           # Build custom liquibase image
           docker build -f $(pwd)/.github/test/Dockerfile -t liquibase:test $(pwd)/.github/test/
-          # Start mssql docker container
-          docker run --name mssql --network test_network -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=Letmein.8' -p 1433:1433 -d mcr.microsoft.com/mssql/server:2017-latest
           # Get the logs and check if the desired string is present
           if docker run --network test_network --rm -it --name liquibase-test --entrypoint="/scripts/liquibase_command.sh" -v $(pwd)/.github/test:/liquibase/changelog liquibase:test "update" 2>&1 | grep -q "$LOG_STRING"; then
               echo "The log contains the string: $LOG_STRING"
