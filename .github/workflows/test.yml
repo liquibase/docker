@@ -199,8 +199,7 @@ jobs:
           docker run --name mssql --network test_network -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=Letmein.8' -p 1433:1433 -d mcr.microsoft.com/mssql/server:2017-latest
           # Get the logs and check if the desired string is present
           docker run --network test_network --rm --name liquibase-test --entrypoint="/scripts/liquibase_command.sh" -v $(pwd)/.github/test:/liquibase/changelog liquibase:test "update" > log.txt
-          cat log.txt
-          if cat log.txt | grep -q "$LOG_STRING"; then
+          if grep -q "$LOG_STRING" log.txt; then
               echo "The log contains the string: $LOG_STRING"
           else
               echo "The log does not contain the string: $LOG_STRING"
