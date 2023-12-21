@@ -190,7 +190,7 @@ jobs:
         run: |
           LOG_STRING="was executed successfully"
           docker stop mssql
-          docker mssql
+          docker rm mssql
           # Build auxiliary liquibase image to inherit from
           docker build -f ${{ matrix.dockerfile }} -t liquibase:test-entrypoint .
           # Build custom liquibase image
