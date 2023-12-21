@@ -48,7 +48,7 @@ jobs:
         run: |
           LOG_STRING="The database does not persist data"
           docker run --name $CONTAINER_NAME -d -v $(pwd)/.github/test:/liquibase/changelog liquibase/liquibase:${{ github.sha }} init start-h2
-          sleep 5
+          sleep 10
           # Check if the container is running
           if docker inspect -f '{{.State.Running}}' "$CONTAINER_NAME" 2>/dev/null | grep -q "true"; then
               # Get the logs and check if the desired string is present
