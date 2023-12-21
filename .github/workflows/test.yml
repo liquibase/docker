@@ -178,9 +178,6 @@ jobs:
           docker network create --driver bridge test_network
           # Start mssql docker container
           docker run --name mssql --network test_network -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=Letmein.8' -p 1433:1433 -d mcr.microsoft.com/mssql/server:2017-latest
-          # Stop liquibase docker container
-          docker stop $CONTAINER_NAME
-          docker rm $CONTAINER_NAME
           # Get the logs and check if the desired string is present
           if docker run --rm --name $CONTAINER_NAME --network test_network -v $(pwd)/.github/test:/liquibase/changelog liquibase/liquibase:${{ github.sha }} update --defaultsFile=/liquibase/changelog/liquibase-mssql.properties --changelog-file=/changelog/changelog.sql 2>&1 | grep -q "$LOG_STRING"; then
               echo "The log contains the string: $LOG_STRING"
