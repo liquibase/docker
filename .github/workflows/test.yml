@@ -174,7 +174,7 @@ jobs:
 
       - name: Test driver connection
         run: |
-          LOG_STRING="was executed successfully"
+          LOG_STRING="Update has been successful"
           docker network create --driver bridge test_network
           # Start mssql docker container
           docker run --name mssql --network test_network -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=Letmein.8' -p 1433:1433 -d mcr.microsoft.com/mssql/server:2017-latest
@@ -188,7 +188,7 @@ jobs:
 
       - name: Test custom entrypoint
         run: |
-          LOG_STRING="was executed successfully"
+          LOG_STRING="Update has been successful"
           docker stop mssql
           docker rm mssql
           # Build auxiliary liquibase image to inherit from
@@ -198,8 +198,9 @@ jobs:
           # Start mssql docker container
           docker run --name mssql --network test_network -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=Letmein.8' -p 1433:1433 -d mcr.microsoft.com/mssql/server:2017-latest
           # Get the logs and check if the desired string is present
-          docker run --network test_network --rm --name liquibase-test --entrypoint="/scripts/liquibase_command.sh" -v $(pwd)/.github/test:/liquibase/changelog liquibase:test "update"
-          if docker run --network test_network --rm -it --name liquibase-test --entrypoint="/scripts/liquibase_command.sh" -v $(pwd)/.github/test:/liquibase/changelog liquibase:test "update" 2>&1 | grep -q "$LOG_STRING"; then
+          docker run --network test_network --rm --name liquibase-test --entrypoint="/scripts/liquibase_command.sh" -v $(pwd)/.github/test:/liquibase/changelog liquibase:test "update" > log.txt
+          cat log.txt
+          if cat log.txt | grep -q "$LOG_STRING"; then
               echo "The log contains the string: $LOG_STRING"
           else
               echo "The log does not contain the string: $LOG_STRING"
