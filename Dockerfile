@@ -41,7 +41,7 @@ RUN ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh &&
     ln -s /liquibase/liquibase /usr/local/bin/liquibase && \
     ln -s /liquibase/bin/lpm /usr/local/bin/lpm
 
-WORKDIR /liquibase
+WORKDIR /liquibase/changelog
 USER liquibase
 ENV LIQUIBASE_HOME=/liquibase
 

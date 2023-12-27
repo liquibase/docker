@@ -39,7 +39,7 @@ RUN addgroup --gid 1001 liquibase && \
 
 # Make /liquibase directory and change owner to liquibase
 RUN mkdir /liquibase && chown liquibase /liquibase
-WORKDIR /liquibase
+WORKDIR /liquibase/changelog
 
 # Copy the /liquibase directory from builder stage into final image
 COPY --from=builder /liquibase /liquibase
