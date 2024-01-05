@@ -1,0 +1,196 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: Test Dockerfiles
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+
+    env:
+      CONTAINER_NAME: "liquibase"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        dockerfile: [Dockerfile, Dockerfile.alpine]
+        os: [ubuntu-latest, macos-latest]
+
+    name: Build & Test ${{ matrix.dockerfile }} - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Docker Desktop on macOS
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew install docker
+          colima start
+          sudo ln -sf $HOME/.colima/default/docker.sock /var/run/docker.sock
+
+      - name: Build an image from ${{ matrix.dockerfile }}
+        run: |
+          docker build -f ${{ matrix.dockerfile }} -t liquibase/liquibase:${{ github.sha }} .
+
+      - name: Test liquibase init start-h2
+        run: |
+          LOG_STRING="The database does not persist data"
+          docker run --name $CONTAINER_NAME -d -v $(pwd)/.github/test:/liquibase/changelog liquibase/liquibase:${{ github.sha }} init start-h2
+          sleep 10
+          # Check if the container is running
+          if docker inspect -f '{{.State.Running}}' "$CONTAINER_NAME" 2>/dev/null | grep -q "true"; then
+              # Get the logs and check if the desired string is present
+              if docker logs "$CONTAINER_NAME" 2>&1 | grep -q "$LOG_STRING"; then
+                  echo "The log contains the string: $LOG_STRING"
+              else
+                  echo "The log does not contain the string: $LOG_STRING"
+                  exit 1
+              fi
+          else
+              echo "Error: Container $CONTAINER_NAME is not running."
+              exit 2
+          fi
+
+      - name: Test liquibase version
+        run: |
+          LOG_STRING="Liquibase Version:"
+          # Check if the container is running
+          if docker inspect -f '{{.State.Running}}' "$CONTAINER_NAME" 2>/dev/null | grep -q "true"; then
+              # Get the logs and check if the desired string is present
+              if docker exec $CONTAINER_NAME liquibase --version 2>&1 | grep -q "$LOG_STRING"; then
+                  echo "The log contains the string: $LOG_STRING"
+              else
+                  echo "The log does not contain the string: $LOG_STRING"
+                  exit 1
+              fi
+          else
+              echo "Error: Container $CONTAINER_NAME is not running."
+              exit 2
+          fi
+
+      - name: Test liquibase update
+        run: |
+          LOG_STRING="Update has been successful"
+          # Check if the container is running
+          if docker inspect -f '{{.State.Running}}' "$CONTAINER_NAME" 2>/dev/null | grep -q "true"; then
+              # Get the logs and check if the desired string is present
+              if docker exec $CONTAINER_NAME liquibase update --defaultsFile=/liquibase/changelog/liquibase.properties --changelog-file=/changelog/example-changelog.xml 2>&1 | grep -q "$LOG_STRING"; then
+                  echo "The log contains the string: $LOG_STRING"
+              else
+                  echo "The log does not contain the string: $LOG_STRING"
+                  exit 1
+              fi
+          else
+              echo "Error: Container $CONTAINER_NAME is not running."
+              exit 2
+          fi
+
+      - name: Test liquibase wrong ENV variable
+        run: |
+          LOG_STRING="Error: Unable to access jarfile wrong_path/internal/lib/"
+          # Stop docker container and remove it
+          docker stop $CONTAINER_NAME
+          docker rm $CONTAINER_NAME
+          # Start docker container with wrong ENV
+          # Get the logs and check if the desired string is present
+          if docker run --name $CONTAINER_NAME -d -v $(pwd)/.github/test:/liquibase/changelog -e LIQUIBASE_HOME="wrong_path" liquibase/liquibase:${{ github.sha }} init start-h2 2>&1 | grep -q "$LOG_STRING"; then
+            echo "The log does not contain the string: $LOG_STRING"
+            exit 1
+          else
+            echo "The log contains the string: $LOG_STRING"
+          fi
+
+      - name: Test liquibase good ENV variable
+        run: |
+          LOG_STRING="The database does not persist data"
+          # Stop docker container and remove it
+          docker stop $CONTAINER_NAME
+          docker rm $CONTAINER_NAME
+          # Start docker container with good ENV
+          docker run --name $CONTAINER_NAME -d -v $(pwd)/.github/test:/liquibase/changelog -e LIQUIBASE_HOME="/liquibase" liquibase/liquibase:${{ github.sha }} init start-h2
+          sleep 10
+          docker logs $CONTAINER_NAME
+          # Check if the container is running
+          if docker inspect -f '{{.State.Running}}' "$CONTAINER_NAME" 2>/dev/null | grep -q "true"; then
+              # Get the logs and check if the desired string is present
+              if docker logs "$CONTAINER_NAME" 2>&1 | grep -q "$LOG_STRING"; then
+                  echo "The log contains the string: $LOG_STRING"
+              else
+                  echo "The log does not contain the string: $LOG_STRING"
+                  exit 1
+              fi
+          else
+              echo "Error: Container $CONTAINER_NAME is not running."
+              exit 2
+          fi
+
+      - name: Test volume persistence
+        run: |
+          LOG_STRING="Update has been successful"
+          # Stop docker container
+          docker stop $CONTAINER_NAME
+          # Start docker container
+          docker start $CONTAINER_NAME
+          sleep 5
+          # Check if the container is running
+          if docker inspect -f '{{.State.Running}}' "$CONTAINER_NAME" 2>/dev/null | grep -q "true"; then
+              # Get the logs and check if the desired string is present
+              if docker exec $CONTAINER_NAME liquibase update --defaultsFile=/liquibase/changelog/liquibase.properties --changelog-file=/changelog/example-changelog.xml 2>&1 | grep -q "$LOG_STRING"; then
+                  echo "The log contains the string: $LOG_STRING"
+              else
+                  echo "The log does not contain the string: $LOG_STRING"
+                  exit 1
+              fi
+          else
+              echo "Error: Container $CONTAINER_NAME is not running."
+              exit 2
+          fi
+
+      - name: Test extension loading
+        run: |
+          LOG_STRING="Liquibase Extension Amazon Redshift support"
+          # Stop docker container
+          docker stop $CONTAINER_NAME
+          docker rm $CONTAINER_NAME
+          # Get the logs and check if the desired string is present
+          if docker run --rm --name $CONTAINER_NAME -v $(pwd)/.github/test:/liquibase/changelog -v $(pwd)/.github/test/extensions:/liquibase/lib liquibase/liquibase:${{ github.sha }} --version 2>&1 | grep -q "$LOG_STRING"; then
+              echo "The log contains the string: $LOG_STRING"
+          else
+              echo "The log does not contain the string: $LOG_STRING"
+              exit 1
+          fi
+
+      - name: Test driver connection
+        run: |
+          LOG_STRING="Update has been successful"
+          docker network create --driver bridge test_network
+          # Start mssql docker container
+          docker run --name mssql --network test_network -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=Letmein.8' -p 1433:1433 -d mcr.microsoft.com/mssql/server:2017-latest
+          # Get the logs and check if the desired string is present
+          docker run --rm --name $CONTAINER_NAME --network test_network -v $(pwd)/.github/test:/liquibase/changelog liquibase/liquibase:${{ github.sha }} update --defaultsFile=/liquibase/changelog/liquibase-mssql.properties --changelog-file=/changelog/changelog.sql
+
+      - name: Test custom entrypoint
+        run: |
+          LOG_STRING="Update has been successful"
+          docker stop mssql
+          docker rm mssql
+          # Build auxiliary liquibase image to inherit from
+          docker build -f ${{ matrix.dockerfile }} -t liquibase:test-entrypoint .
+          # Build custom liquibase image
+          docker build -f $(pwd)/.github/test/Dockerfile -t liquibase:test $(pwd)/.github/test/
+          # Start mssql docker container
+          docker run --name mssql --network test_network -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=Letmein.8' -p 1433:1433 -d mcr.microsoft.com/mssql/server:2017-latest
+          # Get the logs and check if the desired string is present
+          docker run --network test_network --rm --name liquibase-test --entrypoint="/scripts/liquibase_command.sh" -v $(pwd)/.github/test:/liquibase/changelog liquibase:test "update"
