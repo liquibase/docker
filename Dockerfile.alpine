@@ -7,7 +7,7 @@ ARG LPM_VERSION=0.2.4
 ARG LB_SHA256=8b2b7aa8ec755d4ee52fa0210cd2a244fd16ed695fc4a72245562950776d2a56
 
 # Install tools for downloading and verifying packages
-RUN apk add --no-cache wget unzip gnupg
+RUN apk add --no-cache wget unzip gnupg openrc
 
 WORKDIR /liquibase
 
@@ -57,10 +57,6 @@ USER liquibase
 
 COPY --chown=liquibase:liquibase docker-entrypoint.sh /liquibase/
 COPY --chown=liquibase:liquibase liquibase.docker.properties /liquibase/
-
-VOLUME /liquibase/classpath
-
-VOLUME /liquibase/changelog
 
 ENTRYPOINT ["/liquibase/docker-entrypoint.sh"]
 CMD ["--help"]
