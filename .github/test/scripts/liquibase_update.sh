@@ -1,5 +1,5 @@
 #!/bin/bash
-: ${CHANGELOG_FILE:="/changelog/changelog.sql"}
+: ${CHANGELOG_FILE:="changelog.sql"}
 : ${DEFAULTS_FILE:="/liquibase/changelog/liquibase-mssql.properties"}
 
 echo "Applying changes to the database. Changelog: $CHANGELOG_FILE"
