@@ -86,7 +86,7 @@ jobs:
           # Check if the container is running
           if docker inspect -f '{{.State.Running}}' "$CONTAINER_NAME" 2>/dev/null | grep -q "true"; then
               # Get the logs and check if the desired string is present
-              if docker exec $CONTAINER_NAME liquibase update --defaultsFile=/liquibase/changelog/liquibase.properties --changelog-file=/changelog/example-changelog.xml 2>&1 | grep -q "$LOG_STRING"; then
+              if docker exec $CONTAINER_NAME liquibase update --defaultsFile=/liquibase/changelog/liquibase.properties --changelog-file=example-changelog.xml 2>&1 | grep -q "$LOG_STRING"; then
                   echo "The log contains the string: $LOG_STRING"
               else
                   echo "The log does not contain the string: $LOG_STRING"
@@ -147,7 +147,7 @@ jobs:
           # Check if the container is running
           if docker inspect -f '{{.State.Running}}' "$CONTAINER_NAME" 2>/dev/null | grep -q "true"; then
               # Get the logs and check if the desired string is present
-              if docker exec $CONTAINER_NAME liquibase update --defaultsFile=/liquibase/changelog/liquibase.properties --changelog-file=/changelog/example-changelog.xml 2>&1 | grep -q "$LOG_STRING"; then
+              if docker exec $CONTAINER_NAME liquibase update --defaultsFile=/liquibase/changelog/liquibase.properties --changelog-file=example-changelog.xml 2>&1 | grep -q "$LOG_STRING"; then
                   echo "The log contains the string: $LOG_STRING"
               else
                   echo "The log does not contain the string: $LOG_STRING"
@@ -179,7 +179,7 @@ jobs:
           # Start mssql docker container
           docker run --name mssql --network test_network -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=Letmein.8' -p 1433:1433 -d mcr.microsoft.com/mssql/server:2017-latest
           # Get the logs and check if the desired string is present
-          docker run --rm --name $CONTAINER_NAME --network test_network -v $(pwd)/.github/test:/liquibase/changelog liquibase/liquibase:${{ github.sha }} update --defaultsFile=/liquibase/changelog/liquibase-mssql.properties --changelog-file=/changelog/changelog.sql
+          docker run --rm --name $CONTAINER_NAME --network test_network -v $(pwd)/.github/test:/liquibase/changelog liquibase/liquibase:${{ github.sha }} update --defaultsFile=/liquibase/changelog/liquibase-mssql.properties --changelog-file=changelog.sql
 
       - name: Test custom entrypoint
         run: |
