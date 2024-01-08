@@ -38,7 +38,7 @@ RUN addgroup --gid 1001 liquibase && \
     adduser --disabled-password --uid 1001 --ingroup liquibase liquibase
 
 # Make /liquibase directory and change owner to liquibase
-RUN mkdir /liquibase && chown liquibase /liquibase
+RUN mkdir /liquibase && chown root:root /liquibase
 WORKDIR /liquibase/changelog
 
 # Copy the /liquibase directory from builder stage into final image
