@@ -160,12 +160,11 @@ jobs:
 
       - name: Test extension loading
         run: |
-          LOG_STRING="Liquibase Extension Amazon Redshift support"
+          LOG_STRING="liquibase-redshift"
           # Stop docker container
-          docker stop $CONTAINER_NAME
-          docker rm $CONTAINER_NAME
+          docker exec $CONTAINER_NAME lpm add liquibase-redshift --category=extension -g
           # Get the logs and check if the desired string is present
-          if docker run --rm --name $CONTAINER_NAME -v $(pwd)/.github/test:/liquibase/changelog -v $(pwd)/.github/test/extensions:/liquibase/lib liquibase/liquibase:${{ github.sha }} --version 2>&1 | grep -q "$LOG_STRING"; then
+          if docker exec $CONTAINER_NAME liquibase --version 2>&1 | grep -q "$LOG_STRING"; then
               echo "The log contains the string: $LOG_STRING"
           else
               echo "The log does not contain the string: $LOG_STRING"
