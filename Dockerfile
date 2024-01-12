@@ -18,7 +18,7 @@ RUN wget -q -O liquibase-${LIQUIBASE_VERSION}.tar.gz "https://github.com/liquiba
     rm liquibase-${LIQUIBASE_VERSION}.tar.gz
 
 ARG LPM_VERSION=0.2.4
-ARG LPM_SHA256=
+ARG LPM_SHA256=c3ecdc0fc0be75181b40e189289bf7fdb3fa62310a1d2cf768483b34e1d541cf
 # Download and Install lpm
 RUN mkdir bin && \
     case $(dpkg --print-architecture) in \
