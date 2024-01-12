@@ -75,7 +75,7 @@ jobs:
           file_list=("Dockerfile" "Dockerfile.alpine")
           LIQUIBASE_SHA=`curl -LsS https://github.com/liquibase/liquibase/releases/download/v${{ steps.collect-data.outputs.liquibaseVersion }}/liquibase-${{ steps.collect-data.outputs.liquibaseVersion }}.tar.gz | sha256sum | awk '{ print $1 }'`
           LPM_SHA=`curl -LsS https://github.com/liquibase/liquibase-package-manager/releases/download/v${{ inputs.lpmVersion }}/lpm-${{ inputs.lpmVersion }}-linux.zip | sha256sum | awk '{ print $1 }'`
-          cat LPM_SHA
+          echo $LPM_SHA
           for file in "${file_list[@]}"; do
             sed -i 's/^ARG LIQUIBASE_VERSION=.*/ARG LIQUIBASE_VERSION='"${{ steps.collect-data.outputs.liquibaseVersion }}"'/' "${{ github.workspace }}/${file}"
             sed -i 's/^ARG LB_SHA256=.*/ARG LB_SHA256='"$LIQUIBASE_SHA"'/' "${{ github.workspace }}/${file}"
