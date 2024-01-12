@@ -37,11 +37,11 @@ RUN addgroup --gid 1001 liquibase && \
 
 # Setup symbolic links
 RUN ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \
-    ln -s /liquibase/docker-entrypoint.sh /docker-entrypoint.sh && \
     ln -s /liquibase/liquibase /usr/local/bin/liquibase && \
-    ln -s /liquibase/bin/lpm /usr/local/bin/lpm
+    ln -s /liquibase/bin/lpm /usr/local/bin/lpm && \
+    ln -s /liquibase/changelog /liquibase
 
-WORKDIR /liquibase
+WORKDIR /liquibase/changelog
 USER liquibase
 ENV LIQUIBASE_HOME=/liquibase
 

@@ -40,9 +40,9 @@ The /liquibase/changelog volume can also be used for commands that write output,
 
 ### Changelog File Example
 
-If you have a local `c:\projects\my-project\src\main\resources\com\example\changelogs\root.changelog.xml` file, you would run `docker run --rm -v c:\projects\my-project\src\main\resources:/liquibase/changelog liquibase/liquibase --changeLogFile=changelog/com/example/changelogs/root.changelog.xml update`
+If you have a local `c:\projects\my-project\src\main\resources\com\example\changelogs\root.changelog.xml` file, you would run `docker run --rm -v c:\projects\my-project\src\main\resources:/liquibase/changelog liquibase/liquibase --changeLogFile=com/example/changelogs/root.changelog.xml update`
 
-To generate a new changelog file at this location, run `docker run --rm -v c:\projects\my-project\src\main\resources:/liquibase/changelog liquibase/liquibase --changeLogFile=changelog/com/example/changelogs/root.changelog.xml generateChangeLog`
+To generate a new changelog file at this location, run `docker run --rm -v c:\projects\my-project\src\main\resources:/liquibase/changelog liquibase/liquibase --changeLogFile=com/example/changelogs/root.changelog.xml generateChangeLog`
 
 ## Configuration File
 
