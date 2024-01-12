@@ -20,14 +20,14 @@ RUN wget -q -O liquibase-${LIQUIBASE_VERSION}.tar.gz "https://github.com/liquiba
 ARG LPM_VERSION=0.2.4
 ARG LPM_SHA256=c3ecdc0fc0be75181b40e189289bf7fdb3fa62310a1d2cf768483b34e1d541cf
 # Download and Install lpm
-RUN mkdir bin && \
+RUN mkdir /liquibase/bin && \
     case $(dpkg --print-architecture) in \
       "amd64")  DOWNLOAD_ARCH=""  ;; \
       "arm64")  DOWNLOAD_ARCH="-arm64"  ;; \
-    esac &&  wget -v -O lpm.zip "https://github.com/liquibase/liquibase-package-manager/releases/download/v${LPM_VERSION}/lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip" && \
-    echo "$LPM_SHA256  lpm.zip" | sha256sum -c - && \
-    unzip lpm.zip -d bin/ && \
-    rm lpm.zip
+    esac && wget -q -O lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip "https://github.com/liquibase/liquibase-package-manager/releases/download/v${LPM_VERSION}/lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip" && \
+    echo "$LPM_SHA256  lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip" | sha256sum -c - && \
+    unzip lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip -d bin/ && \
+    rm lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip
     
 # Production Stage
 FROM eclipse-temurin:17-jre-jammy as production
