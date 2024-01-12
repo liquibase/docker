@@ -35,13 +35,15 @@ RUN addgroup --gid 1001 liquibase && \
     adduser --disabled-password --uid 1001 --ingroup liquibase liquibase && \
     mkdir /liquibase && chown root:root /liquibase
 
+WORKDIR /liquibase/changelog
+
 # Setup symbolic links
 RUN ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \
     ln -s /liquibase/docker-entrypoint.sh /docker-entrypoint.sh && \
     ln -s /liquibase/liquibase /usr/local/bin/liquibase && \
-    ln -s /liquibase/bin/lpm /usr/local/bin/lpm
+    ln -s /liquibase/bin/lpm /usr/local/bin/lpm && \
+    ln -s /liquibase/changelog /liquibase
 
-WORKDIR /liquibase/changelog
 USER liquibase
 ENV LIQUIBASE_HOME=/liquibase
 
