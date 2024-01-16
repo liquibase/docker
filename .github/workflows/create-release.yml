@@ -7,6 +7,10 @@ on:
       liquibaseVersion:
         description: "Liquibase Version"
         required: true
+      lpmVersion:
+        description: "lpm Version"
+        required: true
+        default: "0.2.4"
       extensionVersion:
         description: "Container Version (Defaults to Liquibase Version)"
         required: false
@@ -70,9 +74,11 @@ jobs:
         run: |
           file_list=("Dockerfile" "Dockerfile.alpine")
           LIQUIBASE_SHA=`curl -LsS https://github.com/liquibase/liquibase/releases/download/v${{ steps.collect-data.outputs.liquibaseVersion }}/liquibase-${{ steps.collect-data.outputs.liquibaseVersion }}.tar.gz | sha256sum | awk '{ print $1 }'`
+          LPM_SHA=`curl -LsS https://github.com/liquibase/liquibase-package-manager/releases/download/v${{ inputs.lpmVersion }}/lpm-${{ inputs.lpmVersion }}-linux.zip | sha256sum | awk '{ print $1 }'`
           for file in "${file_list[@]}"; do
             sed -i 's/^ARG LIQUIBASE_VERSION=.*/ARG LIQUIBASE_VERSION='"${{ steps.collect-data.outputs.liquibaseVersion }}"'/' "${{ github.workspace }}/${file}"
             sed -i 's/^ARG LB_SHA256=.*/ARG LB_SHA256='"$LIQUIBASE_SHA"'/' "${{ github.workspace }}/${file}"
+            sed -i 's/^ARG LPM_SHA256=.*/ARG LPM_SHA256='"$LPM_SHA"'/' "${{ github.workspace }}/${file}"
             git add "${file}"
           done
           if git diff-index --cached --quiet HEAD --
