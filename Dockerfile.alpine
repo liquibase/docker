@@ -45,8 +45,6 @@ RUN ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh &&
     ln -s /liquibase/liquibase /usr/local/bin/liquibase && \
     ln -s /liquibase/bin/lpm /usr/local/bin/lpm
 
-USER liquibase:liquibase
-
 # Set LIQUIBASE_HOME environment variable
 ENV LIQUIBASE_HOME=/liquibase
 
@@ -55,6 +53,8 @@ COPY liquibase.docker.properties /liquibase/
 
 # Copy from builder stage
 COPY --from=builder /liquibase /liquibase
+
+USER liquibase:liquibase
 
 ENTRYPOINT ["/liquibase/docker-entrypoint.sh"]
 CMD ["--help"]
