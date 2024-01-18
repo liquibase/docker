@@ -21,7 +21,7 @@ ARG LPM_VERSION=0.2.4
 ARG LPM_SHA256=c3ecdc0fc0be75181b40e189289bf7fdb3fa62310a1d2cf768483b34e1d541cf
 # Download and Install lpm
 RUN mkdir /liquibase/bin && \
-    case $(dpkg --print-architecture) in \
+    case "$(dpkg --print-architecture)" in \
       "amd64")  DOWNLOAD_ARCH=""  ;; \
       "arm64")  DOWNLOAD_ARCH="-arm64"  ;; \
     esac && wget -q -O lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip "https://github.com/liquibase/liquibase-package-manager/releases/download/v${LPM_VERSION}/lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip" && \
@@ -43,8 +43,6 @@ RUN ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh &&
     ln -s /liquibase/liquibase /usr/local/bin/liquibase && \
     ln -s /liquibase/bin/lpm /usr/local/bin/lpm
 
-USER liquibase:liquibase
-
 # Set LIQUIBASE_HOME environment variable
 ENV LIQUIBASE_HOME=/liquibase
 
@@ -53,6 +51,9 @@ COPY liquibase.docker.properties /liquibase/
 
 # Copy from builder stage
 COPY --from=builder /liquibase /liquibase
+
+# Set user and group
+USER liquibase:liquibase
 
 ENTRYPOINT ["/liquibase/docker-entrypoint.sh"]
 CMD ["--help"]
