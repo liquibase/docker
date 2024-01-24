@@ -13,19 +13,21 @@ ARG LIQUIBASE_VERSION=4.25.1
 ARG LB_SHA256=8b2b7aa8ec755d4ee52fa0210cd2a244fd16ed695fc4a72245562950776d2a56
 
 RUN wget -q -O liquibase-${LIQUIBASE_VERSION}.tar.gz "https://github.com/liquibase/liquibase/releases/download/v${LIQUIBASE_VERSION}/liquibase-${LIQUIBASE_VERSION}.tar.gz" && \
-    echo "$LB_SHA256  liquibase-${LIQUIBASE_VERSION}.tar.gz" | sha256sum -c - && \
+    echo "$LB_SHA256 liquibase-${LIQUIBASE_VERSION}.tar.gz" | sha256sum -c - && \
     tar -xzf liquibase-${LIQUIBASE_VERSION}.tar.gz && \
     rm liquibase-${LIQUIBASE_VERSION}.tar.gz
 
 ARG LPM_VERSION=0.2.4
 ARG LPM_SHA256=c3ecdc0fc0be75181b40e189289bf7fdb3fa62310a1d2cf768483b34e1d541cf
+ARG LPM_SHA256_ARM=375acfa1e12aa0e11c4af65e231e6471ea8d5eea465fb58b516ea2ffbd18f3e0
+
 # Download and Install lpm
 RUN mkdir /liquibase/bin && \
     case "$(dpkg --print-architecture)" in \
       "amd64")  DOWNLOAD_ARCH=""  ;; \
-      "arm64")  DOWNLOAD_ARCH="-arm64"  ;; \
+      "arm64")  DOWNLOAD_ARCH="-arm64" && LPM_SHA256=$LPM_SHA256_ARM ;; \
     esac && wget -q -O lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip "https://github.com/liquibase/liquibase-package-manager/releases/download/v${LPM_VERSION}/lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip" && \
-    echo "$LPM_SHA256  lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip" | sha256sum -c - && \
+    echo "$LPM_SHA256 lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip" | sha256sum -c - && \
     unzip lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip -d bin/ && \
     rm lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip
     
@@ -46,11 +48,11 @@ RUN ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh &&
 # Set LIQUIBASE_HOME environment variable
 ENV LIQUIBASE_HOME=/liquibase
 
-COPY docker-entrypoint.sh /liquibase/
-COPY liquibase.docker.properties /liquibase/
+COPY docker-entrypoint.sh ./
+COPY liquibase.docker.properties ./
 
 # Copy from builder stage
-COPY --from=builder /liquibase /liquibase
+COPY --from=builder /liquibase ./
 
 # Set user and group
 USER liquibase:liquibase
