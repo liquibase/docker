@@ -1,5 +1,5 @@
 # Builder Stage
-FROM ubuntu:jammy as builder
+FROM eclipse-temurin:17-jre-jammy as builder
 
 # Install necessary dependencies
 RUN apt-get update && \
@@ -13,12 +13,12 @@ ARG LIQUIBASE_VERSION=4.25.1
 ARG LB_SHA256=8b2b7aa8ec755d4ee52fa0210cd2a244fd16ed695fc4a72245562950776d2a56
 
 RUN wget -q -O liquibase-${LIQUIBASE_VERSION}.tar.gz "https://github.com/liquibase/liquibase/releases/download/v${LIQUIBASE_VERSION}/liquibase-${LIQUIBASE_VERSION}.tar.gz" && \
-    echo "$LB_SHA256  liquibase-${LIQUIBASE_VERSION}.tar.gz" | sha256sum -c - && \
+    echo "$LB_SHA256 liquibase-${LIQUIBASE_VERSION}.tar.gz" | sha256sum -c - && \
     tar -xzf liquibase-${LIQUIBASE_VERSION}.tar.gz && \
     rm liquibase-${LIQUIBASE_VERSION}.tar.gz
 
 ARG LPM_VERSION=0.2.4
-ARG LPM_SHA256_AMD=c3ecdc0fc0be75181b40e189289bf7fdb3fa62310a1d2cf768483b34e1d541cf
+ARG LPM_SHA256=c3ecdc0fc0be75181b40e189289bf7fdb3fa62310a1d2cf768483b34e1d541cf
 ARG LPM_SHA256_ARM=375acfa1e12aa0e11c4af65e231e6471ea8d5eea465fb58b516ea2ffbd18f3e0
 
 # Download and Install lpm
