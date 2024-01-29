@@ -31,7 +31,7 @@ RUN mkdir /liquibase/bin && \
     rm lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip
 
 # Final Image
-FROM alpine:3.19.0
+FROM alpine:3.19.1
 
 # Install smaller JRE, if available and acceptable
 RUN apk add --no-cache openjdk17-jre-headless bash
