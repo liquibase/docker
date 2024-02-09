@@ -51,8 +51,5 @@ COPY liquibase.docker.properties ./
 
 USER liquibase:liquibase
 
-VOLUME /liquibase/classpath
-VOLUME /liquibase/changelog
-
 ENTRYPOINT ["/liquibase/docker-entrypoint.sh"]
 CMD ["--help"]
