@@ -53,5 +53,8 @@ COPY liquibase.docker.properties ./
 # Set user and group
 USER liquibase:liquibase
 
+VOLUME /liquibase/classpath
+VOLUME /liquibase/changelog
+
 ENTRYPOINT ["/liquibase/docker-entrypoint.sh"]
 CMD ["--help"]
