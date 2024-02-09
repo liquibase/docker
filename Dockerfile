@@ -48,6 +48,7 @@ RUN ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh &&
 ENV LIQUIBASE_HOME=/liquibase
 
 COPY docker-entrypoint.sh ./
+COPY liquibase.docker.properties ./
 
 # Set user and group
 USER liquibase:liquibase
