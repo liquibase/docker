@@ -100,8 +100,8 @@ jobs:
     strategy:
       matrix:
         image: [ 
-          {dockerfile: Dockerfile, name: liquibase/liquibase, suffix: ""},
-          {dockerfile: Dockerfile.alpine, name: liquibase/liquibase, suffix: "-alpine"},
+          {dockerfile: Dockerfile, name: liquibase/liquibase, suffix: "", latest_tag: "latest"},
+          {dockerfile: Dockerfile.alpine, name: liquibase/liquibase, suffix: "-alpine", latest_tag: "alpine"},
           ]
     steps:      
       - uses: actions/checkout@v4
@@ -151,4 +151,4 @@ jobs:
           no-cache: true
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ${{ matrix.image.name }}:latest${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ needs.update-dockerfiles.outputs.extensionVersion }}${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ needs.update-dockerfiles.outputs.minorVersion }}${{ matrix.image.suffix }},${{ env.ECR_REGISTRY }}:latest${{ matrix.image.suffix }},${{ env.ECR_REGISTRY }}:${{ needs.update-dockerfiles.outputs.extensionVersion }}${{ matrix.image.suffix }},${{ env.ECR_REGISTRY }}:${{ needs.update-dockerfiles.outputs.minorVersion }}${{ matrix.image.suffix }}
+          tags: ${{ matrix.image.name }}:${{ matrix.image.latest_tag }},${{ matrix.image.name }}:${{ needs.update-dockerfiles.outputs.extensionVersion }}${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ needs.update-dockerfiles.outputs.minorVersion }}${{ matrix.image.suffix }},${{ env.ECR_REGISTRY }}:${{ matrix.image.latest_tag }},${{ env.ECR_REGISTRY }}:${{ needs.update-dockerfiles.outputs.extensionVersion }}${{ matrix.image.suffix }},${{ env.ECR_REGISTRY }}:${{ needs.update-dockerfiles.outputs.minorVersion }}${{ matrix.image.suffix }}
