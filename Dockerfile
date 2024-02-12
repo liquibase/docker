@@ -31,8 +31,8 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
     mkdir /liquibase/bin && \
     case "$(dpkg --print-architecture)" in \
-      "amd64")  DOWNLOAD_ARCH=""  ;; \
-      "arm64")  DOWNLOAD_ARCH="-arm64" && LPM_SHA256=$LPM_SHA256_ARM ;; \
+      *amd64*)  DOWNLOAD_ARCH=""  ;; \
+      *arm64*)  DOWNLOAD_ARCH="-arm64" && LPM_SHA256=$LPM_SHA256_ARM ;; \
     esac && wget -q -O lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip "https://github.com/liquibase/liquibase-package-manager/releases/download/v${LPM_VERSION}/lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip" && \
     echo "$LPM_SHA256 *lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip" | sha256sum -c - && \
     unzip lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip -d bin/ && \
