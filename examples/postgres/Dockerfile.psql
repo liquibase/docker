@@ -2,8 +2,9 @@ FROM liquibase/liquibase:latest
 
 # Install PSQL
 USER root
-
-RUN apk --no-cache add postgresql-client
+RUN  apt-get update -y && \
+  apt-get install --no-install-recommends -y postgresql-client && \
+  rm -rf /var/lib/apt/lists/*
 
 # Return to liquibase user space
 USER liquibase
