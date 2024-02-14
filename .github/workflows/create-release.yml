@@ -14,6 +14,8 @@ on:
 jobs:
 
   update-dockerfiles:
+    env:
+      LPM_VERSION: "0.2.4"
     name: "Update Dockerfiles"
     runs-on: ubuntu-latest
     outputs:
@@ -70,9 +72,14 @@ jobs:
         run: |
           file_list=("Dockerfile" "Dockerfile.alpine")
           LIQUIBASE_SHA=`curl -LsS https://github.com/liquibase/liquibase/releases/download/v${{ steps.collect-data.outputs.liquibaseVersion }}/liquibase-${{ steps.collect-data.outputs.liquibaseVersion }}.tar.gz | sha256sum | awk '{ print $1 }'`
+          LPM_SHA=`curl -LsS https://github.com/liquibase/liquibase-package-manager/releases/download/v${{ env.LPM_VERSION }}/lpm-${{ env.LPM_VERSION }}-linux.zip | sha256sum | awk '{ print $1 }'`
+          LPM_SHA_ARM=`curl -LsS https://github.com/liquibase/liquibase-package-manager/releases/download/v${{ env.LPM_VERSION }}/lpm-${{ env.LPM_VERSION }}-linux-arm64.zip | sha256sum | awk '{ print $1 }'`
+
           for file in "${file_list[@]}"; do
             sed -i 's/^ARG LIQUIBASE_VERSION=.*/ARG LIQUIBASE_VERSION='"${{ steps.collect-data.outputs.liquibaseVersion }}"'/' "${{ github.workspace }}/${file}"
             sed -i 's/^ARG LB_SHA256=.*/ARG LB_SHA256='"$LIQUIBASE_SHA"'/' "${{ github.workspace }}/${file}"
+            sed -i 's/^ARG LPM_SHA256=.*/ARG LPM_SHA256='"$LPM_SHA"'/' "${{ github.workspace }}/${file}"
+            #sed -i 's/^ARG LPM_SHA256_ARM=.*/ARG LPM_SHA256_ARM='"$LPM_SHA_ARM"'/' "${{ github.workspace }}/${file}"
             git add "${file}"
           done
           if git diff-index --cached --quiet HEAD --
@@ -93,8 +100,8 @@ jobs:
     strategy:
       matrix:
         image: [ 
-          {dockerfile: Dockerfile, name: liquibase/liquibase, suffix: ""},
-          {dockerfile: Dockerfile.alpine, name: liquibase/liquibase, suffix: "-alpine"},
+          {dockerfile: Dockerfile, name: liquibase/liquibase, suffix: "", latest_tag: "latest"},
+          {dockerfile: Dockerfile.alpine, name: liquibase/liquibase, suffix: "-alpine", latest_tag: "alpine"},
           ]
     steps:      
       - uses: actions/checkout@v4
@@ -144,4 +151,4 @@ jobs:
           no-cache: true
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ${{ matrix.image.name }}:latest${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ needs.update-dockerfiles.outputs.extensionVersion }}${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ needs.update-dockerfiles.outputs.minorVersion }}${{ matrix.image.suffix }},${{ env.ECR_REGISTRY }}:latest${{ matrix.image.suffix }},${{ env.ECR_REGISTRY }}:${{ needs.update-dockerfiles.outputs.extensionVersion }}${{ matrix.image.suffix }},${{ env.ECR_REGISTRY }}:${{ needs.update-dockerfiles.outputs.minorVersion }}${{ matrix.image.suffix }}
+          tags: ${{ matrix.image.name }}:${{ matrix.image.latest_tag }},${{ matrix.image.name }}:${{ needs.update-dockerfiles.outputs.extensionVersion }}${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ needs.update-dockerfiles.outputs.minorVersion }}${{ matrix.image.suffix }},${{ env.ECR_REGISTRY }}:${{ matrix.image.latest_tag }},${{ env.ECR_REGISTRY }}:${{ needs.update-dockerfiles.outputs.extensionVersion }}${{ matrix.image.suffix }},${{ env.ECR_REGISTRY }}:${{ needs.update-dockerfiles.outputs.minorVersion }}${{ matrix.image.suffix }}

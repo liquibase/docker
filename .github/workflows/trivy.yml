@@ -34,7 +34,7 @@ jobs:
           docker build -f Dockerfile -t liquibase/liquibase:${{ github.sha }} .
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@91713af97dc80187565512baba96e4364e983601
+        uses: aquasecurity/trivy-action@84384bd6e777ef152729993b8145ea352e9dd3ef
         with:
           image-ref: 'liquibase/liquibase:${{ github.sha }}'
           format: 'sarif'
@@ -45,20 +45,20 @@ jobs:
           docker build -f Dockerfile.alpine -t liquibase/liquibase-alpine:${{ github.sha }} .
 
       - name: Run Trivy vulnerability scanner (alpine)
-        uses: aquasecurity/trivy-action@b77b85c0254bba6789e787844f0585cde1e56320
+        uses: aquasecurity/trivy-action@84384bd6e777ef152729993b8145ea352e9dd3ef
         with:
           image-ref: 'liquibase/liquibase-alpine:${{ github.sha }}'
           format: 'sarif'
           output: 'trivy-results-alpine.sarif'
 
       - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: 'trivy-results.sarif'
           category: 'eclipse-temurin'
 
       - name: Upload Trivy scan results to GitHub Security tab (alpine)
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: 'trivy-results-alpine.sarif'
           category: 'alpine'

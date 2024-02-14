@@ -1,64 +1,57 @@
 # Builder Stage
-FROM eclipse-temurin:17-jre-jammy as builder
-
-ARG TARGETARCH
-ARG LIQUIBASE_VERSION=4.25.0
-ARG LPM_VERSION=0.2.4
-ARG LB_SHA256=e984b936c6b351da92d701103db5e944234348b5ac938176a4a4297afcc780f2
-
-# Install necessary dependencies
-RUN apt-get update && \
-    apt-get -yqq install krb5-user libpam-krb5 gnupg wget unzip --no-install-recommends && \
-    rm -rf /var/lib/apt/lists/*
-
-# Download and install Liquibase
-WORKDIR /liquibase
-RUN wget -q -O liquibase-${LIQUIBASE_VERSION}.tar.gz "https://github.com/liquibase/liquibase/releases/download/v${LIQUIBASE_VERSION}/liquibase-${LIQUIBASE_VERSION}.tar.gz" && \
-    echo "$LB_SHA256  liquibase-${LIQUIBASE_VERSION}.tar.gz" | sha256sum -c - && \
-    tar -xzf liquibase-${LIQUIBASE_VERSION}.tar.gz && \
-    rm liquibase-${LIQUIBASE_VERSION}.tar.gz
-
-# Download and Install lpm
-RUN mkdir bin && \
-    case ${TARGETARCH} in \
-      "amd64")  DOWNLOAD_ARCH=""  ;; \
-      "arm64")  DOWNLOAD_ARCH="-arm64"  ;; \
-    esac &&  wget -v -O lpm.zip "https://github.com/liquibase/liquibase-package-manager/releases/download/v${LPM_VERSION}/lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip" && \
-    unzip lpm.zip -d bin/ && \
-    rm lpm.zip
-    
-# Production Stage
-FROM eclipse-temurin:17-jre-jammy as production
+FROM eclipse-temurin:17-jre-jammy
 
 # Create liquibase user
 RUN addgroup --gid 1001 liquibase && \
-    adduser --disabled-password --uid 1001 --ingroup liquibase liquibase && \
-    mkdir /liquibase && chown liquibase /liquibase
+    adduser --disabled-password --uid 1001 --ingroup liquibase liquibase
+
+# Install necessary dependencies
+#RUN apt-get update && \
+#    apt-get -yqq install krb5-user libpam-krb5 --no-install-recommends && \
+#    rm -rf /var/lib/apt/lists/*
+
+# Download and install Liquibase
+WORKDIR /liquibase
+
+ARG LIQUIBASE_VERSION=4.26.0
+ARG LB_SHA256=46850b5fd21c548f969253cbbc97dc6c846198a8225581e3af5346ac8aa7dbf2
+
+RUN wget -q -O liquibase-${LIQUIBASE_VERSION}.tar.gz "https://github.com/liquibase/liquibase/releases/download/v${LIQUIBASE_VERSION}/liquibase-${LIQUIBASE_VERSION}.tar.gz" && \
+    echo "$LB_SHA256 *liquibase-${LIQUIBASE_VERSION}.tar.gz" | sha256sum -c - && \
+    tar -xzf liquibase-${LIQUIBASE_VERSION}.tar.gz && \
+    rm liquibase-${LIQUIBASE_VERSION}.tar.gz
+
+ARG LPM_VERSION=0.2.4
+ARG LPM_SHA256=c3ecdc0fc0be75181b40e189289bf7fdb3fa62310a1d2cf768483b34e1d541cf
+ARG LPM_SHA256_ARM=375acfa1e12aa0e11c4af65e231e6471ea8d5eea465fb58b516ea2ffbd18f3e0
+
+# Download and Install lpm
+RUN apt-get update && \
+    apt-get -yqq install unzip --no-install-recommends && \
+    rm -rf /var/lib/apt/lists/* && \
+    mkdir /liquibase/bin && \
+    case "$(dpkg --print-architecture)" in \
+      *amd64*)  DOWNLOAD_ARCH=""  ;; \
+      *arm64*)  DOWNLOAD_ARCH="-arm64" && LPM_SHA256=$LPM_SHA256_ARM ;; \
+    esac && wget -q -O lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip "https://github.com/liquibase/liquibase-package-manager/releases/download/v${LPM_VERSION}/lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip" && \
+    echo "$LPM_SHA256 *lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip" | sha256sum -c - && \
+    unzip lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip -d bin/ && \
+    rm lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip && \
+    apt-get purge -y --auto-remove unzip
 
 # Setup symbolic links
 RUN ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \
-    ln -s /liquibase/docker-entrypoint.sh /docker-entrypoint.sh && \
     ln -s /liquibase/liquibase /usr/local/bin/liquibase && \
     ln -s /liquibase/bin/lpm /usr/local/bin/lpm
 
-WORKDIR /liquibase
-USER liquibase
+# Set LIQUIBASE_HOME environment variable
 ENV LIQUIBASE_HOME=/liquibase
 
-# Copy from builder stage
-COPY --from=builder /liquibase /liquibase
+COPY docker-entrypoint.sh ./
+COPY liquibase.docker.properties ./
 
-# Install Drivers
-RUN lpm update && \
-    /liquibase/liquibase --version
-
-COPY --chown=liquibase:liquibase docker-entrypoint.sh /liquibase/
-COPY --chown=liquibase:liquibase liquibase.docker.properties /liquibase/
-
-## This is not used for anything beyond an alternative location for "/liquibase/changelog", but remains for backwards compatibility
-VOLUME /liquibase/classpath
-
-VOLUME /liquibase/changelog
+# Set user and group
+USER liquibase:liquibase
 
 ENTRYPOINT ["/liquibase/docker-entrypoint.sh"]
 CMD ["--help"]
