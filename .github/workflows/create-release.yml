@@ -156,8 +156,11 @@ jobs:
       - name: Marketplace - Build and Push Docker Image
         env:
           ECR_REGISTRY: 709825985650.dkr.ecr.us-east-1.amazonaws.com/liquibase/liquibase-pro
+          AWS_REGION: us-east-1
         uses: docker/build-push-action@v5
         with:
+          username: ${{ secrets.AWS_MARKETPLACE_ECR_ACCESS_KEY_ID }}
+          password: ${{ secrets.AWS_MARKETPLACE_ECR_SECRET_ACCESS_KEY }}
           context: .
           file: ${{ matrix.image.dockerfile }}
           no-cache: true
