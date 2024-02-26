@@ -53,5 +53,10 @@ COPY liquibase.docker.properties ./
 # Set user and group
 USER liquibase:liquibase
 
+## This is not used for anything beyond an alternative location for "/liquibase/changelog", but remains for backwards compatibility
+VOLUME /liquibase/classpath
+
+VOLUME /liquibase/changelog
+
 ENTRYPOINT ["/liquibase/docker-entrypoint.sh"]
 CMD ["--help"]
