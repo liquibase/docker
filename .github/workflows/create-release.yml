@@ -116,7 +116,7 @@ jobs:
           distribution: "adopt"
 
       - name: Release Notes
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           name: v${{ needs.update-dockerfiles.outputs.extensionVersion}}
           tag_name: v${{ needs.update-dockerfiles.outputs.extensionVersion }}
