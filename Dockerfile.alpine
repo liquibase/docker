@@ -3,7 +3,8 @@ FROM alpine:3.19
 
 # Create liquibase user
 RUN addgroup --gid 1001 liquibase && \
-    adduser --disabled-password --uid 1001 --ingroup liquibase liquibase
+    adduser --disabled-password --uid 1001 --ingroup liquibase liquibase && \
+    mkdir /liquibase && chown liquibase /liquibase
 
 # Install smaller JRE, if available and acceptable
 RUN apk add --no-cache openjdk17-jre-headless bash
@@ -20,7 +21,10 @@ RUN set -x && \
     echo "$LB_SHA256 *liquibase-${LIQUIBASE_VERSION}.tar.gz" | sha256sum -c - && \
     tar -xzf liquibase-${LIQUIBASE_VERSION}.tar.gz && \
     rm liquibase-${LIQUIBASE_VERSION}.tar.gz && \
-    apk del --no-network .fetch-deps
+    apk del --no-network .fetch-deps && \
+    ln -s /liquibase/liquibase /usr/local/bin/liquibase && \
+    ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \
+    liquibase --version
 
 ARG LPM_VERSION=0.2.4
 ARG LPM_SHA256=c3ecdc0fc0be75181b40e189289bf7fdb3fa62310a1d2cf768483b34e1d541cf
@@ -29,19 +33,18 @@ ARG LPM_SHA256_ARM=375acfa1e12aa0e11c4af65e231e6471ea8d5eea465fb58b516ea2ffbd18f
 # Download and Install lpm
 RUN mkdir /liquibase/bin && \
     apk add --no-cache --virtual .fetch-deps wget unzip && \
-    case "$(apk --print-architecture)" in \
-      *amd64*)  DOWNLOAD_ARCH=""  ;; \
-      *arm64*)  DOWNLOAD_ARCH="-arm64" && LPM_SHA256=$LPM_SHA256_ARM  ;; \
+    arch="$(apk --print-arch)" && \
+    case "$arch" in \
+      x86_64)   DOWNLOAD_ARCH=""  ;; \
+      aarch64)  DOWNLOAD_ARCH="-arm64" && LPM_SHA256=$LPM_SHA256_ARM  ;; \
+      *) echo >&2 "error: unsupported architecture '$arch'" && exit 1 ;; \
     esac && wget -q -O lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip "https://github.com/liquibase/liquibase-package-manager/releases/download/v${LPM_VERSION}/lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip" && \
     echo "$LPM_SHA256 *lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip" | sha256sum -c - && \
     unzip lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip -d bin/ && \
     rm lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip && \
-    apk del --no-network .fetch-deps
-
-# Setup symbolic links
-RUN ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \
-    ln -s /liquibase/liquibase /usr/local/bin/liquibase && \
-    ln -s /liquibase/bin/lpm /usr/local/bin/lpm
+    apk del --no-network .fetch-deps && \
+    ln -s /liquibase/bin/lpm /usr/local/bin/lpm && \
+    lpm --version
 
 # Set LIQUIBASE_HOME environment variable
 ENV LIQUIBASE_HOME=/liquibase
