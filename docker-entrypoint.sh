@@ -1,6 +1,13 @@
 #!/bin/bash
 set -e
 
+# Function to retrieve the license key from Secrets Manager
+retrieve_license_key() {
+  local LICENSE_KEY
+  LICENSE_KEY=$(aws secretsmanager get-secret-value --secret-id MyLicenseKey --query SecretString --output text)
+  echo "$LICENSE_KEY" > /liquibase/liquibase-pro-license.key
+}
+
 if [[ "$INSTALL_MYSQL" ]]; then
   lpm add mysql --global
 fi
