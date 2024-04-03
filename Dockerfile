@@ -56,5 +56,9 @@ COPY liquibase.docker.properties ./
 # Set user and group
 USER liquibase:liquibase
 
+# Set entrypoint to a script that retrieves the license key from Secrets Manager and then executes the original entrypoint script
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+
 ENTRYPOINT ["/liquibase/docker-entrypoint.sh"]
 CMD ["--help"]
