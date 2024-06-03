@@ -195,6 +195,12 @@ jobs:
                 git push https://liquibot:$GITHUB_TOKEN@github.com/jandroav/official-images.git
             fi
 
+      - name: Check out the repository
+        uses: actions/checkout@v4
+        with:
+          repository: jandroav/official-images
+          ref: master
+
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
         with:
