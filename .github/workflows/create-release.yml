@@ -184,11 +184,16 @@ jobs:
             echo "GitFetch: refs/heads/main" >> library/liquibase
             echo "GitCommit: ${{ github.sha }}" >> library/liquibase
             echo "File: Dockerfile.alpine" >> library/liquibase
-            git config user.name "liquibot"
-            git config user.email "liquibot@liquibase.org"
-            git add library/liquibase
-            git commit -m "Update library/liquibase to ${{ inputs.liquibaseVersion }}"
-            git push https://liquibot:$GITHUB_TOKEN@github.com/jandroav/official-images.git
+            if git diff-index --cached --quiet HEAD --
+              then
+                echo "Nothing new to commit"
+              else
+                git config user.name "liquibot"
+                git config user.email "liquibot@liquibase.org"
+                git add library/liquibase
+                git commit -m "Update library/liquibase to ${{ inputs.liquibaseVersion }}"
+                git push https://liquibot:$GITHUB_TOKEN@github.com/jandroav/official-images.git
+            fi
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
