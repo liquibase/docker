@@ -13,145 +13,145 @@ on:
 
 jobs:
 
-  # update-dockerfiles:
-  #   env:
-  #     LPM_VERSION: "0.2.4"
-  #   name: "Update Dockerfiles"
-  #   runs-on: ubuntu-latest
-  #   outputs:
-  #     liquibaseVersion: ${{ steps.collect-data.outputs.liquibaseVersion }}
-  #     extensionVersion: ${{ steps.collect-data.outputs.extensionVersion }}
-  #     minorVersion: ${{ steps.collect-data.outputs.minorVersion }}
-  #   steps:
-  #     - name: Collect Data
-  #       id: collect-data
-  #       uses: actions/github-script@v7
-  #       with:
-  #         script: |
-  #           const getMinorVersion = (liquibaseVersion) => {
-  #             const arr = liquibaseVersion.split(".")
-  #             return `${arr[0]}.${arr[1]}`
-  #           }
-  #           if (context.payload.client_payload) {
-  #               const liquibaseVersion = context.payload.client_payload.liquibaseVersion
-  #               const minorVersion = getMinorVersion(liquibaseVersion)
-  #               core.setOutput("liquibaseVersion", liquibaseVersion);
-  #               core.setOutput("extensionVersion", liquibaseVersion);
-  #               core.setOutput("minorVersion", minorVersion);
-  #           } else if (context.payload.inputs) {
-  #               const liquibaseVersion = context.payload.inputs.liquibaseVersion
-  #               const minorVersion = getMinorVersion(liquibaseVersion)
-  #               core.setOutput("liquibaseVersion", liquibaseVersion);
-  #               core.setOutput("extensionVersion", context.payload.inputs.extensionVersion || liquibaseVersion);
-  #               core.setOutput("minorVersion", minorVersion);
-  #           } else {
-  #             core.setFailed('Unknown event type')
-  #           }
+  update-dockerfiles:
+    env:
+      LPM_VERSION: "0.2.4"
+    name: "Update Dockerfiles"
+    runs-on: ubuntu-latest
+    outputs:
+      liquibaseVersion: ${{ steps.collect-data.outputs.liquibaseVersion }}
+      extensionVersion: ${{ steps.collect-data.outputs.extensionVersion }}
+      minorVersion: ${{ steps.collect-data.outputs.minorVersion }}
+    steps:
+      - name: Collect Data
+        id: collect-data
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const getMinorVersion = (liquibaseVersion) => {
+              const arr = liquibaseVersion.split(".")
+              return `${arr[0]}.${arr[1]}`
+            }
+            if (context.payload.client_payload) {
+                const liquibaseVersion = context.payload.client_payload.liquibaseVersion
+                const minorVersion = getMinorVersion(liquibaseVersion)
+                core.setOutput("liquibaseVersion", liquibaseVersion);
+                core.setOutput("extensionVersion", liquibaseVersion);
+                core.setOutput("minorVersion", minorVersion);
+            } else if (context.payload.inputs) {
+                const liquibaseVersion = context.payload.inputs.liquibaseVersion
+                const minorVersion = getMinorVersion(liquibaseVersion)
+                core.setOutput("liquibaseVersion", liquibaseVersion);
+                core.setOutput("extensionVersion", context.payload.inputs.extensionVersion || liquibaseVersion);
+                core.setOutput("minorVersion", minorVersion);
+            } else {
+              core.setFailed('Unknown event type')
+            }
 
-  #     - run: |
-  #         echo "Saw Liquibase version ${{ steps.collect-data.outputs.liquibaseVersion }}"
-  #         echo "Saw Extension version ${{ steps.collect-data.outputs.extensionVersion }}"
+      - run: |
+          echo "Saw Liquibase version ${{ steps.collect-data.outputs.liquibaseVersion }}"
+          echo "Saw Extension version ${{ steps.collect-data.outputs.extensionVersion }}"
 
-  #     - uses: actions/checkout@v4
-  #       with:
-  #         persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal token
-  #         ref: ${{ github.ref }}
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal token
+          ref: ${{ github.ref }}
           
-  #     - name: Set up JDK
-  #       uses: actions/setup-java@v4
-  #       with:
-  #         java-version: "8"
-  #         distribution: "adopt"
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: "8"
+          distribution: "adopt"
           
-  #     - name: Configure git user
-  #       run: |
-  #         git config user.name "liquibot"
-  #         git config user.email "liquibot@liquibase.org"
+      - name: Configure git user
+        run: |
+          git config user.name "liquibot"
+          git config user.email "liquibot@liquibase.org"
           
-  #     - name: Update Dockerfile and commit changes
-  #       run: |
-  #         file_list=("Dockerfile" "Dockerfile.alpine")
-  #         LIQUIBASE_SHA=`curl -LsS https://github.com/liquibase/liquibase/releases/download/v${{ steps.collect-data.outputs.liquibaseVersion }}/liquibase-${{ steps.collect-data.outputs.liquibaseVersion }}.tar.gz | sha256sum | awk '{ print $1 }'`
-  #         LPM_SHA=`curl -LsS https://github.com/liquibase/liquibase-package-manager/releases/download/v${{ env.LPM_VERSION }}/lpm-${{ env.LPM_VERSION }}-linux.zip | sha256sum | awk '{ print $1 }'`
-  #         LPM_SHA_ARM=`curl -LsS https://github.com/liquibase/liquibase-package-manager/releases/download/v${{ env.LPM_VERSION }}/lpm-${{ env.LPM_VERSION }}-linux-arm64.zip | sha256sum | awk '{ print $1 }'`
+      - name: Update Dockerfile and commit changes
+        run: |
+          file_list=("Dockerfile" "Dockerfile.alpine")
+          LIQUIBASE_SHA=`curl -LsS https://github.com/liquibase/liquibase/releases/download/v${{ steps.collect-data.outputs.liquibaseVersion }}/liquibase-${{ steps.collect-data.outputs.liquibaseVersion }}.tar.gz | sha256sum | awk '{ print $1 }'`
+          LPM_SHA=`curl -LsS https://github.com/liquibase/liquibase-package-manager/releases/download/v${{ env.LPM_VERSION }}/lpm-${{ env.LPM_VERSION }}-linux.zip | sha256sum | awk '{ print $1 }'`
+          LPM_SHA_ARM=`curl -LsS https://github.com/liquibase/liquibase-package-manager/releases/download/v${{ env.LPM_VERSION }}/lpm-${{ env.LPM_VERSION }}-linux-arm64.zip | sha256sum | awk '{ print $1 }'`
 
-  #         for file in "${file_list[@]}"; do
-  #           sed -i 's/^ARG LIQUIBASE_VERSION=.*/ARG LIQUIBASE_VERSION='"${{ steps.collect-data.outputs.liquibaseVersion }}"'/' "${{ github.workspace }}/${file}"
-  #           sed -i 's/^ARG LB_SHA256=.*/ARG LB_SHA256='"$LIQUIBASE_SHA"'/' "${{ github.workspace }}/${file}"
-  #           sed -i 's/^ARG LPM_SHA256=.*/ARG LPM_SHA256='"$LPM_SHA"'/' "${{ github.workspace }}/${file}"
-  #           #sed -i 's/^ARG LPM_SHA256_ARM=.*/ARG LPM_SHA256_ARM='"$LPM_SHA_ARM"'/' "${{ github.workspace }}/${file}"
-  #           git add "${file}"
-  #         done
-  #         if git diff-index --cached --quiet HEAD --
-  #         then
-  #           echo "Nothing new to commit"
-  #         else
-  #           git commit -m "Liquibase Version Bumped to ${{ steps.collect-data.outputs.extensionVersion }}"
-  #           git tag -fa -m "Version Bumped to ${{ steps.collect-data.outputs.extensionVersion }}" v${{ steps.collect-data.outputs.extensionVersion }}
-  #           git push -f "https://liquibot:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git" HEAD:${{ github.ref }} --follow-tags --tags
-  #         fi
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
+          for file in "${file_list[@]}"; do
+            sed -i 's/^ARG LIQUIBASE_VERSION=.*/ARG LIQUIBASE_VERSION='"${{ steps.collect-data.outputs.liquibaseVersion }}"'/' "${{ github.workspace }}/${file}"
+            sed -i 's/^ARG LB_SHA256=.*/ARG LB_SHA256='"$LIQUIBASE_SHA"'/' "${{ github.workspace }}/${file}"
+            sed -i 's/^ARG LPM_SHA256=.*/ARG LPM_SHA256='"$LPM_SHA"'/' "${{ github.workspace }}/${file}"
+            #sed -i 's/^ARG LPM_SHA256_ARM=.*/ARG LPM_SHA256_ARM='"$LPM_SHA_ARM"'/' "${{ github.workspace }}/${file}"
+            git add "${file}"
+          done
+          if git diff-index --cached --quiet HEAD --
+          then
+            echo "Nothing new to commit"
+          else
+            git commit -m "Liquibase Version Bumped to ${{ steps.collect-data.outputs.extensionVersion }}"
+            git tag -fa -m "Version Bumped to ${{ steps.collect-data.outputs.extensionVersion }}" v${{ steps.collect-data.outputs.extensionVersion }}
+            git push -f "https://liquibot:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git" HEAD:${{ github.ref }} --follow-tags --tags
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
 
-  # setup-update-draft-build:
-  #   name: "${{ matrix.image.name }}:${{ inputs.liquibaseVersion}}${{ matrix.image.suffix }}"
-  #   needs: update-dockerfiles
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     matrix:
-  #       image: [ 
-  #         {dockerfile: Dockerfile, name: liquibase/liquibase, suffix: "", latest_tag: "latest"},
-  #         {dockerfile: Dockerfile.alpine, name: liquibase/liquibase, suffix: "-alpine", latest_tag: "alpine"},
-  #         ]
-  #   steps:      
-  #     - uses: actions/checkout@v4
-  #       with:
-  #         persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal token
-  #         ref: ${{ github.ref }}
+  setup-update-draft-build:
+    name: "${{ matrix.image.name }}:${{ inputs.liquibaseVersion}}${{ matrix.image.suffix }}"
+    needs: update-dockerfiles
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        image: [ 
+          {dockerfile: Dockerfile, name: liquibase/liquibase, suffix: "", latest_tag: "latest"},
+          {dockerfile: Dockerfile.alpine, name: liquibase/liquibase, suffix: "-alpine", latest_tag: "alpine"},
+          ]
+    steps:      
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal token
+          ref: ${{ github.ref }}
           
-  #     - name: Set up JDK
-  #       uses: actions/setup-java@v4
-  #       with:
-  #         java-version: "8"
-  #         distribution: "adopt"
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: "8"
+          distribution: "adopt"
 
-  #     - name: Release Notes
-  #       uses: softprops/action-gh-release@v2
-  #       with:
-  #         name: v${{ needs.update-dockerfiles.outputs.extensionVersion}}
-  #         tag_name: v${{ needs.update-dockerfiles.outputs.extensionVersion }}
-  #         draft: true
-  #         body: Support for Liquibase ${{ needs.update-dockerfiles.outputs.liquibaseVersion }}.
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Release Notes
+        uses: softprops/action-gh-release@v2
+        with:
+          name: v${{ needs.update-dockerfiles.outputs.extensionVersion}}
+          tag_name: v${{ needs.update-dockerfiles.outputs.extensionVersion }}
+          draft: true
+          body: Support for Liquibase ${{ needs.update-dockerfiles.outputs.liquibaseVersion }}.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  #     - uses: docker/setup-qemu-action@v3
-  #     - uses: docker/setup-buildx-action@v3
-  #     - uses: docker/login-action@v3
-  #       with:
-  #         username: ${{ secrets.DOCKERHUB_USERNAME }}
-  #         password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
   
-  #     - name: Login to ECR Registry
-  #       uses: docker/login-action@v3
-  #       env:
-  #         AWS_REGION: us-east-1
-  #       with:
-  #         registry: public.ecr.aws
-  #         username: ${{ secrets.PUBLIC_ECR_ACCESS_KEY_ID }}
-  #         password: ${{ secrets.PUBLIC_ECR_SECRET_ACCESS_KEY }}
+      - name: Login to ECR Registry
+        uses: docker/login-action@v3
+        env:
+          AWS_REGION: us-east-1
+        with:
+          registry: public.ecr.aws
+          username: ${{ secrets.PUBLIC_ECR_ACCESS_KEY_ID }}
+          password: ${{ secrets.PUBLIC_ECR_SECRET_ACCESS_KEY }}
               
-  #     - name: Build and Push Docker Image
-  #       env:
-  #         ECR_REGISTRY: public.ecr.aws/liquibase/liquibase
-  #       uses: docker/build-push-action@v5
-  #       with:
-  #         context: .
-  #         file: ${{ matrix.image.dockerfile }}
-  #         no-cache: true
-  #         push: true
-  #         platforms: linux/amd64,linux/arm64
-  #         tags: ${{ matrix.image.name }}:${{ matrix.image.latest_tag }},${{ matrix.image.name }}:${{ needs.update-dockerfiles.outputs.extensionVersion }}${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ needs.update-dockerfiles.outputs.minorVersion }}${{ matrix.image.suffix }},${{ env.ECR_REGISTRY }}:${{ matrix.image.latest_tag }},${{ env.ECR_REGISTRY }}:${{ needs.update-dockerfiles.outputs.extensionVersion }}${{ matrix.image.suffix }},${{ env.ECR_REGISTRY }}:${{ needs.update-dockerfiles.outputs.minorVersion }}${{ matrix.image.suffix }}
+      - name: Build and Push Docker Image
+        env:
+          ECR_REGISTRY: public.ecr.aws/liquibase/liquibase
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ${{ matrix.image.dockerfile }}
+          no-cache: true
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ matrix.image.name }}:${{ matrix.image.latest_tag }},${{ matrix.image.name }}:${{ needs.update-dockerfiles.outputs.extensionVersion }}${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ needs.update-dockerfiles.outputs.minorVersion }}${{ matrix.image.suffix }},${{ env.ECR_REGISTRY }}:${{ matrix.image.latest_tag }},${{ env.ECR_REGISTRY }}:${{ needs.update-dockerfiles.outputs.extensionVersion }}${{ matrix.image.suffix }},${{ env.ECR_REGISTRY }}:${{ needs.update-dockerfiles.outputs.minorVersion }}${{ matrix.image.suffix }}
 
 
   update-official-repo:
