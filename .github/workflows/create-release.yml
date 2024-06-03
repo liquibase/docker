@@ -185,7 +185,6 @@ jobs:
             echo "GitCommit: ${{ github.sha }}" >> library/liquibase
             echo "File: Dockerfile.alpine" >> library/liquibase
             git add library/liquibase
-            cd ..
             if git diff-index --cached --quiet HEAD --
               then
                 echo "Nothing new to commit"
