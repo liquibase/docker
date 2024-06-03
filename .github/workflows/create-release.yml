@@ -188,7 +188,7 @@ jobs:
             git config user.email "liquibot@liquibase.org"
             git add library/liquibase
             git commit -m "Update library/liquibase to ${{ inputs.liquibaseVersion }}"
-            git push https://github.com/jandroav/official-images.git
+            git push https://liquibot:$GITHUB_TOKEN@github.com/jandroav/official-images.git
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
