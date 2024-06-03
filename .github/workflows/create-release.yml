@@ -158,6 +158,13 @@ jobs:
     name: "Update Official Docker Repo"
     runs-on: ubuntu-latest
     steps:
+
+      - name: Extract major.minor version
+        id: extract_version
+        run: |
+          VERSION="${{ inputs.liquibaseVersion }}"
+          echo "MAJOR_MINOR=${VERSION%.*}" >> $GITHUB_ENV
+
       - name: Update library/liquibase in official-images repo
         env:
           GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
@@ -168,12 +175,12 @@ jobs:
             echo "Architectures: arm64v8, amd64" >> library/liquibase
             echo "GitRepo: https://github.com/liquibase/docker.git" >> library/liquibase
             echo "" >> library/liquibase
-            echo "Tags: ${${{ inputs.liquibaseVersion }}%.*}, ${{ inputs.liquibaseVersion }}, latest" >> library/liquibase
+            echo "Tags: ${{ env.MAJOR_MINOR }}, ${{ inputs.liquibaseVersion }}, latest" >> library/liquibase
             echo "GitFetch: refs/heads/main" >> library/liquibase
             echo "GitCommit: ${{ github.sha }}" >> library/liquibase
             echo "File: Dockerfile" >> library/liquibase
             echo "" >> library/liquibase
-            echo "Tags: ${${{ inputs.liquibaseVersion }}%.*}-alpine, ${{ inputs.liquibaseVersion }}-alpine, alpine" >> library/liquibase
+            echo "Tags: ${{ env.MAJOR_MINOR }}-alpine, ${{ inputs.liquibaseVersion }}-alpine, alpine" >> library/liquibase
             echo "GitFetch: refs/heads/main" >> library/liquibase
             echo "GitCommit: ${{ github.sha }}" >> library/liquibase
             echo "File: Dockerfile.alpine" >> library/liquibase
