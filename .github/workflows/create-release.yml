@@ -207,4 +207,4 @@ jobs:
           commit-message: Update library/liquibase to ${{ inputs.liquibaseVersion }}
           title: Update library/liquibase to ${{ inputs.liquibaseVersion }}
           body: Update library/liquibase with latest commit and version
-          #push-to-fork: true
+          push-to-fork: true
