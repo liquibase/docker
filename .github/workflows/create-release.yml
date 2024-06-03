@@ -165,12 +165,16 @@ jobs:
           VERSION="${{ inputs.liquibaseVersion }}"
           echo "MAJOR_MINOR=${VERSION%.*}" >> $GITHUB_ENV
 
-      - name: Update library/liquibase in official-images repo
+      - name: Check out liquibase/official-images
+        uses: actions/checkout@v4
+        with:
+          repository: jandroav/official-images
+          ref: master
+
+      - name: Update library/liquibase in liquibase/official-images
         env:
           GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
         run: |
-            git clone https://github.com/jandroav/official-images.git
-            cd official-images
             echo "Maintainers: Jake Newton <docker@liquibase.com> (@jnewton03)" > library/liquibase
             echo "Architectures: arm64v8, amd64" >> library/liquibase
             echo "GitRepo: https://github.com/liquibase/docker.git" >> library/liquibase
@@ -194,12 +198,6 @@ jobs:
                 git commit -m "Update library/liquibase to ${{ inputs.liquibaseVersion }}"
                 git push https://liquibot:$GITHUB_TOKEN@github.com/jandroav/official-images.git
             fi
-
-      - name: Check out the repository
-        uses: actions/checkout@v4
-        with:
-          repository: jandroav/official-images
-          ref: master
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
