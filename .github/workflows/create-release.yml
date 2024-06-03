@@ -173,7 +173,7 @@ jobs:
 
       - name: Update library/liquibase in liquibase/official-images
         env:
-          GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.TEST }}
         run: |
             echo "Maintainers: Jake Newton <docker@liquibase.com> (@jnewton03)" > library/liquibase
             echo "Architectures: arm64v8, amd64" >> library/liquibase
@@ -202,7 +202,7 @@ jobs:
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
         with:
-          token: ${{ secrets.BOT_TOKEN }}
+          token: ${{ secrets.TEST }}
           commit-message: Update library/liquibase to ${{ inputs.liquibaseVersion }}
           title: Update library/liquibase to ${{ inputs.liquibaseVersion }}
           body: Update library/liquibase with latest commit and version
