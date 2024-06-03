@@ -157,6 +157,8 @@ jobs:
   update-official-repo:
     name: "Update Official Docker Repo"
     runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
     steps:
 
       - name: Extract major.minor version
@@ -170,10 +172,9 @@ jobs:
         with:
           repository: liquibase/official-images
           ref: master
+          token: ${{ env.GITHUB_TOKEN }}
 
       - name: Update library/liquibase in liquibase/official-images
-        env:
-          GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
         run: |
             echo "Maintainers: Jake Newton <docker@liquibase.com> (@jnewton03)" > library/liquibase
             echo "Architectures: arm64v8, amd64" >> library/liquibase
