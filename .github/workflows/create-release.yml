@@ -168,12 +168,12 @@ jobs:
       - name: Check out liquibase/official-images
         uses: actions/checkout@v4
         with:
-          repository: jandroav/official-images
+          repository: liquibase/official-images
           ref: master
 
       - name: Update library/liquibase in liquibase/official-images
         env:
-          GITHUB_TOKEN: ${{ secrets.TEST }}
+          GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
         run: |
             echo "Maintainers: Jake Newton <docker@liquibase.com> (@jnewton03)" > library/liquibase
             echo "Architectures: arm64v8, amd64" >> library/liquibase
@@ -196,14 +196,14 @@ jobs:
                 git config user.name "liquibot"
                 git config user.email "liquibot@liquibase.org"
                 git commit -m "Update library/liquibase to ${{ inputs.liquibaseVersion }}"
-                git push https://liquibot:$GITHUB_TOKEN@github.com/jandroav/official-images.git
+                git push https://liquibot:$GITHUB_TOKEN@github.com/liquibase/official-images.git
             fi
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
         with:
-          token: ${{ secrets.TEST }}
+          token: ${{ secrets.BOT_TOKEN }}
           commit-message: Update library/liquibase to ${{ inputs.liquibaseVersion }}
           title: Update library/liquibase to ${{ inputs.liquibaseVersion }}
           body: Update library/liquibase with latest commit and version
-          push-to-fork: true
+          #push-to-fork: true
