@@ -153,7 +153,6 @@ jobs:
           platforms: linux/amd64,linux/arm64
           tags: ${{ matrix.image.name }}:${{ matrix.image.latest_tag }},${{ matrix.image.name }}:${{ needs.update-dockerfiles.outputs.extensionVersion }}${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ needs.update-dockerfiles.outputs.minorVersion }}${{ matrix.image.suffix }},${{ env.ECR_REGISTRY }}:${{ matrix.image.latest_tag }},${{ env.ECR_REGISTRY }}:${{ needs.update-dockerfiles.outputs.extensionVersion }}${{ matrix.image.suffix }},${{ env.ECR_REGISTRY }}:${{ needs.update-dockerfiles.outputs.minorVersion }}${{ matrix.image.suffix }}
 
-
   update-official-repo:
     name: "Update Official Docker Repo"
     runs-on: ubuntu-latest
