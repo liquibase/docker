@@ -1,10 +1,25 @@
-# Official Liquibase Docker images
 
-[![Docker Auto Build](https://img.shields.io/docker/cloud/automated/liquibase/liquibase)][docker]
+## 🚨 Notice: New Official Liquibase Docker Image 🚨
 
-[docker]: https://hub.docker.com/r/liquibase/liquibase
+We are excited to announce that a new Official Liquibase Docker image is now available at [https://hub.docker.com/_/liquibase](https://hub.docker.com/_/liquibase). We recommend all users start using this image for the latest updates and support.
 
-This is the official repository for [Liquibase](https://download.liquibase.org/) images.
+### Action Required
+
+Please update your Dockerfiles and scripts to pull from the new official image:
+
+```dockerfile
+FROM liquibase:latest
+```
+
+```bash
+docker pull liquibase
+```
+
+In the future, we will stop updating this community liquibase/liquibase Docker image repository. Please transition to the new official image to ensure you continue receiving updates and support.
+
+# Liquibase Docker images
+
+This is the community repository for [Liquibase](https://download.liquibase.org/) images.
 
 ## BREAKING CHANGE
 
@@ -14,7 +29,7 @@ Support for Snowflake database has been moved from the external extension liquib
 
 The following tags are officially supported:
 
-https://hub.docker.com/r/liquibase/liquibase/tags
+<https://hub.docker.com/r/liquibase/liquibase/tags>
 
 ### liquibase:<version>
 
