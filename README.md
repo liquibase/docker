@@ -2,7 +2,7 @@
 
 ## 🚨 Notice: New Official Liquibase Docker Image 🚨
 
-We are excited to announce that a new official Liquibase Docker image is now available at [https://hub.docker.com/_/liquibase](https://hub.docker.com/_/liquibase). We recommend all users to start using this image for the latest updates and support.
+We are excited to announce that a new official Liquibase Docker image is now available at [https://hub.docker.com/_/liquibase](https://hub.docker.com/_/liquibase) starting with liquibase 4.27.0 and newer. We recommend all users to start using this image for the latest updates and support. Any versions prior to 4.27.0 will only be available on the existing `liquibase/liquibase` community image.
 
 ### 🔧 Action Required
 
