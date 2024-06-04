@@ -36,7 +36,7 @@ jobs:
       - name: Install Docker Desktop on macOS
         if: matrix.os == 'macos-13'
         run: |
-          brew install docker
+          brew install docker colima
           colima start
           sudo ln -sf $HOME/.colima/default/docker.sock /var/run/docker.sock
 
