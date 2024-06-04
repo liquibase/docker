@@ -37,6 +37,20 @@ jobs:
         if: matrix.os == 'macos-12'
         run: |
           brew install docker colima
+          brew remove --ignore-dependencies qemu
+          curl -o ./qemu.rb https://raw.githubusercontent.com/Homebrew/homebrew-core/dc0669eca9479e9eeb495397ba3a7480aaa45c2e/Formula/qemu.rb
+          brew install ./qemu.rb
+          cat >entitlements.xml <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>com.apple.security.hypervisor</key>
+              <true/>
+          </dict>
+          </plist>
+          EOF
+          codesign --sign - --entitlements entitlements.xml --force /usr/local/bin/qemu-system-x86_64
           colima start
           sudo ln -sf $HOME/.colima/default/docker.sock /var/run/docker.sock
 
