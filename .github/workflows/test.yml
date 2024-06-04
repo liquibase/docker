@@ -37,6 +37,7 @@ jobs:
         if: matrix.os == 'macos-latest'
         run: |
           brew install orbstack
+          orb
 
       - name: Build an image from ${{ matrix.dockerfile }}
         run: |
