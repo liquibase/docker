@@ -25,7 +25,7 @@ jobs:
       fail-fast: false
       matrix:
         dockerfile: [Dockerfile, Dockerfile.alpine]
-        os: [ubuntu-latest, macos-13]
+        os: [ubuntu-latest, macos-latest]
 
     name: Build & Test ${{ matrix.dockerfile }} - ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
@@ -34,11 +34,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install Docker Desktop on macOS
-        if: matrix.os == 'macos-13'
+        if: matrix.os == 'macos-latest'
         run: |
-          brew install docker colima
-          colima start
-          sudo ln -sf $HOME/.colima/default/docker.sock /var/run/docker.sock
+          brew install orbstack
 
       - name: Build an image from ${{ matrix.dockerfile }}
         run: |
@@ -178,8 +176,7 @@ jobs:
           docker rm $CONTAINER_NAME
           docker network create --driver bridge test_network
           # Start mssql docker container
-          docker run --name mssql --network test_network -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=Letmein.8' -p 1433:1433 mcr.microsoft.com/mssql/server:2017-latest
-          sleep 60
+          docker run --name mssql --network test_network -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=Letmein.8' -p 1433:1433 -d mcr.microsoft.com/mssql/server:2017-latest
           docker ps
           # Get the logs and check if the desired string is present
           docker run -d --name $CONTAINER_NAME --network test_network -v $(pwd)/.github/test:/liquibase/changelog liquibase/liquibase:${{ github.sha }} init start-h2
