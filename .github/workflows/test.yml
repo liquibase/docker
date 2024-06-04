@@ -36,8 +36,9 @@ jobs:
       - name: Install Docker Desktop on macOS
         if: matrix.os == 'macos-latest'
         run: |
-          brew install orbstack
-          orb
+          brew install docker colima
+          colima start
+          sudo ln -sf $HOME/.colima/default/docker.sock /var/run/docker.sock
 
       - name: Build an image from ${{ matrix.dockerfile }}
         run: |
