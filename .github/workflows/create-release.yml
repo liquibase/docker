@@ -221,27 +221,5 @@ jobs:
           response="https://github.com/docker-library/official-images/pull/16898"
           echo "::set-output name=pr_url::$(echo $response)"
 
-      - name: Comment PR link on PR
-        run: |
-          curl \
-            -X POST \
-            -H "Authorization: token ${{ env.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/docker-library/official-images/issues/${{ steps.create_pr.outputs.pr_url }}/comments \
-            -d '{
-              "body": "Pull request created: ${{ steps.create_pr.outputs.pr_url }}"
-            }'
-
-      - name: Comment PR link on commit
-        uses: actions/github-script@v5
-        with:
-          script: |
-            const { owner, repo, number } = context.issue;
-            const pr_url = "${{ steps.create_pr.outputs.pr_url }}";
-            const message = `Build completed. [View the PR](${pr_url})`;
-            github.rest.issues.createComment({
-              owner,
-              repo,
-              issue_number: number,
-              body: message
-            });
+      - name: Adding markdown
+        run: echo '### 🚀 Official Docker PR -> ${{ steps.create_pr.outputs.pr_url }}' >> $GITHUB_STEP_SUMMARY
