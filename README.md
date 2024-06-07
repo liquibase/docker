@@ -132,3 +132,5 @@ Note: If the database IP refers to a locally running docker container then one n
 ### Adding Native Executors
 
 The recommended path for adding native executors/binaries such as Oracle SQL*Plus, Microsoft SQLCMD, Postgres PSQL, or the AWS CLI is to extend the liquibase/liquibase Dockerfile. Examples are provided in the [Examples](https://github.com/liquibase/docker/tree/main/examples) Directory.
+
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=fc4516b5-fc01-40ce-849b-f97dd7be2a34" />
