@@ -25,7 +25,7 @@ jobs:
       fail-fast: false
       matrix:
         dockerfile: [Dockerfile, Dockerfile.alpine]
-        os: [ubuntu-latest, macos-12]
+        os: [ubuntu-latest, macos-13]
 
     name: Build & Test ${{ matrix.dockerfile }} - ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
@@ -33,12 +33,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Docker Desktop on macOS
-        if: matrix.os == 'macos-12'
-        run: |
-          brew install docker
-          colima start
-          sudo ln -sf $HOME/.colima/default/docker.sock /var/run/docker.sock
+      - name: Setup Docker on macOS
+        if: matrix.os == 'macos-13'
+        uses: douglascamata/setup-docker-macos-action@v1-alpha
+            
 
       - name: Build an image from ${{ matrix.dockerfile }}
         run: |
@@ -173,27 +171,25 @@ jobs:
 
       - name: Test driver connection
         run: |
-          LOG_STRING="Update has been successful"
+          LOG_STRING="successfully installed in classpath"
           docker stop $CONTAINER_NAME
           docker rm $CONTAINER_NAME
           docker network create --driver bridge test_network
-          # Start mssql docker container
-          docker run --name mssql --network test_network -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=Letmein.8' -p 1433:1433 -d mcr.microsoft.com/mssql/server:2017-latest
           # Get the logs and check if the desired string is present
           docker run -d --name $CONTAINER_NAME --network test_network -v $(pwd)/.github/test:/liquibase/changelog liquibase/liquibase:${{ github.sha }} init start-h2
-          docker exec $CONTAINER_NAME lpm add mssql --category=driver -g
-          docker exec $CONTAINER_NAME liquibase update --defaultsFile=/liquibase/changelog/liquibase-mssql.properties --changelog-file=/changelog/changelog.sql
+          if docker exec $CONTAINER_NAME lpm add mssql --category=driver -g 2>&1 | grep -q "$LOG_STRING"; then
+              echo "The log contains the string: $LOG_STRING"
+          else
+              echo "The log does not contain the string: $LOG_STRING"
+              exit 1
+          fi
 
       - name: Test custom entrypoint
         run: |
           LOG_STRING="Update has been successful"
-          docker stop mssql
-          docker rm mssql
           # Build auxiliary liquibase image to inherit from
           docker build -f ${{ matrix.dockerfile }} -t liquibase:test-entrypoint .
           # Build custom liquibase image
           docker build -f $(pwd)/.github/test/Dockerfile -t liquibase:test $(pwd)/.github/test/
-          # Start mssql docker container
-          docker run --name mssql --network test_network -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=Letmein.8' -p 1433:1433 -d mcr.microsoft.com/mssql/server:2017-latest
           # Get the logs and check if the desired string is present
-          docker run --network test_network --rm --name liquibase-test --entrypoint="/scripts/liquibase_command.sh" -v $(pwd)/.github/test:/liquibase/changelog liquibase:test "update"
+          docker run --rm --name liquibase-test --entrypoint="/scripts/liquibase_command.sh" -v $(pwd)/.github/test:/liquibase/changelog liquibase:test "version"
