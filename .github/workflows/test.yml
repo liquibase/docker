@@ -177,14 +177,13 @@ jobs:
           docker network create --driver bridge test_network
           # Get the logs and check if the desired string is present
           docker run -d --name $CONTAINER_NAME --network test_network -v $(pwd)/.github/test:/liquibase/changelog liquibase/liquibase:${{ github.sha }} init start-h2
-          docker exec $CONTAINER_NAME lpm add mssql --category=driver -g
-          if docker exec $CONTAINER_NAME liquibase --version 2>&1 | grep -q "$LOG_STRING"; then
+          if docker exec $CONTAINER_NAME lpm add mssql --category=driver -g 2>&1 | grep -q "$LOG_STRING"; then
               echo "The log contains the string: $LOG_STRING"
           else
               echo "The log does not contain the string: $LOG_STRING"
               exit 1
           fi
-          
+
       - name: Test custom entrypoint
         run: |
           LOG_STRING="Update has been successful"
