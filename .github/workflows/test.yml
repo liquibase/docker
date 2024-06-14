@@ -36,7 +36,18 @@ jobs:
       - name: Install Docker Desktop on macOS
         if: matrix.os == 'macos-12'
         run: |
-          brew install docker
+          brew install docker colima
+          cat >entitlements.xml <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>com.apple.security.hypervisor</key>
+              <true/>
+          </dict>
+          </plist>
+          EOF
+          codesign --sign - --entitlements entitlements.xml --force /usr/local/bin/qemu-system-x86_64
           colima start
           sudo ln -sf $HOME/.colima/default/docker.sock /var/run/docker.sock
 
@@ -179,6 +190,7 @@ jobs:
           docker network create --driver bridge test_network
           # Start mssql docker container
           docker run --name mssql --network test_network -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=Letmein.8' -p 1433:1433 -d mcr.microsoft.com/mssql/server:2017-latest
+          docker ps
           # Get the logs and check if the desired string is present
           docker run -d --name $CONTAINER_NAME --network test_network -v $(pwd)/.github/test:/liquibase/changelog liquibase/liquibase:${{ github.sha }} init start-h2
           docker exec $CONTAINER_NAME lpm add mssql --category=driver -g
