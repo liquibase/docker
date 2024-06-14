@@ -33,16 +33,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Docker Desktop on macOS
+      - name: Setup Docker on macOS
         if: matrix.os == 'macos-13'
-        run: |
-          set -x
-          sudo chmod ugo+w /usr/local/bin
-          brew install --overwrite python@3.11
-          brew install docker docker-compose lima
-          brew install colima
-          colima version
-          colima start --cpu 3 --memory 6 --disk 100 --vm-type=qemu --mount-type=sshfs --dns=1.1.1.1
+        uses: douglascamata/setup-docker-macos-action@v1-alpha
+            
 
       - name: Build an image from ${{ matrix.dockerfile }}
         run: |
