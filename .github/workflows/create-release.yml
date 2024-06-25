@@ -15,7 +15,7 @@ jobs:
 
   update-dockerfiles:
     env:
-      LPM_VERSION: "0.2.4"
+      LPM_VERSION: "0.2.6"
     name: "Update Dockerfiles"
     runs-on: ubuntu-latest
     outputs:
@@ -144,7 +144,7 @@ jobs:
       - name: Build and Push Docker Image
         env:
           ECR_REGISTRY: public.ecr.aws/liquibase/liquibase
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: ${{ matrix.image.dockerfile }}
@@ -152,3 +152,70 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           tags: ${{ matrix.image.name }}:${{ matrix.image.latest_tag }},${{ matrix.image.name }}:${{ needs.update-dockerfiles.outputs.extensionVersion }}${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ needs.update-dockerfiles.outputs.minorVersion }}${{ matrix.image.suffix }},${{ env.ECR_REGISTRY }}:${{ matrix.image.latest_tag }},${{ env.ECR_REGISTRY }}:${{ needs.update-dockerfiles.outputs.extensionVersion }}${{ matrix.image.suffix }},${{ env.ECR_REGISTRY }}:${{ needs.update-dockerfiles.outputs.minorVersion }}${{ matrix.image.suffix }}
+
+  update-official-repo:
+    name: "Update Official Docker Repo"
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
+    steps:
+
+      - name: Extract major.minor version
+        id: extract_version
+        run: |
+          VERSION="${{ inputs.liquibaseVersion }}"
+          echo "MAJOR_MINOR=${VERSION%.*}" >> $GITHUB_ENV
+
+      - name: Check out liquibase/official-images
+        uses: actions/checkout@v4
+        with:
+          repository: liquibase/official-images
+          ref: master
+          token: ${{ env.GITHUB_TOKEN }}
+
+      - name: Update library/liquibase in liquibase/official-images
+        run: |
+            echo "Maintainers: Jake Newton <docker@liquibase.com> (@jnewton03)" > library/liquibase
+            echo "Architectures: arm64v8, amd64" >> library/liquibase
+            echo "GitRepo: https://github.com/liquibase/docker.git" >> library/liquibase
+            echo "" >> library/liquibase
+            echo "Tags: ${{ env.MAJOR_MINOR }}, ${{ inputs.liquibaseVersion }}, latest" >> library/liquibase
+            echo "GitFetch: refs/heads/main" >> library/liquibase
+            echo "GitCommit: ${{ github.sha }}" >> library/liquibase
+            echo "File: Dockerfile" >> library/liquibase
+            echo "" >> library/liquibase
+            echo "Tags: ${{ env.MAJOR_MINOR }}-alpine, ${{ inputs.liquibaseVersion }}-alpine, alpine" >> library/liquibase
+            echo "GitFetch: refs/heads/main" >> library/liquibase
+            echo "GitCommit: ${{ github.sha }}" >> library/liquibase
+            echo "File: Dockerfile.alpine" >> library/liquibase
+            git add library/liquibase
+            if git diff-index --cached --quiet HEAD --
+              then
+                echo "Nothing new to commit"
+              else
+                git config user.name "liquibot"
+                git config user.email "liquibot@liquibase.org"
+                git commit -m "Update library/liquibase to ${{ inputs.liquibaseVersion }}"
+                git push https://liquibot:$GITHUB_TOKEN@github.com/liquibase/official-images.git
+            fi
+
+      - name: Create Official Docker Pull Request
+        id: create_pr
+        run: |
+          response=$(curl \
+            -X POST \
+            -H "Authorization: token ${{ env.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/docker-library/official-images/pulls \
+            -d '{
+              "title": "Update library/liquibase to ${{ inputs.liquibaseVersion }}",
+              "body": "Update library/liquibase with latest commit and version",
+              "head": "liquibase:master",
+              "base": "master"
+            }')
+          pr_url=$(echo $response | jq -r '.html_url')
+          echo "PR_URL=$pr_url" >> $GITHUB_ENV
+
+      - name: Adding Official Docker PR to job summary
+        run: echo '### 🚀 Official Docker PR -> ${{ env.PR_URL }}' >> $GITHUB_STEP_SUMMARY
+        

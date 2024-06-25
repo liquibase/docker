@@ -150,3 +150,5 @@ docker run --rm -v /path/to/changelog:/liquibase/changelog liquibase/liquibase -
 - SQLite: `jdbc:sqlite:/tmp/<DB FILE NAME>.db`
 
 For more details, visit our [Liquibase Documentation](https://docs.liquibase.com/).
+
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=fc4516b5-fc01-40ce-849b-f97dd7be2a34" />
