@@ -37,14 +37,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build ${{ matrix.image.name }}${{ matrix.image.suffix }}" from Dockerfile
+      - name: Build ${{ matrix.image.name }}${{ matrix.image.suffix }} from Dockerfile
         run: |
-          docker build -f ${{ matrix.image.dockerfile }} -t ${{ matrix.image.name }}${{ matrix.image.suffix }}":${{ github.sha }} .
+          docker build -f ${{ matrix.image.dockerfile }} -t ${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }} .
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.23.0
         with:
-          image-ref: '${{ matrix.image.name }}${{ matrix.image.suffix }}":${{ github.sha }}'
+          image-ref: '${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}'
           vuln-type: 'os,library'
           format: 'sarif'
           output: 'trivy-results.sarif'
