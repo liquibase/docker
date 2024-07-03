@@ -48,20 +48,21 @@ jobs:
           vuln-type: 'os,library'
           format: 'sarif'
           output: 'trivy-results.sarif'
-          exit-code: 1
-          severity: CRITICAL
+          severity: 'HIGH,CRITICAL'
+          exit-code: '1'
+          limit-severities-for-sarif: true
 
       - name: Notify Slack on Build Failure
         if: failure()
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_COLOR: 'failure'
-          SLACK_MESSAGE: "View details on GitHub Actions: ${{ github.event.client_payload.server_url }}/${{ github.event.client_payload.repository }}/actions/runs/${{ github.event.client_payload.run_id }}. Triggered by repository: ${{ github.event.client_payload.repository }} and job: ${{ github.job }}"
-          SLACK_TITLE: "❌ ${{ github.event.client_payload.repository }} ❌ Trivy failed on branch ${{ github.event.client_payload.branch }} for commit ${{ github.event.client_payload.sha }} in repository ${{ github.event.client_payload.repository }}"
+          SLACK_MESSAGE: "View details on GitHub Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Triggered by repository: ${{ github.repository }} and job: ${{ github.job }}"
+          SLACK_TITLE: "❌ ${{ github.repository }} ❌ Trivy failed on branch ${{ github.ref_name }} for commit ${{ github.sha }} in repository ${{ github.repository }}"
           SLACK_USERNAME: liquibot
           SLACK_WEBHOOK: ${{ secrets.NIGHTLY_BUILDS_SLACK_WEBHOOK }}
           SLACK_ICON_EMOJI: ":whale:"
-          SLACK_FOOTER: "${{ github.event.client_payload.repository }}"
+          SLACK_FOOTER: "${{ github.repository }} - ${{ matrix.image.name }}:${{ github.sha }}"
           SLACK_LINK_NAMES: true
 
       - name: Upload Trivy scan results to GitHub Security tab
@@ -130,12 +131,12 @@ jobs:
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_COLOR: 'failure'
-          SLACK_MESSAGE: "View details on GitHub Actions: ${{ github.event.client_payload.server_url }}/${{ github.event.client_payload.repository }}/actions/runs/${{ github.event.client_payload.run_id }}. Triggered by repository: ${{ github.event.client_payload.repository }} and job: ${{ github.job }}"
-          SLACK_TITLE: "❌ ${{ github.event.client_payload.repository }} ❌ Docker Scout failed on branch ${{ github.event.client_payload.branch }} for commit ${{ github.event.client_payload.sha }} in repository ${{ github.event.client_payload.repository }}"
+          SLACK_MESSAGE: "View details on GitHub Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Triggered by repository: ${{ github.repository }} and job: ${{ github.job }}"
+          SLACK_TITLE: "❌ ${{ github.repository }} ❌ Docker Scout failed on branch ${{ github.ref_name }} for commit ${{ github.sha }} in repository ${{ github.repository }}"
           SLACK_USERNAME: liquibot
           SLACK_WEBHOOK: ${{ secrets.NIGHTLY_BUILDS_SLACK_WEBHOOK }}
           SLACK_ICON_EMOJI: ":whale:"
-          SLACK_FOOTER: "${{ github.event.client_payload.repository }}"
+          SLACK_FOOTER: "${{ github.repository }} - ${{ matrix.image.name }}:${{ github.sha }}"
           SLACK_LINK_NAMES: true
 
       - name: Upload Scout scan results to GitHub Security tab
