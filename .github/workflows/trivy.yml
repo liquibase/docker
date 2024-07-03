@@ -24,8 +24,8 @@ jobs:
       fail-fast: false
       matrix:
         image: [ 
-          {dockerfile: Dockerfile, name: liquibase/liquibase},
-          {dockerfile: Dockerfile.alpine, name: liquibase/liquibase},
+          {dockerfile: Dockerfile, name: liquibase/liquibase, suffix: ""},
+          {dockerfile: Dockerfile.alpine, name: liquibase/liquibase, suffix: "-alpine"},
           ]
     permissions:
       contents: read # for actions/checkout to fetch code
@@ -37,14 +37,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build ${{ matrix.image.name }} from Dockerfile
+      - name: Build ${{ matrix.image.name }}${{ matrix.image.suffix }}" from Dockerfile
         run: |
-          docker build -f ${{ matrix.image.dockerfile }} -t ${{ matrix.image.name }}:${{ github.sha }} .
+          docker build -f ${{ matrix.image.dockerfile }} -t ${{ matrix.image.name }}${{ matrix.image.suffix }}":${{ github.sha }} .
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.23.0
         with:
-          image-ref: '${{ matrix.image.name }}:${{ github.sha }}'
+          image-ref: '${{ matrix.image.name }}${{ matrix.image.suffix }}":${{ github.sha }}'
           vuln-type: 'os,library'
           format: 'sarif'
           output: 'trivy-results.sarif'
@@ -62,7 +62,7 @@ jobs:
           SLACK_USERNAME: liquibot
           SLACK_WEBHOOK: ${{ secrets.NIGHTLY_BUILDS_SLACK_WEBHOOK }}
           SLACK_ICON_EMOJI: ":whale:"
-          SLACK_FOOTER: "${{ github.repository }} - ${{ matrix.image.name }}:${{ github.sha }}"
+          SLACK_FOOTER: "${{ github.repository }} - ${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}"
           SLACK_LINK_NAMES: true
 
       - name: Upload Trivy scan results to GitHub Security tab
@@ -70,7 +70,7 @@ jobs:
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: 'trivy-results.sarif'
-          category: '${{ matrix.image.name }}'
+          category: '${{ matrix.image.name }}${{ matrix.image.suffix }}'
 
       - name: Generate Security Report
         if: always()
@@ -93,8 +93,8 @@ jobs:
       fail-fast: false
       matrix:
         image: [ 
-          {dockerfile: Dockerfile, name: liquibase/liquibase},
-          {dockerfile: Dockerfile.alpine, name: liquibase/liquibase},
+          {dockerfile: Dockerfile, name: liquibase/liquibase, suffix: ""},
+          {dockerfile: Dockerfile.alpine, name: liquibase/liquibase, suffix: "-alpine"},
           ]
     permissions:
       contents: read # for actions/checkout to fetch code
@@ -107,9 +107,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build ${{ matrix.image.name }} from Dockerfile
+      - name: Build ${{ matrix.image.name }}${{ matrix.image.suffix }} from Dockerfile
         run: |
-          docker build -f ${{ matrix.image.dockerfile }} -t ${{ matrix.image.name }}:${{ github.sha }} .
+          docker build -f ${{ matrix.image.dockerfile }} -t ${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }} .
 
       - uses: docker/login-action@v3
         with:
@@ -120,7 +120,7 @@ jobs:
         uses: docker/scout-action@v1.10.0
         with:
           command: cves
-          image: '${{ matrix.image.name }}:${{ github.sha }}'
+          image: '${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}'
           github-token: ${{ secrets.GITHUB_TOKEN }}
           write-comment: true
           sarif-file: 'scout-results.sarif'
@@ -136,7 +136,7 @@ jobs:
           SLACK_USERNAME: liquibot
           SLACK_WEBHOOK: ${{ secrets.NIGHTLY_BUILDS_SLACK_WEBHOOK }}
           SLACK_ICON_EMOJI: ":whale:"
-          SLACK_FOOTER: "${{ github.repository }} - ${{ matrix.image.name }}:${{ github.sha }}"
+          SLACK_FOOTER: "${{ github.repository }} - ${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}"
           SLACK_LINK_NAMES: true
 
       - name: Upload Scout scan results to GitHub Security tab
@@ -144,7 +144,7 @@ jobs:
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: 'scout-results.sarif'
-          category: '${{ matrix.image.name }}'
+          category: '${{ matrix.image.name }}${{ matrix.image.suffix }}'
 
       - name: Generate Security Report
         if: always()
