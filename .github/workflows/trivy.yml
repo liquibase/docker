@@ -48,6 +48,8 @@ jobs:
           vuln-type: 'os,library'
           format: 'sarif'
           output: 'trivy-results.sarif'
+          exit-code: 1
+          severity: CRITICAL
 
       - name: Notify Slack on Build Failure
         if: failure()
