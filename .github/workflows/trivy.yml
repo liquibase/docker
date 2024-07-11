@@ -125,6 +125,7 @@ jobs:
           write-comment: true
           sarif-file: 'scout-results.sarif'
           summary: true
+          exit-code: true
 
       - name: Notify Slack on Build Failure
         if: failure()
