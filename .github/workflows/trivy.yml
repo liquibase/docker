@@ -126,6 +126,7 @@ jobs:
           sarif-file: 'scout-results.sarif'
           summary: true
           exit-code: true
+          only-severities: "critical,high"
 
       - name: Notify Slack on Build Failure
         if: failure()
