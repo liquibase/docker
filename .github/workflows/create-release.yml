@@ -167,7 +167,7 @@ jobs:
           VERSION="${{ needs.update-dockerfiles.outputs.liquibaseVersion }}"
           echo "MAJOR_MINOR=${VERSION%.*}" >> $GITHUB_ENV
           echo "VERSION: $VERSION"
-          echo "MAJOR_MINOR: $MAJOR_MINOR"
+          echo "MAJOR_MINOR: ${VERSION%.*}"
 
   #     - name: Check out liquibase/official-images
   #       uses: actions/checkout@v4
