@@ -3,67 +3,77 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: trivy
+name: Vulnerability Scanning
 
 on:
+  workflow_dispatch:
   push:
-    branches: [ "main", "master" ]
+    branches: [ "main" ]
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ "main" ]
   schedule:
-    - cron: '27 6 * * 2'
+    - cron: '0 7 * * 1-5' # Run every weekday at 7am UTC
 
 permissions:
   contents: read
 
 jobs:
-  build:
+  trivy:
+    strategy:
+      fail-fast: false
+      matrix:
+        image: [ 
+          {dockerfile: Dockerfile, name: liquibase/liquibase, suffix: ""},
+          {dockerfile: Dockerfile.alpine, name: liquibase/liquibase, suffix: "-alpine"},
+          ]
     permissions:
       contents: read # for actions/checkout to fetch code
       security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
       actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
-    name: Build
-    runs-on: "ubuntu-20.04"
+    name: Trivy
+    runs-on: "ubuntu-22.04"
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build an image from Dockerfile
+      - name: Build ${{ matrix.image.name }}${{ matrix.image.suffix }} from Dockerfile
         run: |
-          docker build -f Dockerfile -t liquibase/liquibase:${{ github.sha }} .
+          docker build -f ${{ matrix.image.dockerfile }} -t ${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }} .
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@595be6a0f6560a0a8fc419ddf630567fc623531d
+        uses: aquasecurity/trivy-action@0.24.0
         with:
-          image-ref: 'liquibase/liquibase:${{ github.sha }}'
+          image-ref: '${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}'
+          vuln-type: 'os,library'
           format: 'sarif'
           output: 'trivy-results.sarif'
+          severity: 'HIGH,CRITICAL'
+          exit-code: '1'
+          limit-severities-for-sarif: true
 
-      - name: Build an image from Dockerfile (alpine)
-        run: |
-          docker build -f Dockerfile.alpine -t liquibase/liquibase-alpine:${{ github.sha }} .
-
-      - name: Run Trivy vulnerability scanner (alpine)
-        uses: aquasecurity/trivy-action@595be6a0f6560a0a8fc419ddf630567fc623531d
-        with:
-          image-ref: 'liquibase/liquibase-alpine:${{ github.sha }}'
-          format: 'sarif'
-          output: 'trivy-results-alpine.sarif'
+      - name: Notify Slack on Build Failure
+        if: failure()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_COLOR: 'failure'
+          SLACK_MESSAGE: "View details on GitHub Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Triggered by repository: ${{ github.repository }} and job: ${{ github.job }}"
+          SLACK_TITLE: "❌ ${{ github.repository }} ❌ Trivy failed on branch ${{ github.ref_name }} for commit ${{ github.sha }} in repository ${{ github.repository }}"
+          SLACK_USERNAME: liquibot
+          SLACK_WEBHOOK: ${{ secrets.DOCKER_SLACK_WEBHOOK_URL }}
+          SLACK_ICON_EMOJI: ":whale:"
+          SLACK_FOOTER: "${{ github.repository }} - ${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}"
+          SLACK_LINK_NAMES: true
 
       - name: Upload Trivy scan results to GitHub Security tab
+        if: always()
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: 'trivy-results.sarif'
-          category: 'eclipse-temurin'
-
-      - name: Upload Trivy scan results to GitHub Security tab (alpine)
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: 'trivy-results-alpine.sarif'
-          category: 'alpine'
+          category: '${{ matrix.image.name }}${{ matrix.image.suffix }}'
 
       - name: Generate Security Report
+        if: always()
         uses: rsdmike/github-security-report-action@v3.0.4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -71,7 +81,84 @@ jobs:
           sarifReportDir: .
 
       - name: Upload Security Report
+        if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: security-report
+          name: security-report-trivy
+          path: ./reports/summary.pdf
+
+
+  scout:
+    strategy:
+      fail-fast: false
+      matrix:
+        image: [ 
+          {dockerfile: Dockerfile, name: liquibase/liquibase, suffix: ""},
+          {dockerfile: Dockerfile.alpine, name: liquibase/liquibase, suffix: "-alpine"},
+          ]
+    permissions:
+      contents: read # for actions/checkout to fetch code
+      security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
+      actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
+      pull-requests: write # for docker/scout-action to write comments on pull requests
+    name: Scout
+    runs-on: "ubuntu-22.04"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build ${{ matrix.image.name }}${{ matrix.image.suffix }} from Dockerfile
+        run: |
+          docker build -f ${{ matrix.image.dockerfile }} -t ${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }} .
+
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Docker Scout
+        uses: docker/scout-action@v1.11.0
+        with:
+          command: cves
+          image: '${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          write-comment: true
+          sarif-file: 'scout-results.sarif'
+          summary: true
+          exit-code: true
+          only-severities: "critical,high"
+
+      - name: Notify Slack on Build Failure
+        if: failure()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_COLOR: 'failure'
+          SLACK_MESSAGE: "View details on GitHub Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Triggered by repository: ${{ github.repository }} and job: ${{ github.job }}"
+          SLACK_TITLE: "❌ ${{ github.repository }} ❌ Docker Scout failed on branch ${{ github.ref_name }} for commit ${{ github.sha }} in repository ${{ github.repository }}"
+          SLACK_USERNAME: liquibot
+          SLACK_WEBHOOK: ${{ secrets.DOCKER_SLACK_WEBHOOK_URL }}
+          SLACK_ICON_EMOJI: ":whale:"
+          SLACK_FOOTER: "${{ github.repository }} - ${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}"
+          SLACK_LINK_NAMES: true
+
+      - name: Upload Scout scan results to GitHub Security tab
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'scout-results.sarif'
+          category: '${{ matrix.image.name }}${{ matrix.image.suffix }}'
+
+      - name: Generate Security Report
+        if: always()
+        uses: rsdmike/github-security-report-action@v3.0.4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          outputDir: ./reports/
+          sarifReportDir: .
+
+      - name: Upload Security Report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: security-report-scout
           path: ./reports/summary.pdf

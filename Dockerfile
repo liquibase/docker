@@ -14,8 +14,8 @@ RUN groupadd --gid 1001 liquibase && \
 # Download and install Liquibase
 WORKDIR /liquibase
 
-ARG LIQUIBASE_VERSION=4.28.0
-ARG LB_SHA256=97dd07eaca0406a09e1ae19b407eea42a7e944c7f4571922bffce71b43b75ce8
+ARG LIQUIBASE_VERSION=4.29.0
+ARG LB_SHA256=0883b4975fc2f0a2f0180614cb156cea3c453057e6ec185c01550ec67030d8d0
 
 RUN wget -q -O liquibase-${LIQUIBASE_VERSION}.tar.gz "https://github.com/liquibase/liquibase/releases/download/v${LIQUIBASE_VERSION}/liquibase-${LIQUIBASE_VERSION}.tar.gz" && \
     echo "$LB_SHA256 *liquibase-${LIQUIBASE_VERSION}.tar.gz" | sha256sum -c - && \
@@ -25,9 +25,9 @@ RUN wget -q -O liquibase-${LIQUIBASE_VERSION}.tar.gz "https://github.com/liquiba
     ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \
     liquibase --version
 
-ARG LPM_VERSION=0.2.6
-ARG LPM_SHA256=0e1df6b8daf9d53a2d1d90fa8e48abbcbb8e885d249de7a09879a3a0276bebdf
-ARG LPM_SHA256_ARM=b1f6d5c8b21353b213ef828849c3d767d4214e13e8c0f4fbadd038c96ef93389
+ARG LPM_VERSION=0.2.7
+ARG LPM_SHA256=e831120c566c76a427c6d3489cd62d5447322444399393e3ef304db0c036c4a1
+ARG LPM_SHA256_ARM=720afb6bafb987ab502b86682f410d0e19da45fdf0119d947ed7bfa4e6a02665
 
 # Download and Install lpm
 RUN apt-get update && \
