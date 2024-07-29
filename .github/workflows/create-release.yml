@@ -15,7 +15,7 @@ jobs:
 
   update-dockerfiles:
     env:
-      LPM_VERSION: "0.2.6"
+      LPM_VERSION: "0.2.7"
     name: "Update Dockerfiles"
     runs-on: ubuntu-latest
     outputs:
@@ -155,6 +155,7 @@ jobs:
 
   update-official-repo:
     name: "Update Official Docker Repo"
+    needs: update-dockerfiles
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
@@ -163,8 +164,10 @@ jobs:
       - name: Extract major.minor version
         id: extract_version
         run: |
-          VERSION="${{ inputs.liquibaseVersion }}"
+          VERSION="${{ needs.update-dockerfiles.outputs.liquibaseVersion }}"
           echo "MAJOR_MINOR=${VERSION%.*}" >> $GITHUB_ENV
+          echo "VERSION: $VERSION"
+          echo "MAJOR_MINOR: ${VERSION%.*}"
 
       - name: Check out liquibase/official-images
         uses: actions/checkout@v4
@@ -179,12 +182,12 @@ jobs:
             echo "Architectures: arm64v8, amd64" >> library/liquibase
             echo "GitRepo: https://github.com/liquibase/docker.git" >> library/liquibase
             echo "" >> library/liquibase
-            echo "Tags: ${{ env.MAJOR_MINOR }}, ${{ inputs.liquibaseVersion }}, latest" >> library/liquibase
+            echo "Tags: ${{ env.MAJOR_MINOR }}, ${{ needs.update-dockerfiles.outputs.liquibaseVersion }}, latest" >> library/liquibase
             echo "GitFetch: refs/heads/main" >> library/liquibase
             echo "GitCommit: ${{ github.sha }}" >> library/liquibase
             echo "File: Dockerfile" >> library/liquibase
             echo "" >> library/liquibase
-            echo "Tags: ${{ env.MAJOR_MINOR }}-alpine, ${{ inputs.liquibaseVersion }}-alpine, alpine" >> library/liquibase
+            echo "Tags: ${{ env.MAJOR_MINOR }}-alpine, ${{ needs.update-dockerfiles.outputs.liquibaseVersion }}-alpine, alpine" >> library/liquibase
             echo "GitFetch: refs/heads/main" >> library/liquibase
             echo "GitCommit: ${{ github.sha }}" >> library/liquibase
             echo "File: Dockerfile.alpine" >> library/liquibase
@@ -195,7 +198,7 @@ jobs:
               else
                 git config user.name "liquibot"
                 git config user.email "liquibot@liquibase.org"
-                git commit -m "Update library/liquibase to ${{ inputs.liquibaseVersion }}"
+                git commit -m "Update library/liquibase to ${{ needs.update-dockerfiles.outputs.liquibaseVersion }}"
                 git push https://liquibot:$GITHUB_TOKEN@github.com/liquibase/official-images.git
             fi
 
@@ -208,7 +211,7 @@ jobs:
             -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/docker-library/official-images/pulls \
             -d '{
-              "title": "Update library/liquibase to ${{ inputs.liquibaseVersion }}",
+              "title": "Update library/liquibase to ${{ needs.update-dockerfiles.outputs.liquibaseVersion }}",
               "body": "Update library/liquibase with latest commit and version",
               "head": "liquibase:master",
               "base": "master"
