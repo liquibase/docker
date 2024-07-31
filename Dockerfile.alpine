@@ -11,8 +11,8 @@ RUN apk add --no-cache openjdk17-jre-headless bash
 
 WORKDIR /liquibase
 
-ARG LIQUIBASE_VERSION=4.29.0
-ARG LB_SHA256=0883b4975fc2f0a2f0180614cb156cea3c453057e6ec185c01550ec67030d8d0
+ARG LIQUIBASE_VERSION=4.29.1
+ARG LB_SHA256=30524ff1c1be1aac46b774bcc7e2d5488eb217c174e9ff82f0bac244feb9b117
 
 # Download, verify, extract
 RUN set -x && \
