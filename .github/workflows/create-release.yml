@@ -22,6 +22,8 @@ jobs:
       liquibaseVersion: ${{ steps.collect-data.outputs.liquibaseVersion }}
       extensionVersion: ${{ steps.collect-data.outputs.extensionVersion }}
       minorVersion: ${{ steps.collect-data.outputs.minorVersion }}
+      latestCommitSha: ${{ steps.get-latest-sha.outputs.latestCommitSha }}
+
     steps:
       - name: Collect Data
         id: collect-data
@@ -92,6 +94,10 @@ jobs:
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
+
+      - name: Get latest commit SHA
+        id: get-latest-sha
+        run: echo "latestCommitSha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
   setup-update-draft-build:
     name: "${{ matrix.image.name }}:${{ inputs.liquibaseVersion}}${{ matrix.image.suffix }}"
@@ -184,12 +190,12 @@ jobs:
             echo "" >> library/liquibase
             echo "Tags: ${{ env.MAJOR_MINOR }}, ${{ needs.update-dockerfiles.outputs.liquibaseVersion }}, latest" >> library/liquibase
             echo "GitFetch: refs/heads/main" >> library/liquibase
-            echo "GitCommit: ${{ github.sha }}" >> library/liquibase
+            echo "GitCommit: ${{ needs.update-dockerfiles.outputs.latestCommitSha }}" >> library/liquibase
             echo "File: Dockerfile" >> library/liquibase
             echo "" >> library/liquibase
             echo "Tags: ${{ env.MAJOR_MINOR }}-alpine, ${{ needs.update-dockerfiles.outputs.liquibaseVersion }}-alpine, alpine" >> library/liquibase
             echo "GitFetch: refs/heads/main" >> library/liquibase
-            echo "GitCommit: ${{ github.sha }}" >> library/liquibase
+            echo "GitCommit: ${{ needs.update-dockerfiles.outputs.latestCommitSha }}" >> library/liquibase
             echo "File: Dockerfile.alpine" >> library/liquibase
             git add library/liquibase
             if git diff-index --cached --quiet HEAD --
