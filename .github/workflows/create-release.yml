@@ -137,7 +137,7 @@ jobs:
           distribution: "adopt"
 
       - name: Release Notes
-        if: ${{ needs.update-dockerfiles.outputs.dryRun == false }}
+        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' }}
         uses: softprops/action-gh-release@v2
         with:
           name: v${{ needs.update-dockerfiles.outputs.extensionVersion}}
@@ -150,13 +150,13 @@ jobs:
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
-        if: ${{ needs.update-dockerfiles.outputs.dryRun == false }}
+        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' }}
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
   
       - name: Login to ECR Registry
-        if: ${{ needs.update-dockerfiles.outputs.dryRun == false }}
+        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' }}
         uses: docker/login-action@v3
         env:
           AWS_REGION: us-east-1
@@ -166,7 +166,7 @@ jobs:
           password: ${{ secrets.PUBLIC_ECR_SECRET_ACCESS_KEY }}
 
       - name: Login to ECR Private Registry (dry-run)
-        if: ${{ needs.update-dockerfiles.outputs.dryRun == true }}
+        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'true' }}
         uses: docker/login-action@v3
         env:
           AWS_REGION: us-east-1
@@ -176,7 +176,7 @@ jobs:
           password: ${{ secrets.PUBLIC_ECR_SECRET_ACCESS_KEY }}
               
       - name: Build and Push Docker Image
-        if: ${{ needs.update-dockerfiles.outputs.dryRun == false }}
+        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' }}
         env:
           ECR_REGISTRY: public.ecr.aws/liquibase/liquibase
         uses: docker/build-push-action@v6
@@ -189,7 +189,7 @@ jobs:
           tags: ${{ matrix.image.name }}:${{ matrix.image.latest_tag }},${{ matrix.image.name }}:${{ needs.update-dockerfiles.outputs.extensionVersion }}${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ needs.update-dockerfiles.outputs.minorVersion }}${{ matrix.image.suffix }},${{ env.ECR_REGISTRY }}:${{ matrix.image.latest_tag }},${{ env.ECR_REGISTRY }}:${{ needs.update-dockerfiles.outputs.extensionVersion }}${{ matrix.image.suffix }},${{ env.ECR_REGISTRY }}:${{ needs.update-dockerfiles.outputs.minorVersion }}${{ matrix.image.suffix }}
 
       - name: Build and Push Docker Image (dry-run)
-        if: ${{ needs.update-dockerfiles.outputs.dryRun == true }}
+        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'true' }}
         env:
           ECR_REGISTRY: ${{ secrets.PRIVATE_ECR_DRY_RUN_REPO }}
         uses: docker/build-push-action@v6
@@ -256,7 +256,7 @@ jobs:
             fi
 
       - name: Create Official Docker Pull Request
-        if: ${{ needs.update-dockerfiles.outputs.dryRun == false }}
+        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' }}
         id: create_pr
         run: |
           response=$(curl \
@@ -274,6 +274,6 @@ jobs:
           echo "PR_URL=$pr_url" >> $GITHUB_ENV
 
       - name: Adding Official Docker PR to job summary
-        if: ${{ needs.update-dockerfiles.outputs.dryRun == false }}
+        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' }}
         run: echo '### 🚀 Official Docker PR -> ${{ env.PR_URL }}' >> $GITHUB_STEP_SUMMARY
         
