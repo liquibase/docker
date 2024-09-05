@@ -92,7 +92,7 @@ Due to licensing restrictions, the MySQL driver is not included. Add it either b
 Dockerfile:
 
 ```dockerfile
-FROM liquibase
+FROM liquibase:latest
 
 RUN lpm add mysql --global
 ```
