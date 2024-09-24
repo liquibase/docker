@@ -49,6 +49,8 @@ RUN apt-get update && \
 
 # Set LIQUIBASE_HOME environment variable
 ENV LIQUIBASE_HOME=/liquibase
+# Marker which indicates this is a Liquibase docker container
+ENV DOCKER_LIQUIBASE=true
 
 COPY docker-entrypoint.sh ./
 COPY liquibase.docker.properties ./
