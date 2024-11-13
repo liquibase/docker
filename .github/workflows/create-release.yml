@@ -56,6 +56,7 @@ jobs:
                 core.setOutput("extensionVersion", context.payload.inputs.extensionVersion || liquibaseVersion);
                 core.setOutput("minorVersion", minorVersion);
                 core.setOutput("dryRun", dryRun);
+                print(context.payload.inputs);
             } else {
               core.setFailed('Unknown event type')
             }
