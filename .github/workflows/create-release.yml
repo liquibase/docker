@@ -255,6 +255,10 @@ jobs:
 #              fi
 #            fi
 
+      - name: print value
+        run: |
+          echo ${{ needs.update-dockerfiles.outputs.dryRun }}
+
       - name: Create Official Docker Pull Request
         if: ${{ needs.update-dockerfiles.outputs.dryRun == false }}
         id: create_pr
