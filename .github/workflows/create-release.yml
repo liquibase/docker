@@ -40,26 +40,31 @@ jobs:
               const arr = liquibaseVersion.split(".")
               return `${arr[0]}.${arr[1]}`
             }
+            let dryRun=false;
             if (context.payload.client_payload) {
                 const liquibaseVersion = context.payload.client_payload.liquibaseVersion
-                const dryRun = context.payload.client_payload.dryRun
+                dryRun = context.payload.client_payload.dryRun
                 const minorVersion = getMinorVersion(liquibaseVersion)
                 core.setOutput("liquibaseVersion", liquibaseVersion);
                 core.setOutput("extensionVersion", liquibaseVersion);
                 core.setOutput("minorVersion", minorVersion);
-                core.setOutput("dryRun", dryRun);
             } else if (context.payload.inputs) {
                 const liquibaseVersion = context.payload.inputs.liquibaseVersion
-                const dryRun = context.payload.inputs.dryRun
+                dryRun = context.payload.inputs.dryRun
                 const minorVersion = getMinorVersion(liquibaseVersion)
                 core.setOutput("liquibaseVersion", liquibaseVersion);
                 core.setOutput("extensionVersion", context.payload.inputs.extensionVersion || liquibaseVersion);
                 core.setOutput("minorVersion", minorVersion);
-                core.setOutput("dryRun", dryRun);
-                console.log(context.payload.inputs);
             } else {
               core.setFailed('Unknown event type')
             }
+            
+            // Convert string to boolean
+            if (typeof dryRun === 'string') {
+              dryRun=dryRun.toLowerCase() === 'true';
+            }
+            core.setOutput("dryRun", dryRun);
+            console.log("dry run val set:", dryRun);
 
       - run: |
           echo "Saw Liquibase version ${{ steps.collect-data.outputs.liquibaseVersion }}"
