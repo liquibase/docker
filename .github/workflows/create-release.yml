@@ -50,7 +50,7 @@ jobs:
                 core.setOutput("dryRun", dryRun);
             } else if (context.payload.inputs) {
                 const liquibaseVersion = context.payload.inputs.liquibaseVersion
-                const dryRun = context.payload.inputs.dryRun || false
+                const dryRun = context.payload.inputs.dryRun
                 const minorVersion = getMinorVersion(liquibaseVersion)
                 core.setOutput("liquibaseVersion", liquibaseVersion);
                 core.setOutput("extensionVersion", context.payload.inputs.extensionVersion || liquibaseVersion);
