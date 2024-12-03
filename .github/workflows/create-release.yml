@@ -42,7 +42,7 @@ jobs:
             }
             if (context.payload.client_payload) {
                 const liquibaseVersion = context.payload.client_payload.liquibaseVersion
-                const dryRun = context.payload.client_payload.dryRun || false
+                const dryRun = context.payload.client_payload.dryRun
                 const minorVersion = getMinorVersion(liquibaseVersion)
                 core.setOutput("liquibaseVersion", liquibaseVersion);
                 core.setOutput("extensionVersion", liquibaseVersion);
@@ -50,7 +50,7 @@ jobs:
                 core.setOutput("dryRun", dryRun);
             } else if (context.payload.inputs) {
                 const liquibaseVersion = context.payload.inputs.liquibaseVersion
-                const dryRun = context.payload.inputs.dryRun || false
+                const dryRun = context.payload.inputs.dryRun
                 const minorVersion = getMinorVersion(liquibaseVersion)
                 core.setOutput("liquibaseVersion", liquibaseVersion);
                 core.setOutput("extensionVersion", context.payload.inputs.extensionVersion || liquibaseVersion);
@@ -276,3 +276,4 @@ jobs:
       - name: Adding Official Docker PR to job summary
         if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' }}
         run: echo '### 🚀 Official Docker PR -> ${{ env.PR_URL }}' >> $GITHUB_STEP_SUMMARY
+        
