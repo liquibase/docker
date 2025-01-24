@@ -3,8 +3,8 @@ FROM alpine:3.20
 
 # Create liquibase user
 RUN addgroup --gid 1001 liquibase && \
-    adduser --disabled-password --uid 1001 --ingroup liquibase liquibase && \
-    mkdir /liquibase && chown liquibase /liquibase
+    adduser --disabled-password --uid 1001 --ingroup liquibase --home /liquibase liquibase && \
+    chown liquibase /liquibase
 
 # Install smaller JRE, if available and acceptable
 RUN apk add --no-cache openjdk17-jre-headless bash

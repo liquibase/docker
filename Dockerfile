@@ -3,8 +3,8 @@ FROM eclipse-temurin:17-jre-jammy
 
 # Create liquibase user
 RUN groupadd --gid 1001 liquibase && \
-    useradd --uid 1001 --gid liquibase liquibase && \
-    mkdir /liquibase && chown liquibase /liquibase
+    useradd --uid 1001 --gid liquibase --create-home --home-dir /liquibase liquibase && \
+    chown liquibase /liquibase
 
 # Install necessary dependencies
 #RUN apt-get update && \
