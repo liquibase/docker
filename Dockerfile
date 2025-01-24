@@ -3,8 +3,8 @@ FROM eclipse-temurin:17-jre-jammy
 
 # Create liquibase user
 RUN groupadd --gid 1001 liquibase && \
-    useradd --uid 1001 --gid liquibase liquibase && \
-    mkdir /liquibase && chown liquibase /liquibase
+    useradd --uid 1001 --gid liquibase --create-home --home-dir /liquibase liquibase && \
+    chown liquibase /liquibase
 
 # Install necessary dependencies
 #RUN apt-get update && \
@@ -14,8 +14,8 @@ RUN groupadd --gid 1001 liquibase && \
 # Download and install Liquibase
 WORKDIR /liquibase
 
-ARG LIQUIBASE_VERSION=4.30.0
-ARG LB_SHA256=184ffd609518091da42d6cd75e883b4f6ff1763cce8883e95fc99f7f05ca262d
+ARG LIQUIBASE_VERSION=4.31.0
+ARG LB_SHA256=ffcf80c34c8b05a50c32c423ad2899aa9e7a5cd40097628f2bc739b70654962d
 
 RUN wget -q -O liquibase-${LIQUIBASE_VERSION}.tar.gz "https://github.com/liquibase/liquibase/releases/download/v${LIQUIBASE_VERSION}/liquibase-${LIQUIBASE_VERSION}.tar.gz" && \
     echo "$LB_SHA256 *liquibase-${LIQUIBASE_VERSION}.tar.gz" | sha256sum -c - && \
