@@ -80,7 +80,8 @@ jobs:
         run: |
           git config user.name "liquibot"
           git config user.email "liquibot@liquibase.org"
-          
+              
+            
       - name: Update Dockerfile and commit changes
         run: |
           file_list=("Dockerfile" "Dockerfile.alpine")
@@ -209,6 +210,17 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
     steps:
+      - name: Fetch and Rebase Official Images Repository
+        run: |
+          git clone https://github.com/docker-library/official-images.git
+          cd official-images
+          git fetch origin master
+          git checkout master
+          # Reset liquibase:master to match official master
+          git checkout -B liquibase:master
+          git reset --hard origin/master
+          # Push the reset liquibase:master back to the remote repository
+          git push origin liquibase:master --force
 
       - name: Extract major.minor version
         id: extract_version
