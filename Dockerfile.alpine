@@ -26,9 +26,9 @@ RUN set -x && \
     ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \
     liquibase --version
 
-ARG LPM_VERSION=0.2.8
-ARG LPM_SHA256=ad46e7f0ca67e39ddbf1435c0bd2879be8a43340c7b627a2da45c07787574200
-ARG LPM_SHA256_ARM=2a2e46f2260f46ccd39f487dca161b4e04d97664160925c5e415bd9b54a23e1a
+ARG LPM_VERSION=0.2.9
+ARG LPM_SHA256=fd45b897260810a3cc8c6d662ff7f4880ad11e2ab34f8965c5bd9ce223640c4b
+ARG LPM_SHA256_ARM=a3c7acedb94ecbe2f5a7630966fc65d792265db9b0eeacd23c58bb1fc0f6e4aa
 
 # Download and Install lpm
 RUN mkdir /liquibase/bin && \
