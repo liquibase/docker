@@ -77,15 +77,15 @@ jobs:
         uses: rsdmike/github-security-report-action@v3.0.4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          outputDir: ./reports/
+          outputDir: ./reports/trivy${{ matrix.image.suffix }}/
           sarifReportDir: .
 
       - name: Upload Security Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: security-report-trivy-${{ matrix.image.name }}${{ matrix.image.suffix }}
-          path: ./reports/summary.pdf
+          name: security-report-trivy${{ matrix.image.suffix }}
+          path: ./reports/trivy${{ matrix.image.suffix }}/summary.pdf
 
 
   scout:
@@ -153,12 +153,12 @@ jobs:
         uses: rsdmike/github-security-report-action@v3.0.4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          outputDir: ./reports/
+          outputDir: ./reports/scout${{ matrix.image.suffix }}/
           sarifReportDir: .
 
       - name: Upload Security Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: security-report-scout-${{ matrix.image.name }}${{ matrix.image.suffix }}
-          path: ./reports/summary.pdf
+          name: security-report-scout${{ matrix.image.suffix }}
+          path: ./reports/scout${{ matrix.image.suffix }}/summary.pdf
