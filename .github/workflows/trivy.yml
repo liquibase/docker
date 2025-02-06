@@ -84,7 +84,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: security-report-trivy-${{ matrix.runs-on }}
+          name: security-report-trivy-${{ matrix.image.name }}${{ matrix.image.suffix }}
           path: ./reports/summary.pdf
 
 
@@ -160,5 +160,5 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: security-report-scout-${{ matrix.runs-on }}
+          name: security-report-scout-${{ matrix.image.name }}${{ matrix.image.suffix }}
           path: ./reports/summary.pdf
