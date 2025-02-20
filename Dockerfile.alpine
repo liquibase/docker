@@ -58,3 +58,4 @@ USER liquibase:liquibase
 
 ENTRYPOINT ["/liquibase/docker-entrypoint.sh"]
 CMD ["--help"]
+
