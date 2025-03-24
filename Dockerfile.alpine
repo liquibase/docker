@@ -7,7 +7,7 @@ RUN addgroup --gid 1001 liquibase && \
     chown liquibase /liquibase
 
 # Install smaller JRE, if available and acceptable
-RUN apk add --no-cache openjdk17-jre-headless bash
+RUN apk add --no-cache openjdk21-jre-headless bash
 
 WORKDIR /liquibase
 
