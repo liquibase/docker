@@ -1,5 +1,5 @@
 # Builder Stage
-FROM eclipse-temurin:17-jre-jammy
+FROM eclipse-temurin:21-jre-jammy
 
 # Create liquibase user
 RUN groupadd --gid 1001 liquibase && \
