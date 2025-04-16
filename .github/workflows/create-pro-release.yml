@@ -1,0 +1,267 @@
+name: Release PRO Extension (v2)
+on:
+  repository_dispatch:
+    types: [liquibase-pro-release]
+  workflow_dispatch:
+    inputs:
+      liquibaseProVersion:
+        description: "Liquibase Version"
+        required: true
+      dryRun:
+        description: "Dry Run release"
+        required: true
+        type: boolean
+        default: false
+      distinct_id:
+        description: "Only needed for liquibase-pro dispatch"
+        required: false
+        type: string
+        default: ""
+
+jobs:
+  update-dockerfiles:
+    env:
+      LPM_VERSION: "0.2.8"
+    name: "Update Dockerfiles"
+    runs-on: ubuntu-latest
+    outputs:
+      liquibaseProVersion: ${{ steps.collect-data.outputs.liquibaseProVersion }}
+      dryRun: ${{ steps.collect-data.outputs.dryRun }}
+      minorVersion: ${{ steps.collect-data.outputs.minorVersion }}
+      latestCommitSha: ${{ steps.get-latest-sha.outputs.latestCommitSha }}
+
+    steps:
+      - name: Collect Data
+        id: collect-data
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const getMinorVersion = (liquibaseProVersion) => {
+              const arr = liquibaseProVersion.split(".")
+              return `${arr[0]}.${arr[1]}`
+            }
+            if (context.payload.client_payload) {
+                const liquibaseProVersion = context.payload.client_payload.liquibaseProVersion
+                const dryRun = context.payload.client_payload.dryRun
+                const minorVersion = getMinorVersion(liquibaseProVersion)
+                core.setOutput("liquibaseProVersion", liquibaseProVersion);
+                core.setOutput("minorVersion", minorVersion);
+                core.setOutput("dryRun", dryRun);
+            } else if (context.payload.inputs) {
+                const liquibaseProVersion = context.payload.inputs.liquibaseProVersion
+                const dryRun = context.payload.inputs.dryRun
+                const minorVersion = getMinorVersion(liquibaseProVersion)
+                core.setOutput("liquibaseProVersion", liquibaseProVersion);
+                core.setOutput("minorVersion", minorVersion);
+                core.setOutput("dryRun", dryRun);
+            } else {
+              core.setFailed('Unknown event type')
+            }
+
+      - run: |
+          echo "Saw Liquibase version ${{ steps.collect-data.outputs.liquibaseProVersion }}"
+          echo "Saw dryRun ${{ steps.collect-data.outputs.dryRun }}"
+
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal token
+          ref: ${{ github.ref }}
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: "8"
+          distribution: "adopt"
+
+      - name: Configure git user
+        run: |
+          git config user.name "liquibot"
+          git config user.email "liquibot@liquibase.org"
+
+      - name: Update Dockerfile and commit changes
+        run: |
+          file_list=("DockerfilePro")
+          LIQUIBASE_PRO_SHA=`curl -LsS https://d99xeykk82f6.cloudfront.net/releases/${{ steps.collect-data.outputs.liquibaseProVersion }}/liquibase-pro-${{ steps.collect-data.outputs.liquibaseProVersion }}.tar.gz | sha256sum | awk '{ print $1 }'`
+          LPM_SHA=`curl -LsS https://github.com/liquibase/liquibase-package-manager/releases/download/v${{ env.LPM_VERSION }}/lpm-${{ env.LPM_VERSION }}-linux.zip | sha256sum | awk '{ print $1 }'`
+          LPM_SHA_ARM=`curl -LsS https://github.com/liquibase/liquibase-package-manager/releases/download/v${{ env.LPM_VERSION }}/lpm-${{ env.LPM_VERSION }}-linux-arm64.zip | sha256sum | awk '{ print $1 }'`
+
+          for file in "${file_list[@]}"; do
+            sed -i 's/^ARG LIQUIBASE_PRO_VERSION=.*/ARG LIQUIBASE_PRO_VERSION='"${{ steps.collect-data.outputs.liquibaseProVersion }}"'/' "${{ github.workspace }}/${file}"
+            sed -i 's/^ARG LB_PRO_SHA256=.*/ARG LB_PRO_SHA256='"$LIQUIBASE_PRO_SHA"'/' "${{ github.workspace }}/${file}"
+            sed -i 's/^ARG LPM_SHA256=.*/ARG LPM_SHA256='"$LPM_SHA"'/' "${{ github.workspace }}/${file}"
+            #sed -i 's/^ARG LPM_SHA256_ARM=.*/ARG LPM_SHA256_ARM='"$LPM_SHA_ARM"'/' "${{ github.workspace }}/${file}"
+            git add "${file}"
+          done
+          if git diff-index --cached --quiet HEAD --
+          then
+            echo "Nothing new to commit"
+          else
+            git commit -m "Liquibase PRO Version Bumped to ${{ steps.collect-data.outputs.liquibaseProVersion }}"
+            if [[ "${{ steps.collect-data.outputs.dryRun }}" == false ]]; then
+              git tag -fa -m "Version Bumped to ${{ steps.collect-data.outputs.liquibaseProVersion }}" v${{ steps.collect-data.outputs.liquibaseProVersion }}
+              git push -f "https://liquibot:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git" HEAD:${{ github.ref }} --follow-tags --tags
+            else
+              echo "Dry run mode: changes have not been pushed."
+            fi
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
+
+      - name: Get latest commit SHA
+        id: get-latest-sha
+        run: echo "latestCommitSha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+  setup-update-draft-build:
+    name: "${{ matrix.image.name }}:${{ inputs.liquibaseProVersion}}${{ matrix.image.suffix }}"
+    needs: update-dockerfiles
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        image:
+          [
+            {
+              dockerfile: DockerfilePro,
+              name: liquibase/liquibase-pro,
+              suffix: "",
+              latest_tag: "latest",
+            },
+          ]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal token
+          ref: ${{ github.ref }}
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: "8"
+          distribution: "adopt"
+
+      - name: Release Notes
+        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' }}
+        uses: softprops/action-gh-release@v2
+        with:
+          name: v${{ needs.update-dockerfiles.outputs.liquibaseProVersion}}
+          tag_name: v${{ needs.update-dockerfiles.outputs.liquibaseProVersion }}
+          draft: true
+          body: Support for Liquibase PRO ${{ needs.update-dockerfiles.outputs.liquibaseProVersion }}.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' }}
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Login to ECR Private Registry (dry-run)
+        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'true' }}
+        uses: docker/login-action@v3
+        env:
+          AWS_REGION: us-east-1
+        with:
+          registry: ${{ secrets.PRIVATE_ECR_DRY_RUN_REPO }}
+          username: ${{ secrets.PUBLIC_ECR_ACCESS_KEY_ID }}
+          password: ${{ secrets.PUBLIC_ECR_SECRET_ACCESS_KEY }}
+
+      - name: Build and Push Docker Image
+        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' }}
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ matrix.image.dockerfile }}
+          no-cache: true
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ matrix.image.name }}:${{ matrix.image.latest_tag }},${{ matrix.image.name }}:${{ needs.update-dockerfiles.outputs.liquibaseProVersion }}${{ matrix.image.suffix }},${{ matrix.image.name }}:${{ needs.update-dockerfiles.outputs.minorVersion }}${{ matrix.image.suffix }}
+
+      - name: Build and Push Docker Image (dry-run)
+        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'true' }}
+        env:
+          ECR_REGISTRY: ${{ secrets.PRIVATE_ECR_DRY_RUN_REPO }}
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ matrix.image.dockerfile }}
+          no-cache: true
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ env.ECR_REGISTRY }}:${{ matrix.image.latest_tag }},${{ env.ECR_REGISTRY }}:${{ needs.update-dockerfiles.outputs.liquibaseProVersion }}${{ matrix.image.suffix }},${{ env.ECR_REGISTRY }}:${{ needs.update-dockerfiles.outputs.minorVersion }}${{ matrix.image.suffix }}
+
+  # update-official-repo:
+  #   name: "Update Official Docker Repo"
+  #   needs: update-dockerfiles
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
+  #   steps:
+
+  #     - name: Extract major.minor version
+  #       id: extract_version
+  #       run: |
+  #         VERSION="${{ needs.update-dockerfiles.outputs.liquibaseProVersion }}"
+  #         echo "MAJOR_MINOR=${VERSION%.*}" >> $GITHUB_ENV
+  #         echo "VERSION: $VERSION"
+  #         echo "MAJOR_MINOR: ${VERSION%.*}"
+
+  #     - name: Check out liquibase/official-images
+  #       uses: actions/checkout@v4
+  #       with:
+  #         repository: liquibase/official-images
+  #         ref: master
+  #         token: ${{ env.GITHUB_TOKEN }}
+
+  #     - name: Update library/liquibase-pro in liquibase-pro/official-images
+  #       run: |
+  #           echo "Maintainers: Jake Newton <docker@liquibase.com> (@jnewton03)" > library/liquibase-pro
+  #           echo "Architectures: arm64v8, amd64" >> library/liquibase-pro
+  #           echo "GitRepo: https://github.com/liquibase/docker.git" >> library/liquibase-pro
+  #           echo "" >> library/liquibase-pro
+  #           echo "Tags: ${{ env.MAJOR_MINOR }}, ${{ needs.update-dockerfiles.outputs.liquibaseProVersion }}, latest" >> library/liquibase-pro
+  #           echo "GitFetch: refs/heads/main" >> library/liquibase
+  #           echo "GitCommit: ${{ needs.update-dockerfiles.outputs.latestCommitSha }}" >> library/liquibase-pro
+  #           echo "File: Dockerfile" >> library/liquibase-pro
+  #           echo "" >> library/liquibase-pro
+  #           echo "Tags: ${{ env.MAJOR_MINOR }}-alpine, ${{ needs.update-dockerfiles.outputs.liquibaseProVersion }}-alpine, alpine" >> library/liquibase-pro
+  #           echo "GitFetch: refs/heads/main" >> library/liquibase-pro
+  #           echo "GitCommit: ${{ needs.update-dockerfiles.outputs.latestCommitSha }}" >> library/liquibase-pro
+  #           echo "File: Dockerfile.alpine" >> library/liquibase-pro
+  #           git add library/liquibase-pro
+  #           if git diff-index --cached --quiet HEAD --
+  #             then
+  #               echo "Nothing new to commit"
+  #             else
+  #               git config user.name "liquibot"
+  #               git config user.email "liquibot@liquibase.org"
+  #               git commit -m "Update library/liquibase-pro to ${{ needs.update-dockerfiles.outputs.liquibaseProVersion }}"
+  #               if [[ "${{ needs.update-dockerfiles.outputs.dryRun }}" == false ]]; then
+  #                 git push https://liquibot:$GITHUB_TOKEN@github.com/liquibase-pro/official-images.git
+  #               else
+  #               echo "Dry run mode: changes have not been pushed."
+  #             fi
+  #           fi
+
+  #     - name: Create Official Docker Pull Request
+  #       if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' }}
+  #       id: create_pr
+  #       run: |
+  #         response=$(curl \
+  #           -X POST \
+  #           -H "Authorization: token ${{ env.GITHUB_TOKEN }}" \
+  #           -H "Accept: application/vnd.github.v3+json" \
+  #           https://api.github.com/repos/docker-library/official-images/pulls \
+  #           -d '{
+  #             "title": "Update library/liquibase-pro to ${{ needs.update-dockerfiles.outputs.liquibaseProVersion }}",
+  #             "body": "Update library/liquibase-pro with latest commit and version",
+  #             "head": "liquibase:master",
+  #             "base": "master"
+  #           }')
+  #         pr_url=$(echo $response | jq -r '.html_url')
+  #         echo "PR_URL=$pr_url" >> $GITHUB_ENV
+
+  #     - name: Adding Official Docker PR to job summary
+  #       if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' }}
+  #       run: echo '### 🚀 Official Docker PR -> ${{ env.PR_URL }}' >> $GITHUB_STEP_SUMMARY
