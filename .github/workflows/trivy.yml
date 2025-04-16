@@ -96,7 +96,7 @@ jobs:
         image: [ 
           {dockerfile: Dockerfile, name: liquibase/liquibase, suffix: ""},
           {dockerfile: Dockerfile.alpine, name: liquibase/liquibase, suffix: "-alpine"},
-          {dockerfile: DockerfilePro, name: liquibase/liquibase-pro, suffix: "-alpine"},
+          {dockerfile: DockerfilePro, name: liquibase/liquibase-pro, suffix: ""},
           ]
     permissions:
       contents: read # for actions/checkout to fetch code
