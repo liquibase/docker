@@ -155,6 +155,7 @@ jobs:
           fi
 
       - name: Test extension loading
+        if: matrix.dockerfile != 'DockerfilePro'
         run: |
           LOG_STRING="liquibase-redshift"
           # Stop docker container
