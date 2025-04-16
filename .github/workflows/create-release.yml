@@ -108,7 +108,7 @@ jobs:
         run: |
           if [[ "${{ steps.collect-data.outputs.releaseType }}" == "liquibase-pro-release" ]]; then
             file_list=("DockerfilePro")
-            LIQUIBASE_PRO_SHA=$(curl -LsS https://d99xeykk82f6.cloudfront.net/releases/${{ steps.collect-data.outputs.liquibaseVersion }}/liquibase-pro-${{ steps.collect-data.outputs.liquibaseVersion }}.tar.gz | sha256sum | awk '{ print $1 }')
+            LIQUIBASE_PRO_SHA=$(curl -LsS https://repo.liquibase.com/releases/pro/${{ steps.collect-data.outputs.liquibaseVersion }}/liquibase-pro-${{ steps.collect-data.outputs.liquibaseVersion }}.tar.gz | sha256sum | awk '{ print $1 }')
             LPM_SHA=$(curl -LsS https://github.com/liquibase/liquibase-package-manager/releases/download/v${{ env.LPM_VERSION }}/lpm-${{ env.LPM_VERSION }}-linux.zip | sha256sum | awk '{ print $1 }')
             LPM_SHA_ARM=$(curl -LsS https://github.com/liquibase/liquibase-package-manager/releases/download/v${{ env.LPM_VERSION }}/lpm-${{ env.LPM_VERSION }}-linux-arm64.zip | sha256sum | awk '{ print $1 }')
             for file in "${file_list[@]}"; do
