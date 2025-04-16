@@ -198,7 +198,7 @@ jobs:
         if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' && ((needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' && matrix.type == 'liquibase-release') || (needs.update-dockerfiles.outputs.releaseType == 'liquibase-pro-release' && matrix.type == 'liquibase-pro-release')) }}
         uses: softprops/action-gh-release@v2
         with:
-          name: v${{ needs.update-dockerfiles.outputs.extensionVersion }}
+          name: ${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-pro-release' && format('v{0} PRO', needs.update-dockerfiles.outputs.extensionVersion) || format('v{0}', needs.update-dockerfiles.outputs.extensionVersion) }}
           tag_name: v${{ needs.update-dockerfiles.outputs.extensionVersion }}
           draft: true
           body: |
