@@ -10,9 +10,9 @@ RUN groupadd --gid 1001 liquibase && \
 WORKDIR /liquibase
 
 ARG LIQUIBASE_PRO_VERSION=4.32.0-RC1
-ARG LB_PRO_SHA256=67815fcae54e760fc94e47f8e06cd12a7a6a53268a2ae110790ea277e97cedbd
+ARG LB_PRO_SHA256=90f63e0795927ea782da2589fa2b84da65f99e1e68c8c0fc38ed5e2ab07429a0
 
-RUN wget -q -O liquibase-pro-${LIQUIBASE_PRO_VERSION}.tar.gz "https://d99xeykk82f6.cloudfront.net/releases/${LIQUIBASE_PRO_VERSION}/liquibase-pro-${LIQUIBASE_PRO_VERSION}.tar.gz" && \
+RUN wget -q -O liquibase-pro-${LIQUIBASE_PRO_VERSION}.tar.gz "https://repo.liquibase.com/releases/pro/${LIQUIBASE_PRO_VERSION}/liquibase-pro-${LIQUIBASE_PRO_VERSION}.tar.gz" && \
     echo "$LB_PRO_SHA256 *liquibase-pro-${LIQUIBASE_PRO_VERSION}.tar.gz" | sha256sum -c - && \
     tar -xzf liquibase-pro-${LIQUIBASE_PRO_VERSION}.tar.gz && \
     rm liquibase-pro-${LIQUIBASE_PRO_VERSION}.tar.gz && \
