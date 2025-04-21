@@ -26,8 +26,8 @@ RUN wget -q -O liquibase-${LIQUIBASE_VERSION}.tar.gz "https://github.com/liquiba
     liquibase --version
 
 ARG LPM_VERSION=0.2.9
-ARG LPM_SHA256=423673ad9bbb1711cd6b4db004223f3d927f5cda8c17f7f92cb10b882059d2c8
-ARG LPM_SHA256_ARM=d3080a913cb17a0346ff27229ce06090d8bb1f29d719c33087a36aa29705fc20
+ARG LPM_SHA256=b9caecd34c98a6c19a2bc582e8064aff5251c5f1adbcd100d3403c5eceb5373a
+ARG LPM_SHA256_ARM=0adb3a96d7384b4da549979bf00217a8914f0df37d1ed8fdb1b4a4baebfa104c
 
 # Download and Install lpm
 RUN apt-get update && \
