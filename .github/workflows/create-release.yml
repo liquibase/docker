@@ -114,8 +114,6 @@ jobs:
             for file in "${file_list[@]}"; do
               sed -i 's/^ARG LIQUIBASE_PRO_VERSION=.*/ARG LIQUIBASE_PRO_VERSION='"${{ steps.collect-data.outputs.liquibaseVersion }}"'/' "${{ github.workspace }}/${file}"
               sed -i 's/^ARG LB_PRO_SHA256=.*/ARG LB_PRO_SHA256='"$LIQUIBASE_PRO_SHA"'/' "${{ github.workspace }}/${file}"
-              sed -i 's/^ARG LPM_SHA256=.*/ARG LPM_SHA256='"$LPM_SHA"'/' "${{ github.workspace }}/${file}"
-              #sed -i 's/^ARG LPM_SHA256_ARM=.*/ARG LPM_SHA256_ARM='"$LPM_SHA_ARM"'/' "${{ github.workspace }}/${file}"
               git add "${file}"
             done
             if git diff-index --cached --quiet HEAD --; then
@@ -234,33 +232,33 @@ jobs:
           username: ${{ secrets.PUBLIC_ECR_ACCESS_KEY_ID }}
           password: ${{ secrets.PUBLIC_ECR_SECRET_ACCESS_KEY }}
 
-      # - name: Build and Push Docker Image
-      #   if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' && ((needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' && matrix.type == 'liquibase-release') || (needs.update-dockerfiles.outputs.releaseType == 'liquibase-pro-release' && matrix.type == 'liquibase-pro-release')) }}
-      #   env:
-      #     ECR_REGISTRY: ${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' && 'public.ecr.aws/liquibase/liquibase' || '' }}
-      #   uses: docker/build-push-action@v6
-      #   with:
-      #     context: .
-      #     file: ${{ matrix.dockerfile }}
-      #     no-cache: true
-      #     push: true
-      #     platforms: linux/amd64,linux/arm64
-      #     tags: |
-      #       ${{ matrix.name }}:${{ matrix.latest_tag }}${{ matrix.suffix }}${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' && format(',{0}:{1}{2},{0}:{3}{2},{4}:{1}{2},{4}:{3}{2}', matrix.name, needs.update-dockerfiles.outputs.extensionVersion, matrix.suffix, needs.update-dockerfiles.outputs.minorVersion, env.ECR_REGISTRY) || format(',{0}:{1}{2},{0}:{3}{2}', matrix.name, needs.update-dockerfiles.outputs.liquibaseVersion, matrix.suffix, needs.update-dockerfiles.outputs.minorVersion) }}
+      - name: Build and Push Docker Image
+        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' && ((needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' && matrix.type == 'liquibase-release') || (needs.update-dockerfiles.outputs.releaseType == 'liquibase-pro-release' && matrix.type == 'liquibase-pro-release')) }}
+        env:
+          ECR_REGISTRY: ${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' && 'public.ecr.aws/liquibase/liquibase' || '' }}
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          no-cache: true
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: |
+            ${{ matrix.name }}:${{ matrix.latest_tag }}${{ matrix.suffix }}${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' && format(',{0}:{1}{2},{0}:{3}{2},{4}:{1}{2},{4}:{3}{2}', matrix.name, needs.update-dockerfiles.outputs.extensionVersion, matrix.suffix, needs.update-dockerfiles.outputs.minorVersion, env.ECR_REGISTRY) || format(',{0}:{1}{2},{0}:{3}{2}', matrix.name, needs.update-dockerfiles.outputs.liquibaseVersion, matrix.suffix, needs.update-dockerfiles.outputs.minorVersion) }}
 
-      # - name: Build and Push Docker Image (dry-run)
-      #   if: ${{ needs.update-dockerfiles.outputs.dryRun == 'true' && ((needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' && matrix.type == 'liquibase-release') || (needs.update-dockerfiles.outputs.releaseType == 'liquibase-pro-release' && matrix.type == 'liquibase-pro-release')) }}
-      #   env:
-      #     ECR_REGISTRY: ${{ secrets.PRIVATE_ECR_DRY_RUN_REPO }}
-      #   uses: docker/build-push-action@v6
-      #   with:
-      #     context: .
-      #     file: ${{ matrix.dockerfile }}
-      #     no-cache: true
-      #     push: true
-      #     platforms: linux/amd64,linux/arm64
-      #     tags: |
-      #       ${{ env.ECR_REGISTRY }}:${{ matrix.latest_tag }}${{ matrix.suffix }},${{ env.ECR_REGISTRY }}:${{ needs.update-dockerfiles.outputs.extensionVersion }}${{ matrix.suffix }},${{ env.ECR_REGISTRY }}:${{ needs.update-dockerfiles.outputs.minorVersion }}${{ matrix.suffix }}
+      - name: Build and Push Docker Image (dry-run)
+        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'true' && ((needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' && matrix.type == 'liquibase-release') || (needs.update-dockerfiles.outputs.releaseType == 'liquibase-pro-release' && matrix.type == 'liquibase-pro-release')) }}
+        env:
+          ECR_REGISTRY: ${{ secrets.PRIVATE_ECR_DRY_RUN_REPO }}
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          no-cache: true
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: |
+            ${{ env.ECR_REGISTRY }}:${{ matrix.latest_tag }}${{ matrix.suffix }},${{ env.ECR_REGISTRY }}:${{ needs.update-dockerfiles.outputs.extensionVersion }}${{ matrix.suffix }},${{ env.ECR_REGISTRY }}:${{ needs.update-dockerfiles.outputs.minorVersion }}${{ matrix.suffix }}
 
   # update-official-repo:
   #   name: "Update Official Docker Repo"
