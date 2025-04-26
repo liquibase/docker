@@ -34,8 +34,8 @@ jobs:
 
       - name: Setup Docker on macOS
         if: matrix.os == 'macos-13'
-        uses: douglascamata/setup-docker-macos-action@v1-alpha
-
+        uses: douglascamata/setup-docker-macos-action@v1.0.0
+            
       - name: Build an image from ${{ matrix.dockerfile }}
         run: |
           docker build -f ${{ matrix.dockerfile }} -t liquibase/liquibase:${{ github.sha }} .
