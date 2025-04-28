@@ -176,7 +176,7 @@ jobs:
             latest_tag: "alpine"
             type: liquibase-release
           - dockerfile: DockerfilePro
-            name: liquibase/liquibase-pro-test
+            name: liquibase/liquibase-pro
             suffix: ""
             latest_tag: "latest"
             type: liquibase-pro-release
