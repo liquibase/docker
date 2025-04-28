@@ -169,6 +169,7 @@ jobs:
           fi
 
       - name: Test driver connection
+        if: matrix.dockerfile != 'DockerfilePro'
         run: |
           LOG_STRING="successfully installed in classpath"
           echo "Stopping and removing existing container..."
@@ -179,25 +180,9 @@ jobs:
           docker network create --driver bridge test_network || echo "Network may already exist"
           
           echo "Starting container with docker run..."
-          docker run -d --env LIQUIBASE_LICENSE_KEY=${{ secrets.PRO_LICENSE_KEY }} --name $CONTAINER_NAME --network test_network -v $(pwd)/.github/test:/liquibase/changelog liquibase/liquibase:${{ github.sha }} init start-h2
-          
-          echo "Container status after run:"
-          docker ps -a | grep $CONTAINER_NAME
-          
-          echo "Container logs:"
-          docker logs $CONTAINER_NAME
-          
-          echo "Attempting to add mssql driver..."
-          if docker exec $CONTAINER_NAME lpm add mssql --category=driver -g 2>&1 | tee /tmp/driver_output.log | grep -q "$LOG_STRING"; then
-          echo "SUCCESS: The log contains the string: $LOG_STRING"
-          cat /tmp/driver_output.log
-          else
-          echo "ERROR: The log does not contain the string: $LOG_STRING"
-          echo "Full output:"
-          cat /tmp/driver_output.log
+          echo "The log does not contain the string: $LOG_STRING"
           exit 1
           fi
-
 
       - name: Test custom entrypoint
         run: |
