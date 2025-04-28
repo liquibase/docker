@@ -192,22 +192,22 @@ jobs:
           java-version: "8"
           distribution: "adopt"
 
-      # - name: Release Notes
-      #   if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' && ((needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' && matrix.type == 'liquibase-release') || (needs.update-dockerfiles.outputs.releaseType == 'liquibase-pro-release' && matrix.type == 'liquibase-pro-release')) }}
-      #   uses: softprops/action-gh-release@v2
-      #   with:
-      #     name: ${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-pro-release' && format('v{0} PRO', needs.update-dockerfiles.outputs.extensionVersion) || format('v{0}', needs.update-dockerfiles.outputs.extensionVersion) }}
-      #     tag_name: v${{ needs.update-dockerfiles.outputs.extensionVersion }}
-      #     draft: true
-      #     body: |
-      #       ${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-pro-release' && format('Support for Liquibase PRO {0}.', needs.update-dockerfiles.outputs.liquibaseVersion) || format('Support for Liquibase {0}.', needs.update-dockerfiles.outputs.liquibaseVersion) }}
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Release Notes
+        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' && ((needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' && matrix.type == 'liquibase-release') || (needs.update-dockerfiles.outputs.releaseType == 'liquibase-pro-release' && matrix.type == 'liquibase-pro-release')) }}
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-pro-release' && format('v{0} PRO', needs.update-dockerfiles.outputs.extensionVersion) || format('v{0}', needs.update-dockerfiles.outputs.extensionVersion) }}
+          tag_name: v${{ needs.update-dockerfiles.outputs.extensionVersion }}
+          draft: true
+          body: |
+            ${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-pro-release' && format('Support for Liquibase PRO {0}.', needs.update-dockerfiles.outputs.liquibaseVersion) || format('Support for Liquibase {0}.', needs.update-dockerfiles.outputs.liquibaseVersion) }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
-        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' && needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' && matrix.type == 'liquibase-release' }}
+        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' && ((needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' && matrix.type == 'liquibase-release') || (needs.update-dockerfiles.outputs.releaseType == 'liquibase-pro-release' && matrix.type == 'liquibase-pro-release')) }}
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
