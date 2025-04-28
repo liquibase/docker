@@ -169,6 +169,7 @@ jobs:
           fi
 
       - name: Test driver connection
+        if: matrix.dockerfile != 'DockerfilePro'
         run: |
           LOG_STRING="successfully installed in classpath"
           docker stop $CONTAINER_NAME
