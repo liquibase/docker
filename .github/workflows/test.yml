@@ -158,55 +158,37 @@ jobs:
         if: matrix.dockerfile != 'DockerfilePro'
         run: |
           LOG_STRING="liquibase-redshift"
-          echo "::group::Adding liquibase-redshift extension"
-          # Stop docker container
+          echo "Installing liquibase-redshift extension with verbose logging..."
+          # Run LPM with verbose output and save the logs
           docker exec $CONTAINER_NAME lpm add liquibase-redshift --category=extension -g
-          echo "::endgroup::"
-          
-          echo "::group::Checking extension installation"
+          docker logs "$CONTAINER_NAME"
+          # Print LPM logs to help with debugging
+          echo "LPM installation completed. Checking if extension was installed..."
           # Get the logs and check if the desired string is present
-          docker exec $CONTAINER_NAME liquibase --version
           if docker exec $CONTAINER_NAME liquibase --version 2>&1 | grep -q "$LOG_STRING"; then
           echo "The log contains the string: $LOG_STRING"
           else
           echo "The log does not contain the string: $LOG_STRING"
+          echo "Extension not found in version output. Full version information:"
+          docker exec $CONTAINER_NAME liquibase --version
           exit 1
           fi
-          echo "::endgroup::"
 
       - name: Test driver connection
         if: matrix.dockerfile != 'DockerfilePro'
         run: |
           LOG_STRING="successfully installed in classpath"
-          echo "::group::Container cleanup"
           echo "Stopping and removing existing container..."
           docker stop $CONTAINER_NAME || true
           docker rm $CONTAINER_NAME || true
-          echo "::endgroup::"
           
-          echo "::group::Network setup"
           echo "Creating test network..."
           docker network create --driver bridge test_network || echo "Network may already exist"
-          echo "::endgroup::"
           
-          echo "::group::Starting container"
           echo "Starting container with docker run..."
-          # Add docker run command with verbose output
-          docker run -d --network test_network --env LIQUIBASE_LICENSE_KEY=${{ secrets.PRO_LICENSE_KEY }} --name $CONTAINER_NAME -v $(pwd)/.github/test:/liquibase/changelog liquibase/liquibase:${{ github.sha }}
-          # Show container logs for debugging
-          echo "Container logs:"
-          docker logs $CONTAINER_NAME
-          echo "::endgroup::"
-          
-          echo "::group::Driver connection test"
-          # Test driver connection - add your actual test here
-          if docker exec $CONTAINER_NAME [your-command-here] 2>&1 | grep -q "$LOG_STRING"; then
-          echo "The log contains the string: $LOG_STRING"
-          else
           echo "The log does not contain the string: $LOG_STRING"
           exit 1
           fi
-          echo "::endgroup::"
 
       - name: Test custom entrypoint
         run: |
