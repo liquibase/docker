@@ -171,17 +171,33 @@ jobs:
       - name: Test driver connection
         run: |
           LOG_STRING="successfully installed in classpath"
-          docker stop $CONTAINER_NAME
-          docker rm $CONTAINER_NAME
-          docker network create --driver bridge test_network
-          # Get the logs and check if the desired string is present
+          echo "Stopping and removing existing container..."
+          docker stop $CONTAINER_NAME || true
+          docker rm $CONTAINER_NAME || true
+          
+          echo "Creating test network..."
+          docker network create --driver bridge test_network || echo "Network may already exist"
+          
+          echo "Starting container with docker run..."
           docker run -d --env LIQUIBASE_LICENSE_KEY=${{ secrets.PRO_LICENSE_KEY }} --name $CONTAINER_NAME --network test_network -v $(pwd)/.github/test:/liquibase/changelog liquibase/liquibase:${{ github.sha }} init start-h2
-          if docker exec $CONTAINER_NAME lpm add mssql --category=driver -g 2>&1 | grep -q "$LOG_STRING"; then
-              echo "The log contains the string: $LOG_STRING"
+          
+          echo "Container status after run:"
+          docker ps -a | grep $CONTAINER_NAME
+          
+          echo "Container logs:"
+          docker logs $CONTAINER_NAME
+          
+          echo "Attempting to add mssql driver..."
+          if docker exec $CONTAINER_NAME lpm add mssql --category=driver -g 2>&1 | tee /tmp/driver_output.log | grep -q "$LOG_STRING"; then
+          echo "SUCCESS: The log contains the string: $LOG_STRING"
+          cat /tmp/driver_output.log
           else
-              echo "The log does not contain the string: $LOG_STRING"
-              exit 1
+          echo "ERROR: The log does not contain the string: $LOG_STRING"
+          echo "Full output:"
+          cat /tmp/driver_output.log
+          exit 1
           fi
+
 
       - name: Test custom entrypoint
         run: |
