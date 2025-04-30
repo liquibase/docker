@@ -6,10 +6,13 @@ RUN groupadd --gid 1001 liquibase && \
     useradd --uid 1001 --gid liquibase --create-home --home-dir /liquibase liquibase && \
     chown liquibase /liquibase
 
-# Install necessary dependencies
-#RUN apt-get update && \
-#    apt-get -yqq install krb5-user libpam-krb5 --no-install-recommends && \
-#    rm -rf /var/lib/apt/lists/*
+# Add metadata labels
+LABEL org.opencontainers.image.source="https://github.com/liquibase/docker"
+LABEL org.opencontainers.image.description="Liquibase Container Image"
+LABEL org.opencontainers.image.licenses="Apache-2.0"
+LABEL org.opencontainers.image.vendor="Liquibase"
+LABEL org.opencontainers.image.version="${LIQUIBASE_VERSION}"
+LABEL org.opencontainers.image.documentation="https://docs.liquibase.com"
 
 # Download and install Liquibase
 WORKDIR /liquibase

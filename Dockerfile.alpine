@@ -9,6 +9,14 @@ RUN addgroup --gid 1001 liquibase && \
 # Install smaller JRE, if available and acceptable
 RUN apk add --no-cache openjdk21-jre-headless bash
 
+# Add metadata labels
+LABEL org.opencontainers.image.source="https://github.com/liquibase/docker"
+LABEL org.opencontainers.image.description="Liquibase Container Image (Alpine)"
+LABEL org.opencontainers.image.licenses="Apache-2.0"
+LABEL org.opencontainers.image.vendor="Liquibase"
+LABEL org.opencontainers.image.version="${LIQUIBASE_VERSION}"
+LABEL org.opencontainers.image.documentation="https://docs.liquibase.com"
+
 WORKDIR /liquibase
 
 ARG LIQUIBASE_VERSION=4.31.1
