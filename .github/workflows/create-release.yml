@@ -246,6 +246,17 @@ jobs:
           registry: public.ecr.aws
           username: ${{ secrets.PUBLIC_ECR_ACCESS_KEY_ID }}
           password: ${{ secrets.PUBLIC_ECR_SECRET_ACCESS_KEY }}
+          
+      # Add login for dry-run mode to private ECR
+      - name: Login to Private ECR Registry (dry-run)
+        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'true' }}
+        uses: docker/login-action@v3
+        env:
+          AWS_REGION: us-east-1
+        with:
+          registry: ${{ secrets.PRIVATE_ECR_DRY_RUN_REPO }}
+          username: ${{ secrets.PUBLIC_ECR_ACCESS_KEY_ID }}
+          password: ${{ secrets.PUBLIC_ECR_SECRET_ACCESS_KEY }}
 
       # Generate tags dynamically using a separate step
       - name: Generate Docker Tags
