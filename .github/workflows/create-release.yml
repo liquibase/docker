@@ -138,7 +138,7 @@ jobs:
               sed -i 's/^ARG LIQUIBASE_VERSION=.*/ARG LIQUIBASE_VERSION='"${{ steps.collect-data.outputs.liquibaseVersion }}"'/' "${{ github.workspace }}/${file}"
               sed -i 's/^ARG LB_SHA256=.*/ARG LB_SHA256='"$LIQUIBASE_SHA"'/' "${{ github.workspace }}/${file}"
               sed -i 's/^ARG LPM_SHA256=.*/ARG LPM_SHA256='"$LPM_SHA"'/' "${{ github.workspace }}/${file}"
-              #sed -i 's/^ARG LPM_SHA256_ARM=.*/ARG LPM_SHA256_ARM='"$LPM_SHA_ARM"'/' "${{ github.workspace }}/${file}"
+              sed -i 's/^ARG LPM_SHA256_ARM=.*/ARG LPM_SHA256_ARM='"$LPM_SHA_ARM"'/' "${{ github.workspace }}/${file}"
               git add "${file}"
             done
             if git diff-index --cached --quiet HEAD --; then
