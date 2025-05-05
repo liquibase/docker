@@ -83,9 +83,9 @@ jobs:
               core.setOutput("minorVersion", minorVersion);
               core.setOutput("dryRun", dryRun);
               core.setOutput("releaseType", eventType);
-              core.setOutput("pushDockerHub", 'true');
-              core.setOutput("pushGHCR", 'true');
-              core.setOutput("pushECR", 'true');
+              core.setOutput("pushDockerHub", context.payload.client_payload.pushDockerHub ?? true);
+              core.setOutput("pushGHCR", context.payload.client_payload.pushGHCR ?? true);
+              core.setOutput("pushECR", context.payload.client_payload.pushECR ?? true);
             } else if (context.payload.inputs) {
               eventType = context.payload.inputs.releaseType || 'liquibase-release';
               liquibaseVersion = context.payload.inputs.liquibaseVersion;
