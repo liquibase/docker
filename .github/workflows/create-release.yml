@@ -32,7 +32,7 @@ on:
 jobs:
   update-dockerfiles:
     env:
-      LPM_VERSION: "0.2.8"
+      LPM_VERSION: "0.2.9"
     name: "Update Dockerfiles"
     runs-on: ubuntu-latest
     outputs:
@@ -206,14 +206,39 @@ jobs:
 
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
-      - uses: docker/login-action@v3
-        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' && ((needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' && matrix.type == 'liquibase-release') || (needs.update-dockerfiles.outputs.releaseType == 'liquibase-pro-release' && matrix.type == 'liquibase-pro-release')) }}
+
+      # Define registry configurations based on image type
+      - name: Set registry variables
+        id: set-registries
+        run: |
+          if [[ "${{ matrix.type }}" == "liquibase-release" ]]; then
+            echo "DOCKERHUB_REPO=${{ matrix.name }}" >> $GITHUB_OUTPUT
+            echo "ECR_REPO=public.ecr.aws/liquibase/liquibase" >> $GITHUB_OUTPUT
+            echo "GHCR_REPO=ghcr.io/liquibase/liquibase" >> $GITHUB_OUTPUT
+          elif [[ "${{ matrix.type }}" == "liquibase-pro-release" ]]; then
+            echo "DOCKERHUB_REPO=${{ matrix.name }}" >> $GITHUB_OUTPUT
+            echo "ECR_REPO=" >> $GITHUB_OUTPUT
+            echo "GHCR_REPO=" >> $GITHUB_OUTPUT
+          fi
+
+      # Use separate login steps for each registry
+      - name: Login to Docker Hub
+        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' }}
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Login to GitHub Container Registry
+        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' && steps.set-registries.outputs.GHCR_REPO != '' }}
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Login to ECR Registry
-        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' && needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' && matrix.type == 'liquibase-release' }}
+        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' && steps.set-registries.outputs.ECR_REPO != '' }}
         uses: docker/login-action@v3
         env:
           AWS_REGION: us-east-1
@@ -222,7 +247,8 @@ jobs:
           username: ${{ secrets.PUBLIC_ECR_ACCESS_KEY_ID }}
           password: ${{ secrets.PUBLIC_ECR_SECRET_ACCESS_KEY }}
 
-      - name: Login to ECR Private Registry (dry-run)
+      # Add login for dry-run mode to private ECR
+      - name: Login to Private ECR Registry (dry-run)
         if: ${{ needs.update-dockerfiles.outputs.dryRun == 'true' }}
         uses: docker/login-action@v3
         env:
@@ -232,24 +258,48 @@ jobs:
           username: ${{ secrets.PUBLIC_ECR_ACCESS_KEY_ID }}
           password: ${{ secrets.PUBLIC_ECR_SECRET_ACCESS_KEY }}
 
-      - name: Build and Push Docker Image
-        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' && ((needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' && matrix.type == 'liquibase-release') || (needs.update-dockerfiles.outputs.releaseType == 'liquibase-pro-release' && matrix.type == 'liquibase-pro-release')) }}
-        env:
-          ECR_REGISTRY: ${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' && 'public.ecr.aws/liquibase/liquibase' || '' }}
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: ${{ matrix.dockerfile }}
-          no-cache: true
-          push: true
-          platforms: linux/amd64,linux/arm64
-          tags: |
-            ${{ matrix.name }}:${{ matrix.latest_tag }}${{ matrix.suffix }}${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' && format(',{0}:{1}{2},{0}:{3}{2},{4}:{1}{2},{4}:{3}{2}', matrix.name, needs.update-dockerfiles.outputs.extensionVersion, matrix.suffix, needs.update-dockerfiles.outputs.minorVersion, env.ECR_REGISTRY) || format(',{0}:{1}{2},{0}:{3}{2}', matrix.name, needs.update-dockerfiles.outputs.liquibaseVersion, matrix.suffix, needs.update-dockerfiles.outputs.minorVersion) }}
+      # Generate tags dynamically using a separate step
+      - name: Generate Docker Tags
+        id: generate-tags
+        run: |
+          VERSION="${{ needs.update-dockerfiles.outputs.extensionVersion }}"
+          MINOR_VERSION="${{ needs.update-dockerfiles.outputs.minorVersion }}"
+          SUFFIX="${{ matrix.suffix }}"
+          LATEST_TAG="${{ matrix.latest_tag }}"
+          TAGS=""
 
-      - name: Build and Push Docker Image (dry-run)
-        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'true' && ((needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' && matrix.type == 'liquibase-release') || (needs.update-dockerfiles.outputs.releaseType == 'liquibase-pro-release' && matrix.type == 'liquibase-pro-release')) }}
-        env:
-          ECR_REGISTRY: ${{ secrets.PRIVATE_ECR_DRY_RUN_REPO }}
+          # Always add DockerHub tags
+          TAGS="${{ steps.set-registries.outputs.DOCKERHUB_REPO }}:${LATEST_TAG}${SUFFIX}"
+          TAGS="${TAGS},${{ steps.set-registries.outputs.DOCKERHUB_REPO }}:${VERSION}${SUFFIX}"
+          TAGS="${TAGS},${{ steps.set-registries.outputs.DOCKERHUB_REPO }}:${MINOR_VERSION}${SUFFIX}"
+
+          # Add ECR tags if applicable
+          if [[ -n "${{ steps.set-registries.outputs.ECR_REPO }}" ]]; then
+            TAGS="${TAGS},${{ steps.set-registries.outputs.ECR_REPO }}:${LATEST_TAG}${SUFFIX}"
+            TAGS="${TAGS},${{ steps.set-registries.outputs.ECR_REPO }}:${VERSION}${SUFFIX}"
+            TAGS="${TAGS},${{ steps.set-registries.outputs.ECR_REPO }}:${MINOR_VERSION}${SUFFIX}"
+          fi
+
+          # Add GHCR tags if applicable
+          if [[ -n "${{ steps.set-registries.outputs.GHCR_REPO }}" ]]; then
+            TAGS="${TAGS},${{ steps.set-registries.outputs.GHCR_REPO }}:${LATEST_TAG}${SUFFIX}"
+            TAGS="${TAGS},${{ steps.set-registries.outputs.GHCR_REPO }}:${VERSION}${SUFFIX}"
+            TAGS="${TAGS},${{ steps.set-registries.outputs.GHCR_REPO }}:${MINOR_VERSION}${SUFFIX}"
+          fi
+
+          # For dry run, only use ECR registry
+          if [[ "${{ needs.update-dockerfiles.outputs.dryRun }}" == "true" ]]; then
+            TAGS="${{ secrets.PRIVATE_ECR_DRY_RUN_REPO }}:${LATEST_TAG}${SUFFIX}"
+            TAGS="${TAGS},${{ secrets.PRIVATE_ECR_DRY_RUN_REPO }}:${VERSION}${SUFFIX}"
+            TAGS="${TAGS},${{ secrets.PRIVATE_ECR_DRY_RUN_REPO }}:${MINOR_VERSION}${SUFFIX}"
+          fi
+
+          echo "tags=${TAGS}" >> $GITHUB_OUTPUT
+          echo "Generated tags: ${TAGS}"
+
+      # Unified build and push step using generated tags
+      - name: Build and Push Docker Image
+        if: ${{ needs.update-dockerfiles.outputs.releaseType == matrix.type }}
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -257,8 +307,7 @@ jobs:
           no-cache: true
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: |
-            ${{ env.ECR_REGISTRY }}:${{ matrix.latest_tag }}${{ matrix.suffix }},${{ env.ECR_REGISTRY }}:${{ needs.update-dockerfiles.outputs.extensionVersion }}${{ matrix.suffix }},${{ env.ECR_REGISTRY }}:${{ needs.update-dockerfiles.outputs.minorVersion }}${{ matrix.suffix }}
+          tags: ${{ steps.generate-tags.outputs.tags }}
 
   update-official-repo:
     name: "Update Official Docker Repo"

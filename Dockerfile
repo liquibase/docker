@@ -1,21 +1,27 @@
 # Builder Stage
 FROM eclipse-temurin:21-jre-jammy
 
+ARG LIQUIBASE_VERSION=4.31.1
+ARG LB_SHA256=0555808b59941d497f0c1114c3f2225698afde11c60d191c88e449506a60a3ea
+ARG LPM_VERSION=0.2.9
+ARG LPM_SHA256=b9caecd34c98a6c19a2bc582e8064aff5251c5f1adbcd100d3403c5eceb5373a
+ARG LPM_SHA256_ARM=0adb3a96d7384b4da549979bf00217a8914f0df37d1ed8fdb1b4a4baebfa104c
+
 # Create liquibase user
 RUN groupadd --gid 1001 liquibase && \
     useradd --uid 1001 --gid liquibase --create-home --home-dir /liquibase liquibase && \
     chown liquibase /liquibase
 
-# Install necessary dependencies
-#RUN apt-get update && \
-#    apt-get -yqq install krb5-user libpam-krb5 --no-install-recommends && \
-#    rm -rf /var/lib/apt/lists/*
+# Add metadata labels
+LABEL org.opencontainers.image.source="https://github.com/liquibase/docker"
+LABEL org.opencontainers.image.description="Liquibase Container Image"
+LABEL org.opencontainers.image.licenses="Apache-2.0"
+LABEL org.opencontainers.image.vendor="Liquibase"
+LABEL org.opencontainers.image.version="${LIQUIBASE_VERSION}"
+LABEL org.opencontainers.image.documentation="https://docs.liquibase.com"
 
 # Download and install Liquibase
 WORKDIR /liquibase
-
-ARG LIQUIBASE_VERSION=4.31.1
-ARG LB_SHA256=0555808b59941d497f0c1114c3f2225698afde11c60d191c88e449506a60a3ea
 
 RUN wget -q -O liquibase-${LIQUIBASE_VERSION}.tar.gz "https://github.com/liquibase/liquibase/releases/download/v${LIQUIBASE_VERSION}/liquibase-${LIQUIBASE_VERSION}.tar.gz" && \
     echo "$LB_SHA256 *liquibase-${LIQUIBASE_VERSION}.tar.gz" | sha256sum -c - && \
@@ -25,10 +31,6 @@ RUN wget -q -O liquibase-${LIQUIBASE_VERSION}.tar.gz "https://github.com/liquiba
     ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \
     liquibase --version
 
-ARG LPM_VERSION=0.2.9
-ARG LPM_SHA256=b9caecd34c98a6c19a2bc582e8064aff5251c5f1adbcd100d3403c5eceb5373a
-ARG LPM_SHA256_ARM=0adb3a96d7384b4da549979bf00217a8914f0df37d1ed8fdb1b4a4baebfa104c
-
 # Download and Install lpm
 RUN apt-get update && \
     apt-get -yqq install unzip --no-install-recommends && \
@@ -36,9 +38,9 @@ RUN apt-get update && \
     mkdir /liquibase/bin && \
     arch="$(dpkg --print-architecture)" && \
     case "$arch" in \
-      amd64)  DOWNLOAD_ARCH=""  ;; \
-      arm64)  DOWNLOAD_ARCH="-arm64" && LPM_SHA256=$LPM_SHA256_ARM ;; \
-      *) echo >&2 "error: unsupported architecture '$arch'" && exit 1 ;; \
+    amd64)  DOWNLOAD_ARCH=""  ;; \
+    arm64)  DOWNLOAD_ARCH="-arm64" && LPM_SHA256=$LPM_SHA256_ARM ;; \
+    *) echo >&2 "error: unsupported architecture '$arch'" && exit 1 ;; \
     esac && wget -q -O lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip "https://github.com/liquibase/liquibase-package-manager/releases/download/v${LPM_VERSION}/lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip" && \
     echo "$LPM_SHA256 *lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip" | sha256sum -c - && \
     unzip lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip -d bin/ && \
