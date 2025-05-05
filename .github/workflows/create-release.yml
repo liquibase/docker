@@ -28,6 +28,18 @@ on:
         required: false
         type: string
         default: ""
+      pushDockerHub:
+        description: "Publish to Docker Hub"
+        type: boolean
+        default: true
+      pushGHCR:
+        description: "Publish to GitHub Container Registry"
+        type: boolean
+        default: true
+      pushECR:
+        description: "Publish to AWS Public ECR"
+        type: boolean
+        default: true
 
 jobs:
   update-dockerfiles:
@@ -42,6 +54,9 @@ jobs:
       dryRun: ${{ steps.collect-data.outputs.dryRun }}
       minorVersion: ${{ steps.collect-data.outputs.minorVersion }}
       latestCommitSha: ${{ steps.get-latest-sha.outputs.latestCommitSha }}
+      pushDockerHub: ${{ steps.collect-data.outputs.pushDockerHub }}
+      pushGHCR: ${{ steps.collect-data.outputs.pushGHCR }}
+      pushECR: ${{ steps.collect-data.outputs.pushECR }}
 
     steps:
       - name: Collect Data
@@ -68,6 +83,9 @@ jobs:
               core.setOutput("minorVersion", minorVersion);
               core.setOutput("dryRun", dryRun);
               core.setOutput("releaseType", eventType);
+              core.setOutput("pushDockerHub", 'true');
+              core.setOutput("pushGHCR", 'true');
+              core.setOutput("pushECR", 'true');
             } else if (context.payload.inputs) {
               eventType = context.payload.inputs.releaseType || 'liquibase-release';
               liquibaseVersion = context.payload.inputs.liquibaseVersion;
@@ -78,6 +96,9 @@ jobs:
               core.setOutput("minorVersion", minorVersion);
               core.setOutput("dryRun", dryRun);
               core.setOutput("releaseType", eventType);
+              core.setOutput("pushDockerHub", (context.payload.inputs?.pushDockerHub ?? 'true'));
+              core.setOutput("pushGHCR", (context.payload.inputs?.pushGHCR ?? 'true'));
+              core.setOutput("pushECR", (context.payload.inputs?.pushECR ?? 'true'));
             } else {
               core.setFailed('Unknown event type');
             }
@@ -162,6 +183,10 @@ jobs:
     name: "Build and Push Docker Images"
     needs: update-dockerfiles
     runs-on: ubuntu-latest
+    env:
+      PUSH_DOCKERHUB: ${{ needs.update-dockerfiles.outputs.pushDockerHub }}
+      PUSH_GHCR: ${{ needs.update-dockerfiles.outputs.pushGHCR }}
+      PUSH_ECR: ${{ needs.update-dockerfiles.outputs.pushECR }}
     strategy:
       matrix:
         include:
@@ -223,14 +248,14 @@ jobs:
 
       # Use separate login steps for each registry
       - name: Login to Docker Hub
-        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' }}
+        if: ${{ env.PUSH_DOCKERHUB == 'true' && needs.update-dockerfiles.outputs.dryRun == 'false' }}
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Login to GitHub Container Registry
-        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' && steps.set-registries.outputs.GHCR_REPO != '' }}
+        if: ${{ env.PUSH_GHCR == 'true' && needs.update-dockerfiles.outputs.dryRun == 'false' && steps.set-registries.outputs.GHCR_REPO != '' }}
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -238,7 +263,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Login to ECR Registry
-        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' && steps.set-registries.outputs.ECR_REPO != '' }}
+        if: ${{ env.PUSH_ECR == 'true' && needs.update-dockerfiles.outputs.dryRun == 'false' && steps.set-registries.outputs.ECR_REPO != '' }}
         uses: docker/login-action@v3
         env:
           AWS_REGION: us-east-1
@@ -268,30 +293,42 @@ jobs:
           LATEST_TAG="${{ matrix.latest_tag }}"
           TAGS=""
 
-          # Always add DockerHub tags
-          TAGS="${{ steps.set-registries.outputs.DOCKERHUB_REPO }}:${LATEST_TAG}${SUFFIX}"
-          TAGS="${TAGS},${{ steps.set-registries.outputs.DOCKERHUB_REPO }}:${VERSION}${SUFFIX}"
-          TAGS="${TAGS},${{ steps.set-registries.outputs.DOCKERHUB_REPO }}:${MINOR_VERSION}${SUFFIX}"
-
-          # Add ECR tags if applicable
-          if [[ -n "${{ steps.set-registries.outputs.ECR_REPO }}" ]]; then
-            TAGS="${TAGS},${{ steps.set-registries.outputs.ECR_REPO }}:${LATEST_TAG}${SUFFIX}"
-            TAGS="${TAGS},${{ steps.set-registries.outputs.ECR_REPO }}:${VERSION}${SUFFIX}"
-            TAGS="${TAGS},${{ steps.set-registries.outputs.ECR_REPO }}:${MINOR_VERSION}${SUFFIX}"
-          fi
-
-          # Add GHCR tags if applicable
-          if [[ -n "${{ steps.set-registries.outputs.GHCR_REPO }}" ]]; then
-            TAGS="${TAGS},${{ steps.set-registries.outputs.GHCR_REPO }}:${LATEST_TAG}${SUFFIX}"
-            TAGS="${TAGS},${{ steps.set-registries.outputs.GHCR_REPO }}:${VERSION}${SUFFIX}"
-            TAGS="${TAGS},${{ steps.set-registries.outputs.GHCR_REPO }}:${MINOR_VERSION}${SUFFIX}"
-          fi
-
           # For dry run, only use ECR registry
           if [[ "${{ needs.update-dockerfiles.outputs.dryRun }}" == "true" ]]; then
             TAGS="${{ secrets.PRIVATE_ECR_DRY_RUN_REPO }}:${LATEST_TAG}${SUFFIX}"
             TAGS="${TAGS},${{ secrets.PRIVATE_ECR_DRY_RUN_REPO }}:${VERSION}${SUFFIX}"
             TAGS="${TAGS},${{ secrets.PRIVATE_ECR_DRY_RUN_REPO }}:${MINOR_VERSION}${SUFFIX}"
+            echo "tags=${TAGS}" >> $GITHUB_OUTPUT
+            echo "Generated tags (dry-run): ${TAGS}"
+            exit 0
+          fi
+          
+          # Add DockerHub tags if selected
+          if [[ "${PUSH_DOCKERHUB}" == "true" ]]; then
+            TAGS="${{ steps.set-registries.outputs.DOCKERHUB_REPO }}:${LATEST_TAG}${SUFFIX}"
+            TAGS="${TAGS},${{ steps.set-registries.outputs.DOCKERHUB_REPO }}:${VERSION}${SUFFIX}"
+            TAGS="${TAGS},${{ steps.set-registries.outputs.DOCKERHUB_REPO }}:${MINOR_VERSION}${SUFFIX}"
+          fi
+
+          # Add ECR tags if selected and available for this image type
+          if [[ "${PUSH_ECR}" == "true" && -n "${{ steps.set-registries.outputs.ECR_REPO }}" ]]; then
+            if [[ -n "${TAGS}" ]]; then TAGS="${TAGS},"; fi
+            TAGS="${TAGS}${{ steps.set-registries.outputs.ECR_REPO }}:${LATEST_TAG}${SUFFIX}"
+            TAGS="${TAGS},${{ steps.set-registries.outputs.ECR_REPO }}:${VERSION}${SUFFIX}"
+            TAGS="${TAGS},${{ steps.set-registries.outputs.ECR_REPO }}:${MINOR_VERSION}${SUFFIX}"
+          fi
+
+          # Add GHCR tags if selected and available for this image type
+          if [[ "${PUSH_GHCR}" == "true" && -n "${{ steps.set-registries.outputs.GHCR_REPO }}" ]]; then
+            if [[ -n "${TAGS}" ]]; then TAGS="${TAGS},"; fi
+            TAGS="${TAGS}${{ steps.set-registries.outputs.GHCR_REPO }}:${LATEST_TAG}${SUFFIX}"
+            TAGS="${TAGS},${{ steps.set-registries.outputs.GHCR_REPO }}:${VERSION}${SUFFIX}"
+            TAGS="${TAGS},${{ steps.set-registries.outputs.GHCR_REPO }}:${MINOR_VERSION}${SUFFIX}"
+          fi
+
+          if [[ -z "${TAGS}" ]]; then
+            echo "::warning::No registries were selected. Running in dry-run mode."
+            TAGS="${{ secrets.PRIVATE_ECR_DRY_RUN_REPO }}:${LATEST_TAG}${SUFFIX}"
           fi
 
           echo "tags=${TAGS}" >> $GITHUB_OUTPUT
