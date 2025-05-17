@@ -1,4 +1,10 @@
 name: Release Extension (v2)
+
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
+  
 on:
   repository_dispatch:
     types: [liquibase-release, liquibase-pro-release]
@@ -152,7 +158,7 @@ jobs:
             fi
           fi
         env:
-          GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Get latest commit SHA
         id: get-latest-sha
@@ -315,7 +321,7 @@ jobs:
     if: ${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' }}
     runs-on: ubuntu-latest
     env:
-      GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Extract major.minor version
         id: extract_version
@@ -325,12 +331,22 @@ jobs:
           echo "VERSION: $VERSION"
           echo "MAJOR_MINOR: ${VERSION%.*}"
 
+      - name: Get GitHub App token
+        id: get-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.LIQUIBASE_GITHUB_APP_ID }}
+          private-key: ${{ secrets.LIQUIBASE_GITHUB_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          permission-contents: write
+          permission-actions: write
+                
       - name: Check out liquibase/official-images
         uses: actions/checkout@v4
         with:
           repository: liquibase/official-images
           ref: master
-          token: ${{ env.GITHUB_TOKEN }}
+          token: ${{ steps.get-token.outputs.token }}
 
       - name: Update library/liquibase in liquibase/official-images
         run: |
