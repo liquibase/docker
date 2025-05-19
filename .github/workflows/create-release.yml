@@ -351,6 +351,22 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           tags: ${{ steps.generate-tags.outputs.tags }}
+          # Labels applied to each architecture-specific image
+          labels: |
+            org.opencontainers.image.source=https://github.com/liquibase/docker
+            org.opencontainers.image.description=${{ matrix.type == 'liquibase-pro-release' && 'Liquibase PRO Container Image' || format('Liquibase Container Image{0}', matrix.suffix == '-alpine' && ' (Alpine)' || '') }}
+            org.opencontainers.image.licenses=Apache-2.0
+            org.opencontainers.image.vendor=Liquibase
+            org.opencontainers.image.version=${{ needs.update-dockerfiles.outputs.extensionVersion }}
+            org.opencontainers.image.documentation=https://docs.liquibase.com
+          # Annotations applied to the manifest list (important for multi-arch images)
+          annotations: |
+            org.opencontainers.image.source=https://github.com/liquibase/docker
+            org.opencontainers.image.description=${{ matrix.type == 'liquibase-pro-release' && 'Liquibase PRO Container Image' || format('Liquibase Container Image{0}', matrix.suffix == '-alpine' && ' (Alpine)' || '') }}
+            org.opencontainers.image.licenses=Apache-2.0
+            org.opencontainers.image.vendor=Liquibase
+            org.opencontainers.image.version=${{ needs.update-dockerfiles.outputs.extensionVersion }}
+            org.opencontainers.image.documentation=https://docs.liquibase.com
 
   update-official-repo:
     name: "Update Official Docker Repo"

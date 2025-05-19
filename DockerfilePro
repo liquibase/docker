@@ -6,11 +6,20 @@ RUN groupadd --gid 1001 liquibase && \
     useradd --uid 1001 --gid liquibase --create-home --home-dir /liquibase liquibase && \
     chown liquibase /liquibase
 
-# Download and install Liquibase
-WORKDIR /liquibase
-
+# Define ARGs before using them in LABELs
 ARG LIQUIBASE_PRO_VERSION=4.32.0-RC1
 ARG LB_PRO_SHA256=8da09e9c3a4e8c869b0bf432c1813dcebe426c41b6a5e6b9a084d6f087f11d02
+
+# Add metadata labels
+LABEL org.opencontainers.image.source="https://github.com/liquibase/docker"
+LABEL org.opencontainers.image.description="Liquibase Pro Container Image"
+LABEL org.opencontainers.image.licenses="Apache-2.0"
+LABEL org.opencontainers.image.vendor="Liquibase"
+LABEL org.opencontainers.image.version="${LIQUIBASE_PRO_VERSION}"
+LABEL org.opencontainers.image.documentation="https://docs.liquibase.com"
+
+# Download and install Liquibase
+WORKDIR /liquibase
 
 RUN wget -q -O liquibase-pro-${LIQUIBASE_PRO_VERSION}.tar.gz "https://repo.liquibase.com/releases/pro/${LIQUIBASE_PRO_VERSION}/liquibase-pro-${LIQUIBASE_PRO_VERSION}.tar.gz" && \
     echo "$LB_PRO_SHA256 *liquibase-pro-${LIQUIBASE_PRO_VERSION}.tar.gz" | sha256sum -c - && \
