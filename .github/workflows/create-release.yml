@@ -306,7 +306,6 @@ jobs:
             TAGS="${TAGS},${{ secrets.PRIVATE_ECR_DRY_RUN_REPO }}:${MINOR_VERSION}${SUFFIX}"
             echo "tags=${TAGS}" >> $GITHUB_OUTPUT
             echo "Generated tags (dry-run): ${TAGS}"
-            exit 0
           fi
           
           # Add DockerHub tags if selected
