@@ -102,9 +102,9 @@ jobs:
               core.setOutput("minorVersion", minorVersion);
               core.setOutput("dryRun", dryRun);
               core.setOutput("releaseType", eventType);
-              core.setOutput("pushDockerHub", (context.payload.inputs?.pushDockerHub ?? 'true'));
-              core.setOutput("pushGHCR", (context.payload.inputs?.pushGHCR ?? 'true'));
-              core.setOutput("pushECR", (context.payload.inputs?.pushECR ?? 'true'));
+              core.setOutput("pushDockerHub", Boolean(context.payload.inputs?.pushDockerHub ?? true));
+              core.setOutput("pushGHCR", Boolean(context.payload.inputs?.pushGHCR ?? true));
+              core.setOutput("pushECR", Boolean(context.payload.inputs?.pushECR ?? true));
             } else {
               core.setFailed('Unknown event type');
             }
