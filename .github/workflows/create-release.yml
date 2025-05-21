@@ -4,6 +4,7 @@ permissions:
   contents: write
   pull-requests: write
   id-token: write
+  packages: write
   
 on:
   repository_dispatch:
