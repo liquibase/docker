@@ -135,11 +135,6 @@ jobs:
           java-version: "8"
           distribution: "adopt"
 
-      - name: Configure git user
-        run: |
-          git config user.name "liquibot"
-          git config user.email "liquibot@liquibase.org"
-
       - name: Update Dockerfile(s) and commit changes
         run: |
           if [[ "${{ steps.collect-data.outputs.releaseType }}" == "liquibase-pro-release" ]]; then
@@ -158,7 +153,7 @@ jobs:
               git commit -m "Liquibase PRO Version Bumped to ${{ steps.collect-data.outputs.liquibaseVersion }}"
               if [[ "${{ steps.collect-data.outputs.dryRun }}" == false ]]; then
                 git tag -fa -m "Version Bumped to ${{ steps.collect-data.outputs.liquibaseVersion }}" v${{ steps.collect-data.outputs.liquibaseVersion }}
-                git push -f "https://liquibot:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git" HEAD:${{ github.ref }} --follow-tags --tags
+                git push -f "https://x-access-token:${{ steps.get-token.outputs.token }}@github.com/$GITHUB_REPOSITORY.git" HEAD:${{ github.ref }} --follow-tags --tags
               else
                 echo "Dry run mode: changes have not been pushed."
               fi
@@ -181,7 +176,7 @@ jobs:
               git commit -m "Liquibase Version Bumped to ${{ steps.collect-data.outputs.extensionVersion }}"
               if [[ "${{ steps.collect-data.outputs.dryRun }}" == false ]]; then
                 git tag -fa -m "Version Bumped to ${{ steps.collect-data.outputs.extensionVersion }}" v${{ steps.collect-data.outputs.extensionVersion }}
-                git push -f "https://liquibot:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git" HEAD:${{ github.ref }} --follow-tags --tags
+                git push -f "https://x-access-token:${{ steps.get-token.outputs.token }}@github.com/$GITHUB_REPOSITORY.git" HEAD:${{ github.ref }} --follow-tags --tags
               else
                 echo "Dry run mode: changes have not been pushed."
               fi
