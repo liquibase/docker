@@ -120,6 +120,15 @@ jobs:
           persist-credentials: false
           ref: ${{ github.ref }}
 
+      - name: Get GitHub App token
+        id: get-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.LIQUIBASE_GITHUB_APP_ID }}
+          private-key: ${{ secrets.LIQUIBASE_GITHUB_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          permission-contents: write
+
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -179,7 +188,7 @@ jobs:
             fi
           fi
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.get-token.outputs.token }}
 
       - name: Get latest commit SHA
         id: get-latest-sha
