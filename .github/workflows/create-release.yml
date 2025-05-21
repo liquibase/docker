@@ -298,46 +298,53 @@ jobs:
           SUFFIX="${{ matrix.suffix }}"
           LATEST_TAG="${{ matrix.latest_tag }}"
           TAGS=""
+          IS_DRY_RUN="${{ needs.update-dockerfiles.outputs.dryRun }}"
 
-          # For dry run, only use ECR registry
-          if [[ "${{ needs.update-dockerfiles.outputs.dryRun }}" == "true" ]]; then
+          if [[ "${IS_DRY_RUN}" == "true" ]]; then
+            # For dry run, only use ECR registry
             TAGS="${{ secrets.PRIVATE_ECR_DRY_RUN_REPO }}:${LATEST_TAG}${SUFFIX}"
             TAGS="${TAGS},${{ secrets.PRIVATE_ECR_DRY_RUN_REPO }}:${VERSION}${SUFFIX}"
             TAGS="${TAGS},${{ secrets.PRIVATE_ECR_DRY_RUN_REPO }}:${MINOR_VERSION}${SUFFIX}"
-            echo "tags=${TAGS}" >> $GITHUB_OUTPUT
-            echo "Generated tags (dry-run): ${TAGS}"
-          fi
-          
-          # Add DockerHub tags if selected
-          if [[ "${PUSH_DOCKERHUB}" == "true" ]]; then
-            TAGS="${{ steps.set-registries.outputs.DOCKERHUB_REPO }}:${LATEST_TAG}${SUFFIX}"
-            TAGS="${TAGS},${{ steps.set-registries.outputs.DOCKERHUB_REPO }}:${VERSION}${SUFFIX}"
-            TAGS="${TAGS},${{ steps.set-registries.outputs.DOCKERHUB_REPO }}:${MINOR_VERSION}${SUFFIX}"
+          else
+            # Not in dry-run mode, apply normal tag selection logic
+            
+            # Add DockerHub tags if selected
+            if [[ "${PUSH_DOCKERHUB}" == "true" ]]; then
+              TAGS="${{ steps.set-registries.outputs.DOCKERHUB_REPO }}:${LATEST_TAG}${SUFFIX}"
+              TAGS="${TAGS},${{ steps.set-registries.outputs.DOCKERHUB_REPO }}:${VERSION}${SUFFIX}"
+              TAGS="${TAGS},${{ steps.set-registries.outputs.DOCKERHUB_REPO }}:${MINOR_VERSION}${SUFFIX}"
+            fi
+
+            # Add ECR tags if selected and available for this image type
+            if [[ "${PUSH_ECR}" == "true" && -n "${{ steps.set-registries.outputs.ECR_REPO }}" ]]; then
+              if [[ -n "${TAGS}" ]]; then TAGS="${TAGS},"; fi
+              TAGS="${TAGS}${{ steps.set-registries.outputs.ECR_REPO }}:${LATEST_TAG}${SUFFIX}"
+              TAGS="${TAGS},${{ steps.set-registries.outputs.ECR_REPO }}:${VERSION}${SUFFIX}"
+              TAGS="${TAGS},${{ steps.set-registries.outputs.ECR_REPO }}:${MINOR_VERSION}${SUFFIX}"
+            fi
+
+            # Add GHCR tags if selected and available for this image type
+            if [[ "${PUSH_GHCR}" == "true" && -n "${{ steps.set-registries.outputs.GHCR_REPO }}" ]]; then
+              if [[ -n "${TAGS}" ]]; then TAGS="${TAGS},"; fi
+              TAGS="${TAGS}${{ steps.set-registries.outputs.GHCR_REPO }}:${LATEST_TAG}${SUFFIX}"
+              TAGS="${TAGS},${{ steps.set-registries.outputs.GHCR_REPO }}:${VERSION}${SUFFIX}"
+              TAGS="${TAGS},${{ steps.set-registries.outputs.GHCR_REPO }}:${MINOR_VERSION}${SUFFIX}"
+            fi
+
+            # If no tags were set, fall back to dry-run mode
+            if [[ -z "${TAGS}" ]]; then
+              echo "::warning::No registries were selected. Running in dry-run mode."
+              TAGS="${{ secrets.PRIVATE_ECR_DRY_RUN_REPO }}:${LATEST_TAG}${SUFFIX}"
+            fi
           fi
 
-          # Add ECR tags if selected and available for this image type
-          if [[ "${PUSH_ECR}" == "true" && -n "${{ steps.set-registries.outputs.ECR_REPO }}" ]]; then
-            if [[ -n "${TAGS}" ]]; then TAGS="${TAGS},"; fi
-            TAGS="${TAGS}${{ steps.set-registries.outputs.ECR_REPO }}:${LATEST_TAG}${SUFFIX}"
-            TAGS="${TAGS},${{ steps.set-registries.outputs.ECR_REPO }}:${VERSION}${SUFFIX}"
-            TAGS="${TAGS},${{ steps.set-registries.outputs.ECR_REPO }}:${MINOR_VERSION}${SUFFIX}"
-          fi
-
-          # Add GHCR tags if selected and available for this image type
-          if [[ "${PUSH_GHCR}" == "true" && -n "${{ steps.set-registries.outputs.GHCR_REPO }}" ]]; then
-            if [[ -n "${TAGS}" ]]; then TAGS="${TAGS},"; fi
-            TAGS="${TAGS}${{ steps.set-registries.outputs.GHCR_REPO }}:${LATEST_TAG}${SUFFIX}"
-            TAGS="${TAGS},${{ steps.set-registries.outputs.GHCR_REPO }}:${VERSION}${SUFFIX}"
-            TAGS="${TAGS},${{ steps.set-registries.outputs.GHCR_REPO }}:${MINOR_VERSION}${SUFFIX}"
-          fi
-
-          if [[ -z "${TAGS}" ]]; then
-            echo "::warning::No registries were selected. Running in dry-run mode."
-            TAGS="${{ secrets.PRIVATE_ECR_DRY_RUN_REPO }}:${LATEST_TAG}${SUFFIX}"
-          fi
-
+          # Output tags at the end
           echo "tags=${TAGS}" >> $GITHUB_OUTPUT
-          echo "Generated tags: ${TAGS}"
+          if [[ "${IS_DRY_RUN}" == "true" ]]; then
+            echo "Generated tags (dry-run): ${TAGS}"
+          else
+            echo "Generated tags: ${TAGS}"
+          fi
 
       # Unified build and push step using generated tags
       - name: Build and Push Docker Image
