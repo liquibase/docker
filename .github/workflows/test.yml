@@ -61,7 +61,7 @@ jobs:
 
       - name: Test liquibase version
         run: |
-          LOG_STRING="Liquibase Version:"
+          LOG_STRING="Starting Liquibase"
           # Check if the container is running
           if docker inspect -f '{{.State.Running}}' "$CONTAINER_NAME" 2>/dev/null | grep -q "true"; then
               # Get the logs and check if the desired string is present
