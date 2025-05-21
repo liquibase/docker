@@ -135,6 +135,11 @@ jobs:
           java-version: "8"
           distribution: "adopt"
 
+      - name: Configure git user
+        run: |
+          git config user.name "liquibot"
+          git config user.email "liquibot@liquibase.org"
+      
       - name: Update Dockerfile(s) and commit changes
         run: |
           if [[ "${{ steps.collect-data.outputs.releaseType }}" == "liquibase-pro-release" ]]; then
