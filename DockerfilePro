@@ -6,9 +6,11 @@ RUN groupadd --gid 1001 liquibase && \
     useradd --uid 1001 --gid liquibase --create-home --home-dir /liquibase liquibase && \
     chown liquibase /liquibase
 
-# Define ARGs before using them in LABELs
-ARG LIQUIBASE_PRO_VERSION=4.32.0-RC1
-ARG LB_PRO_SHA256=8da09e9c3a4e8c869b0bf432c1813dcebe426c41b6a5e6b9a084d6f087f11d02
+# Download and install Liquibase
+WORKDIR /liquibase
+
+ARG LIQUIBASE_PRO_VERSION=4.32.0
+ARG LB_PRO_SHA256=e91175e1c1bcc33afb14f21d6899052bae6070ca87997869c7c29f6c75bb7374
 
 # Add metadata labels
 LABEL org.opencontainers.image.source="https://github.com/liquibase/docker"
