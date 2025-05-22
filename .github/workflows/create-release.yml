@@ -389,8 +389,6 @@ jobs:
     needs: update-dockerfiles
     if: ${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' }}
     runs-on: ubuntu-latest
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Extract major.minor version
         id: extract_version
@@ -442,7 +440,7 @@ jobs:
               git config user.email "liquibot@liquibase.org"
               git commit -m "Update library/liquibase to ${{ needs.update-dockerfiles.outputs.liquibaseVersion }}"
               if [[ "${{ needs.update-dockerfiles.outputs.dryRun }}" == false ]]; then
-                git push https://liquibot:$GITHUB_TOKEN@github.com/liquibase/official-images.git
+                git push
               else
               echo "Dry run mode: changes have not been pushed."
             fi
@@ -453,6 +451,7 @@ jobs:
         id: create_pr
         run: |
           response=$(curl \
+            -V \
             -X POST \
             -H "Authorization: token ${{ steps.get-token.outputs.token }}" \
             -H "Accept: application/vnd.github.v3+json" \
