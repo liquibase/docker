@@ -356,7 +356,7 @@ jobs:
             echo "Generated tags: ${TAGS}"
           fi
 
-      Unified build and push step using generated tags
+      # Unified build and push step using generated tags
       - name: Build and Push Docker Image
         if: ${{ needs.update-dockerfiles.outputs.releaseType == matrix.type }}
         uses: docker/build-push-action@v6
