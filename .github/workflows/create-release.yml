@@ -450,20 +450,59 @@ jobs:
         if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' }}
         id: create_pr
         run: |
-          response=$(curl \
-            -V \
+          echo "Attempting to create a PR from liquibase:master to docker-library/official-images:master"
+          
+          # Create a temp file for the response
+          response_file=$(mktemp)
+          
+          # Add verbose flag (-v) to see request and response headers
+          curl_status=$(curl -v \
             -X POST \
             -H "Authorization: token ${{ steps.get-token.outputs.token }}" \
             -H "Accept: application/vnd.github.v3+json" \
+            -H "Content-Type: application/json" \
             https://api.github.com/repos/docker-library/official-images/pulls \
             -d '{
               "title": "Update library/liquibase to ${{ needs.update-dockerfiles.outputs.liquibaseVersion }}",
               "body": "Update library/liquibase with latest commit and version",
               "head": "liquibase:master",
               "base": "master"
-            }')
-          pr_url=$(echo $response | jq -r '.html_url')
-          echo "PR_URL=$pr_url" >> $GITHUB_ENV
+            }' \
+            -o "$response_file" \
+            -w "%{http_code}" 2>&1)
+          
+          # Print the response status code
+          echo "HTTP Status Code: $curl_status"
+          
+          # Print raw response for debugging
+          echo "API Response:"
+          cat "$response_file"
+          
+          # Check for successful response (2xx status codes)
+          if [[ $curl_status -ge 200 && $curl_status -lt 300 ]]; then
+            pr_url=$(cat "$response_file" | jq -r '.html_url')
+            
+            # Verify PR URL was found in response
+            if [[ -n "$pr_url" && "$pr_url" != "null" ]]; then
+              echo "PR successfully created: $pr_url"
+              echo "PR_URL=$pr_url" >> $GITHUB_ENV
+            else
+              echo "WARNING: PR may have been created but couldn't extract URL from response"
+              # Get error message if available
+              error_message=$(cat "$response_file" | jq -r '.message // "No error message provided"')
+              echo "API Error: $error_message"
+              echo "PR_URL=Unknown (see logs for details)" >> $GITHUB_ENV
+            fi
+          else
+            echo "ERROR: Failed to create PR. Status code: $curl_status"
+            # Get error message if available
+            error_message=$(cat "$response_file" | jq -r '.message // "No error message provided"')
+            errors_detail=$(cat "$response_file" | jq -r '.errors // []')
+            echo "API Error: $error_message"
+            echo "Error details: $errors_detail"
+            echo "PR_URL=Failed (see logs for details)" >> $GITHUB_ENV
+            exit 1
+          fi
 
       - name: Adding Official Docker PR to job summary
         if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' }}
