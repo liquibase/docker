@@ -446,19 +446,34 @@ jobs:
             fi
           fi
 
+      - name: Get GitHub App token for PR creation
+        id: get-pr-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.LIQUIBASE_GITHUB_APP_ID }}
+          private-key: ${{ secrets.LIQUIBASE_GITHUB_APP_PRIVATE_KEY }}
+          owner: docker-library
+          repositories: official-images
+          permissions: >-
+            {"pull_requests": "write", "contents": "write"}
+
       - name: Create Official Docker Pull Request
         if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' }}
         id: create_pr
         run: |
           echo "Attempting to create a PR from liquibase:master to docker-library/official-images:master"
           
-          # Create a temp file for the response
+          # Create temp files for response and verbose output
           response_file=$(mktemp)
+          verbose_output=$(mktemp)
           
-          # Add verbose flag (-v) to see request and response headers
-          curl_status=$(curl -v \
-            -X POST \
-            -H "Authorization: token ${{ steps.get-token.outputs.token }}" \
+          # First, run curl with verbose output redirected to a separate file
+          # and the JSON response to another file. Status code goes to stdout.
+          status_code=$(curl \
+            -s \
+            -o "$response_file" \
+            -w "%{http_code}" \
+            -H "Authorization: token ${{ steps.get-pr-token.outputs.token }}" \
             -H "Accept: application/vnd.github.v3+json" \
             -H "Content-Type: application/json" \
             https://api.github.com/repos/docker-library/official-images/pulls \
@@ -467,19 +482,31 @@ jobs:
               "body": "Update library/liquibase with latest commit and version",
               "head": "liquibase:master",
               "base": "master"
-            }' \
-            -o "$response_file" \
-            -w "%{http_code}" 2>&1)
+            }')
           
-          # Print the response status code
-          echo "HTTP Status Code: $curl_status"
-          
-          # Print raw response for debugging
+          # Then run the verbose version separately just for logging
+          curl -v \
+            -H "Authorization: token ${{ steps.get-pr-token.outputs.token }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "Content-Type: application/json" \
+            https://api.github.com/repos/docker-library/official-images/pulls \
+            -d '{
+              "title": "Update library/liquibase to ${{ needs.update-dockerfiles.outputs.liquibaseVersion }}",
+              "body": "Update library/liquibase with latest commit and version",
+              "head": "liquibase:master",
+              "base": "master"
+            }' > "$verbose_output" 2>&1 || true
+            
+          # Print the response status code and response body
+          echo "HTTP Status Code: $status_code"
           echo "API Response:"
           cat "$response_file"
+          echo ""
+          echo "Verbose curl output:"
+          cat "$verbose_output"
           
-          # Check for successful response (2xx status codes)
-          if [[ $curl_status -ge 200 && $curl_status -lt 300 ]]; then
+          # Use numeric comparison for status code
+          if [[ "$status_code" -ge 200 && "$status_code" -lt 300 ]]; then
             pr_url=$(cat "$response_file" | jq -r '.html_url')
             
             # Verify PR URL was found in response
@@ -494,7 +521,7 @@ jobs:
               echo "PR_URL=Unknown (see logs for details)" >> $GITHUB_ENV
             fi
           else
-            echo "ERROR: Failed to create PR. Status code: $curl_status"
+            echo "ERROR: Failed to create PR. Status code: $status_code"
             # Get error message if available
             error_message=$(cat "$response_file" | jq -r '.message // "No error message provided"')
             errors_detail=$(cat "$response_file" | jq -r '.errors // []')
