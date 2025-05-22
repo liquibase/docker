@@ -283,8 +283,8 @@ jobs:
             echo "GHCR_REPO=ghcr.io/liquibase/liquibase" >> $GITHUB_OUTPUT
           elif [[ "${{ matrix.type }}" == "liquibase-pro-release" ]]; then
             echo "DOCKERHUB_REPO=${{ matrix.name }}" >> $GITHUB_OUTPUT
-            echo "ECR_REPO=" >> $GITHUB_OUTPUT
-            echo "GHCR_REPO=" >> $GITHUB_OUTPUT
+            echo "ECR_REPO=public.ecr.aws/liquibase/liquibase-pro" >> $GITHUB_OUTPUT
+            echo "GHCR_REPO=ghcr.io/liquibase/liquibase-pro" >> $GITHUB_OUTPUT
           fi
 
       # Use separate login steps for each registry
