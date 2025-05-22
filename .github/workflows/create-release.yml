@@ -452,9 +452,8 @@ jobs:
         id: create_pr
         run: |
           response=$(curl \
-            -v \
             -X POST \
-            -H "Authorization: token ${{ steps.get-token.outputs.token }}" \
+            -H "Authorization: token ${{ secrets.LIQUIBOT_PAT_GPM_ACCESS }}" \
             -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/docker-library/official-images/pulls \
             -d '{
