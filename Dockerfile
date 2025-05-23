@@ -6,8 +6,20 @@ RUN groupadd --gid 1001 liquibase && \
     useradd --uid 1001 --gid liquibase --create-home --home-dir /liquibase liquibase && \
     chown liquibase /liquibase
 
+# Download and install Liquibase
+WORKDIR /liquibase
+
 ARG LIQUIBASE_VERSION=4.32.0
 ARG LB_SHA256=10910d42ae9990c95a4ac8f0a3665a24bd40d08fb264055d78b923a512774d54
+
+RUN wget -q -O liquibase-${LIQUIBASE_VERSION}.tar.gz "https://github.com/liquibase/liquibase/releases/download/v${LIQUIBASE_VERSION}/liquibase-${LIQUIBASE_VERSION}.tar.gz" && \
+    echo "$LB_SHA256 *liquibase-${LIQUIBASE_VERSION}.tar.gz" | sha256sum -c - && \
+    tar -xzf liquibase-${LIQUIBASE_VERSION}.tar.gz && \
+    rm liquibase-${LIQUIBASE_VERSION}.tar.gz && \
+    ln -s /liquibase/liquibase /usr/local/bin/liquibase && \
+    ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \
+    liquibase --version
+    
 ARG LPM_VERSION=0.2.9
 ARG LPM_SHA256=b9caecd34c98a6c19a2bc582e8064aff5251c5f1adbcd100d3403c5eceb5373a
 ARG LPM_SHA256_ARM=0adb3a96d7384b4da549979bf00217a8914f0df37d1ed8fdb1b4a4baebfa104c
@@ -18,17 +30,6 @@ LABEL org.opencontainers.image.licenses="Apache-2.0"
 LABEL org.opencontainers.image.vendor="Liquibase"
 LABEL org.opencontainers.image.version="${LIQUIBASE_VERSION}"
 LABEL org.opencontainers.image.documentation="https://docs.liquibase.com"
-
-# Download and install Liquibase
-WORKDIR /liquibase
-
-RUN wget -q -O liquibase-${LIQUIBASE_VERSION}.tar.gz "https://github.com/liquibase/liquibase/releases/download/v${LIQUIBASE_VERSION}/liquibase-${LIQUIBASE_VERSION}.tar.gz" && \
-    echo "$LB_SHA256 *liquibase-${LIQUIBASE_VERSION}.tar.gz" | sha256sum -c - && \
-    tar -xzf liquibase-${LIQUIBASE_VERSION}.tar.gz && \
-    rm liquibase-${LIQUIBASE_VERSION}.tar.gz && \
-    ln -s /liquibase/liquibase /usr/local/bin/liquibase && \
-    ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \
-    liquibase --version
 
 # Download and Install lpm
 RUN apt-get update && \
