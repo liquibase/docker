@@ -13,7 +13,6 @@ ARG LIQUIBASE_PRO_VERSION=4.32.0
 ARG LB_PRO_SHA256=69adc7b73458af84b286bcdc7b9d2148c77a8dadeb85580e50c9fc9a90c19ed4
 
 # Add metadata labels
-LABEL org.opencontainers.image.source="https://github.com/liquibase/docker"
 LABEL org.opencontainers.image.description="Liquibase Pro Container Image"
 LABEL org.opencontainers.image.licenses="Apache-2.0"
 LABEL org.opencontainers.image.vendor="Liquibase"
