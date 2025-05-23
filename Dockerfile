@@ -1,19 +1,18 @@
 # Builder Stage
 FROM eclipse-temurin:21-jre-jammy
 
-ARG LIQUIBASE_VERSION=4.32.0
-ARG LB_SHA256=10910d42ae9990c95a4ac8f0a3665a24bd40d08fb264055d78b923a512774d54
-ARG LPM_VERSION=0.2.9
-ARG LPM_SHA256=b9caecd34c98a6c19a2bc582e8064aff5251c5f1adbcd100d3403c5eceb5373a
-ARG LPM_SHA256_ARM=0adb3a96d7384b4da549979bf00217a8914f0df37d1ed8fdb1b4a4baebfa104c
-
 # Create liquibase user
 RUN groupadd --gid 1001 liquibase && \
     useradd --uid 1001 --gid liquibase --create-home --home-dir /liquibase liquibase && \
     chown liquibase /liquibase
 
+ARG LIQUIBASE_VERSION=4.32.0
+ARG LB_SHA256=10910d42ae9990c95a4ac8f0a3665a24bd40d08fb264055d78b923a512774d54
+ARG LPM_VERSION=0.2.9
+ARG LPM_SHA256=b9caecd34c98a6c19a2bc582e8064aff5251c5f1adbcd100d3403c5eceb5373a
+ARG LPM_SHA256_ARM=0adb3a96d7384b4da549979bf00217a8914f0df37d1ed8fdb1b4a4baebfa104c
+    
 # Add metadata labels
-LABEL org.opencontainers.image.source="https://github.com/liquibase/docker"
 LABEL org.opencontainers.image.description="Liquibase Container Image"
 LABEL org.opencontainers.image.licenses="Apache-2.0"
 LABEL org.opencontainers.image.vendor="Liquibase"
