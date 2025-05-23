@@ -12,11 +12,11 @@ Please update your Dockerfiles and scripts to pull from the new official image:
 
 We publish this image to multiple registries:
 
-| Registry | Image |
-|----------|-------|
-| **Docker Hub (default)** | `liquibase/liquibase` |
-| **GitHub Container Registry** | `ghcr.io/liquibase/liquibase` |
-| **Amazon ECR Public** | `public.ecr.aws/liquibase/liquibase` |
+| Registry | OSS Image | Pro Image |
+|----------|----------------|-----------|
+| **Docker Hub (default)** | `liquibase/liquibase` | `liquibase/liquibase-pro` |
+| **GitHub Container Registry** | `ghcr.io/liquibase/liquibase` | `ghcr.io/liquibase/liquibase-pro` |
+| **Amazon ECR Public** | `public.ecr.aws/liquibase/liquibase` | `public.ecr.aws/liquibase/liquibase-pro` |
 
 ## Dockerfile
 
@@ -28,18 +28,35 @@ FROM liquibase:latest
 
 ## Scripts
 
+### OSS Edition
+
 ```bash
-# Docker Hub (default)
+# Docker Hub (default)
 docker pull liquibase/liquibase
 
 # GitHub Container Registry
 docker pull ghcr.io/liquibase/liquibase
 
-# Amazon ECR Public
+# Amazon ECR Public
 docker pull public.ecr.aws/liquibase/liquibase
 ```
 
+### Pro Edition
+
+```bash
+# Docker Hub (default)
+docker pull liquibase/liquibase-pro
+
+# GitHub Container Registry
+docker pull ghcr.io/liquibase/liquibase-pro
+
+# Amazon ECR Public
+docker pull public.ecr.aws/liquibase/liquibase-pro
+```
+
 ### Pulling the Latest or Specific Version
+
+#### OSS Edition
 
 ```bash
 # Latest
@@ -47,10 +64,24 @@ docker pull liquibase/liquibase:latest
 docker pull ghcr.io/liquibase/liquibase:latest
 docker pull public.ecr.aws/liquibase/liquibase:latest
 
-# Specific version (example: 4.27.0)
-docker pull liquibase/liquibase:4.27.0
-docker pull ghcr.io/liquibase/liquibase:4.27.0
-docker pull public.ecr.aws/liquibase/liquibase:4.27.0
+# Specific version (example: 4.32.0)
+docker pull liquibase/liquibase:4.32.0
+docker pull ghcr.io/liquibase/liquibase:4.32.0
+docker pull public.ecr.aws/liquibase/liquibase:4.32.0
+```
+
+#### Pro Edition
+
+```bash
+# Latest
+docker pull liquibase/liquibase-pro:latest
+docker pull ghcr.io/liquibase/liquibase-pro:latest
+docker pull public.ecr.aws/liquibase/liquibase-pro:latest
+
+# Specific version (example: 4.32.0)
+docker pull liquibase/liquibase-pro:4.32.0
+docker pull ghcr.io/liquibase/liquibase-pro:4.32.0
+docker pull public.ecr.aws/liquibase/liquibase-pro:4.32.0
 ```
 
 For any questions or support, please visit our [Liquibase Community Forum](https://forum.liquibase.org/).
