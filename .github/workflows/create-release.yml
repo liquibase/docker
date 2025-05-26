@@ -141,8 +141,6 @@ jobs:
         run: |
           git config user.name "liquibot"
           git config user.email "liquibot@liquibase.org"
-          # Configure git to use the token for authentication
-          git config --global url."https://x-access-token:${{ steps.get-token.outputs.token }}@github.com/".insteadOf "https://github.com/"
       
       - name: Update Dockerfile(s) and commit changes
         run: |
@@ -167,9 +165,9 @@ jobs:
               if [[ "${{ steps.collect-data.outputs.dryRun }}" == false ]]; then
                 # Create and push new tag
                 git tag -a -m "Version Bumped to ${{ steps.collect-data.outputs.liquibaseVersion }}" v${{ steps.collect-data.outputs.liquibaseVersion }}
-                # Push changes and tags
-                git push origin ${{ github.ref }}
-                git push origin v${{ steps.collect-data.outputs.liquibaseVersion }}
+                # Push changes and tags using the token
+                git remote set-url origin "https://x-access-token:${{ steps.get-token.outputs.token }}@github.com/$GITHUB_REPOSITORY.git"
+                git push origin ${{ github.ref }} --tags
               else
                 echo "Dry run mode: changes have not been pushed."
               fi
@@ -193,9 +191,9 @@ jobs:
               if [[ "${{ steps.collect-data.outputs.dryRun }}" == false ]]; then
                 # Create and push new tag
                 git tag -a -m "Version Bumped to ${{ steps.collect-data.outputs.extensionVersion }}" v${{ steps.collect-data.outputs.extensionVersion }}
-                # Push changes and tags
-                git push origin ${{ github.ref }}
-                git push origin v${{ steps.collect-data.outputs.extensionVersion }}
+                # Push changes and tags using the token
+                git remote set-url origin "https://x-access-token:${{ steps.get-token.outputs.token }}@github.com/$GITHUB_REPOSITORY.git"
+                git push origin ${{ github.ref }} --tags
               else
                 echo "Dry run mode: changes have not been pushed."
               fi
