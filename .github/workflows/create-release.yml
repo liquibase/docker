@@ -141,6 +141,8 @@ jobs:
         run: |
           git config user.name "liquibot"
           git config user.email "liquibot@liquibase.org"
+          # Configure git to use the token for authentication
+          git config --global url."https://x-access-token:${{ steps.get-token.outputs.token }}@github.com/".insteadOf "https://github.com/"
       
       - name: Update Dockerfile(s) and commit changes
         run: |
@@ -163,12 +165,11 @@ jobs:
             else
               git commit -m "Liquibase PRO Version Bumped to ${{ steps.collect-data.outputs.liquibaseVersion }}"
               if [[ "${{ steps.collect-data.outputs.dryRun }}" == false ]]; then
-                # Delete existing tag if it exists
-                git tag -d v${{ steps.collect-data.outputs.liquibaseVersion }} || true
-                git push origin :refs/tags/v${{ steps.collect-data.outputs.liquibaseVersion }} || true
                 # Create and push new tag
                 git tag -a -m "Version Bumped to ${{ steps.collect-data.outputs.liquibaseVersion }}" v${{ steps.collect-data.outputs.liquibaseVersion }}
-                git push origin ${{ github.ref }} --tags
+                # Push changes and tags
+                git push origin ${{ github.ref }}
+                git push origin v${{ steps.collect-data.outputs.liquibaseVersion }}
               else
                 echo "Dry run mode: changes have not been pushed."
               fi
@@ -190,12 +191,11 @@ jobs:
             else
               git commit -m "Liquibase Version Bumped to ${{ steps.collect-data.outputs.extensionVersion }}"
               if [[ "${{ steps.collect-data.outputs.dryRun }}" == false ]]; then
-                # Delete existing tag if it exists
-                git tag -d v${{ steps.collect-data.outputs.extensionVersion }} || true
-                git push origin :refs/tags/v${{ steps.collect-data.outputs.extensionVersion }} || true
                 # Create and push new tag
                 git tag -a -m "Version Bumped to ${{ steps.collect-data.outputs.extensionVersion }}" v${{ steps.collect-data.outputs.extensionVersion }}
-                git push origin ${{ github.ref }} --tags
+                # Push changes and tags
+                git push origin ${{ github.ref }}
+                git push origin v${{ steps.collect-data.outputs.extensionVersion }}
               else
                 echo "Dry run mode: changes have not been pushed."
               fi
