@@ -206,276 +206,276 @@ jobs:
         id: get-latest-sha
         run: echo "latestCommitSha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
-  # setup-update-draft-build:
-  #   name: "Build and Push Docker Images"
-  #   needs: update-dockerfiles
-  #   runs-on: ubuntu-latest
-  #   env:
-  #     PUSH_DOCKERHUB: ${{ needs.update-dockerfiles.outputs.pushDockerHub }}
-  #     PUSH_GHCR: ${{ needs.update-dockerfiles.outputs.pushGHCR }}
-  #     PUSH_ECR: ${{ needs.update-dockerfiles.outputs.pushECR }}
-  #   strategy:
-  #     matrix:
-  #       include:
-  #         - dockerfile: Dockerfile
-  #           name: liquibase/liquibase
-  #           suffix: ""
-  #           latest_tag: "latest"
-  #           type: liquibase-release
-  #         - dockerfile: Dockerfile.alpine
-  #           name: liquibase/liquibase
-  #           suffix: "-alpine"
-  #           latest_tag: "alpine"
-  #           type: liquibase-release
-  #         - dockerfile: DockerfilePro
-  #           name: liquibase/liquibase-pro
-  #           suffix: ""
-  #           latest_tag: "latest"
-  #           type: liquibase-pro-release
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #       with:
-  #         persist-credentials: false
-  #         ref: ${{ github.ref }}
+  setup-update-draft-build:
+    name: "Build and Push Docker Images"
+    needs: update-dockerfiles
+    runs-on: ubuntu-latest
+    env:
+      PUSH_DOCKERHUB: ${{ needs.update-dockerfiles.outputs.pushDockerHub }}
+      PUSH_GHCR: ${{ needs.update-dockerfiles.outputs.pushGHCR }}
+      PUSH_ECR: ${{ needs.update-dockerfiles.outputs.pushECR }}
+    strategy:
+      matrix:
+        include:
+          - dockerfile: Dockerfile
+            name: liquibase/liquibase
+            suffix: ""
+            latest_tag: "latest"
+            type: liquibase-release
+          - dockerfile: Dockerfile.alpine
+            name: liquibase/liquibase
+            suffix: "-alpine"
+            latest_tag: "alpine"
+            type: liquibase-release
+          - dockerfile: DockerfilePro
+            name: liquibase/liquibase-pro
+            suffix: ""
+            latest_tag: "latest"
+            type: liquibase-pro-release
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.ref }}
 
-  #     - name: Set up JDK
-  #       uses: actions/setup-java@v4
-  #       with:
-  #         java-version: "8"
-  #         distribution: "adopt"
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: "8"
+          distribution: "adopt"
 
-  #     - name: Release Notes
-  #       if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' && ((needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' && matrix.type == 'liquibase-release') || (needs.update-dockerfiles.outputs.releaseType == 'liquibase-pro-release' && matrix.type == 'liquibase-pro-release')) }}
-  #       uses: softprops/action-gh-release@v2
-  #       with:
-  #         name: ${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-pro-release' && format('v{0} PRO', needs.update-dockerfiles.outputs.extensionVersion) || format('v{0}', needs.update-dockerfiles.outputs.extensionVersion) }}
-  #         tag_name: v${{ needs.update-dockerfiles.outputs.extensionVersion }}
-  #         draft: true
-  #         body: |
-  #           ${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-pro-release' && format('Support for Liquibase PRO {0}.', needs.update-dockerfiles.outputs.liquibaseVersion) || format('Support for Liquibase {0}.', needs.update-dockerfiles.outputs.liquibaseVersion) }}
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Release Notes
+        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' && ((needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' && matrix.type == 'liquibase-release') || (needs.update-dockerfiles.outputs.releaseType == 'liquibase-pro-release' && matrix.type == 'liquibase-pro-release')) }}
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-pro-release' && format('v{0} PRO', needs.update-dockerfiles.outputs.extensionVersion) || format('v{0}', needs.update-dockerfiles.outputs.extensionVersion) }}
+          tag_name: v${{ needs.update-dockerfiles.outputs.extensionVersion }}
+          draft: true
+          body: |
+            ${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-pro-release' && format('Support for Liquibase PRO {0}.', needs.update-dockerfiles.outputs.liquibaseVersion) || format('Support for Liquibase {0}.', needs.update-dockerfiles.outputs.liquibaseVersion) }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  #     - uses: docker/setup-qemu-action@v3
-  #     - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
 
-  #     # Define registry configurations based on image type
-  #     - name: Set registry variables
-  #       id: set-registries
-  #       run: |
-  #         if [[ "${{ matrix.type }}" == "liquibase-release" ]]; then
-  #           echo "DOCKERHUB_REPO=${{ matrix.name }}" >> $GITHUB_OUTPUT
-  #           echo "ECR_REPO=public.ecr.aws/liquibase/liquibase" >> $GITHUB_OUTPUT
-  #           echo "GHCR_REPO=ghcr.io/liquibase/liquibase" >> $GITHUB_OUTPUT
-  #         elif [[ "${{ matrix.type }}" == "liquibase-pro-release" ]]; then
-  #           echo "DOCKERHUB_REPO=${{ matrix.name }}" >> $GITHUB_OUTPUT
-  #           echo "ECR_REPO=" >> $GITHUB_OUTPUT
-  #           echo "GHCR_REPO=" >> $GITHUB_OUTPUT
-  #         fi
+      # Define registry configurations based on image type
+      - name: Set registry variables
+        id: set-registries
+        run: |
+          if [[ "${{ matrix.type }}" == "liquibase-release" ]]; then
+            echo "DOCKERHUB_REPO=${{ matrix.name }}" >> $GITHUB_OUTPUT
+            echo "ECR_REPO=public.ecr.aws/liquibase/liquibase" >> $GITHUB_OUTPUT
+            echo "GHCR_REPO=ghcr.io/liquibase/liquibase" >> $GITHUB_OUTPUT
+          elif [[ "${{ matrix.type }}" == "liquibase-pro-release" ]]; then
+            echo "DOCKERHUB_REPO=${{ matrix.name }}" >> $GITHUB_OUTPUT
+            echo "ECR_REPO=" >> $GITHUB_OUTPUT
+            echo "GHCR_REPO=" >> $GITHUB_OUTPUT
+          fi
 
-  #     # Use separate login steps for each registry
-  #     - name: Login to Docker Hub
-  #       if: ${{ env.PUSH_DOCKERHUB == 'true' && needs.update-dockerfiles.outputs.dryRun == 'false' }}
-  #       uses: docker/login-action@v3
-  #       with:
-  #         username: ${{ secrets.DOCKERHUB_USERNAME }}
-  #         password: ${{ secrets.DOCKERHUB_TOKEN }}
+      # Use separate login steps for each registry
+      - name: Login to Docker Hub
+        if: ${{ env.PUSH_DOCKERHUB == 'true' && needs.update-dockerfiles.outputs.dryRun == 'false' }}
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-  #     - name: Login to GitHub Container Registry
-  #       if: ${{ env.PUSH_GHCR == 'true' && needs.update-dockerfiles.outputs.dryRun == 'false' && steps.set-registries.outputs.GHCR_REPO != '' }}
-  #       uses: docker/login-action@v3
-  #       with:
-  #         registry: ghcr.io
-  #         username: ${{ github.actor }}
-  #         password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Login to GitHub Container Registry
+        if: ${{ env.PUSH_GHCR == 'true' && needs.update-dockerfiles.outputs.dryRun == 'false' && steps.set-registries.outputs.GHCR_REPO != '' }}
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-  #     - name: Login to ECR Registry
-  #       if: ${{ env.PUSH_ECR == 'true' && needs.update-dockerfiles.outputs.dryRun == 'false' && steps.set-registries.outputs.ECR_REPO != '' }}
-  #       uses: docker/login-action@v3
-  #       env:
-  #         AWS_REGION: us-east-1
-  #       with:
-  #         registry: public.ecr.aws
-  #         username: ${{ secrets.PUBLIC_ECR_ACCESS_KEY_ID }}
-  #         password: ${{ secrets.PUBLIC_ECR_SECRET_ACCESS_KEY }}
+      - name: Login to ECR Registry
+        if: ${{ env.PUSH_ECR == 'true' && needs.update-dockerfiles.outputs.dryRun == 'false' && steps.set-registries.outputs.ECR_REPO != '' }}
+        uses: docker/login-action@v3
+        env:
+          AWS_REGION: us-east-1
+        with:
+          registry: public.ecr.aws
+          username: ${{ secrets.PUBLIC_ECR_ACCESS_KEY_ID }}
+          password: ${{ secrets.PUBLIC_ECR_SECRET_ACCESS_KEY }}
 
-  #     # Add login for dry-run mode to private ECR
-  #     - name: Login to Private ECR Registry (dry-run)
-  #       if: ${{ needs.update-dockerfiles.outputs.dryRun == 'true' }}
-  #       uses: docker/login-action@v3
-  #       env:
-  #         AWS_REGION: us-east-1
-  #       with:
-  #         registry: ${{ secrets.PRIVATE_ECR_DRY_RUN_REPO }}
-  #         username: ${{ secrets.PUBLIC_ECR_ACCESS_KEY_ID }}
-  #         password: ${{ secrets.PUBLIC_ECR_SECRET_ACCESS_KEY }}
+      # Add login for dry-run mode to private ECR
+      - name: Login to Private ECR Registry (dry-run)
+        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'true' }}
+        uses: docker/login-action@v3
+        env:
+          AWS_REGION: us-east-1
+        with:
+          registry: ${{ secrets.PRIVATE_ECR_DRY_RUN_REPO }}
+          username: ${{ secrets.PUBLIC_ECR_ACCESS_KEY_ID }}
+          password: ${{ secrets.PUBLIC_ECR_SECRET_ACCESS_KEY }}
 
-  #     # Generate tags dynamically using a separate step
-  #     - name: Generate Docker Tags
-  #       id: generate-tags
-  #       run: |
-  #         VERSION="${{ needs.update-dockerfiles.outputs.extensionVersion }}"
-  #         MINOR_VERSION="${{ needs.update-dockerfiles.outputs.minorVersion }}"
-  #         SUFFIX="${{ matrix.suffix }}"
-  #         LATEST_TAG="${{ matrix.latest_tag }}"
-  #         TAGS=""
-  #         IS_DRY_RUN="${{ needs.update-dockerfiles.outputs.dryRun }}"
+      # Generate tags dynamically using a separate step
+      - name: Generate Docker Tags
+        id: generate-tags
+        run: |
+          VERSION="${{ needs.update-dockerfiles.outputs.extensionVersion }}"
+          MINOR_VERSION="${{ needs.update-dockerfiles.outputs.minorVersion }}"
+          SUFFIX="${{ matrix.suffix }}"
+          LATEST_TAG="${{ matrix.latest_tag }}"
+          TAGS=""
+          IS_DRY_RUN="${{ needs.update-dockerfiles.outputs.dryRun }}"
 
-  #         if [[ "${IS_DRY_RUN}" == "true" ]]; then
-  #           # For dry run, only use ECR registry
-  #           TAGS="${{ secrets.PRIVATE_ECR_DRY_RUN_REPO }}:${LATEST_TAG}${SUFFIX}"
-  #           TAGS="${TAGS},${{ secrets.PRIVATE_ECR_DRY_RUN_REPO }}:${VERSION}${SUFFIX}"
-  #           TAGS="${TAGS},${{ secrets.PRIVATE_ECR_DRY_RUN_REPO }}:${MINOR_VERSION}${SUFFIX}"
-  #         else
-  #           # Not in dry-run mode, apply normal tag selection logic
+          if [[ "${IS_DRY_RUN}" == "true" ]]; then
+            # For dry run, only use ECR registry
+            TAGS="${{ secrets.PRIVATE_ECR_DRY_RUN_REPO }}:${LATEST_TAG}${SUFFIX}"
+            TAGS="${TAGS},${{ secrets.PRIVATE_ECR_DRY_RUN_REPO }}:${VERSION}${SUFFIX}"
+            TAGS="${TAGS},${{ secrets.PRIVATE_ECR_DRY_RUN_REPO }}:${MINOR_VERSION}${SUFFIX}"
+          else
+            # Not in dry-run mode, apply normal tag selection logic
             
-  #           # Add DockerHub tags if selected
-  #           if [[ "${PUSH_DOCKERHUB}" == "true" ]]; then
-  #             TAGS="${{ steps.set-registries.outputs.DOCKERHUB_REPO }}:${LATEST_TAG}${SUFFIX}"
-  #             TAGS="${TAGS},${{ steps.set-registries.outputs.DOCKERHUB_REPO }}:${VERSION}${SUFFIX}"
-  #             TAGS="${TAGS},${{ steps.set-registries.outputs.DOCKERHUB_REPO }}:${MINOR_VERSION}${SUFFIX}"
-  #           fi
+            # Add DockerHub tags if selected
+            if [[ "${PUSH_DOCKERHUB}" == "true" ]]; then
+              TAGS="${{ steps.set-registries.outputs.DOCKERHUB_REPO }}:${LATEST_TAG}${SUFFIX}"
+              TAGS="${TAGS},${{ steps.set-registries.outputs.DOCKERHUB_REPO }}:${VERSION}${SUFFIX}"
+              TAGS="${TAGS},${{ steps.set-registries.outputs.DOCKERHUB_REPO }}:${MINOR_VERSION}${SUFFIX}"
+            fi
 
-  #           # Add ECR tags if selected and available for this image type
-  #           if [[ "${PUSH_ECR}" == "true" && -n "${{ steps.set-registries.outputs.ECR_REPO }}" ]]; then
-  #             if [[ -n "${TAGS}" ]]; then TAGS="${TAGS},"; fi
-  #             TAGS="${TAGS}${{ steps.set-registries.outputs.ECR_REPO }}:${LATEST_TAG}${SUFFIX}"
-  #             TAGS="${TAGS},${{ steps.set-registries.outputs.ECR_REPO }}:${VERSION}${SUFFIX}"
-  #             TAGS="${TAGS},${{ steps.set-registries.outputs.ECR_REPO }}:${MINOR_VERSION}${SUFFIX}"
-  #           fi
+            # Add ECR tags if selected and available for this image type
+            if [[ "${PUSH_ECR}" == "true" && -n "${{ steps.set-registries.outputs.ECR_REPO }}" ]]; then
+              if [[ -n "${TAGS}" ]]; then TAGS="${TAGS},"; fi
+              TAGS="${TAGS}${{ steps.set-registries.outputs.ECR_REPO }}:${LATEST_TAG}${SUFFIX}"
+              TAGS="${TAGS},${{ steps.set-registries.outputs.ECR_REPO }}:${VERSION}${SUFFIX}"
+              TAGS="${TAGS},${{ steps.set-registries.outputs.ECR_REPO }}:${MINOR_VERSION}${SUFFIX}"
+            fi
 
-  #           # Add GHCR tags if selected and available for this image type
-  #           if [[ "${PUSH_GHCR}" == "true" && -n "${{ steps.set-registries.outputs.GHCR_REPO }}" ]]; then
-  #             if [[ -n "${TAGS}" ]]; then TAGS="${TAGS},"; fi
-  #             TAGS="${TAGS}${{ steps.set-registries.outputs.GHCR_REPO }}:${LATEST_TAG}${SUFFIX}"
-  #             TAGS="${TAGS},${{ steps.set-registries.outputs.GHCR_REPO }}:${VERSION}${SUFFIX}"
-  #             TAGS="${TAGS},${{ steps.set-registries.outputs.GHCR_REPO }}:${MINOR_VERSION}${SUFFIX}"
-  #           fi
+            # Add GHCR tags if selected and available for this image type
+            if [[ "${PUSH_GHCR}" == "true" && -n "${{ steps.set-registries.outputs.GHCR_REPO }}" ]]; then
+              if [[ -n "${TAGS}" ]]; then TAGS="${TAGS},"; fi
+              TAGS="${TAGS}${{ steps.set-registries.outputs.GHCR_REPO }}:${LATEST_TAG}${SUFFIX}"
+              TAGS="${TAGS},${{ steps.set-registries.outputs.GHCR_REPO }}:${VERSION}${SUFFIX}"
+              TAGS="${TAGS},${{ steps.set-registries.outputs.GHCR_REPO }}:${MINOR_VERSION}${SUFFIX}"
+            fi
 
-  #           # If no tags were set, fall back to dry-run mode
-  #           if [[ -z "${TAGS}" ]]; then
-  #             echo "::warning::No registries were selected. Running in dry-run mode."
-  #             TAGS="${{ secrets.PRIVATE_ECR_DRY_RUN_REPO }}:${LATEST_TAG}${SUFFIX}"
-  #           fi
-  #         fi
+            # If no tags were set, fall back to dry-run mode
+            if [[ -z "${TAGS}" ]]; then
+              echo "::warning::No registries were selected. Running in dry-run mode."
+              TAGS="${{ secrets.PRIVATE_ECR_DRY_RUN_REPO }}:${LATEST_TAG}${SUFFIX}"
+            fi
+          fi
 
-  #         # Output tags at the end
-  #         echo "tags=${TAGS}" >> $GITHUB_OUTPUT
-  #         if [[ "${IS_DRY_RUN}" == "true" ]]; then
-  #           echo "Generated tags (dry-run): ${TAGS}"
-  #         else
-  #           echo "Generated tags: ${TAGS}"
-  #         fi
+          # Output tags at the end
+          echo "tags=${TAGS}" >> $GITHUB_OUTPUT
+          if [[ "${IS_DRY_RUN}" == "true" ]]; then
+            echo "Generated tags (dry-run): ${TAGS}"
+          else
+            echo "Generated tags: ${TAGS}"
+          fi
 
-  #     # Unified build and push step using generated tags
-  #     - name: Build and Push Docker Image
-  #       if: ${{ needs.update-dockerfiles.outputs.releaseType == matrix.type }}
-  #       uses: docker/build-push-action@v6
-  #       with:
-  #         context: .
-  #         file: ${{ matrix.dockerfile }}
-  #         no-cache: true
-  #         push: true
-  #         platforms: linux/amd64,linux/arm64
-  #         tags: ${{ steps.generate-tags.outputs.tags }}
-  #         # Labels applied to each architecture-specific image
-  #         labels: |
-  #           org.opencontainers.image.source=https://github.com/liquibase/docker
-  #           org.opencontainers.image.description=${{ matrix.type == 'liquibase-pro-release' && 'Liquibase PRO Container Image' || format('Liquibase Container Image{0}', matrix.suffix == '-alpine' && ' (Alpine)' || '') }}
-  #           org.opencontainers.image.licenses=Apache-2.0
-  #           org.opencontainers.image.vendor=Liquibase
-  #           org.opencontainers.image.version=${{ needs.update-dockerfiles.outputs.extensionVersion }}
-  #           org.opencontainers.image.documentation=https://docs.liquibase.com
-  #         # Annotations applied to the manifest list (important for multi-arch images)
-  #         annotations: |
-  #           org.opencontainers.image.source=https://github.com/liquibase/docker
-  #           org.opencontainers.image.description=${{ matrix.type == 'liquibase-pro-release' && 'Liquibase PRO Container Image' || format('Liquibase Container Image{0}', matrix.suffix == '-alpine' && ' (Alpine)' || '') }}
-  #           org.opencontainers.image.licenses=Apache-2.0
-  #           org.opencontainers.image.vendor=Liquibase
-  #           org.opencontainers.image.version=${{ needs.update-dockerfiles.outputs.extensionVersion }}
-  #           org.opencontainers.image.documentation=https://docs.liquibase.com
+      # Unified build and push step using generated tags
+      - name: Build and Push Docker Image
+        if: ${{ needs.update-dockerfiles.outputs.releaseType == matrix.type }}
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          no-cache: true
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ steps.generate-tags.outputs.tags }}
+          # Labels applied to each architecture-specific image
+          labels: |
+            org.opencontainers.image.source=https://github.com/liquibase/docker
+            org.opencontainers.image.description=${{ matrix.type == 'liquibase-pro-release' && 'Liquibase PRO Container Image' || format('Liquibase Container Image{0}', matrix.suffix == '-alpine' && ' (Alpine)' || '') }}
+            org.opencontainers.image.licenses=Apache-2.0
+            org.opencontainers.image.vendor=Liquibase
+            org.opencontainers.image.version=${{ needs.update-dockerfiles.outputs.extensionVersion }}
+            org.opencontainers.image.documentation=https://docs.liquibase.com
+          # Annotations applied to the manifest list (important for multi-arch images)
+          annotations: |
+            org.opencontainers.image.source=https://github.com/liquibase/docker
+            org.opencontainers.image.description=${{ matrix.type == 'liquibase-pro-release' && 'Liquibase PRO Container Image' || format('Liquibase Container Image{0}', matrix.suffix == '-alpine' && ' (Alpine)' || '') }}
+            org.opencontainers.image.licenses=Apache-2.0
+            org.opencontainers.image.vendor=Liquibase
+            org.opencontainers.image.version=${{ needs.update-dockerfiles.outputs.extensionVersion }}
+            org.opencontainers.image.documentation=https://docs.liquibase.com
 
-  # update-official-repo:
-  #   name: "Update Official Docker Repo"
-  #   needs: update-dockerfiles
-  #   if: ${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' }}
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Extract major.minor version
-  #       id: extract_version
-  #       run: |
-  #         VERSION="${{ needs.update-dockerfiles.outputs.liquibaseVersion }}"
-  #         echo "MAJOR_MINOR=${VERSION%.*}" >> $GITHUB_ENV
-  #         echo "VERSION: $VERSION"
-  #         echo "MAJOR_MINOR: ${VERSION%.*}"
+  update-official-repo:
+    name: "Update Official Docker Repo"
+    needs: update-dockerfiles
+    if: ${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Extract major.minor version
+        id: extract_version
+        run: |
+          VERSION="${{ needs.update-dockerfiles.outputs.liquibaseVersion }}"
+          echo "MAJOR_MINOR=${VERSION%.*}" >> $GITHUB_ENV
+          echo "VERSION: $VERSION"
+          echo "MAJOR_MINOR: ${VERSION%.*}"
 
-  #     - name: Get GitHub App token
-  #       id: get-token
-  #       uses: actions/create-github-app-token@v1
-  #       with:
-  #         app-id: ${{ secrets.LIQUIBASE_GITHUB_APP_ID }}
-  #         private-key: ${{ secrets.LIQUIBASE_GITHUB_APP_PRIVATE_KEY }}
-  #         owner: ${{ github.repository_owner }}
-  #         permission-contents: write
-  #         permission-actions: write
-  #         permission-pull-requests: write
+      - name: Get GitHub App token
+        id: get-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.LIQUIBASE_GITHUB_APP_ID }}
+          private-key: ${{ secrets.LIQUIBASE_GITHUB_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          permission-contents: write
+          permission-actions: write
+          permission-pull-requests: write
                 
-  #     - name: Check out liquibase/official-images
-  #       uses: actions/checkout@v4
-  #       with:
-  #         repository: liquibase/official-images
-  #         ref: master
-  #         token: ${{ steps.get-token.outputs.token }}
+      - name: Check out liquibase/official-images
+        uses: actions/checkout@v4
+        with:
+          repository: liquibase/official-images
+          ref: master
+          token: ${{ steps.get-token.outputs.token }}
 
-  #     - name: Update library/liquibase in liquibase/official-images
-  #       if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' }}
-  #       run: |
-  #         echo "Maintainers: Jake Newton <docker@liquibase.com> (@jnewton03)" > library/liquibase
-  #         echo "Architectures: arm64v8, amd64" >> library/liquibase
-  #         echo "GitRepo: https://github.com/liquibase/docker.git" >> library/liquibase
-  #         echo "" >> library/liquibase
-  #         echo "Tags: ${{ env.MAJOR_MINOR }}, ${{ needs.update-dockerfiles.outputs.liquibaseVersion }}, latest" >> library/liquibase
-  #         echo "GitFetch: refs/heads/main" >> library/liquibase
-  #         echo "GitCommit: ${{ needs.update-dockerfiles.outputs.latestCommitSha }}" >> library/liquibase
-  #         echo "File: Dockerfile" >> library/liquibase
-  #         echo "" >> library/liquibase
-  #         echo "Tags: ${{ env.MAJOR_MINOR }}-alpine, ${{ needs.update-dockerfiles.outputs.liquibaseVersion }}-alpine, alpine" >> library/liquibase
-  #         echo "GitFetch: refs/heads/main" >> library/liquibase
-  #         echo "GitCommit: ${{ needs.update-dockerfiles.outputs.latestCommitSha }}" >> library/liquibase
-  #         echo "File: Dockerfile.alpine" >> library/liquibase
-  #         git add library/liquibase
-  #         if git diff-index --cached --quiet HEAD --
-  #           then
-  #             echo "Nothing new to commit"
-  #           else
-  #             git config user.name "liquibot"
-  #             git config user.email "liquibot@liquibase.org"
-  #             git commit -m "Update library/liquibase to ${{ needs.update-dockerfiles.outputs.liquibaseVersion }}"
-  #             if [[ "${{ needs.update-dockerfiles.outputs.dryRun }}" == false ]]; then
-  #               git push
-  #             else
-  #             echo "Dry run mode: changes have not been pushed."
-  #           fi
-  #         fi
+      - name: Update library/liquibase in liquibase/official-images
+        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' }}
+        run: |
+          echo "Maintainers: Jake Newton <docker@liquibase.com> (@jnewton03)" > library/liquibase
+          echo "Architectures: arm64v8, amd64" >> library/liquibase
+          echo "GitRepo: https://github.com/liquibase/docker.git" >> library/liquibase
+          echo "" >> library/liquibase
+          echo "Tags: ${{ env.MAJOR_MINOR }}, ${{ needs.update-dockerfiles.outputs.liquibaseVersion }}, latest" >> library/liquibase
+          echo "GitFetch: refs/heads/main" >> library/liquibase
+          echo "GitCommit: ${{ needs.update-dockerfiles.outputs.latestCommitSha }}" >> library/liquibase
+          echo "File: Dockerfile" >> library/liquibase
+          echo "" >> library/liquibase
+          echo "Tags: ${{ env.MAJOR_MINOR }}-alpine, ${{ needs.update-dockerfiles.outputs.liquibaseVersion }}-alpine, alpine" >> library/liquibase
+          echo "GitFetch: refs/heads/main" >> library/liquibase
+          echo "GitCommit: ${{ needs.update-dockerfiles.outputs.latestCommitSha }}" >> library/liquibase
+          echo "File: Dockerfile.alpine" >> library/liquibase
+          git add library/liquibase
+          if git diff-index --cached --quiet HEAD --
+            then
+              echo "Nothing new to commit"
+            else
+              git config user.name "liquibot"
+              git config user.email "liquibot@liquibase.org"
+              git commit -m "Update library/liquibase to ${{ needs.update-dockerfiles.outputs.liquibaseVersion }}"
+              if [[ "${{ needs.update-dockerfiles.outputs.dryRun }}" == false ]]; then
+                git push
+              else
+              echo "Dry run mode: changes have not been pushed."
+            fi
+          fi
 
-  #     - name: Create Official Docker Pull Request
-  #       if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' }}
-  #       id: create_pr
-  #       run: |
-  #         response=$(curl \
-  #           -X POST \
-  #           -H "Authorization: token ${{ secrets.LIQUIBOT_PAT_GPM_ACCESS }}" \
-  #           -H "Accept: application/vnd.github.v3+json" \
-  #           https://api.github.com/repos/docker-library/official-images/pulls \
-  #           -d '{
-  #             "title": "Update library/liquibase to ${{ needs.update-dockerfiles.outputs.liquibaseVersion }}",
-  #             "body": "Update library/liquibase with latest commit and version",
-  #             "head": "liquibase:master",
-  #             "base": "master"
-  #           }')
-  #         pr_url=$(echo $response | jq -r '.html_url')
-  #         echo "PR_URL=$pr_url" >> $GITHUB_ENV
+      - name: Create Official Docker Pull Request
+        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' }}
+        id: create_pr
+        run: |
+          response=$(curl \
+            -X POST \
+            -H "Authorization: token ${{ secrets.LIQUIBOT_PAT_GPM_ACCESS }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/docker-library/official-images/pulls \
+            -d '{
+              "title": "Update library/liquibase to ${{ needs.update-dockerfiles.outputs.liquibaseVersion }}",
+              "body": "Update library/liquibase with latest commit and version",
+              "head": "liquibase:master",
+              "base": "master"
+            }')
+          pr_url=$(echo $response | jq -r '.html_url')
+          echo "PR_URL=$pr_url" >> $GITHUB_ENV
 
-  #     - name: Adding Official Docker PR to job summary
-  #       if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' }}
-  #       run: echo '### 🚀 Official Docker PR -> ${{ env.PR_URL }}' >> $GITHUB_STEP_SUMMARY
+      - name: Adding Official Docker PR to job summary
+        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' }}
+        run: echo '### 🚀 Official Docker PR -> ${{ env.PR_URL }}' >> $GITHUB_STEP_SUMMARY
