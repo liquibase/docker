@@ -163,8 +163,8 @@ jobs:
             else
               git commit -m "Liquibase PRO Version Bumped to ${{ steps.collect-data.outputs.liquibaseVersion }}"
               if [[ "${{ steps.collect-data.outputs.dryRun }}" == false ]]; then
-                # Create and push new tag
-                git tag -a -m "Version Bumped to ${{ steps.collect-data.outputs.liquibaseVersion }}" v${{ steps.collect-data.outputs.liquibaseVersion }}
+                # Create and push new tag with -PRO suffix
+                git tag -a -m "Version Bumped to ${{ steps.collect-data.outputs.liquibaseVersion }} PRO" v${{ steps.collect-data.outputs.liquibaseVersion }}-PRO
                 # Push changes and tags using the token
                 git remote set-url origin "https://x-access-token:${{ steps.get-token.outputs.token }}@github.com/$GITHUB_REPOSITORY.git"
                 git push origin ${{ github.ref }} --tags
