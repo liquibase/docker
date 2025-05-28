@@ -116,11 +116,6 @@ jobs:
           echo "Extension version: ${{ steps.collect-data.outputs.extensionVersion }}"
           echo "Dry run: ${{ steps.collect-data.outputs.dryRun }}"
 
-      - uses: actions/checkout@v4
-        with:
-          persist-credentials: false
-          ref: ${{ github.ref }}
-
       - name: Get GitHub App token
         id: get-token
         uses: actions/create-github-app-token@v2
@@ -129,6 +124,13 @@ jobs:
           private-key: ${{ secrets.LIQUIBASE_GITHUB_APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
           permission-contents: write
+
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.ref }}
+          token: ${{ steps.get-token.outputs.token }}
+          fetch-depth: 0
 
       - name: Set up JDK
         uses: actions/setup-java@v4
@@ -142,7 +144,12 @@ jobs:
           git config user.email "liquibot@liquibase.org"
       
       - name: Update Dockerfile(s) and commit changes
+        id: update-dockerfiles
         run: |
+          # First ensure we're up to date with remote
+          git fetch origin
+          git reset --hard origin/${{ github.ref_name }}
+          
           if [[ "${{ steps.collect-data.outputs.releaseType }}" == "liquibase-pro-release" ]]; then
             file_list=("DockerfilePro")
             LIQUIBASE_PRO_SHA=$(curl -LsS https://repo.liquibase.com/releases/pro/${{ steps.collect-data.outputs.liquibaseVersion }}/liquibase-pro-${{ steps.collect-data.outputs.liquibaseVersion }}.tar.gz | sha256sum | awk '{ print $1 }')
@@ -155,14 +162,11 @@ jobs:
             done
             if git diff-index --cached --quiet HEAD --; then
               echo "Nothing new to commit"
+              echo "changes_made=false" >> $GITHUB_OUTPUT
             else
-              git commit -m "Liquibase PRO Version Bumped to ${{ steps.collect-data.outputs.liquibaseVersion }}"
-              if [[ "${{ steps.collect-data.outputs.dryRun }}" == false ]]; then
-                git tag -fa -m "Version Bumped to ${{ steps.collect-data.outputs.liquibaseVersion }}" v${{ steps.collect-data.outputs.liquibaseVersion }}
-                git push -f "https://x-access-token:${{ steps.get-token.outputs.token }}@github.com/$GITHUB_REPOSITORY.git" HEAD:${{ github.ref }} --follow-tags --tags
-              else
-                echo "Dry run mode: changes have not been pushed."
-              fi
+              COMMIT_MSG="Liquibase PRO Version Bumped to ${{ steps.collect-data.outputs.liquibaseVersion }}"
+              git commit -m "${COMMIT_MSG}"
+              echo "changes_made=true" >> $GITHUB_OUTPUT
             fi
           else
             file_list=("Dockerfile" "Dockerfile.alpine")
@@ -178,16 +182,37 @@ jobs:
             done
             if git diff-index --cached --quiet HEAD --; then
               echo "Nothing new to commit"
+              echo "changes_made=false" >> $GITHUB_OUTPUT
             else
-              git commit -m "Liquibase Version Bumped to ${{ steps.collect-data.outputs.extensionVersion }}"
-              if [[ "${{ steps.collect-data.outputs.dryRun }}" == false ]]; then
-                git tag -fa -m "Version Bumped to ${{ steps.collect-data.outputs.extensionVersion }}" v${{ steps.collect-data.outputs.extensionVersion }}
-                git push -f "https://x-access-token:${{ steps.get-token.outputs.token }}@github.com/$GITHUB_REPOSITORY.git" HEAD:${{ github.ref }} --follow-tags --tags
-              else
-                echo "Dry run mode: changes have not been pushed."
-              fi
+              COMMIT_MSG="Liquibase Version Bumped to ${{ steps.collect-data.outputs.extensionVersion }}"
+              git commit -m "${COMMIT_MSG}"
+              echo "changes_made=true" >> $GITHUB_OUTPUT
             fi
           fi
+
+      - name: Create and Push Tag
+        id: create-tag
+        if: ${{ steps.update-dockerfiles.outputs.changes_made == 'true' && steps.collect-data.outputs.dryRun == 'false' }}
+        run: |
+          VERSION="${{ steps.collect-data.outputs.liquibaseVersion }}"
+          EXTENSION_VERSION="${{ steps.collect-data.outputs.extensionVersion }}"
+          RELEASE_TYPE="${{ steps.collect-data.outputs.releaseType }}"
+          
+          if [[ "${RELEASE_TYPE}" == "liquibase-pro-release" ]]; then
+            TAG_NAME="v${VERSION}-PRO"
+            COMMIT_MSG="Liquibase PRO Version Bumped to ${VERSION}"
+            TAG_MSG="Version Bumped to ${VERSION} PRO"
+          else
+            TAG_NAME="v${EXTENSION_VERSION}"
+            COMMIT_MSG="Liquibase Version Bumped to ${EXTENSION_VERSION}"
+            TAG_MSG="Version Bumped to ${EXTENSION_VERSION}"
+          fi
+          
+          # Create and push new tag
+          git tag -a -m "${TAG_MSG}" "${TAG_NAME}"
+          # Push changes and tags using the token
+          git remote set-url origin "https://x-access-token:${{ steps.get-token.outputs.token }}@github.com/$GITHUB_REPOSITORY.git"
+          git push origin ${{ github.ref }} --tags
         env:
           GITHUB_TOKEN: ${{ steps.get-token.outputs.token }}
 
