@@ -412,7 +412,7 @@ jobs:
   update-official-repo:
     name: "Update Official Docker Repo"
     needs: update-dockerfiles
-    if: ${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' }}
+    if: ${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' && needs.update-dockerfiles.outputs.dryRun == 'false' }}
     runs-on: ubuntu-latest
     steps:
       - name: Extract major.minor version
@@ -442,7 +442,6 @@ jobs:
           token: ${{ steps.get-token.outputs.token }}
 
       - name: Update library/liquibase in liquibase/official-images
-        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' }}
         run: |
           echo "Maintainers: Jake Newton <docker@liquibase.com> (@jnewton03)" > library/liquibase
           echo "Architectures: arm64v8, amd64" >> library/liquibase
@@ -465,15 +464,10 @@ jobs:
               git config user.name "liquibot"
               git config user.email "liquibot@liquibase.org"
               git commit -m "Update library/liquibase to ${{ needs.update-dockerfiles.outputs.liquibaseVersion }}"
-              if [[ "${{ needs.update-dockerfiles.outputs.dryRun }}" == false ]]; then
-                git push
-              else
-              echo "Dry run mode: changes have not been pushed."
-            fi
+              git push
           fi
 
       - name: Create Official Docker Pull Request
-        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' }}
         id: create_pr
         run: |
           response=$(curl \
@@ -491,5 +485,4 @@ jobs:
           echo "PR_URL=$pr_url" >> $GITHUB_ENV
 
       - name: Adding Official Docker PR to job summary
-        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' }}
         run: echo '### 🚀 Official Docker PR -> ${{ env.PR_URL }}' >> $GITHUB_STEP_SUMMARY
