@@ -1,27 +1,16 @@
 # Builder Stage
 FROM eclipse-temurin:21-jre-jammy
 
-ARG LIQUIBASE_VERSION=4.31.1
-ARG LB_SHA256=0555808b59941d497f0c1114c3f2225698afde11c60d191c88e449506a60a3ea
-ARG LPM_VERSION=0.2.9
-ARG LPM_SHA256=b9caecd34c98a6c19a2bc582e8064aff5251c5f1adbcd100d3403c5eceb5373a
-ARG LPM_SHA256_ARM=0adb3a96d7384b4da549979bf00217a8914f0df37d1ed8fdb1b4a4baebfa104c
-
 # Create liquibase user
 RUN groupadd --gid 1001 liquibase && \
     useradd --uid 1001 --gid liquibase --create-home --home-dir /liquibase liquibase && \
     chown liquibase /liquibase
 
-# Add metadata labels
-LABEL org.opencontainers.image.source="https://github.com/liquibase/docker"
-LABEL org.opencontainers.image.description="Liquibase Container Image"
-LABEL org.opencontainers.image.licenses="Apache-2.0"
-LABEL org.opencontainers.image.vendor="Liquibase"
-LABEL org.opencontainers.image.version="${LIQUIBASE_VERSION}"
-LABEL org.opencontainers.image.documentation="https://docs.liquibase.com"
-
 # Download and install Liquibase
 WORKDIR /liquibase
+
+ARG LIQUIBASE_VERSION=4.32.0
+ARG LB_SHA256=10910d42ae9990c95a4ac8f0a3665a24bd40d08fb264055d78b923a512774d54
 
 RUN wget -q -O liquibase-${LIQUIBASE_VERSION}.tar.gz "https://github.com/liquibase/liquibase/releases/download/v${LIQUIBASE_VERSION}/liquibase-${LIQUIBASE_VERSION}.tar.gz" && \
     echo "$LB_SHA256 *liquibase-${LIQUIBASE_VERSION}.tar.gz" | sha256sum -c - && \
@@ -30,6 +19,17 @@ RUN wget -q -O liquibase-${LIQUIBASE_VERSION}.tar.gz "https://github.com/liquiba
     ln -s /liquibase/liquibase /usr/local/bin/liquibase && \
     ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \
     liquibase --version
+    
+ARG LPM_VERSION=0.2.9
+ARG LPM_SHA256=b9caecd34c98a6c19a2bc582e8064aff5251c5f1adbcd100d3403c5eceb5373a
+ARG LPM_SHA256_ARM=0adb3a96d7384b4da549979bf00217a8914f0df37d1ed8fdb1b4a4baebfa104c
+    
+# Add metadata labels
+LABEL org.opencontainers.image.description="Liquibase Container Image"
+LABEL org.opencontainers.image.licenses="Apache-2.0"
+LABEL org.opencontainers.image.vendor="Liquibase"
+LABEL org.opencontainers.image.version="${LIQUIBASE_VERSION}"
+LABEL org.opencontainers.image.documentation="https://docs.liquibase.com"
 
 # Download and Install lpm
 RUN apt-get update && \

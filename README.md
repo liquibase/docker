@@ -8,19 +8,50 @@ We are excited to announce that a new official Liquibase Docker image is now ava
 
 Please update your Dockerfiles and scripts to pull from the new official image:
 
+## Available Registries
+
+We publish this image to multiple registries:
+
+| Registry | Image |
+|----------|-------|
+| **Docker Hub (default)** | `liquibase/liquibase` |
+| **GitHub Container Registry** | `ghcr.io/liquibase/liquibase` |
+| **Amazon ECR Public** | `public.ecr.aws/liquibase/liquibase` |
+
 ## Dockerfile
 
 ```dockerfile
 FROM liquibase:latest
+# OR ghcr.io/liquibase/liquibase:latest    # GHCR  
+# OR public.ecr.aws/liquibase/liquibase:latest   # Amazon ECR Public
 ```
 
 ## Scripts
 
 ```bash
-docker pull liquibase
+# Docker Hub (default)
+docker pull liquibase/liquibase
+
+# GitHub Container Registry
+docker pull ghcr.io/liquibase/liquibase
+
+# Amazon ECR Public
+docker pull public.ecr.aws/liquibase/liquibase
 ```
 
-In the future, we will stop updating the community `liquibase/liquibase` Docker image. Transition to the new official image to ensure you continue receiving updates and support.
+### Pulling the Latest or Specific Version
+
+```bash
+# Latest
+docker pull liquibase/liquibase:latest
+docker pull ghcr.io/liquibase/liquibase:latest
+docker pull public.ecr.aws/liquibase/liquibase:latest
+
+# Specific version (example: 4.27.0)
+docker pull liquibase/liquibase:4.27.0
+docker pull ghcr.io/liquibase/liquibase:4.27.0
+docker pull public.ecr.aws/liquibase/liquibase:4.27.0
+```
 
 For any questions or support, please visit our [Liquibase Community Forum](https://forum.liquibase.org/).
 
