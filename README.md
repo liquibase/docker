@@ -115,6 +115,10 @@ The `liquibase/liquibase:<version>-alpine` image is a lightweight version design
 
 For examples of extending the alpine image, see the [alpine image examples](https://github.com/liquibase/docker/tree/main/examples).
 
+### 🐳 Docker Compose Example
+
+For a complete example using Docker Compose with PostgreSQL, see the [docker-compose example](https://github.com/liquibase/docker/tree/main/examples/docker-compose).
+
 ### 📄 Using the Changelog File
 
 Mount your changelog directory to the `/liquibase/changelog` volume and use relative paths for the `--changeLogFile` argument.
