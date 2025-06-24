@@ -7,7 +7,7 @@
 > **WARNING**: Liquibase Pro requires a valid license key to use Pro features. Without a license, the container will run in Liquibase Community mode with limited functionality.
 >
 > - Contact [Liquibase Sales](https://www.liquibase.com/community/contact) to obtain a Pro license
-> - Existing customers can find their license key in the [Liquibase Account Portal](https://account.liquibase.com/)
+> - Existing customers receive their Pro license keys in an email.
 
 ## 📋 Pro Features
 
