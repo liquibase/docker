@@ -21,6 +21,6 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-          repository: liquibase/docker
-          readme-filepath: ./README.md
+          repository: liquibase/liquibase
+          readme-filepath: README.md
           short-description: "Liquibase OSS"
