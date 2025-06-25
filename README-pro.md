@@ -50,7 +50,7 @@ We publish this image to multiple registries:
 ## Dockerfile
 
 ```dockerfile
-FROM liquibase:latest
+FROM liquibase/liquibase-pro:latest
 # OR ghcr.io/liquibase/liquibase-pro:latest    # GHCR  
 # OR public.ecr.aws/liquibase/liquibase-pro:latest   # Amazon ECR Public
 ```
@@ -93,7 +93,6 @@ For any questions or support, please visit our [Liquibase Community Forum](https
 The following tags are officially supported and can be found on [Docker Hub](https://hub.docker.com/r/liquibase/liquibase-pro/tags):
 
 - `liquibase/liquibase-pro:<version>`
-- `liquibase/liquibase-pro:<version>-alpine`
 
 ### Database Connection Variables
 
@@ -164,7 +163,7 @@ username=postgres
 password=password
 changelog-file=example-changelog.xml
 search-path=/liquibase/changelog/
-liquibase.licenseKey=<PASTE LB PRO LICENSE KEY HERE>
+licenseKey=<PASTE LB PRO LICENSE KEY HERE>
 ```
 
 ## Adding Additional JARs
@@ -186,29 +185,6 @@ The `liquibase/liquibase-pro:<version>` image is the standard choice. Use it as 
 
 For examples of extending the standard image, see the [standard image examples](https://github.com/liquibase/docker/tree/main/examples).
 
-### 🏷️ Alpine Image
-
-The `liquibase/liquibase-pro:<version>-alpine` image is a lightweight version designed for environments with limited resources. It is built on Alpine Linux and has a smaller footprint.
-
-# Extending Liquibase Pro Docker Image Examples
-
-## AWS CLI Integration
-
-**Dockerfile:**
-
-```dockerfile
-FROM liquibase/liquibase-pro:latest-alpine
-
-USER root
-
-RUN apk add --no-cache wget unzip
-
-RUN wget "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -O "awscliv2.zip" && \
-  unzip awscliv2.zip && rm -rf awscliv2.zip && \
-  ./aws/install
-
-USER liquibase
-```
 
 **Usage:**
 
