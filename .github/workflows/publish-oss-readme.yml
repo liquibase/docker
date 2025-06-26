@@ -1,0 +1,26 @@
+name: Publish Liquibase OSS README to Docker Hub
+
+on:
+  push:
+    paths:
+      - 'README.md'
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  update-liquibase-oss-readme:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Update Liquibase OSS README on Docker Hub
+        uses: peter-evans/dockerhub-description@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: liquibase/liquibase
+          readme-filepath: README.md
+          short-description: "Liquibase OSS"

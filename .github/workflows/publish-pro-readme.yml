@@ -1,0 +1,26 @@
+name: Publish Liquibase Pro README to Docker Hub
+
+on:
+  push:
+    paths:
+      - 'README-pro.md'
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  update-liquibase-pro-readme:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Update Liquibase Pro README on Docker Hub
+        uses: peter-evans/dockerhub-description@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: liquibase/liquibase-pro
+          readme-filepath: ./README-pro.md
+          short-description: "Liquibase Pro"
