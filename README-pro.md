@@ -61,13 +61,13 @@ FROM liquibase/liquibase-pro:latest
 
 ```bash
 # Docker Hub (default)
-docker pull liquibase/liquibase-pro
+docker pull docker.liquibase.com/liquibase/liquibase-pro
 
 # GitHub Container Registry
-docker pull ghcr.io/liquibase/liquibase-pro
+docker pull ghcr.liquibase.com/liquibase/liquibase-pro
 
 # Amazon ECR Public
-docker pull public.ecr.aws/liquibase/liquibase-pro
+docker pull public.ecr.liquibase.com/liquibase/liquibase-pro
 ```
 
 ### Pulling the Latest or Specific Version
@@ -76,14 +76,14 @@ docker pull public.ecr.aws/liquibase/liquibase-pro
 
 ```bash
 # Latest
-docker pull liquibase/liquibase-pro:latest
-docker pull ghcr.io/liquibase/liquibase-pro:latest
-docker pull public.ecr.aws/liquibase/liquibase-pro:latest
+docker pull docker.liquibase.com/liquibase-pro:latest
+docker pull ghcr.liquibase.com/liquibase/liquibase-pro:latest
+docker pull public.ecr.liquibase.com/liquibase/liquibase-pro:latest
 
 # Specific version (example: 4.32.0)
-docker pull liquibase/liquibase-pro:4.32.0
-docker pull ghcr.io/liquibase/liquibase-pro:4.32.0
-docker pull public.ecr.aws/liquibase/liquibase-pro:4.32.0
+docker pull docker.liquibase.com/liquibase-pro:4.32.0
+docker pull ghcr.liquibase.com/liquibase/liquibase-pro:4.32.0
+docker pull public.ecr.liquibase.com/liquibase/liquibase-pro:4.32.0
 ```
 
 For any questions or support, please visit our [Liquibase Community Forum](https://forum.liquibase.org/).
