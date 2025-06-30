@@ -164,3 +164,85 @@ jobs:
         with:
           name: security-report-scout${{ matrix.image.suffix }}
           path: ./reports/scout${{ matrix.image.suffix }}/summary.pdf
+
+  trivy-published:
+    name: Trivy Scan Published Images
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        image: [
+          # Docker Hub
+          {name: liquibase/liquibase, tag: 'latest', registry: 'docker.io'},
+          {name: liquibase/liquibase, tag: 'alpine', registry: 'docker.io'},
+          {name: liquibase/liquibase-pro, tag: 'pro', registry: 'docker.io'},
+          # GHCR
+          {name: ghcr.io/liquibase/liquibase, tag: 'latest', registry: 'ghcr.io'},
+          {name: ghcr.io/liquibase/liquibase, tag: 'alpine', registry: 'ghcr.io'},
+          {name: ghcr.io/liquibase/liquibase-pro, tag: 'pro', registry: 'ghcr.io'},
+          # ECR Public
+          {name: public.ecr.aws/liquibase/liquibase, tag: 'latest', registry: 'ecr'},
+          {name: public.ecr.aws/liquibase/liquibase, tag: 'alpine', registry: 'ecr'},
+          {name: public.ecr.aws/liquibase/liquibase-pro, tag: 'pro', registry: 'ecr'},
+        ]
+    steps:
+      - name: Login to GHCR
+        if: matrix.image.registry == 'ghcr.io'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Login to Amazon ECR Registry
+        if: matrix.image.registry == 'ecr'
+        uses: docker/login-action@v3
+        env:
+          AWS_REGION: us-east-1
+        with:
+          registry: public.ecr.aws
+          username: ${{ secrets.PUBLIC_ECR_ACCESS_KEY_ID }}
+          password: ${{ secrets.PUBLIC_ECR_SECRET_ACCESS_KEY }}
+
+      - name: Pull published image ${{ matrix.image.name }}:${{ matrix.image.tag }}
+        run: docker pull ${{ matrix.image.name }}:${{ matrix.image.tag }}
+
+      - name: Run Trivy CVE vulnerability scanner on published image
+        # This step scans for CVE vulnerabilities (OS and libraries)
+        uses: aquasecurity/trivy-action@0.31.0
+        with:
+          image-ref: '${{ matrix.image.name }}:${{ matrix.image.tag }}'
+          vuln-type: 'os,library'
+          scanners: 'vuln'
+          format: 'sarif'
+          output: 'trivy-published-results.sarif'
+          severity: 'HIGH,CRITICAL'
+          exit-code: '1'
+          limit-severities-for-sarif: true
+
+      - name: Notify Slack on Published Image Scan Failure
+        if: failure()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_COLOR: 'failure'
+          SLACK_MESSAGE: "View details on GitHub Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Triggered by repository: ${{ github.repository }} and job: ${{ github.job }}"
+          SLACK_TITLE: "❌ ${{ github.repository }} ❌ Trivy published image scan failed for ${{ matrix.image.name }}:${{ matrix.image.tag }} on branch ${{ github.ref_name }} for commit ${{ github.sha }} in repository ${{ github.repository }}"
+          SLACK_USERNAME: liquibot
+          SLACK_WEBHOOK: ${{ secrets.DOCKER_SLACK_WEBHOOK_URL }}
+          SLACK_ICON_EMOJI: ":whale:"
+          SLACK_FOOTER: "${{ github.repository }} - ${{ matrix.image.name }}:${{ matrix.image.tag }}"
+          SLACK_LINK_NAMES: true
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-published-results.sarif'
+          category: 'published-${{ matrix.image.name }}-${{ matrix.image.tag }}'
+
+      - name: Upload Trivy Published Security Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-report-trivy-published-${{ matrix.image.name }}-${{ matrix.image.tag }}
+          path: trivy-published-results.sarif
