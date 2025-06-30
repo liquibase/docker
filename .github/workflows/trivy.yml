@@ -182,11 +182,9 @@ jobs:
           {name: liquibase/liquibase-pro, tag: 'pro', registry: 'docker.io'},
           # GHCR
           {name: ghcr.io/liquibase/liquibase, tag: 'latest', registry: 'ghcr.io'},
-          {name: ghcr.io/liquibase/liquibase, tag: 'alpine', registry: 'ghcr.io'},
           {name: ghcr.io/liquibase/liquibase-pro, tag: 'pro', registry: 'ghcr.io'},
           # ECR Public
           {name: public.ecr.aws/liquibase/liquibase, tag: 'latest', registry: 'ecr'},
-          {name: public.ecr.aws/liquibase/liquibase, tag: 'alpine', registry: 'ecr'},
           {name: public.ecr.aws/liquibase/liquibase-pro, tag: 'pro', registry: 'ecr'},
         ]
     steps:
@@ -213,7 +211,6 @@ jobs:
 
       - name: Run Trivy CVE vulnerability scanner on published image
         id: trivy_scan
-        continue-on-error: true
         uses: aquasecurity/trivy-action@0.31.0
         with:
           image-ref: '${{ matrix.image.name }}:${{ matrix.image.tag }}'
@@ -252,6 +249,7 @@ jobs:
           category: 'published-${{ matrix.image.name }}-${{ matrix.image.tag }}'
 
       - name: Set sanitized image name
+        if: always()
         id: sanitize
         run: echo "sanitized=${IMAGE_NAME//\//-}" >> $GITHUB_OUTPUT
         env:
@@ -265,7 +263,7 @@ jobs:
           path: trivy-published-results.sarif
 
       - name: Print Trivy vulnerabilities to log
-        if: steps.trivy_scan.outcome == 'failure'
+        if: steps.trivy_scan.outcome == 'failure' && always()
         run: |
           echo "\n==== Trivy Vulnerabilities (table format) ===="
           docker run --rm aquasec/trivy:0.49.1 image --severity HIGH,CRITICAL --format table ${{ matrix.image.name }}:${{ matrix.image.tag }}
