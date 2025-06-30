@@ -168,6 +168,10 @@ jobs:
   trivy-published:
     name: Trivy Scan Published Images
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
     strategy:
       fail-fast: false
       matrix:
@@ -220,18 +224,18 @@ jobs:
           exit-code: '1'
           limit-severities-for-sarif: true
 
-      - name: Notify Slack on Published Image Scan Failure
-        if: failure()
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_COLOR: 'failure'
-          SLACK_MESSAGE: "View details on GitHub Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Triggered by repository: ${{ github.repository }} and job: ${{ github.job }}"
-          SLACK_TITLE: "❌ ${{ github.repository }} ❌ Trivy published image scan failed for ${{ matrix.image.name }}:${{ matrix.image.tag }} on branch ${{ github.ref_name }} for commit ${{ github.sha }} in repository ${{ github.repository }}"
-          SLACK_USERNAME: liquibot
-          SLACK_WEBHOOK: ${{ secrets.DOCKER_SLACK_WEBHOOK_URL }}
-          SLACK_ICON_EMOJI: ":whale:"
-          SLACK_FOOTER: "${{ github.repository }} - ${{ matrix.image.name }}:${{ matrix.image.tag }}"
-          SLACK_LINK_NAMES: true
+      # - name: Notify Slack on Published Image Scan Failure
+      #   if: failure()
+      #   uses: rtCamp/action-slack-notify@v2
+      #   env:
+      #     SLACK_COLOR: 'failure'
+      #     SLACK_MESSAGE: "View details on GitHub Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Triggered by repository: ${{ github.repository }} and job: ${{ github.job }}"
+      #     SLACK_TITLE: "❌ ${{ github.repository }} ❌ Trivy published image scan failed for ${{ matrix.image.name }}:${{ matrix.image.tag }} on branch ${{ github.ref_name }} for commit ${{ github.sha }} in repository ${{ github.repository }}"
+      #     SLACK_USERNAME: liquibot
+      #     SLACK_WEBHOOK: ${{ secrets.DOCKER_SLACK_WEBHOOK_URL }}
+      #     SLACK_ICON_EMOJI: ":whale:"
+      #     SLACK_FOOTER: "${{ github.repository }} - ${{ matrix.image.name }}:${{ matrix.image.tag }}"
+      #     SLACK_LINK_NAMES: true
 
       - name: Upload Trivy scan results to GitHub Security tab
         if: always()
@@ -240,9 +244,15 @@ jobs:
           sarif_file: 'trivy-published-results.sarif'
           category: 'published-${{ matrix.image.name }}-${{ matrix.image.tag }}'
 
+      - name: Set sanitized image name
+        id: sanitize
+        run: echo "sanitized=${IMAGE_NAME//\//-}" >> $GITHUB_OUTPUT
+        env:
+          IMAGE_NAME: ${{ matrix.image.name }}
+
       - name: Upload Trivy Published Security Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: security-report-trivy-published-${{ matrix.image.name }}-${{ matrix.image.tag }}
+          name: security-report-trivy-published-${{ steps.sanitize.outputs.sanitized }}-${{ matrix.image.tag }}
           path: trivy-published-results.sarif
