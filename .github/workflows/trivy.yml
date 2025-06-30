@@ -254,5 +254,5 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: security-report-trivy-published-${{ steps.sanitize.outputs.sanitized }}-${{ matrix.image.tag }}
+          name: security-report-trivy-published-${{ matrix.image.registry }}-${{ steps.sanitize.outputs.sanitized }}-${{ matrix.image.tag }}
           path: trivy-published-results.sarif
