@@ -29,7 +29,29 @@ RUN wget -q -O liquibase-pro-${LIQUIBASE_PRO_VERSION}.tar.gz "https://repo.liqui
     ln -s /liquibase/liquibase /usr/local/bin/liquibase && \
     ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \
     liquibase --version
+    
+ARG LPM_VERSION=0.2.10
+ARG LPM_SHA256=3a47a733e4bf203f9d09ff400ff34146aacac79bd2d192fa0cd2ba3e6312f8d3
+ARG LPM_SHA256_ARM=5f63a39b0774b372f64189f1e332c70098a51e55bc0f4c442a86753e8e8a0978
 
+# Download and Install lpm
+RUN apt-get update && \
+    apt-get -yqq install unzip --no-install-recommends && \
+    rm -rf /var/lib/apt/lists/* && \
+    mkdir /liquibase/bin && \
+    arch="$(dpkg --print-architecture)" && \
+    case "$arch" in \
+    amd64)  DOWNLOAD_ARCH=""  ;; \
+    arm64)  DOWNLOAD_ARCH="-arm64" && LPM_SHA256=$LPM_SHA256_ARM ;; \
+    *) echo >&2 "error: unsupported architecture '$arch'" && exit 1 ;; \
+    esac && wget -q -O lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip "https://github.com/liquibase/liquibase-package-manager/releases/download/v${LPM_VERSION}/lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip" && \
+    echo "$LPM_SHA256 *lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip" | sha256sum -c - && \
+    unzip lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip -d bin/ && \
+    rm lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip && \
+    apt-get purge -y --auto-remove unzip && \
+    ln -s /liquibase/bin/lpm /usr/local/bin/lpm && \
+    lpm --version
+    
 # Set LIQUIBASE_HOME environment variable
 ENV LIQUIBASE_HOME=/liquibase
 # Marker which indicates this is a Liquibase docker container
