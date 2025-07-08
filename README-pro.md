@@ -76,14 +76,14 @@ docker pull ecr.liquibase.com/liquibase/liquibase-pro
 
 ```bash
 # Latest
-docker pull docker.liquibase.com/liquibase-pro:latest
-docker pull ghcr.liquibase.com/liquibase-ghcr/liquibase-pro:latest
-docker pull public.ecr.liquibase.com/liquibase-ecr/liquibase-pro:latest
+docker pull docker.liquibase.com/liquibase/liquibase-pro:latest
+docker pull ghcr.liquibase.com/liquibase-pro:latest
+docker pull ecr.liquibase.com/liquibase-pro:latest
 
 # Specific version (example: 4.32.0)
-docker pull docker.liquibase.com/liquibase-pro:4.32.0
-docker pull ghcr.liquibase.com/liquibase-ghcr/liquibase-pro:4.32.0
-docker pull public.ecr.liquibase.com/liquibase-ecr/liquibase-pro:4.32.0
+docker pull docker.liquibase.com/liquibase/liquibase-pro:4.32.0
+docker pull ghcr.liquibase.com/liquibase-pro:4.32.0
+docker pull ecr.liquibase.com/liquibase-pro:4.32.0
 ```
 
 For any questions or support, please visit our [Liquibase Community Forum](https://forum.liquibase.org/).
