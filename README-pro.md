@@ -64,10 +64,10 @@ FROM liquibase/liquibase-pro:latest
 docker pull docker.liquibase.com/liquibase/liquibase-pro
 
 # GitHub Container Registry
-docker pull ghcr.liquibase.com/liquibase-ghcr/liquibase-pro
+docker pull ghcr.liquibase.com/liquibase/liquibase-pro
 
 # Amazon ECR Public
-docker pull public.ecr.liquibase.com/liquibase-ecr/liquibase-pro
+docker pull ecr.liquibase.com/liquibase/liquibase-pro
 ```
 
 ### Pulling the Latest or Specific Version
