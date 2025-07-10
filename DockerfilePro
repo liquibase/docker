@@ -38,16 +38,22 @@ ARG LPM_SHA256_ARM=5f63a39b0774b372f64189f1e332c70098a51e55bc0f4c442a86753e8e8a0
 RUN apt-get update && \
     apt-get -yqq install unzip --no-install-recommends && \
     rm -rf /var/lib/apt/lists/* && \
-    mkdir /liquibase/bin && \
+    mkdir -p /liquibase/bin && \
     arch="$(dpkg --print-architecture)" && \
-    case "$arch" in \
-    amd64)  DOWNLOAD_ARCH=""  ;; \
-    arm64)  DOWNLOAD_ARCH="-arm64" && LPM_SHA256=$LPM_SHA256_ARM ;; \
-    *) echo >&2 "error: unsupported architecture '$arch'" && exit 1 ;; \
-    esac && wget -q -O lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip "https://github.com/liquibase/liquibase-package-manager/releases/download/v${LPM_VERSION}/lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip" && \
-    echo "$LPM_SHA256 *lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip" | sha256sum -c - && \
-    unzip lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip -d bin/ && \
-    rm lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip && \
+    if [ "$arch" = "amd64" ]; then \
+        DOWNLOAD_ARCH=""; \
+        DOWNLOAD_SHA256="$LPM_SHA256"; \
+    elif [ "$arch" = "arm64" ]; then \
+        DOWNLOAD_ARCH="-arm64"; \
+        DOWNLOAD_SHA256="$LPM_SHA256_ARM"; \
+    else \
+        echo >&2 "error: unsupported architecture '$arch'"; \
+        exit 1; \
+    fi && \
+    wget -q -O /tmp/lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip "https://github.com/liquibase/liquibase-package-manager/releases/download/v${LPM_VERSION}/lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip" && \
+    echo "$DOWNLOAD_SHA256 */tmp/lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip" | sha256sum -c - && \
+    unzip /tmp/lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip -d /liquibase/bin/ && \
+    rm /tmp/lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip && \
     apt-get purge -y --auto-remove unzip && \
     ln -s /liquibase/bin/lpm /usr/local/bin/lpm && \
     lpm --version
