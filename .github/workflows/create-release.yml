@@ -116,12 +116,26 @@ jobs:
           echo "Extension version: ${{ steps.collect-data.outputs.extensionVersion }}"
           echo "Dry run: ${{ steps.collect-data.outputs.dryRun }}"
 
+      - name: Configure AWS credentials for vault access
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.LIQUIBASE_VAULT_OIDC_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Get secrets from vault
+        id: vault-secrets
+        uses: aws-actions/aws-secretsmanager-get-secrets@v2
+        with:
+          secret-ids: |
+            ,/vault/liquibase
+          parse-json-secrets: true
+
       - name: Get GitHub App token
         id: get-token
         uses: actions/create-github-app-token@v2
         with:
-          app-id: ${{ secrets.LIQUIBASE_GITHUB_APP_ID }}
-          private-key: ${{ secrets.LIQUIBASE_GITHUB_APP_PRIVATE_KEY }}
+          app-id: ${{ env.LIQUIBASE_GITHUB_APP_ID }}
+          private-key: ${{ env.LIQUIBASE_GITHUB_APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
           permission-contents: write
 
@@ -254,6 +268,20 @@ jobs:
           persist-credentials: false
           ref: ${{ github.ref }}
 
+      - name: Configure AWS credentials for vault access
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.LIQUIBASE_VAULT_OIDC_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Get secrets from vault
+        id: vault-secrets
+        uses: aws-actions/aws-secretsmanager-get-secrets@v2
+        with:
+          secret-ids: |
+            ,/vault/liquibase
+          parse-json-secrets: true
+
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -294,8 +322,8 @@ jobs:
         if: ${{ env.PUSH_DOCKERHUB == 'true' && needs.update-dockerfiles.outputs.dryRun == 'false' }}
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          username: ${{ env.DOCKERHUB_USERNAME }}
+          password: ${{ env.DOCKERHUB_TOKEN }}
 
       - name: Login to GitHub Container Registry
         if: ${{ env.PUSH_GHCR == 'true' && needs.update-dockerfiles.outputs.dryRun == 'false' && steps.set-registries.outputs.GHCR_REPO != '' }}
@@ -305,6 +333,13 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Configure AWS credentials for PROD ECR
+        id: configure-aws-credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_PROD_GITHUB_OIDC_ROLE_ARN_INFRASTRUCTURE }}
+          aws-region: us-east-1
+
       - name: Login to ECR Registry
         if: ${{ env.PUSH_ECR == 'true' && needs.update-dockerfiles.outputs.dryRun == 'false' && steps.set-registries.outputs.ECR_REPO != '' }}
         uses: docker/login-action@v3
@@ -312,8 +347,8 @@ jobs:
           AWS_REGION: us-east-1
         with:
           registry: public.ecr.aws
-          username: ${{ secrets.PUBLIC_ECR_ACCESS_KEY_ID }}
-          password: ${{ secrets.PUBLIC_ECR_SECRET_ACCESS_KEY }}
+          username: ${{ steps.configure-aws-credentials.outputs.aws_access_key_id }}
+          password: ${{ steps.configure-aws-credentials.outputs.aws_secret_access_key }}
 
       # Add login for dry-run mode to private ECR
       - name: Login to Private ECR Registry (dry-run)
@@ -322,9 +357,9 @@ jobs:
         env:
           AWS_REGION: us-east-1
         with:
-          registry: ${{ secrets.PRIVATE_ECR_DRY_RUN_REPO }}
-          username: ${{ secrets.PUBLIC_ECR_ACCESS_KEY_ID }}
-          password: ${{ secrets.PUBLIC_ECR_SECRET_ACCESS_KEY }}
+          registry: ${{ env.PRIVATE_ECR_DRY_RUN_REPO }}
+          username: ${{ steps.configure-aws-credentials.outputs.aws_access_key_id }}
+          password: ${{ steps.configure-aws-credentials.outputs.aws_secret_access_key }}
 
       # Generate tags dynamically using a separate step
       - name: Generate Docker Tags
@@ -339,9 +374,9 @@ jobs:
 
           if [[ "${IS_DRY_RUN}" == "true" ]]; then
             # For dry run, only use ECR registry
-            TAGS="${{ secrets.PRIVATE_ECR_DRY_RUN_REPO }}:${LATEST_TAG}${SUFFIX}"
-            TAGS="${TAGS},${{ secrets.PRIVATE_ECR_DRY_RUN_REPO }}:${VERSION}${SUFFIX}"
-            TAGS="${TAGS},${{ secrets.PRIVATE_ECR_DRY_RUN_REPO }}:${MINOR_VERSION}${SUFFIX}"
+            TAGS="${{ env.PRIVATE_ECR_DRY_RUN_REPO }}:${LATEST_TAG}${SUFFIX}"
+            TAGS="${TAGS},${{ env.PRIVATE_ECR_DRY_RUN_REPO }}:${VERSION}${SUFFIX}"
+            TAGS="${TAGS},${{ env.PRIVATE_ECR_DRY_RUN_REPO }}:${MINOR_VERSION}${SUFFIX}"
           else
             # Not in dry-run mode, apply normal tag selection logic
             
@@ -371,7 +406,7 @@ jobs:
             # If no tags were set, fall back to dry-run mode
             if [[ -z "${TAGS}" ]]; then
               echo "::warning::No registries were selected. Running in dry-run mode."
-              TAGS="${{ secrets.PRIVATE_ECR_DRY_RUN_REPO }}:${LATEST_TAG}${SUFFIX}"
+              TAGS="${{ env.PRIVATE_ECR_DRY_RUN_REPO }}:${LATEST_TAG}${SUFFIX}"
             fi
           fi
 
@@ -425,12 +460,26 @@ jobs:
           echo "VERSION: $VERSION"
           echo "MAJOR_MINOR: ${VERSION%.*}"
 
+      - name: Configure AWS credentials for vault access
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.LIQUIBASE_VAULT_OIDC_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Get secrets from vault
+        id: vault-secrets
+        uses: aws-actions/aws-secretsmanager-get-secrets@v2
+        with:
+          secret-ids: |
+            ,/vault/liquibase
+          parse-json-secrets: true
+
       - name: Get GitHub App token
         id: get-token
         uses: actions/create-github-app-token@v2
         with:
-          app-id: ${{ secrets.LIQUIBASE_GITHUB_APP_ID }}
-          private-key: ${{ secrets.LIQUIBASE_GITHUB_APP_PRIVATE_KEY }}
+          app-id: ${{ env.LIQUIBASE_GITHUB_APP_ID }}
+          private-key: ${{ env.LIQUIBASE_GITHUB_APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
           permission-contents: write
           permission-actions: write
@@ -474,7 +523,7 @@ jobs:
         run: |
           response=$(curl \
             -X POST \
-            -H "Authorization: token ${{ secrets.LIQUIBOT_PAT_GPM_ACCESS }}" \
+            -H "Authorization: token ${{ env.LIQUIBOT_PAT_GPM_ACCESS }}" \
             -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/docker-library/official-images/pulls \
             -d '{
