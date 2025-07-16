@@ -18,6 +18,9 @@ on:
 permissions:
   contents: read
   id-token: write # Required for AWS OIDC authentication
+  security-events: write # Required for uploading SARIF results to GitHub Security tab
+  actions: read # Required for private repositories to get Action run status
+  pull-requests: write # Required for writing comments on pull requests
 
 jobs:
   trivy:
@@ -29,10 +32,6 @@ jobs:
           {dockerfile: Dockerfile.alpine, name: liquibase/liquibase, suffix: "-alpine"},
           {dockerfile: DockerfilePro, name: liquibase/liquibase-pro, suffix: "-pro"},
           ]
-    permissions:
-      contents: read # for actions/checkout to fetch code
-      security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
-      actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
     name: Trivy
     runs-on: "ubuntu-22.04"
     steps:
@@ -113,11 +112,6 @@ jobs:
           {dockerfile: Dockerfile.alpine, name: liquibase/liquibase, suffix: "-alpine"},
           {dockerfile: DockerfilePro, name: liquibase/liquibase-pro, suffix: "-pro"},
           ]
-    permissions:
-      contents: read # for actions/checkout to fetch code
-      security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
-      actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
-      pull-requests: write # for docker/scout-action to write comments on pull requests
     name: Scout
     runs-on: "ubuntu-22.04"
     steps:
