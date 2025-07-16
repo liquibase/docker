@@ -8,6 +8,10 @@ on:
       - main
   workflow_dispatch:
 
+permissions:
+  contents: write
+  id-token: write
+  
 jobs:
   update-liquibase-pro-readme:
     runs-on: ubuntu-latest
