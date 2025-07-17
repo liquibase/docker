@@ -14,6 +14,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 jobs:
   test:
@@ -40,10 +41,24 @@ jobs:
         run: |
           docker build -f ${{ matrix.dockerfile }} -t liquibase/liquibase:${{ github.sha }} .
 
+      - name: Configure AWS credentials for vault access
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.LIQUIBASE_VAULT_OIDC_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Get secrets from vault
+        id: vault-secrets
+        uses: aws-actions/aws-secretsmanager-get-secrets@v2
+        with:
+          secret-ids: |
+            ,/vault/liquibase
+          parse-json-secrets: true
+
       - name: Test liquibase init start-h2
         run: |
           LOG_STRING="The database does not persist data"
-          docker run --env LIQUIBASE_LICENSE_KEY=${{ secrets.PRO_LICENSE_KEY }} --name $CONTAINER_NAME -d -v $(pwd)/.github/test:/liquibase/changelog liquibase/liquibase:${{ github.sha }} init start-h2
+          docker run --env LIQUIBASE_LICENSE_KEY=${{ env.PRO_LICENSE_KEY }} --name $CONTAINER_NAME -d -v $(pwd)/.github/test:/liquibase/changelog liquibase/liquibase:${{ github.sha }} init start-h2
           sleep 30
           # Check if the container is running
           if docker inspect -f '{{.State.Running}}' "$CONTAINER_NAME" 2>/dev/null | grep -q "true"; then
@@ -101,7 +116,7 @@ jobs:
           docker rm $CONTAINER_NAME
           # Start docker container with wrong ENV
           # Get the logs and check if the desired string is present
-          if docker run --env LIQUIBASE_LICENSE_KEY=${{ secrets.PRO_LICENSE_KEY }} --name $CONTAINER_NAME -d -v $(pwd)/.github/test:/liquibase/changelog -e LIQUIBASE_HOME="wrong_path" liquibase/liquibase:${{ github.sha }} init start-h2 2>&1 | grep -q "$LOG_STRING"; then
+          if docker run --env LIQUIBASE_LICENSE_KEY=${{ env.PRO_LICENSE_KEY }} --name $CONTAINER_NAME -d -v $(pwd)/.github/test:/liquibase/changelog -e LIQUIBASE_HOME="wrong_path" liquibase/liquibase:${{ github.sha }} init start-h2 2>&1 | grep -q "$LOG_STRING"; then
             echo "The log does not contain the string: $LOG_STRING"
             exit 1
           else
@@ -115,7 +130,7 @@ jobs:
           docker stop $CONTAINER_NAME
           docker rm $CONTAINER_NAME
           # Start docker container with good ENV
-          docker run --env LIQUIBASE_LICENSE_KEY=${{ secrets.PRO_LICENSE_KEY }} --name $CONTAINER_NAME -d -v $(pwd)/.github/test:/liquibase/changelog -e LIQUIBASE_HOME="/liquibase" liquibase/liquibase:${{ github.sha }} init start-h2
+          docker run --env LIQUIBASE_LICENSE_KEY=${{ env.PRO_LICENSE_KEY }} --name $CONTAINER_NAME -d -v $(pwd)/.github/test:/liquibase/changelog -e LIQUIBASE_HOME="/liquibase" liquibase/liquibase:${{ github.sha }} init start-h2
           sleep 30
           docker logs $CONTAINER_NAME
           # Check if the container is running
@@ -174,7 +189,7 @@ jobs:
           docker rm $CONTAINER_NAME
           docker network create --driver bridge test_network
           # Get the logs and check if the desired string is present
-          docker run -d --env LIQUIBASE_LICENSE_KEY=${{ secrets.PRO_LICENSE_KEY }} --name $CONTAINER_NAME --network test_network -v $(pwd)/.github/test:/liquibase/changelog liquibase/liquibase:${{ github.sha }} init start-h2
+          docker run -d --env LIQUIBASE_LICENSE_KEY=${{ env.PRO_LICENSE_KEY }} --name $CONTAINER_NAME --network test_network -v $(pwd)/.github/test:/liquibase/changelog liquibase/liquibase:${{ github.sha }} init start-h2
           if docker exec $CONTAINER_NAME lpm add mssql --category=driver -g 2>&1 | grep -q "$LOG_STRING"; then
               echo "The log contains the string: $LOG_STRING"
           else
@@ -190,4 +205,4 @@ jobs:
           # Build custom liquibase image
           docker build -f $(pwd)/.github/test/Dockerfile -t liquibase:test $(pwd)/.github/test/
           # Get the logs and check if the desired string is present
-          docker run --rm --env LIQUIBASE_LICENSE_KEY=${{ secrets.PRO_LICENSE_KEY }} --name liquibase-test --entrypoint="/scripts/liquibase_command.sh" -v $(pwd)/.github/test:/liquibase/changelog liquibase:test "version"
+          docker run --rm --env LIQUIBASE_LICENSE_KEY=${{ env.PRO_LICENSE_KEY }} --name liquibase-test --entrypoint="/scripts/liquibase_command.sh" -v $(pwd)/.github/test:/liquibase/changelog liquibase:test "version"
