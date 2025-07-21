@@ -29,26 +29,21 @@ jobs:
     name: "Build and Push QA Docker Images"
     runs-on: ubuntu-latest
     strategy:
-      matrix:
-        include:
-          - dockerfile: Dockerfile
-            image_name: "liquibase-qa"
-            suffix: ""
-            condition: ${{ inputs.buildLiquibaseQA }}
-          - dockerfile: Dockerfile.alpine
-            image_name: "liquibase-qa-alpine"
-            suffix: "-alpine"
-            condition: ${{ inputs.buildLiquibaseAlpineQA }}
-          - dockerfile: DockerfilePro
-            image_name: "liquibase-pro-qa"
-            suffix: "-pro"
-            condition: ${{ inputs.buildLiquibaseProQA }}
+      matrix: ${{ fromJSON(needs.set-matrix.outputs.matrix) }}
     steps:
-      - name: Skip if not selected
-        if: ${{ matrix.condition == false }}
+      - name: Set matrix dynamically
+        id: set-matrix
         run: |
-          echo "Skipping ${{ matrix.image_name }} - not selected for build"
-          exit 0
+          echo '{
+            "include": [
+              {"dockerfile": "Dockerfile", "image_name": "liquibase-qa", "suffix": ""} 
+              ${ inputs.buildLiquibaseQA == 'true' ? ',' : '' }
+              {"dockerfile": "Dockerfile.alpine", "image_name": "liquibase-qa-alpine", "suffix": "-alpine"} 
+              ${ inputs.buildLiquibaseAlpineQA == 'true' ? ',' : '' }
+              {"dockerfile": "DockerfilePro", "image_name": "liquibase-pro-qa", "suffix": "-pro"} 
+            ]
+          }' > matrix.json
+          echo "::set-output name=matrix::$(cat matrix.json)"
 
       - name: Checkout code
         if: ${{ matrix.condition == true }}
