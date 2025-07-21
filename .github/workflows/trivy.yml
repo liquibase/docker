@@ -8,7 +8,7 @@ name: Vulnerability Scanning
 on:
   workflow_dispatch:
     inputs:
-      max_tags:
+      max_tags_to_scan:
         description: 'Maximum number of published tags to scan'
         required: false
         default: '20'
@@ -24,9 +24,6 @@ permissions:
   contents: read
   security-events: write
   actions: read
-
-env:
-  MAX_TAGS_TO_SCAN: ${{ github.event.inputs.max_tags || '10' }}  # Use input or default to 10
 
 jobs:
   # trivy:
@@ -185,7 +182,7 @@ jobs:
       - name: Generate matrix for all image/tag combinations
         id: set-matrix
         run: |
-          MAX_TAGS=${{ github.event.inputs.max_tags || '10' }}
+          MAX_TAGS=${{ github.event.inputs.max_tags_to_scan || '10' }}
           
           echo "Generating matrix for scanning with max $MAX_TAGS tags per image..."
           
@@ -282,15 +279,64 @@ jobs:
           path: trivy-results.sarif
           if-no-files-found: ignore
 
-      - name: Notify Slack on Published Image Scan Failure
+      - name: Fail job if vulnerabilities found
         if: steps.trivy_scan.outcome == 'failure'
+        run: |
+          echo "❌ Vulnerabilities were found in ${{ matrix.image }}:${{ matrix.tag }}"
+          echo "Check the logs above for detailed vulnerability information"
+          exit 1
+
+  notify-results:
+    name: Notify Scan Results
+    runs-on: ubuntu-22.04
+    needs: trivy-scan
+    if: always()
+    strategy:
+      matrix:
+        image: [
+          liquibase/liquibase,
+          liquibase/liquibase-pro
+        ]
+    steps:
+      - name: "Check failures for ${{ matrix.image }}"
+        id: check_failures
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const image = '${{ matrix.image }}';
+            console.log(`Checking for failures in ${image}...`);
+            
+            // Get the trivy-scan job results
+            const jobs = await github.rest.actions.listJobsForWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId
+            });
+            
+            // Check if any jobs for this specific image failed
+            const imageJobs = jobs.data.jobs.filter(job => 
+              job.name.includes(image) && job.name.includes('Trivy Scan')
+            );
+            
+            const failedJobs = imageJobs.filter(job => job.conclusion === 'failure');
+            const hasFailures = failedJobs.length > 0;
+            
+            console.log(`Found ${imageJobs.length} scan jobs for ${image}`);
+            console.log(`Failed jobs: ${failedJobs.length}`);
+            
+            core.setOutput('has_failures', hasFailures.toString());
+            core.setOutput('failed_count', failedJobs.length.toString());
+            core.setOutput('total_count', imageJobs.length.toString());
+
+      - name: "Notify Slack for ${{ matrix.image }} failures" 
+        if: steps.check_failures.outputs.has_failures == 'true'
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_COLOR: 'failure'
-          SLACK_MESSAGE: "View details on GitHub Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Triggered by repository: ${{ github.repository }} and job: ${{ github.job }}"
-          SLACK_TITLE: "❌ ${{ github.repository }} ❌ Trivy published image scan failed for ${{ matrix.image }}:${{ matrix.tag }} on branch ${{ github.ref_name }} for commit ${{ github.sha }} in repository ${{ github.repository }}"
+          SLACK_MESSAGE: "Security vulnerabilities found in ${{ steps.check_failures.outputs.failed_count }} out of ${{ steps.check_failures.outputs.total_count }} tags for ${{ matrix.image }}. View details: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          SLACK_TITLE: "❌ Trivy scan found vulnerabilities in ${{ matrix.image }}"
           SLACK_USERNAME: liquibot
           SLACK_WEBHOOK: ${{ secrets.DOCKER_SLACK_WEBHOOK_URL }}
-          SLACK_ICON_EMOJI: ":whale:"
-          SLACK_FOOTER: "${{ github.repository }} - ${{ matrix.image }}:${{ matrix.tag }}"
+          SLACK_ICON_EMOJI: ":warning:"
+          SLACK_FOOTER: "${{ github.repository }} - ${{ matrix.image }}"
           SLACK_LINK_NAMES: true
