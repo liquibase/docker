@@ -37,9 +37,9 @@ jobs:
           echo '{
             "include": [
               {"dockerfile": "Dockerfile", "image_name": "liquibase-qa", "suffix": ""} 
-              ${ inputs.buildLiquibaseQA == 'true' ? ',' : '' }
+              ${{ inputs.buildLiquibaseQA && ',' }}
               {"dockerfile": "Dockerfile.alpine", "image_name": "liquibase-qa-alpine", "suffix": "-alpine"} 
-              ${ inputs.buildLiquibaseAlpineQA == 'true' ? ',' : '' }
+              ${{ inputs.buildLiquibaseAlpineQA && ',' }}
               {"dockerfile": "DockerfilePro", "image_name": "liquibase-pro-qa", "suffix": "-pro"} 
             ]
           }' > matrix.json
