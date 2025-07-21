@@ -176,131 +176,121 @@ jobs:
     #       path: ./reports/scout${{ matrix.image.suffix }}/summary.pdf
 
 
-  trivy-published:
-    name: Trivy Scan Published Docker Images
+  generate-matrix:
+    name: Generate Scan Matrix
     runs-on: ubuntu-22.04
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Generate matrix for all image/tag combinations
+        id: set-matrix
+        run: |
+          MAX_TAGS=${{ github.event.inputs.max_tags || '10' }}
+          
+          echo "Generating matrix for scanning with max $MAX_TAGS tags per image..."
+          
+          # Initialize matrix
+          MATRIX_INCLUDE="["
+          FIRST=true
+          
+          # Process each image
+          for IMAGE in "liquibase/liquibase" "liquibase/liquibase-pro"; do
+            echo "Getting tags for $IMAGE..."
+            
+            # Get tags from Docker Hub API
+            TAGS=$(curl -s "https://hub.docker.com/v2/repositories/$IMAGE/tags/?page_size=100&ordering=-last_updated" | \
+              jq -r '.results[] | select(.tag_status == "active") | .name' | \
+              head -n $MAX_TAGS)
+            
+            # Add each tag to matrix
+            while IFS= read -r tag; do
+              if [ -n "$tag" ]; then
+                if [ "$FIRST" = true ]; then
+                  MATRIX_INCLUDE="${MATRIX_INCLUDE}{\"image\":\"$IMAGE\",\"tag\":\"$tag\"}"
+                  FIRST=false
+                else
+                  MATRIX_INCLUDE="${MATRIX_INCLUDE},{\"image\":\"$IMAGE\",\"tag\":\"$tag\"}"
+                fi
+              fi
+            done <<< "$TAGS"
+          done
+          
+          MATRIX_INCLUDE="${MATRIX_INCLUDE}]"
+          MATRIX="{\"include\":$MATRIX_INCLUDE}"
+          
+          echo "Generated matrix: $MATRIX"
+          echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
+
+  trivy-scan:
+    name: Trivy Scan ${{ matrix.image }}:${{ matrix.tag }}
+    runs-on: ubuntu-22.04
+    needs: generate-matrix
     permissions:
       contents: read
       security-events: write
       actions: read
-    env:
-      MAX_TAGS_TO_SCAN: ${{ github.event.inputs.max_tags || '10' }}  # Use input or default to 10
     strategy:
       fail-fast: false
-      matrix:
-        image: [
-          liquibase/liquibase,
-          liquibase/liquibase-pro
-        ]
+      matrix: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Trivy
-        uses: aquasecurity/setup-trivy@v0.2.0
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.31.0
         with:
-          version: 'latest'
-          cache: true
+          image-ref: '${{ matrix.image }}:${{ matrix.tag }}'
+          vuln-type: 'os,library'
+          scanners: 'vuln'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'HIGH,CRITICAL'
+          exit-code: '1'
+          limit-severities-for-sarif: true
+        continue-on-error: true
+        id: trivy_scan
 
-      - name: Get Docker tags to scan
-        id: get_tags
+      - name: Print Trivy vulnerabilities to log
+        if: steps.trivy_scan.outcome == 'failure' && always()
         run: |
-          IMAGE="${{ matrix.image }}"
-          MAX_TAGS=${{ env.MAX_TAGS_TO_SCAN }}
-          
-          echo "Getting $MAX_TAGS most recent tags for $IMAGE..."
-          
-          # Get tags from Docker Hub API
-          TAGS=$(curl -s "https://hub.docker.com/v2/repositories/$IMAGE/tags/?page_size=100&ordering=-last_updated" | \
-            jq -r '.results[] | select(.tag_status == "active") | .name' | \
-            head -n $MAX_TAGS | \
-            tr '\n' ' ')
-          
-          echo "Found tags: $TAGS"
-          echo "tags=$TAGS" >> $GITHUB_OUTPUT
-
-      - name: Scan each Docker tag
-        id: scan_tags
-        run: |
-          TAGS="${{ steps.get_tags.outputs.tags }}"
-          IMAGE="${{ matrix.image }}"
-          
-          echo "Scanning tags for $IMAGE: $TAGS"
-          
-          SCAN_FAILED=false
-          mkdir -p sarif-results
-          
-          for tag in $TAGS; do
-            echo ""
-            echo "===== Scanning $IMAGE:$tag ====="
-            
-            # Pull image
-            echo "Pulling $IMAGE:$tag..."
-            if ! docker pull "$IMAGE:$tag"; then
-              echo "❌ Failed to pull $IMAGE:$tag, skipping..."
-              continue
-            fi
-            
-            # Create sanitized file name
-            SANITIZED_IMAGE=$(echo "$IMAGE" | tr '/' '-')
-            SANITIZED_TAG=$(echo "$tag" | tr '/' '-' | tr ':' '-' | tr '.' '-')
-            SARIF_FILE="sarif-results/trivy-${SANITIZED_IMAGE}-${SANITIZED_TAG}.sarif"
-            
-            # Run Trivy scan with native action
-            echo "Running Trivy scan..."
-            if ! docker run --rm \
-              -v "$(pwd)/sarif-results:/output" \
-              aquasecurity/trivy:latest image \
-              --format sarif \
-              --output "/output/trivy-${SANITIZED_IMAGE}-${SANITIZED_TAG}.sarif" \
-              --severity HIGH,CRITICAL \
-              --vuln-type os,library \
-              --scanners vuln \
-              --exit-code 1 \
-              "$IMAGE:$tag"; then
-              
-              echo "❌ Vulnerabilities found in $IMAGE:$tag"
-              SCAN_FAILED=true
-              
-              # Print vulnerabilities to log
-              echo ""
-              echo "==== Trivy Vulnerabilities (table format) ===="
-              docker run --rm aquasecurity/trivy:latest image \
-                --severity HIGH,CRITICAL \
-                --format table \
-                "$IMAGE:$tag" || true
-            else
-              echo "✅ No HIGH/CRITICAL vulnerabilities found in $IMAGE:$tag"
-            fi
-          done
-          
-          echo "scan_failed=$SCAN_FAILED" >> $GITHUB_OUTPUT
+          echo ""
+          echo "==== Trivy Vulnerabilities (table format) ===="
+          trivy image --severity HIGH,CRITICAL --format table ${{ matrix.image }}:${{ matrix.tag }}
 
       - name: Upload SARIF results to GitHub Security tab
         if: always()
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: sarif-results/
-          category: 'trivy-docker-${{ matrix.image }}'
+          sarif_file: 'trivy-results.sarif'
+          category: 'trivy-${{ matrix.image }}-${{ matrix.tag }}'
         continue-on-error: true
+
+      - name: Set sanitized names for artifacts
+        if: always()
+        id: sanitize
+        run: |
+          SANITIZED_IMAGE=$(echo "${{ matrix.image }}" | tr '/' '-')
+          SANITIZED_TAG=$(echo "${{ matrix.tag }}" | tr '/' '-' | tr ':' '-' | tr '.' '-')
+          echo "image=$SANITIZED_IMAGE" >> $GITHUB_OUTPUT
+          echo "tag=$SANITIZED_TAG" >> $GITHUB_OUTPUT
 
       - name: Upload Trivy Published Security Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: security-report-trivy-published-${{ matrix.image }}
-          path: sarif-results/
+          name: security-report-trivy-${{ steps.sanitize.outputs.image }}-${{ steps.sanitize.outputs.tag }}
+          path: trivy-results.sarif
           if-no-files-found: ignore
 
       - name: Notify Slack on Published Image Scan Failure
-        if: steps.scan_tags.outputs.scan_failed == 'true'
+        if: steps.trivy_scan.outcome == 'failure'
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_COLOR: 'failure'
           SLACK_MESSAGE: "View details on GitHub Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Triggered by repository: ${{ github.repository }} and job: ${{ github.job }}"
-          SLACK_TITLE: "❌ ${{ github.repository }} ❌ Trivy published image scan failed for ${{ matrix.image }} on branch ${{ github.ref_name }} for commit ${{ github.sha }} in repository ${{ github.repository }}"
+          SLACK_TITLE: "❌ ${{ github.repository }} ❌ Trivy published image scan failed for ${{ matrix.image }}:${{ matrix.tag }} on branch ${{ github.ref_name }} for commit ${{ github.sha }} in repository ${{ github.repository }}"
           SLACK_USERNAME: liquibot
           SLACK_WEBHOOK: ${{ secrets.DOCKER_SLACK_WEBHOOK_URL }}
           SLACK_ICON_EMOJI: ":whale:"
-          SLACK_FOOTER: "${{ github.repository }} - ${{ matrix.image }}"
+          SLACK_FOOTER: "${{ github.repository }} - ${{ matrix.image }}:${{ matrix.tag }}"
           SLACK_LINK_NAMES: true
