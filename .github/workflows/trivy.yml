@@ -7,6 +7,11 @@ name: Vulnerability Scanning
 
 on:
   workflow_dispatch:
+    inputs:
+      max_tags:
+        description: 'Maximum number of published tags to scan'
+        required: false
+        default: '20'
   push:
     branches: [ "main" ]
   pull_request:
@@ -17,6 +22,11 @@ on:
 
 permissions:
   contents: read
+
+env:
+  # Configuration for published image scanning
+  MAX_PARALLEL_JOBS: 6
+  MAX_TAGS: ${{ github.event.inputs.max_tags || '20' }}
 
 jobs:
   # trivy:
@@ -165,64 +175,102 @@ jobs:
     #       name: security-report-scout${{ matrix.image.suffix }}
     #       path: ./reports/scout${{ matrix.image.suffix }}/summary.pdf
 
-  scan-liquibase-published-images:
+
+  # OPTIMIZED: Matrix strategy for parallel published image scanning
+
+  scan-published-images:
+      runs-on: ubuntu-22.04
+      strategy:
+        fail-fast: false
+        matrix:
+          repo: [liquibase, liquibase-pro]
+      name: Trivy Scan - ${{ matrix.repo }} (Published)
+      
+      steps:
+        - uses: actions/checkout@v4
+
+        # Cache Trivy DB to speed up scans
+        - name: Cache Trivy DB
+          uses: actions/cache@v4
+          with:
+            path: /tmp/trivy-cache
+            key: trivy-db-${{ runner.os }}-${{ hashFiles('**/scan-repo.sh') }}
+            restore-keys: |
+              trivy-db-${{ runner.os }}-
+
+        # Cache Docker layers for faster pulls
+        - name: Cache Docker layers
+          uses: actions/cache@v4
+          with:
+            path: /tmp/.docker-cache
+            key: docker-cache-${{ runner.os }}-${{ matrix.repo }}
+            restore-keys: |
+              docker-cache-${{ runner.os }}-
+
+        # Pre-install dependencies for better performance
+        - name: Install dependencies
+          run: |
+            sudo apt-get update && sudo apt-get install -y jq curl
+            # Configure Docker to use cache
+            sudo mkdir -p /etc/docker
+            echo '{"data-root": "/tmp/.docker-cache"}' | sudo tee /etc/docker/daemon.json
+            sudo systemctl restart docker
+
+        - name: Run optimized scan script
+          env:
+            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            MAX_PARALLEL_JOBS: ${{ env.MAX_PARALLEL_JOBS }}
+            MAX_TAGS: ${{ env.MAX_TAGS }}
+          run: |
+            chmod +x scan-repo.sh 
+            ./scan-repo.sh ${{ matrix.repo }}
+
+        - name: Upload Trivy artifacts
+          if: always()
+          uses: actions/upload-artifact@v4
+          with:
+            name: trivy-published-scan-${{ matrix.repo }}
+            path: artifacts
+            retention-days: 30  # Reduce retention to save storage
+
+        - name: Notify Slack on failure
+          if: failure()
+          uses: rtCamp/action-slack-notify@v2
+          env:
+            SLACK_COLOR: 'failure'
+            SLACK_MESSAGE: |
+              ⚠️ Vulnerabilities found in published ${{ matrix.repo }} Docker images.
+              Scanned ${{ env.MAX_TAGS }} most recent tags.
+              Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            SLACK_TITLE: "❌ Trivy Scan Failed: ${{ matrix.repo }}"
+            SLACK_USERNAME: liquibot
+            SLACK_WEBHOOK: ${{ secrets.DOCKER_SLACK_WEBHOOK_URL }}
+            SLACK_ICON_EMOJI: ":whale:"
+            SLACK_LINK_NAMES: true
+
+  # Summary job to provide scan overview
+  scan-summary:
+    needs: scan-published-images
     runs-on: ubuntu-22.04
-    name: Trivy Scan - liquibase
+    if: always()
+    name: Published Scan Summary
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Run scan script
-        run: |
-          # Ensure the script is executable
-          chmod +x scan-repo.sh 
-          ./scan-repo.sh liquibase
-
-      - name: Upload Trivy artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
+      - name: Download all scan artifacts
+        uses: actions/download-artifact@v4
         with:
-          name: trivy-published-scan-liquibase
-          path: artifacts
+          path: all-artifacts
 
-      - name: Notify Slack on failure
-        if: failure()
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_COLOR: 'failure'
-          SLACK_MESSAGE: "⚠️ Vulnerabilities found in published Liquibase Docker images.\nRun: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          SLACK_TITLE: "❌ Trivy Scan Failed: liquibase"
-          SLACK_USERNAME: liquibot
-          SLACK_WEBHOOK: ${{ secrets.DOCKER_SLACK_WEBHOOK_URL }}
-          SLACK_ICON_EMOJI: ":whale:"
-          SLACK_LINK_NAMES: true
-
-  scan-liquibase-pro-published-images:
-    runs-on: ubuntu-22.04
-    name: Trivy Scan - liquibase-pro
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Run scan script
+      - name: Generate scan summary
         run: |
-          # Ensure the script is executable
-          chmod +x scan-repo.sh
-          ./scan-repo.sh liquibase-pro
-
-      - name: Upload Trivy artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: trivy-published-scan-liquibase-pro
-          path: artifacts
-
-      - name: Notify Slack on failure
-        if: failure()
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_COLOR: 'failure'
-          SLACK_MESSAGE: "⚠️ Vulnerabilities found in published Liquibase Pro Docker images.\nRun: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          SLACK_TITLE: "❌ Trivy Scan Failed: liquibase-pro"
-          SLACK_USERNAME: liquibot
-          SLACK_WEBHOOK: ${{ secrets.DOCKER_SLACK_WEBHOOK_URL }}
-          SLACK_ICON_EMOJI: ":whale:"
-          SLACK_LINK_NAMES: true
+          echo "# Published Image Scan Summary" >> $GITHUB_STEP_SUMMARY
+          echo "Scan completed at: $(date)" >> $GITHUB_STEP_SUMMARY
+          echo "Maximum tags scanned per repository: ${{ env.MAX_TAGS }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          for repo in liquibase liquibase-pro; do
+            if [ -f "all-artifacts/trivy-published-scan-$repo/scan-summary.txt" ]; then
+              echo "## $repo" >> $GITHUB_STEP_SUMMARY
+              cat "all-artifacts/trivy-published-scan-$repo/scan-summary.txt" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
