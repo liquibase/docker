@@ -165,110 +165,58 @@ jobs:
     #       name: security-report-scout${{ matrix.image.suffix }}
     #       path: ./reports/scout${{ matrix.image.suffix }}/summary.pdf
 
-  trivy_published:
-    name: Trivy Scan Published Images
+  scan-liquibase-published-images:
     runs-on: ubuntu-22.04
-    permissions:
-      contents: read
-      security-events: write
-      actions: read
-
+    name: Trivy Scan - liquibase
     steps:
-      - name: Install jq and curl
-        run: sudo apt-get update && sudo apt-get install -y jq curl
+      - uses: actions/checkout@v4
 
-      - name: Install Trivy
-        run: |
-          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
-          trivy --version
+      - name: Run scan script
+        run: ./scan-repo.sh liquibase
 
-      - name: Fetch and scan Docker tags
-        env:
-          DOCKERHUB_NAMESPACE: liquibase
-        run: |
-          mkdir -p sarif-outputs
-          touch trivy-failures.txt
+      - name: Upload Trivy artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-published-scan-liquibase
+          path: artifacts
 
-          fetch_tags() {
-            local repo=$1
-            local url="https://hub.docker.com/v2/repositories/${DOCKERHUB_NAMESPACE}/${repo}/tags?page_size=100"
-            while [ -n "$url" ]; do
-              echo "Fetching: $url"
-              response=$(curl -s "$url")
-              echo "$response" | jq -r '.results[].name'
-              url=$(echo "$response" | jq -r '.next')
-              [ "$url" = "null" ] && break
-            done
-          }
-
-          scan_tag() {
-            local repo=$1
-            local tag=$2
-            local image="docker.io/${DOCKERHUB_NAMESPACE}/${repo}:${tag}"
-            local sarif="sarif-outputs/${repo//\//-}--${tag//\//-}.sarif"
-            echo "🔍 Scanning $image"
-
-            if docker pull "$image"; then
-              if ! trivy image \
-                --vuln-type os,library \
-                --scanners vuln \
-                --format sarif \
-                --output "$sarif" \
-                --severity HIGH,CRITICAL \
-                --exit-code 1 \
-                "$image"; then
-                echo "$image" >> trivy-failures.txt
-                echo "⚠️ Vulnerabilities found in $image"
-              fi
-            else
-              echo "❌ Failed to pull $image"
-            fi
-
-            # Prune pulled image and clean Docker cache
-            docker image rm "$image" || true
-            docker system prune -f -a --volumes || true
-          }
-
-          for repo in liquibase liquibase-pro; do
-            echo "Fetching and scanning tags for $repo..."
-            for tag in $(fetch_tags "$repo"); do
-              scan_tag "$repo" "$tag"
-            done
-          done
-
-      - name: Notify Slack on Published Image Scan Failure
+      - name: Notify Slack on failure
         if: failure()
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_COLOR: 'failure'
-          SLACK_MESSAGE: "⚠️ Vulnerabilities were found in one or more published Docker images. See GitHub Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          SLACK_TITLE: "❌ Docker Image Scan Failed for Liquibase Images"
+          SLACK_MESSAGE: "⚠️ Vulnerabilities found in published Liquibase Docker images.\nRun: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          SLACK_TITLE: "❌ Trivy Scan Failed: liquibase"
           SLACK_USERNAME: liquibot
           SLACK_WEBHOOK: ${{ secrets.DOCKER_SLACK_WEBHOOK_URL }}
           SLACK_ICON_EMOJI: ":whale:"
-          SLACK_FOOTER: "${{ github.repository }}"
           SLACK_LINK_NAMES: true
 
-      - name: Upload all SARIF results
-        if: always()
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: sarif-outputs
-          category: trivy-published
+  scan-liquibase-pro-published-images:
+    runs-on: ubuntu-22.04
+    name: Trivy Scan - liquibase-pro
+    steps:
+      - uses: actions/checkout@v4
 
-      - name: Upload all Trivy scan artifacts
+      - name: Run scan script
+        run: ./scan-repo.sh liquibase-pro
+
+      - name: Upload Trivy artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: trivy-published-scan-artifacts
-          path: sarif-outputs
+          name: trivy-published-scan-liquibase-pro
+          path: artifacts
 
-      - name: Print summary of failed scans
-        if: always()
-        run: |
-          if [ -s trivy-failures.txt ]; then
-            echo "❌ The following images had HIGH/CRITICAL vulnerabilities:"
-            cat trivy-failures.txt
-          else
-            echo "✅ No vulnerabilities found across all scanned images."
-          fi
+      - name: Notify Slack on failure
+        if: failure()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_COLOR: 'failure'
+          SLACK_MESSAGE: "⚠️ Vulnerabilities found in published Liquibase Pro Docker images.\nRun: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          SLACK_TITLE: "❌ Trivy Scan Failed: liquibase-pro"
+          SLACK_USERNAME: liquibot
+          SLACK_WEBHOOK: ${{ secrets.DOCKER_SLACK_WEBHOOK_URL }}
+          SLACK_ICON_EMOJI: ":whale:"
+          SLACK_LINK_NAMES: true
