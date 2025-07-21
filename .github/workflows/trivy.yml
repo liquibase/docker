@@ -177,44 +177,62 @@ jobs:
       - name: Install jq and curl
         run: sudo apt-get update && sudo apt-get install -y jq curl
 
+      - name: Install Trivy
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+          trivy --version
+
       - name: Fetch and scan Docker tags
+        env:
+          DOCKERHUB_NAMESPACE: liquibase
         run: |
           mkdir -p sarif-outputs
           touch trivy-failures.txt
 
-          scan_image() {
+          fetch_tags() {
+            local repo=$1
+            local url="https://hub.docker.com/v2/repositories/${DOCKERHUB_NAMESPACE}/${repo}/tags?page_size=100"
+            while [ -n "$url" ]; do
+              echo "Fetching: $url"
+              response=$(curl -s "$url")
+              echo "$response" | jq -r '.results[].name'
+              url=$(echo "$response" | jq -r '.next')
+              [ "$url" = "null" ] && break
+            done
+          }
+
+          scan_tag() {
             local repo=$1
             local tag=$2
-            local image="liquibase/$repo:$tag"
-            local sanitized_name="${repo//\//-}--${tag//\//-}"
-            local sarif_file="sarif-outputs/${sanitized_name}.sarif"
+            local image="docker.io/${DOCKERHUB_NAMESPACE}/${repo}:${tag}"
+            local sarif="sarif-outputs/${repo//\//-}--${tag//\//-}.sarif"
+            echo "🔍 Scanning $image"
 
-            echo "🔍 Scanning $image..."
             if docker pull "$image"; then
               if ! trivy image \
                 --vuln-type os,library \
                 --scanners vuln \
                 --format sarif \
-                --output "$sarif_file" \
+                --output "$sarif" \
                 --severity HIGH,CRITICAL \
                 --exit-code 1 \
                 "$image"; then
                 echo "$image" >> trivy-failures.txt
                 echo "⚠️ Vulnerabilities found in $image"
-              else
-                echo "✅ No critical vulnerabilities in $image"
               fi
             else
               echo "❌ Failed to pull $image"
             fi
+
+            # Prune pulled image and clean Docker cache
+            docker image rm "$image" || true
+            docker system prune -f -a --volumes || true
           }
 
           for repo in liquibase liquibase-pro; do
-            echo "Fetching tags for liquibase/$repo"
-            tags=$(curl -s "https://hub.docker.com/v2/repositories/liquibase/$repo/tags?page_size=100" | jq -r '.results[].name')
-
-            for tag in $tags; do
-              scan_image "$repo" "$tag"
+            echo "Fetching and scanning tags for $repo..."
+            for tag in $(fetch_tags "$repo"); do
+              scan_tag "$repo" "$tag"
             done
           done
 
