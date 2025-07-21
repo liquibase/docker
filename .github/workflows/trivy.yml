@@ -172,7 +172,10 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Run scan script
-        run: ./scan-repo.sh liquibase
+        run: |
+          # Ensure the script is executable
+          chmod +x scan-repo.sh 
+          ./scan-repo.sh liquibase
 
       - name: Upload Trivy artifacts
         if: always()
@@ -200,7 +203,9 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Run scan script
-        run: ./scan-repo.sh liquibase-pro
+        run: |
+          chmod +x scan-repo.sh
+          ./scan-repo.sh liquibase-pro
 
       - name: Upload Trivy artifacts
         if: always()
