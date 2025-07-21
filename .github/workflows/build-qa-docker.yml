@@ -97,14 +97,6 @@ jobs:
             org.opencontainers.image.vendor=Liquibase
             org.opencontainers.image.version=${{ inputs.liquibaseVersion }}
             org.opencontainers.image.documentation=https://docs.liquibase.com
-          annotations: |
-            org.opencontainers.image.source=https://github.com/liquibase/docker
-            org.opencontainers.image.description=Liquibase QA Container Image${{ matrix.suffix }}
-            org.opencontainers.image.licenses=Apache-2.0
-            org.opencontainers.image.vendor=Liquibase
-            org.opencontainers.image.version=${{ inputs.liquibaseVersion }}
-            org.opencontainers.image.documentation=https://docs.liquibase.com
-
       - name: Image build summary
         if: ${{ matrix.condition == true }}
         run: |
