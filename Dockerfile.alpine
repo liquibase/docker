@@ -11,8 +11,8 @@ RUN apk add --no-cache openjdk21-jre-headless bash
 
 WORKDIR /liquibase
 
-ARG LIQUIBASE_VERSION=4.32.0
-ARG LB_SHA256=10910d42ae9990c95a4ac8f0a3665a24bd40d08fb264055d78b923a512774d54
+ARG LIQUIBASE_VERSION=4.33.0
+ARG LB_SHA256=689acfcdc97bad0d4c150d1efab9c851e251b398cb3d6326f75e8aafe40ed578
 
 # Download, verify, extract
 RUN set -x && \
@@ -26,9 +26,9 @@ RUN set -x && \
     ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \
     liquibase --version
     
-ARG LPM_VERSION=0.2.9
-ARG LPM_SHA256=b9caecd34c98a6c19a2bc582e8064aff5251c5f1adbcd100d3403c5eceb5373a
-ARG LPM_SHA256_ARM=0adb3a96d7384b4da549979bf00217a8914f0df37d1ed8fdb1b4a4baebfa104c
+ARG LPM_VERSION=0.2.11
+ARG LPM_SHA256=d07d1373446d2a9f11010649d705eba2ebefc23aedffec58d4d0a117c9a195b7
+ARG LPM_SHA256_ARM=77c8cf8369ad07ed536c3b4c352e40815f32f89b111cafabf8e3cfc102d912f8
 
 # Add metadata labels
 LABEL org.opencontainers.image.description="Liquibase Container Image (Alpine)"
