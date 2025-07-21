@@ -75,38 +75,37 @@ scan_tag() {
 # Create parallel job control
 echo "🚀 Starting parallel scans (max $MAX_PARALLEL_JOBS jobs)..."
 
-# Create a temporary file to store valid tags
-temp_tags_file=$(mktemp)
-
-# Get tags and filter valid ones
-fetch_recent_tags | while IFS= read -r tag; do
+# Get tags and filter valid ones into an array
+valid_tags=()
+while IFS= read -r tag; do
   if [[ "$tag" =~ ^[a-zA-Z0-9._-]+$ ]]; then
-    echo "$tag" >> "$temp_tags_file"
+    valid_tags+=("$tag")
   else
     echo "⚠️ Skipping invalid tag: $tag"
   fi
+done < <(fetch_recent_tags)
+
+echo "Found ${#valid_tags[@]} valid tags to scan"
+
+# Process tags with controlled parallelism
+active_jobs=0
+for tag in "${valid_tags[@]}"; do
+  # Start scan in background
+  scan_tag "$tag" &
+  
+  ((active_jobs++))
+  
+  # Wait if we've reached the job limit
+  if ((active_jobs >= MAX_PARALLEL_JOBS)); then
+    wait -n  # Wait for any job to complete
+    ((active_jobs--))
+  fi
 done
 
-# Use GNU parallel or bash jobs with proper syntax
-if command -v parallel >/dev/null 2>&1; then
-  echo "Using GNU parallel for processing"
-  cat "$temp_tags_file" | parallel -j "$MAX_PARALLEL_JOBS" scan_tag {}
-else
-  echo "Using bash jobs for parallel processing"
-  # Process tags in parallel using bash jobs
-  while IFS= read -r tag; do
-    scan_tag "$tag" &
-    
-    # Limit concurrent jobs
-    (($(jobs -r | wc -l) >= MAX_PARALLEL_JOBS)) && wait
-  done < "$temp_tags_file"
-  
-  # Wait for remaining jobs
-  wait
-fi
+# Wait for all remaining jobs to complete
+wait
 
-# Clean up temp file
-rm -f "$temp_tags_file"
+echo "Completed scanning ${#valid_tags[@]} tags"
 
 # Clean up Docker to free space
 docker system prune -f -a --volumes 2>/dev/null || true
