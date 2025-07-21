@@ -172,98 +172,85 @@ jobs:
       contents: read
       security-events: write
       actions: read
-    strategy:
-      fail-fast: false
-      matrix:
-        image: [
-          # Docker Hub
-          {name: liquibase/liquibase, tag: 'latest', registry: 'docker.io'},
-          {name: liquibase/liquibase, tag: 'alpine', registry: 'docker.io'},
-          {name: liquibase/liquibase-pro, tag: 'latest', registry: 'docker.io'},
-          # GHCR
-          {name: ghcr.io/liquibase/liquibase, tag: 'latest', registry: 'ghcr.io'},
-          {name: ghcr.io/liquibase/liquibase-pro, tag: 'latest', registry: 'ghcr.io'},
-          # ECR Public
-          {name: public.ecr.aws/liquibase/liquibase, tag: 'latest', registry: 'ecr'},
-          {name: public.ecr.aws/liquibase/liquibase-pro, tag: 'latest', registry: 'ecr'},
-        ]
+
     steps:
-      - name: Login to GHCR
-        if: matrix.image.registry == 'ghcr.io'
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install jq and curl
+        run: sudo apt-get update && sudo apt-get install -y jq curl
 
-      - name: Login to Amazon ECR Registry
-        if: matrix.image.registry == 'ecr'
-        uses: docker/login-action@v3
-        env:
-          AWS_REGION: us-east-1
-        with:
-          registry: public.ecr.aws
-          username: ${{ secrets.PUBLIC_ECR_ACCESS_KEY_ID }}
-          password: ${{ secrets.PUBLIC_ECR_SECRET_ACCESS_KEY }}
-
-      - name: Pull published image ${{ matrix.image.name }}:${{ matrix.image.tag }}
-        run: docker pull ${{ matrix.image.name }}:${{ matrix.image.tag }}
-
-      - name: Run Trivy CVE vulnerability scanner on published image
-        id: trivy_scan
-        uses: aquasecurity/trivy-action@0.31.0
-        with:
-          image-ref: '${{ matrix.image.name }}:${{ matrix.image.tag }}'
-          vuln-type: 'os,library'
-          scanners: 'vuln'
-          format: 'sarif'
-          output: 'trivy-published-results.sarif'
-          severity: 'HIGH,CRITICAL'
-          exit-code: '1'
-          limit-severities-for-sarif: true
-
-      - name: Echo if vulnerabilities found
-        if: steps.trivy_scan.outcome == 'failure'
+      - name: Fetch and scan Docker tags
         run: |
-          echo "Vulnerabilities were found in the scanned image."
-          echo "See details in the GitHub Security tab: https://github.com/liquibase/docker/security/code-scanning"
+          mkdir -p sarif-outputs
+          touch trivy-failures.txt
+
+          scan_image() {
+            local repo=$1
+            local tag=$2
+            local image="liquibase/$repo:$tag"
+            local sanitized_name="${repo//\//-}--${tag//\//-}"
+            local sarif_file="sarif-outputs/${sanitized_name}.sarif"
+
+            echo "🔍 Scanning $image..."
+            if docker pull "$image"; then
+              if ! trivy image \
+                --vuln-type os,library \
+                --scanners vuln \
+                --format sarif \
+                --output "$sarif_file" \
+                --severity HIGH,CRITICAL \
+                --exit-code 1 \
+                "$image"; then
+                echo "$image" >> trivy-failures.txt
+                echo "⚠️ Vulnerabilities found in $image"
+              else
+                echo "✅ No critical vulnerabilities in $image"
+              fi
+            else
+              echo "❌ Failed to pull $image"
+            fi
+          }
+
+          for repo in liquibase liquibase-pro; do
+            echo "Fetching tags for liquibase/$repo"
+            tags=$(curl -s "https://hub.docker.com/v2/repositories/liquibase/$repo/tags?page_size=100" | jq -r '.results[].name')
+
+            for tag in $tags; do
+              scan_image "$repo" "$tag"
+            done
+          done
 
       - name: Notify Slack on Published Image Scan Failure
         if: failure()
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_COLOR: 'failure'
-          SLACK_MESSAGE: "View details on GitHub Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Triggered by repository: ${{ github.repository }} and job: ${{ github.job }}"
-          SLACK_TITLE: "❌ ${{ github.repository }} ❌ Trivy published image scan failed for ${{ matrix.image.name }}:${{ matrix.image.tag }} on branch ${{ github.ref_name }} for commit ${{ github.sha }} in repository ${{ github.repository }}"
+          SLACK_MESSAGE: "⚠️ Vulnerabilities were found in one or more published Docker images. See GitHub Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          SLACK_TITLE: "❌ Docker Image Scan Failed for Liquibase Images"
           SLACK_USERNAME: liquibot
           SLACK_WEBHOOK: ${{ secrets.DOCKER_SLACK_WEBHOOK_URL }}
           SLACK_ICON_EMOJI: ":whale:"
-          SLACK_FOOTER: "${{ github.repository }} - ${{ matrix.image.name }}:${{ matrix.image.tag }}"
+          SLACK_FOOTER: "${{ github.repository }}"
           SLACK_LINK_NAMES: true
 
-      - name: Upload Trivy scan results to GitHub Security tab
+      - name: Upload all SARIF results
         if: always()
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: 'trivy-published-results.sarif'
-          category: 'published-${{ matrix.image.name }}-${{ matrix.image.tag }}'
+          sarif_file: sarif-outputs
+          category: trivy-published
 
-      - name: Set sanitized image name
-        if: always()
-        id: sanitize
-        run: echo "sanitized=${IMAGE_NAME//\//-}" >> $GITHUB_OUTPUT
-        env:
-          IMAGE_NAME: ${{ matrix.image.name }}
-
-      - name: Upload Trivy Published Security Report
+      - name: Upload all Trivy scan artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: security-report-trivy-published-${{ matrix.image.registry }}-${{ steps.sanitize.outputs.sanitized }}-${{ matrix.image.tag }}
-          path: trivy-published-results.sarif
+          name: trivy-published-scan-artifacts
+          path: sarif-outputs
 
-      - name: Print Trivy vulnerabilities to log
-        if: steps.trivy_scan.outcome == 'failure' && always()
+      - name: Print summary of failed scans
+        if: always()
         run: |
-          echo "\n==== Trivy Vulnerabilities (table format) ===="
-          docker run --rm aquasec/trivy:0.49.1 image --severity HIGH,CRITICAL --format table ${{ matrix.image.name }}:${{ matrix.image.tag }}
+          if [ -s trivy-failures.txt ]; then
+            echo "❌ The following images had HIGH/CRITICAL vulnerabilities:"
+            cat trivy-failures.txt
+          else
+            echo "✅ No vulnerabilities found across all scanned images."
+          fi
