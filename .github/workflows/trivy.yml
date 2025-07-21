@@ -168,16 +168,10 @@ jobs:
   scan-liquibase-published-images:
     runs-on: ubuntu-22.04
     name: Trivy Scan - liquibase
-    permissions:
-      contents: read
-      security-events: write
-      actions: read
     steps:
       - uses: actions/checkout@v4
 
       - name: Run scan script
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
           # Ensure the script is executable
           chmod +x scan-repo.sh 
@@ -205,17 +199,12 @@ jobs:
   scan-liquibase-pro-published-images:
     runs-on: ubuntu-22.04
     name: Trivy Scan - liquibase-pro
-    permissions:
-      contents: read
-      security-events: write
-      actions: read
     steps:
       - uses: actions/checkout@v4
 
       - name: Run scan script
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
+          # Ensure the script is executable
           chmod +x scan-repo.sh
           ./scan-repo.sh liquibase-pro
 
