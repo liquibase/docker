@@ -43,7 +43,7 @@ jobs:
               {"dockerfile": "DockerfilePro", "image_name": "liquibase-pro-qa", "suffix": "-pro"} 
             ]
           }' > matrix.json
-          echo "::set-output name=matrix::$(cat matrix.json)"
+          echo "matrix=$(cat matrix.json)" >> $GITHUB_OUTPUT
 
       - name: Checkout code
         if: ${{ matrix.condition == true }}
