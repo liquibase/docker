@@ -68,22 +68,41 @@ scan_tag() {
   docker image rm "$image" 2>/dev/null || true
 }
 
-# Export function for parallel execution
-export -f scan_tag
-export DOCKERHUB_NAMESPACE REPO_NAME
-
 # Create parallel job control
 echo "🚀 Starting parallel scans (max $MAX_PARALLEL_JOBS jobs)..."
 
-# Get tags and run parallel scans
+# Create a temporary file to store valid tags
+temp_tags_file=$(mktemp)
+
+# Get tags and filter valid ones
 fetch_recent_tags | while IFS= read -r tag; do
   if [[ "$tag" =~ ^[a-zA-Z0-9._-]+$ ]]; then
-    # Use xargs for parallel processing with job limit
-    echo "$tag"
+    echo "$tag" >> "$temp_tags_file"
   else
-    echo "⚠️ Skipping invalid tag: $tag" >&2
+    echo "⚠️ Skipping invalid tag: $tag"
   fi
-done | xargs -n 1 -P "$MAX_PARALLEL_JOBS" -I {} bash -c 'scan_tag "$@"' _ {}
+done
+
+# Use GNU parallel or xargs with proper syntax
+if command -v parallel >/dev/null 2>&1; then
+  echo "Using GNU parallel for processing"
+  cat "$temp_tags_file" | parallel -j "$MAX_PARALLEL_JOBS" scan_tag {}
+else
+  echo "Using xargs for parallel processing"
+  # Process tags in parallel using xargs with proper function call
+  while IFS= read -r tag; do
+    scan_tag "$tag" &
+    
+    # Limit concurrent jobs
+    (($(jobs -r | wc -l) >= MAX_PARALLEL_JOBS)) && wait
+  done < "$temp_tags_file"
+  
+  # Wait for remaining jobs
+  wait
+fi
+
+# Clean up temp file
+rm -f "$temp_tags_file"
 
 # Clean up Docker to free space
 docker system prune -f -a --volumes 2>/dev/null || true
