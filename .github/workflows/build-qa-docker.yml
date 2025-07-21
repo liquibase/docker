@@ -7,6 +7,11 @@ permissions:
 on:
   workflow_dispatch:
     inputs:
+      liquibaseBranch:
+        description: "Liquibase branch to build from (e.g., master, feature-branch)"
+        required: true
+        type: string
+        default: "master"
       liquibaseVersion:
         description: "Liquibase Version (e.g., 4.33.0)"
         required: true
@@ -64,6 +69,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.liquibaseBranch }}
 
       - name: Configure AWS credentials for vault access
         uses: aws-actions/configure-aws-credentials@v4
@@ -101,6 +108,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
           provenance: false
           tags: |
+            ${{ env.REPO_URL }}/${{ matrix.image_name }}:${{ inputs.liquibaseVersion }}-${{ inputs.liquibaseBranch }}
             ${{ env.REPO_URL }}/${{ matrix.image_name }}:${{ inputs.liquibaseVersion }}
           labels: |
             org.opencontainers.image.source=https://github.com/liquibase/docker
@@ -109,6 +117,9 @@ jobs:
             org.opencontainers.image.vendor=Liquibase
             org.opencontainers.image.version=${{ inputs.liquibaseVersion }}
             org.opencontainers.image.documentation=https://docs.liquibase.com
+            org.opencontainers.image.revision=${{ github.sha }}
+            liquibase.branch=${{ inputs.liquibaseBranch }}
       - name: Image build summary
         run: |
-          echo "Successfully built and pushed: ${{ env.REPO_URL }}/${{ matrix.image_name }}:${{ inputs.liquibaseVersion }}"
+          echo "Successfully built and pushed: ${{ env.REPO_URL }}/${{ matrix.image_name }}:${{ inputs.liquibaseVersion }}-${{ inputs.liquibaseBranch }}"
+          echo "Also tagged as: ${{ env.REPO_URL }}/${{ matrix.image_name }}:${{ inputs.liquibaseVersion }}"
