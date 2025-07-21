@@ -253,6 +253,7 @@ jobs:
     needs: scan-published-images
     runs-on: ubuntu-22.04
     if: always()
+    name: Published Scan Summary
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
@@ -263,6 +264,7 @@ jobs:
         run: |
           echo "# Trivy Scan Summary" >> $GITHUB_STEP_SUMMARY
           echo "Scan completed at: $(date)" >> $GITHUB_STEP_SUMMARY
+          echo "Maximum tags scanned per repository: ${{ env.MAX_TAGS }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
           for repo in liquibase liquibase-pro; do

@@ -44,7 +44,7 @@ scan_tag() {
   local image="docker.io/${DOCKERHUB_NAMESPACE}/${REPO_NAME}:${tag}"
   local sarif="sarif-outputs/${REPO_NAME}--${tag//\//-}.sarif"
 
-  echo "🧪 [$] Scanning $image"
+  echo "🧪 [$$] Scanning $image"
   
   # Use --cache-dir for faster subsequent scans
   if docker pull "$image" 2>/dev/null; then
@@ -58,15 +58,14 @@ scan_tag() {
       --exit-code 1 \
       --timeout 10m \
       "$image" 2>/dev/null; then
-      echo "❌ VULNERABILITIES FOUND: $image" | tee -a trivy-failures.txt
-      echo "   → Tag: $tag" | tee -a trivy-failures.txt
-      echo "   → SARIF: $sarif" | tee -a trivy-failures.txt
-      echo "" | tee -a trivy-failures.txt
+      echo "❌ VULNERABILITIES FOUND: $image"
+      echo "$tag" >> trivy-failures.txt
     else
       echo "✅ CLEAN: $image"
     fi
   else
-    echo "❌ Failed to pull $image" | tee -a trivy-failures.txt
+    echo "❌ Failed to pull $image"
+    echo "PULL_FAILED:$tag" >> trivy-failures.txt
   fi
 
   # Clean up immediately to save disk space
@@ -88,13 +87,13 @@ fetch_recent_tags | while IFS= read -r tag; do
   fi
 done
 
-# Use GNU parallel or xargs with proper syntax
+# Use GNU parallel or bash jobs with proper syntax
 if command -v parallel >/dev/null 2>&1; then
   echo "Using GNU parallel for processing"
   cat "$temp_tags_file" | parallel -j "$MAX_PARALLEL_JOBS" scan_tag {}
 else
-  echo "Using xargs for parallel processing"
-  # Process tags in parallel using xargs with proper function call
+  echo "Using bash jobs for parallel processing"
+  # Process tags in parallel using bash jobs
   while IFS= read -r tag; do
     scan_tag "$tag" &
     
@@ -114,6 +113,11 @@ docker system prune -f -a --volumes 2>/dev/null || true
 
 echo "✅ Scanning complete for $REPO_NAME"
 
+# === ALWAYS create artifacts directory first ===
+echo "::group::Prepare artifacts"
+mkdir -p artifacts
+echo "Created artifacts directory"
+
 # === SARIF upload (only if files exist) ===
 if ls sarif-outputs/*.sarif 1> /dev/null 2>&1; then
   echo "::group::Upload SARIF results"
@@ -124,40 +128,73 @@ if ls sarif-outputs/*.sarif 1> /dev/null 2>&1; then
     runs: map(select(.runs) | .runs[])
   }')
   
-  gh api \
-    --method POST \
-    -H "Accept: application/vnd.github+json" \
-    /repos/${GITHUB_REPOSITORY}/code-scanning/sarifs \
-    -f commit_sha="${GITHUB_SHA}" \
-    -f ref="${GITHUB_REF}" \
-    --input <(echo "$combined_sarif") \
-    -F checkout_uri="file://$(pwd)" \
-    -F started_at="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+  if [ -n "$GITHUB_REPOSITORY" ] && [ -n "$GITHUB_SHA" ] && [ -n "$GITHUB_REF" ]; then
+    gh api \
+      --method POST \
+      -H "Accept: application/vnd.github+json" \
+      /repos/${GITHUB_REPOSITORY}/code-scanning/sarifs \
+      -f commit_sha="${GITHUB_SHA}" \
+      -f ref="${GITHUB_REF}" \
+      --input <(echo "$combined_sarif") \
+      -F checkout_uri="file://$(pwd)" \
+      -F started_at="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" || echo "SARIF upload failed, continuing..."
+  else
+    echo "GitHub environment variables missing, skipping SARIF upload"
+  fi
   echo "::endgroup::"
 else
   echo "⚠️ No SARIF files generated"
 fi
 
-# === Upload scan artifacts (more selective) ===
+# === Upload scan artifacts (ensure directory exists) ===
 echo "::group::Upload artifacts"
-mkdir -p artifacts
 
-# Copy SARIF files
+# Copy SARIF files if they exist
 if [ -d sarif-outputs ]; then
   find sarif-outputs -name "*.sarif" -type f -exec cp {} artifacts/ \; 2>/dev/null || true
-  sarif_count=$(find sarif-outputs -name "*.sarif" -type f | wc -l)
+  sarif_count=$(find sarif-outputs -name "*.sarif" -type f 2>/dev/null | wc -l)
+  echo "Copied $sarif_count SARIF files to artifacts/"
 else
   sarif_count=0
+  echo "No sarif-outputs directory found"
 fi
 
-# Copy failure log (create empty if doesn't exist)
-cp trivy-failures.txt artifacts/ 2>/dev/null || touch artifacts/trivy-failures.txt
+# Always create trivy-failures.txt in artifacts (even if empty)
+if [ -f trivy-failures.txt ]; then
+  cp trivy-failures.txt artifacts/
+  echo "Copied trivy-failures.txt to artifacts/"
+else
+  touch artifacts/trivy-failures.txt
+  echo "Created empty trivy-failures.txt in artifacts/"
+fi
 
-# Create summary file for workflow
+# Always create summary file
 echo "Scanned repository: $REPO_NAME" > artifacts/scan-summary.txt
 echo "Tags scanned: $sarif_count" >> artifacts/scan-summary.txt
 echo "Scan date: $(date)" >> artifacts/scan-summary.txt
 echo "Max tags limit: $MAX_TAGS" >> artifacts/scan-summary.txt
+echo "Script completed successfully" >> artifacts/scan-summary.txt
+
+# Create a README for troubleshooting
+echo "Liquibase Docker Scan Results" > artifacts/README.md
+echo "=============================" >> artifacts/README.md
+echo "" >> artifacts/README.md
+echo "Repository: $REPO_NAME" >> artifacts/README.md
+echo "Scan Date: $(date)" >> artifacts/README.md
+echo "SARIF Files: $sarif_count" >> artifacts/README.md
+echo "" >> artifacts/README.md
+if [ -s artifacts/trivy-failures.txt ]; then
+  echo "⚠️ Vulnerable Tags Found:" >> artifacts/README.md
+  echo "\`\`\`" >> artifacts/README.md
+  cat artifacts/trivy-failures.txt >> artifacts/README.md
+  echo "\`\`\`" >> artifacts/README.md
+else
+  echo "✅ No vulnerabilities found in scanned images!" >> artifacts/README.md
+fi
+
+# Verify artifacts directory content
+echo "Artifacts directory contents:"
+ls -la artifacts/ || echo "Failed to list artifacts directory"
 
 echo "::endgroup::"
 
