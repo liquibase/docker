@@ -44,7 +44,7 @@ scan_tag() {
   local image="docker.io/${DOCKERHUB_NAMESPACE}/${REPO_NAME}:${tag}"
   local sarif="sarif-outputs/${REPO_NAME}--${tag//\//-}.sarif"
 
-  echo "🧪 [$$] Scanning $image"
+  echo "🧪 [$] Scanning $image"
   
   # Use --cache-dir for faster subsequent scans
   if docker pull "$image" 2>/dev/null; then
@@ -58,10 +58,15 @@ scan_tag() {
       --exit-code 1 \
       --timeout 10m \
       "$image" 2>/dev/null; then
-      echo "$image" >> trivy-failures.txt
+      echo "❌ VULNERABILITIES FOUND: $image" | tee -a trivy-failures.txt
+      echo "   → Tag: $tag" | tee -a trivy-failures.txt
+      echo "   → SARIF: $sarif" | tee -a trivy-failures.txt
+      echo "" | tee -a trivy-failures.txt
+    else
+      echo "✅ CLEAN: $image"
     fi
   else
-    echo "❌ Failed to pull $image"
+    echo "❌ Failed to pull $image" | tee -a trivy-failures.txt
   fi
 
   # Clean up immediately to save disk space
@@ -136,21 +141,29 @@ fi
 # === Upload scan artifacts (more selective) ===
 echo "::group::Upload artifacts"
 mkdir -p artifacts
-if [ -d sarif-outputs ] && [ "$(ls -A sarif-outputs)" ]; then
-  # Only upload non-empty SARIF files
-  find sarif-outputs -name "*.sarif" -size +0 -exec cp {} artifacts/ \;
-fi
-cp trivy-failures.txt artifacts/ 2>/dev/null || true
 
-# Create summary file
+# Copy SARIF files
+if [ -d sarif-outputs ]; then
+  find sarif-outputs -name "*.sarif" -type f -exec cp {} artifacts/ \; 2>/dev/null || true
+  sarif_count=$(find sarif-outputs -name "*.sarif" -type f | wc -l)
+else
+  sarif_count=0
+fi
+
+# Copy failure log (create empty if doesn't exist)
+cp trivy-failures.txt artifacts/ 2>/dev/null || touch artifacts/trivy-failures.txt
+
+# Create summary file for workflow
 echo "Scanned repository: $REPO_NAME" > artifacts/scan-summary.txt
-echo "Tags scanned: $(ls sarif-outputs/*.sarif 2>/dev/null | wc -l)" >> artifacts/scan-summary.txt
+echo "Tags scanned: $sarif_count" >> artifacts/scan-summary.txt
 echo "Scan date: $(date)" >> artifacts/scan-summary.txt
+echo "Max tags limit: $MAX_TAGS" >> artifacts/scan-summary.txt
+
 echo "::endgroup::"
 
 # === Print scan summary ===
 if [[ -s trivy-failures.txt ]]; then
-  echo "❌ The following images had HIGH/CRITICAL vulnerabilities:"
+  echo "❌ The following tags had HIGH/CRITICAL vulnerabilities:"
   cat trivy-failures.txt
   exit 1
 else
