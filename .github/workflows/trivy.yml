@@ -208,29 +208,29 @@ jobs:
               # Filter out "x.y" shorthand tags if equivalent "x.y.0" exists (e.g., drop 4.33 if 4.33.0 is present)
 
               # Deduplicate shorthand semver tags like "4.33" or "4.33-alpine"
-            # if the corresponding full semver tag "4.33.0" or "4.33.0-alpine" exists.
-            # This version scans all lines first before filtering.
-            TAGS=$(echo "$TAGS" | awk '
-              BEGIN {
-                # First pass: collect all full x.y.z[-suffix] versions
-                while ((getline line < "-") > 0) {
-                  tags[NR] = line
-                  if (match(line, /^([0-9]+)\.([0-9]+)\.([0-9]+)(-alpine|-latest)?$/, m)) {
-                    full = m[1] "." m[2] "." m[3] (m[4] ? m[4] : "")
-                    has_full[full] = 1
+              # if the corresponding full semver tag "4.33.0" or "4.33.0-alpine" exists.
+              # This version scans all lines first before filtering.
+              TAGS=$(echo "$TAGS" | awk '
+                BEGIN {
+                  # First pass: collect all full x.y.z[-suffix] versions
+                  while ((getline line < "-") > 0) {
+                    tags[NR] = line
+                    if (match(line, /^([0-9]+)\.([0-9]+)\.([0-9]+)(-alpine|-latest)?$/, m)) {
+                      full = m[1] "." m[2] "." m[3] (m[4] ? m[4] : "")
+                      has_full[full] = 1
+                    }
+                  }
+                  # Second pass: output only those that are not shorthand duplicates
+                  for (i = 1; i <= NR; i++) {
+                    tag = tags[i]
+                    if (match(tag, /^([0-9]+)\.([0-9]+)(-alpine|-latest)?$/, m)) {
+                      short = m[1] "." m[2] ".0" (m[3] ? m[3] : "")
+                      if (has_full[short]) continue
+                    }
+                    print tag
                   }
                 }
-                # Second pass: output only those that are not shorthand duplicates
-                for (i = 1; i <= NR; i++) {
-                  tag = tags[i]
-                  if (match(tag, /^([0-9]+)\.([0-9]+)(-alpine|-latest)?$/, m)) {
-                    short = m[1] "." m[2] ".0" (m[3] ? m[3] : "")
-                    if (has_full[short]) continue
-                  }
-                  print tag
-                }
-              }
-            ')
+              ')
 
               URL=$(echo "$RESPONSE" | jq -r '.next')
               [ "$URL" = "null" ] && break
