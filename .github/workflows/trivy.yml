@@ -203,7 +203,7 @@ jobs:
             done
 
             # Keep only the latest MAX_TAGS
-            TAGS=$(echo "$TAGS" | tail -r | head -n "$MAX_TAGS")
+            TAGS=$(echo "$TAGS" | tac | head -n "$MAX_TAGS")
 
             while IFS= read -r tag; do
               if [ -n "$tag" ]; then
