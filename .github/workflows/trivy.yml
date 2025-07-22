@@ -183,23 +183,24 @@ jobs:
         id: set-matrix
         run: |
           MAX_TAGS=${{ github.event.inputs.max_tags_to_scan || '10' }}
-          
           echo "Generating matrix for scanning with max $MAX_TAGS tags per image..."
-          
           # Initialize matrix
           MATRIX_INCLUDE="["
           FIRST=true
-          
           # Process each image
           for IMAGE in "liquibase/liquibase" "liquibase/liquibase-pro"; do
             echo "Getting tags for $IMAGE..."
-            
-            # Get tags from Docker Hub API
-            TAGS=$(curl -s "https://hub.docker.com/v2/repositories/$IMAGE/tags/?page_size=100&ordering=-last_updated" | \
-              jq -r '.results[] | select(.tag_status == "active") | .name' | \
-              head -n $MAX_TAGS)
-            
-            # Add each tag to matrix
+            REPO=$(basename "$IMAGE")
+            TAGS=""
+            URL="https://hub.docker.com/v2/namespaces/liquibase/repositories/${REPO}/tags?page_size=100"
+            while [ -n "$URL" ] && [ "$(echo "$TAGS" | wc -l)" -lt "$MAX_TAGS" ]; do
+              RESPONSE=$(curl -s "$URL")
+              NEW_TAGS=$(echo "$RESPONSE" | jq -r '.results[] | select(.tag_status == "active") | .name')
+              TAGS=$(echo -e "$TAGS\n$NEW_TAGS" | sort -u | head -n "$MAX_TAGS")
+              URL=$(echo "$RESPONSE" | jq -r '.next')
+              [ "$URL" = "null" ] && break
+            done
+
             while IFS= read -r tag; do
               if [ -n "$tag" ]; then
                 if [ "$FIRST" = true ]; then
@@ -211,10 +212,10 @@ jobs:
               fi
             done <<< "$TAGS"
           done
-          
+
           MATRIX_INCLUDE="${MATRIX_INCLUDE}]"
           MATRIX="{\"include\":$MATRIX_INCLUDE}"
-          
+
           echo "Generated matrix: $MATRIX"
           echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
 
