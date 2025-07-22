@@ -324,6 +324,21 @@ jobs:
           echo "❌ Vulnerabilities were found in ${{ matrix.image }}:${{ matrix.tag }}"
           echo "Check the logs above for detailed vulnerability information"
           exit 1
+      
+      - name: Append summary to GitHub Actions summary
+        if: always()
+        run: |
+          echo "### 🛡️ Trivy Summary for \`${{ matrix.image }}:${{ matrix.tag }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Library | Vulnerability | Severity | Status | Installed | Fixed |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|---------------|----------|--------|-----------|--------|" >> $GITHUB_STEP_SUMMARY
+
+          # Extract and format top-level vulnerabilities (HIGH or CRITICAL only)
+          trivy image --severity HIGH,CRITICAL --format json "${{ matrix.image }}:${{ matrix.tag }}" |
+            jq -r '.Results[].Vulnerabilities[]? |
+              "| \(.PkgName) | \(.VulnerabilityID) | \(.Severity) | \(.Status // "-") | \(.InstalledVersion) | \(.FixedVersion // "-") |"' \
+            >> $GITHUB_STEP_SUMMARY || true
+
 
   notify-results:
     name: Notify Scan Results
