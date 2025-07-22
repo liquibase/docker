@@ -282,7 +282,7 @@ jobs:
         continue-on-error: true
 
       - name: Print Trivy vulnerabilities to log
-        if: steps.trivy_scan.outcome == 'failure' && always()
+        if: steps.trivy_scan.outcome == 'failure'
         run: |
           echo ""
           echo "==== Trivy Vulnerabilities (table format) ===="
