@@ -199,19 +199,31 @@ jobs:
                 grep -E '^[0-9]+\.[0-9]+(\.[0-9]+)?(-alpine|-latest)?$' || true)
 
               TAGS=$(echo -e "$TAGS\n$NEW_TAGS" | sort -Vu)
+              
+              # Deduplicate shorthand semver tags like "4.33" or "4.33-alpine"
+              # if the corresponding full semver tag "4.33.0" or "4.33.0-alpine" exists.
+              # This ensures we only keep the more specific version when both are present.
+              # Compatible with GNU awk (used in GitHub Actions runners).
+              # Filter out "x.y" shorthand tags if equivalent "x.y.0" exists (e.g., drop 4.33 if 4.33.0 is present)
 
-              # Deduplicate shorthand if long version exists
               TAGS=$(echo "$TAGS" | awk '
                 {
                   tag = $0
-                  if (match(tag, /^([0-9]+\.[0-9]+)(-alpine|-latest)?$/, m)) {
-                    short = m[1] (m[2] ? m[2] : "")
-                    if (seen[short ".0" m[2]]) {
-                      next
-                    }
+                  if (match(tag, /^([0-9]+)\.([0-9]+)(\.([0-9]+))?(-alpine|-latest)?$/, m)) {
+                    major = m[1]
+                    minor = m[2]
+                    patch = (m[4] == "") ? "0" : m[4]
+                    suffix = (m[5] == "") ? "" : m[5]
+                    full = major "." minor "." patch suffix
+                    short = major "." minor suffix
+                    is_shorthand = (m[3] == "")
+
+                    if (is_shorthand && seen[full]) next
+
+                    seen[tag] = 1
+                    seen[full] = 1
+                    print tag
                   }
-                  seen[tag] = 1
-                  print tag
                 }
               ')
 
