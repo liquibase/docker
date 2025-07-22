@@ -142,7 +142,7 @@ jobs:
           password: ${{ env.DOCKERHUB_TOKEN }}
 
       - name: Docker Scout
-        uses: docker/scout-action@v1.18.1
+        uses: docker/scout-action@v1.18.2
         with:
           command: cves
           image: '${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}'
