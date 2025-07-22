@@ -196,11 +196,29 @@ jobs:
             while [ -n "$URL" ]; do
               RESPONSE=$(curl -s "$URL")
               NEW_TAGS=$(echo "$RESPONSE" | jq -r '.results[] | select(.tag_status == "active") | .name' | \
-              grep -E '^[0-9]+\.[0-9]+(\.[0-9]+)?(-alpine|-latest)?$' || true)
+                grep -E '^[0-9]+\.[0-9]+(\.[0-9]+)?(-alpine|-latest)?$' || true)
+
               TAGS=$(echo -e "$TAGS\n$NEW_TAGS" | sort -Vu)
+
+              # Deduplicate shorthand if long version exists
+              TAGS=$(echo "$TAGS" | awk '
+                {
+                  tag = $0
+                  if (match(tag, /^([0-9]+\.[0-9]+)(-alpine|-latest)?$/, m)) {
+                    short = m[1] (m[2] ? m[2] : "")
+                    if (seen[short ".0" m[2]]) {
+                      next
+                    }
+                  }
+                  seen[tag] = 1
+                  print tag
+                }
+              ')
+
               URL=$(echo "$RESPONSE" | jq -r '.next')
               [ "$URL" = "null" ] && break
             done
+
 
             # Keep only the latest MAX_TAGS
             TAGS=$(echo "$TAGS" | tac | head -n "$MAX_TAGS")
