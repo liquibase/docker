@@ -193,13 +193,17 @@ jobs:
             REPO=$(basename "$IMAGE")
             TAGS=""
             URL="https://hub.docker.com/v2/namespaces/liquibase/repositories/${REPO}/tags?page_size=100"
-            while [ -n "$URL" ] && [ "$(echo "$TAGS" | wc -l)" -lt "$MAX_TAGS" ]; do
+            while [ -n "$URL" ]; do
               RESPONSE=$(curl -s "$URL")
-              NEW_TAGS=$(echo "$RESPONSE" | jq -r '.results[] | select(.tag_status == "active") | .name')
-              TAGS=$(echo -e "$TAGS\n$NEW_TAGS" | sort -u | head -n "$MAX_TAGS")
+              NEW_TAGS=$(echo "$RESPONSE" | jq -r '.results[] | select(.tag_status == "active") | .name' | \
+              grep -E '^[0-9]+\.[0-9]+(\.[0-9]+)?(-alpine|-latest)?$' || true)
+              TAGS=$(echo -e "$TAGS\n$NEW_TAGS" | sort -Vu)
               URL=$(echo "$RESPONSE" | jq -r '.next')
               [ "$URL" = "null" ] && break
             done
+
+            # Keep only the latest MAX_TAGS
+            TAGS=$(echo "$TAGS" | tail -r | head -n "$MAX_TAGS")
 
             while IFS= read -r tag; do
               if [ -n "$tag" ]; then
