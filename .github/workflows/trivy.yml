@@ -206,21 +206,16 @@ jobs:
               # This ensures we only keep the more specific version when both are present.
               # Compatible with GNU awk (used in GitHub Actions runners).
               # Filter out "x.y" shorthand tags if equivalent "x.y.0" exists (e.g., drop 4.33 if 4.33.0 is present)
-
-              # Deduplicate shorthand semver tags like "4.33" or "4.33-alpine"
-              # if the corresponding full semver tag "4.33.0" or "4.33.0-alpine" exists.
               # This version scans all lines first before filtering.
               TAGS=$(echo "$TAGS" | awk '
-                BEGIN {
-                  # First pass: collect all full x.y.z[-suffix] versions
-                  while ((getline line < "-") > 0) {
-                    tags[NR] = line
-                    if (match(line, /^([0-9]+)\.([0-9]+)\.([0-9]+)(-alpine|-latest)?$/, m)) {
-                      full = m[1] "." m[2] "." m[3] (m[4] ? m[4] : "")
-                      has_full[full] = 1
-                    }
+                {
+                  tags[NR] = $0
+                  if (match($0, /^([0-9]+)\.([0-9]+)\.([0-9]+)(-alpine|-latest)?$/, m)) {
+                    full = m[1] "." m[2] "." m[3] (m[4] ? m[4] : "")
+                    has_full[full] = 1
                   }
-                  # Second pass: output only those that are not shorthand duplicates
+                }
+                END {
                   for (i = 1; i <= NR; i++) {
                     tag = tags[i]
                     if (match(tag, /^([0-9]+)\.([0-9]+)(-alpine|-latest)?$/, m)) {
@@ -340,57 +335,57 @@ jobs:
             >> $GITHUB_STEP_SUMMARY || true
 
 
-  notify-results:
-    name: Notify Scan Results
-    runs-on: ubuntu-22.04
-    needs: trivy-scan
-    if: always()
-    strategy:
-      matrix:
-        image: [
-          liquibase/liquibase,
-          liquibase/liquibase-pro
-        ]
-    steps:
-      - name: "Check failures for ${{ matrix.image }}"
-        id: check_failures
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const image = '${{ matrix.image }}';
-            console.log(`Checking for failures in ${image}...`);
+  # notify-results:
+  #   name: Notify Scan Results
+  #   runs-on: ubuntu-22.04
+  #   needs: trivy-scan
+  #   if: always()
+  #   strategy:
+  #     matrix:
+  #       image: [
+  #         liquibase/liquibase,
+  #         liquibase/liquibase-pro
+  #       ]
+  #   steps:
+  #     - name: "Check failures for ${{ matrix.image }}"
+  #       id: check_failures
+  #       uses: actions/github-script@v7
+  #       with:
+  #         script: |
+  #           const image = '${{ matrix.image }}';
+  #           console.log(`Checking for failures in ${image}...`);
             
-            // Get the trivy-scan job results
-            const jobs = await github.rest.actions.listJobsForWorkflowRun({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              run_id: context.runId
-            });
+  #           // Get the trivy-scan job results
+  #           const jobs = await github.rest.actions.listJobsForWorkflowRun({
+  #             owner: context.repo.owner,
+  #             repo: context.repo.repo,
+  #             run_id: context.runId
+  #           });
             
-            // Check if any jobs for this specific image failed
-            const imageJobs = jobs.data.jobs.filter(job => 
-              job.name.includes(image) && job.name.includes('Trivy Scan')
-            );
+  #           // Check if any jobs for this specific image failed
+  #           const imageJobs = jobs.data.jobs.filter(job => 
+  #             job.name.includes(image) && job.name.includes('Trivy Scan')
+  #           );
             
-            const failedJobs = imageJobs.filter(job => job.conclusion === 'failure');
-            const hasFailures = failedJobs.length > 0;
+  #           const failedJobs = imageJobs.filter(job => job.conclusion === 'failure');
+  #           const hasFailures = failedJobs.length > 0;
             
-            console.log(`Found ${imageJobs.length} scan jobs for ${image}`);
-            console.log(`Failed jobs: ${failedJobs.length}`);
+  #           console.log(`Found ${imageJobs.length} scan jobs for ${image}`);
+  #           console.log(`Failed jobs: ${failedJobs.length}`);
             
-            core.setOutput('has_failures', hasFailures.toString());
-            core.setOutput('failed_count', failedJobs.length.toString());
-            core.setOutput('total_count', imageJobs.length.toString());
+  #           core.setOutput('has_failures', hasFailures.toString());
+  #           core.setOutput('failed_count', failedJobs.length.toString());
+  #           core.setOutput('total_count', imageJobs.length.toString());
 
-      - name: "Notify Slack for ${{ matrix.image }} failures" 
-        if: steps.check_failures.outputs.has_failures == 'true'
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_COLOR: 'failure'
-          SLACK_MESSAGE: "Security vulnerabilities found in ${{ steps.check_failures.outputs.failed_count }} out of ${{ steps.check_failures.outputs.total_count }} tags for ${{ matrix.image }}. View details: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          SLACK_TITLE: "❌ Trivy scan found vulnerabilities in ${{ matrix.image }}"
-          SLACK_USERNAME: liquibot
-          SLACK_WEBHOOK: ${{ secrets.DOCKER_SLACK_WEBHOOK_URL }}
-          SLACK_ICON_EMOJI: ":warning:"
-          SLACK_FOOTER: "${{ github.repository }} - ${{ matrix.image }}"
-          SLACK_LINK_NAMES: true
+  #     - name: "Notify Slack for ${{ matrix.image }} failures" 
+  #       if: steps.check_failures.outputs.has_failures == 'true'
+  #       uses: rtCamp/action-slack-notify@v2
+  #       env:
+  #         SLACK_COLOR: 'failure'
+  #         SLACK_MESSAGE: "Security vulnerabilities found in ${{ steps.check_failures.outputs.failed_count }} out of ${{ steps.check_failures.outputs.total_count }} tags for ${{ matrix.image }}. View details: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+  #         SLACK_TITLE: "❌ Trivy scan found vulnerabilities in ${{ matrix.image }}"
+  #         SLACK_USERNAME: liquibot
+  #         SLACK_WEBHOOK: ${{ secrets.DOCKER_SLACK_WEBHOOK_URL }}
+  #         SLACK_ICON_EMOJI: ":warning:"
+  #         SLACK_FOOTER: "${{ github.repository }} - ${{ matrix.image }}"
+  #         SLACK_LINK_NAMES: true
