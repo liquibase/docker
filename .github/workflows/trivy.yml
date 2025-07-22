@@ -187,6 +187,7 @@ jobs:
           # Initialize matrix
           MATRIX_INCLUDE="["
           FIRST=true
+          
           # Process each image
           for IMAGE in "liquibase/liquibase" "liquibase/liquibase-pro"; do
             echo "Getting tags for $IMAGE..."
@@ -206,31 +207,34 @@ jobs:
               # Compatible with GNU awk (used in GitHub Actions runners).
               # Filter out "x.y" shorthand tags if equivalent "x.y.0" exists (e.g., drop 4.33 if 4.33.0 is present)
 
-              TAGS=$(echo "$TAGS" | awk '
-                {
-                  tag = $0
-                  if (match(tag, /^([0-9]+)\.([0-9]+)(\.([0-9]+))?(-alpine|-latest)?$/, m)) {
-                    major = m[1]
-                    minor = m[2]
-                    patch = (m[4] == "") ? "0" : m[4]
-                    suffix = (m[5] == "") ? "" : m[5]
-                    full = major "." minor "." patch suffix
-                    short = major "." minor suffix
-                    is_shorthand = (m[3] == "")
-
-                    if (is_shorthand && seen[full]) next
-
-                    seen[tag] = 1
-                    seen[full] = 1
-                    print tag
+              # Deduplicate shorthand semver tags like "4.33" or "4.33-alpine"
+            # if the corresponding full semver tag "4.33.0" or "4.33.0-alpine" exists.
+            # This version scans all lines first before filtering.
+            TAGS=$(echo "$TAGS" | awk '
+              BEGIN {
+                # First pass: collect all full x.y.z[-suffix] versions
+                while ((getline line < "-") > 0) {
+                  tags[NR] = line
+                  if (match(line, /^([0-9]+)\.([0-9]+)\.([0-9]+)(-alpine|-latest)?$/, m)) {
+                    full = m[1] "." m[2] "." m[3] (m[4] ? m[4] : "")
+                    has_full[full] = 1
                   }
                 }
-              ')
+                # Second pass: output only those that are not shorthand duplicates
+                for (i = 1; i <= NR; i++) {
+                  tag = tags[i]
+                  if (match(tag, /^([0-9]+)\.([0-9]+)(-alpine|-latest)?$/, m)) {
+                    short = m[1] "." m[2] ".0" (m[3] ? m[3] : "")
+                    if (has_full[short]) continue
+                  }
+                  print tag
+                }
+              }
+            ')
 
               URL=$(echo "$RESPONSE" | jq -r '.next')
               [ "$URL" = "null" ] && break
             done
-
 
             # Keep only the latest MAX_TAGS
             TAGS=$(echo "$TAGS" | tac | head -n "$MAX_TAGS")
@@ -269,6 +273,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run Trivy vulnerability scanner
+        id: trivy_scan
         uses: aquasecurity/trivy-action@0.31.0
         with:
           image-ref: '${{ matrix.image }}:${{ matrix.tag }}'
@@ -280,7 +285,6 @@ jobs:
           exit-code: '1'
           limit-severities-for-sarif: true
         continue-on-error: true
-        id: trivy_scan
 
       - name: Print Trivy vulnerabilities to log
         if: steps.trivy_scan.outcome == 'failure' && always()
