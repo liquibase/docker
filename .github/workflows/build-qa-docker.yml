@@ -1,0 +1,125 @@
+name: Build QA Docker Images
+
+permissions:
+  contents: read
+  id-token: write
+
+on:
+  workflow_dispatch:
+    inputs:
+      liquibaseBranch:
+        description: "Liquibase branch to build from (e.g., master, feature-branch)"
+        required: true
+        type: string
+        default: "master"
+      liquibaseVersion:
+        description: "Liquibase Version (e.g., 4.33.0)"
+        required: true
+        type: string
+      buildLiquibaseQA:
+        description: "Build liquibase-qa (Dockerfile)"
+        type: boolean
+        default: true
+      buildLiquibaseAlpineQA:
+        description: "Build liquibase-qa-alpine (Dockerfile.alpine)"
+        type: boolean
+        default: true
+      buildLiquibaseProQA:
+        description: "Build liquibase-pro-qa (DockerfilePro)"
+        type: boolean
+        default: true
+
+jobs:
+  set-matrix:
+    name: "Generate Build Matrix"
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Set matrix dynamically
+        id: set-matrix
+        run: |
+          matrix_items=()
+
+          if [[ "${{ inputs.buildLiquibaseQA }}" == "true" ]]; then
+            matrix_items+=('{"dockerfile": "Dockerfile", "image_name": "liquibase-qa", "suffix": ""}')
+          fi
+
+          if [[ "${{ inputs.buildLiquibaseAlpineQA }}" == "true" ]]; then
+            matrix_items+=('{"dockerfile": "Dockerfile.alpine", "image_name": "liquibase-qa-alpine", "suffix": "-alpine"}')
+          fi
+
+          if [[ "${{ inputs.buildLiquibaseProQA }}" == "true" ]]; then
+            matrix_items+=('{"dockerfile": "DockerfilePro", "image_name": "liquibase-pro-qa", "suffix": "-pro"}')
+          fi
+
+          # Join array elements with commas
+          IFS=','
+          matrix_json="{\"include\":[${matrix_items[*]}]}"
+
+          echo "Generated matrix: $matrix_json"
+          echo "matrix=$matrix_json" >> $GITHUB_OUTPUT
+
+  build-qa-docker:
+    name: "Build and Push QA Docker Images"
+    runs-on: ubuntu-latest
+    needs: set-matrix
+    strategy:
+      matrix: ${{ fromJSON(needs.set-matrix.outputs.matrix) }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.liquibaseBranch }}
+
+      - name: Configure AWS credentials for vault access
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.LIQUIBASE_VAULT_OIDC_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Get secrets from vault
+        id: vault-secrets-liquibase
+        uses: aws-actions/aws-secretsmanager-get-secrets@v2
+        with:
+          secret-ids: |
+            ,/vault/liquibase
+          parse-json-secrets: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Log in to internal Nexus Docker Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REPO_URL }}
+          username: ${{ env.REPO_USER }}
+          password: ${{ env.REPO_PASSWORD }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          push: true
+          platforms: linux/amd64,linux/arm64
+          provenance: false
+          tags: |
+            ${{ env.REPO_URL }}/${{ matrix.image_name }}:${{ inputs.liquibaseVersion }}-${{ inputs.liquibaseBranch }}
+            ${{ env.REPO_URL }}/${{ matrix.image_name }}:${{ inputs.liquibaseVersion }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/liquibase/docker
+            org.opencontainers.image.description=Liquibase QA Container Image${{ matrix.suffix }}
+            org.opencontainers.image.licenses=Apache-2.0
+            org.opencontainers.image.vendor=Liquibase
+            org.opencontainers.image.version=${{ inputs.liquibaseVersion }}
+            org.opencontainers.image.documentation=https://docs.liquibase.com
+            org.opencontainers.image.revision=${{ github.sha }}
+            liquibase.branch=${{ inputs.liquibaseBranch }}
+      - name: Image build summary
+        run: |
+          echo "Successfully built and pushed: ${{ env.REPO_URL }}/${{ matrix.image_name }}:${{ inputs.liquibaseVersion }}-${{ inputs.liquibaseBranch }}"
+          echo "Also tagged as: ${{ env.REPO_URL }}/${{ matrix.image_name }}:${{ inputs.liquibaseVersion }}"
