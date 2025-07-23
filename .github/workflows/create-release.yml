@@ -334,10 +334,10 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Configure AWS credentials for PROD ECR
-        id: configure-aws-credentials
+        id: configure-aws-credentials-prod
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_PROD_GITHUB_OIDC_ROLE_ARN_INFRASTRUCTURE }}
+          role-to-assume: ${{ env.AWS_PROD_GITHUB_OIDC_ROLE_ARN_INFRASTRUCTURE }}
           aws-region: us-east-1
 
       - name: Login to ECR Registry
@@ -347,8 +347,8 @@ jobs:
           AWS_REGION: us-east-1
         with:
           registry: public.ecr.aws
-          username: ${{ steps.configure-aws-credentials.outputs.aws_access_key_id }}
-          password: ${{ steps.configure-aws-credentials.outputs.aws_secret_access_key }}
+          username: ${{ steps.configure-aws-credentials-prod.outputs.aws_access_key_id }}
+          password: ${{ steps.configure-aws-credentials-prodoutputs.aws_secret_access_key }}
 
       # Add login for dry-run mode to private ECR
       - name: Login to Private ECR Registry (dry-run)
@@ -358,8 +358,8 @@ jobs:
           AWS_REGION: us-east-1
         with:
           registry: ${{ env.PRIVATE_ECR_DRY_RUN_REPO }}
-          username: ${{ steps.configure-aws-credentials.outputs.aws_access_key_id }}
-          password: ${{ steps.configure-aws-credentials.outputs.aws_secret_access_key }}
+          username: ${{ steps.configure-aws-credentials-prod.outputs.aws_access_key_id }}
+          password: ${{ steps.configure-aws-credentials-prodoutputs.aws_secret_access_key }}
 
       # Generate tags dynamically using a separate step
       - name: Generate Docker Tags
