@@ -136,9 +136,14 @@ jobs:
             ,/vault/liquibase
           parse-json-secrets: true
 
+      - name: Decode DOCKERHUB_USERNAME
+        run: |
+          decoded_username=$(echo "${{ env.DOCKERHUB_USERNAME }}" | base64 -d)
+          echo "DOCKERHUB_USERNAME_DECODED=$decoded_username" >> $GITHUB_ENV
+
       - uses: docker/login-action@v3
         with:
-          username: ${{ env.DOCKERHUB_USERNAME }}
+          username: ${{ env.DOCKERHUB_USERNAME_DECODED }}
           password: ${{ env.DOCKERHUB_TOKEN }}
 
       - name: Docker Scout
