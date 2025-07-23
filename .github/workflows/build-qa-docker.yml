@@ -8,10 +8,10 @@ on:
   workflow_dispatch:
     inputs:
       liquibaseBranch:
-        description: "Liquibase branch to build from (e.g., master, feature-branch)"
+        description: "Liquibase branch to build from (e.g., main, feature-branch)"
         required: true
         type: string
-        default: "master"
+        default: "main"
       liquibaseVersion:
         description: "Liquibase Version (e.g., 4.33.0)"
         required: true
