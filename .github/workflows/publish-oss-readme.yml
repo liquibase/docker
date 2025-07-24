@@ -33,10 +33,15 @@ jobs:
             ,/vault/liquibase
           parse-json-secrets: true
 
+      - name: Decode DOCKERHUB_USERNAME
+        run: |
+          decoded_username=$(echo "${{ env.DOCKERHUB_USERNAME }}" | base64 -d)
+          echo "DOCKERHUB_USERNAME_DECODED=$decoded_username" >> $GITHUB_ENV
+
       - name: Update Liquibase OSS README on Docker Hub
         uses: peter-evans/dockerhub-description@v4
         with:
-          username: ${{ env.DOCKERHUB_USERNAME }}
+          username: ${{ env.DOCKERHUB_USERNAME_DECODED }}
           password: ${{ env.DOCKERHUB_UPDATE_README }}
           repository: liquibase/liquibase
           readme-filepath: README.md
