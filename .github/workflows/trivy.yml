@@ -374,14 +374,10 @@ jobs:
   notify-results:
     name: Notify Scan Results
     runs-on: ubuntu-22.04
-    needs: trivy-scan
+    needs: [trivy-scan, generate-matrix]
     if: always()
     strategy:
-      matrix:
-        image: [
-          liquibase/liquibase,
-          liquibase/liquibase-pro
-        ]
+      matrix: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
     steps:
       - name: "Check failures for ${{ matrix.image }}"
         id: check_failures
