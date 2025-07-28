@@ -353,10 +353,9 @@ jobs:
           echo "|---------|---------------|----------|--------|-----------|--------|" >> $GITHUB_STEP_SUMMARY
 
           # Extract and format top-level vulnerabilities (HIGH or CRITICAL only)
-          trivy image --severity HIGH,CRITICAL --format json "${{ matrix.image }}:${{ matrix.tag }}" |
-            jq -r '.Results[].Vulnerabilities[]? |
-              "| \(.PkgName) | \(.VulnerabilityID) | \(.Severity) | \(.Status // "-") | \(.InstalledVersion) | \(.FixedVersion // "-") |"' \
-            >> $GITHUB_STEP_SUMMARY || true
+          jq -r '.Results[].Vulnerabilities[]? |
+            "| \(.PkgName) | \(.VulnerabilityID) | \(.Severity) | \(.Status // "-") | \(.InstalledVersion) | \(.FixedVersion // "-") |"' \
+            trivy-results.json >> $GITHUB_STEP_SUMMARY || true
 
   notify-results:
     name: Notify Scan Results
