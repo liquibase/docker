@@ -193,47 +193,42 @@ jobs:
     needs: [trivy-scan, generate-matrix]
     if: always()
     strategy:
-      matrix: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
+     matrix:
+        image: ["liquibase/liquibase", "liquibase/liquibase-pro"]
     steps:
       - name: "Check failures for ${{ matrix.image }}"
         id: check_failures
         uses: actions/github-script@v7
         with:
-          script: |
-            const image = '${{ matrix.image }}';
-            console.log(`Checking for failures in ${image}...`);
-            
-            // Get the trivy-scan job results
-            const jobs = await github.rest.actions.listJobsForWorkflowRun({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              run_id: context.runId
-            });
-            
-            // Check if any jobs for this specific image failed
-            const imageJobs = jobs.data.jobs.filter(job => 
-              job.name.includes(image) && job.name.includes('Trivy Scan')
-            );
-            
-            const failedJobs = imageJobs.filter(job => job.conclusion === 'failure');
-            const hasFailures = failedJobs.length > 0;
-            
-            console.log(`Found ${imageJobs.length} scan jobs for ${image}`);
-            console.log(`Failed jobs: ${failedJobs.length}`);
-            
-            core.setOutput('has_failures', hasFailures.toString());
-            core.setOutput('failed_count', failedJobs.length.toString());
-            core.setOutput('total_count', imageJobs.length.toString());
+            script: |
+                const image = '${{ matrix.image }}';
+                const jobs = await github.rest.actions.listJobsForWorkflowRun({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    run_id: context.runId
+                });
 
-      - name: "Notify Slack for ${{ matrix.image }} failures" 
+                const scanJobs = jobs.data.jobs.filter(job =>
+                    job.name.includes(`Trivy Scan ${image}`)
+                );
+
+                const failed = scanJobs.filter(job => job.conclusion === 'failure');
+                const failedCount = failed.length;
+                const totalCount = scanJobs.length;
+
+                core.setOutput('has_failures', failedCount > 0);
+                core.setOutput('failed_count', failedCount.toString());
+                core.setOutput('total_count', totalCount.toString());
+
+      - name: "Notify Slack for ${{ matrix.image }}"
         if: steps.check_failures.outputs.has_failures == 'true'
         uses: rtCamp/action-slack-notify@v2
         env:
-          SLACK_COLOR: 'failure'
-          SLACK_MESSAGE: "Security vulnerabilities found in ${{ steps.check_failures.outputs.failed_count }} out of ${{ steps.check_failures.outputs.total_count }} tags for ${{ matrix.image }}. View details: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          SLACK_TITLE: "❌ Trivy scan found vulnerabilities in ${{ matrix.image }}"
-          SLACK_USERNAME: liquibot
-          SLACK_WEBHOOK: ${{ secrets.DOCKER_SLACK_WEBHOOK_URL }}
-          SLACK_ICON_EMOJI: ":warning:"
-          SLACK_FOOTER: "${{ github.repository }} - ${{ matrix.image }}"
-          SLACK_LINK_NAMES: true
+            SLACK_COLOR: 'danger'
+            SLACK_MESSAGE: "Security vulnerabilities found in ${{ steps.check_failures.outputs.failed_count }} out of ${{ steps.check_failures.outputs.total_count }} tags for *${{ matrix.image }}*.\n🔎 [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+            SLACK_TITLE: "❌ Trivy scan found vulnerabilities in ${{ matrix.image }}"
+            SLACK_USERNAME: liquibot
+            SLACK_WEBHOOK: ${{ secrets.DOCKER_SLACK_WEBHOOK_URL }}
+            SLACK_ICON_EMOJI: ":warning:"
+            SLACK_FOOTER: "${{ github.repository }} - ${{ matrix.image }}"
+            SLACK_LINK_NAMES: true
