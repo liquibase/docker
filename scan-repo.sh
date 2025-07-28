@@ -79,7 +79,7 @@ echo "🚀 Starting parallel scans (max $MAX_PARALLEL_JOBS jobs)..."
 # Get tags and filter valid ones into an array
 valid_tags=()
 while IFS= read -r tag; do
-  if [[ "$tag" =~ ^[a-zA-Z0-9._-]+$ ]]; then
+  if [[ "$tag" =~ ^[a-z0-9]+(?:[._-][a-z0-9]+)*$ ]]; then
     valid_tags+=("$tag")
   else
     echo "⚠️ Skipping invalid tag: $tag"
