@@ -220,8 +220,11 @@ jobs:
             URL="https://hub.docker.com/v2/namespaces/liquibase/repositories/${REPO}/tags?page_size=100"
             while [ -n "$URL" ]; do
               RESPONSE=$(curl -s "$URL")
+              # Define regex pattern for matching Docker tags
+              TAG_REGEX='^[0-9]+\.[0-9]+(\.[0-9]+)?(-alpine|-latest)?$'
+              # Explanation: Matches tags in the format "x.y", "x.y.z", "x.y-alpine", "x.y.z-alpine", "x.y-latest", or "x.y.z-latest"
               NEW_TAGS=$(echo "$RESPONSE" | jq -r '.results[] | select(.tag_status == "active") | .name' | \
-                grep -E '^[0-9]+\.[0-9]+(\.[0-9]+)?(-alpine|-latest)?$' || true)
+                grep -E "$TAG_REGEX" || true)
 
               TAGS=$(echo -e "$TAGS\n$NEW_TAGS" | sort -Vu)
               
