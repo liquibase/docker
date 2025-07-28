@@ -7,6 +7,11 @@ name: Published Images Vulnerability Scanning
 
 on:
   workflow_dispatch:
+    inputs:
+      max_tags_to_scan:
+        description: 'Maximum number of published tags to scan'
+        required: false
+        default: '20'
   schedule:
       # Run Monday-Friday at 10 AM UTC (published image monitoring)
     - cron: '0 10 * * 1-5' # Run every weekday at 10am UTC
