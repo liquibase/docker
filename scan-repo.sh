@@ -47,8 +47,9 @@ scan_tag() {
   echo "🧪 [$$] Scanning $image"
   
   # Use --cache-dir for faster subsequent scans
-  # Error output from docker pull is logged to docker-errors.log for debugging purposes
-  if docker pull "$image" 2>>docker-errors.log; then
+  # Error output from docker pull is logged to a unique docker-errors.log file for debugging purposes
+  LOG_FILE="docker-errors-$(date +%s).log"
+  if docker pull "$image" 2>>"$LOG_FILE"; then
     if ! trivy image \
       --cache-dir /tmp/trivy-cache \
       --vuln-type os,library \
