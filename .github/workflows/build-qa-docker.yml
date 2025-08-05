@@ -3,6 +3,7 @@ name: Build QA Docker Images
 permissions:
   contents: read
   id-token: write
+  actions: read
 
 on:
   workflow_dispatch:
@@ -12,10 +13,6 @@ on:
         required: true
         type: string
         default: "main"
-      liquibaseVersion:
-        description: "Liquibase Version (e.g., 4.33.0)"
-        required: true
-        type: string
       buildLiquibaseQA:
         description: "Build liquibase-qa (Dockerfile)"
         type: boolean
@@ -69,8 +66,155 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.liquibaseBranch }}
+
+      - name: Install jq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+
+      - name: Get latest workflow run for branch
+        id: get-workflow-run
+        run: |
+          # Get the latest successful workflow run for the specified branch
+          WORKFLOW_RUN=$(curl -s \
+            -H "Authorization: Bearer ${{ secrets.LIQUIBASE_REPO_ACCESS_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/liquibase/liquibase/actions/workflows/run-tests.yml/runs?branch=${{ inputs.liquibaseBranch }}&status=completed&conclusion=success&per_page=1" \
+            | jq -r '.workflow_runs[0].id')
+
+          if [ "$WORKFLOW_RUN" = "null" ] || [ -z "$WORKFLOW_RUN" ]; then
+            echo "No successful workflow run found for branch ${{ inputs.liquibaseBranch }}"
+            exit 1
+          fi
+
+          echo "Found workflow run ID: $WORKFLOW_RUN"
+          echo "workflow_run_id=$WORKFLOW_RUN" >> $GITHUB_OUTPUT
+
+      - name: Download liquibase build artifact
+        id: download-artifact
+        run: |
+          # Get artifact download URL
+          ARTIFACT_NAME="liquibase-zip-${{ inputs.liquibaseBranch }}"
+          echo "Looking for artifact: $ARTIFACT_NAME"
+
+          ARTIFACTS_RESPONSE=$(curl -s \
+            -H "Authorization: Bearer ${{ secrets.LIQUIBASE_REPO_ACCESS_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/liquibase/liquibase/actions/runs/${{ steps.get-workflow-run.outputs.workflow_run_id }}/artifacts")
+
+          echo "Available artifacts:"
+          echo "$ARTIFACTS_RESPONSE" | jq -r '.artifacts[].name'
+
+          ARTIFACT_URL=$(echo "$ARTIFACTS_RESPONSE" | jq -r ".artifacts[] | select(.name == \"$ARTIFACT_NAME\") | .archive_download_url")
+
+          if [ "$ARTIFACT_URL" = "null" ] || [ -z "$ARTIFACT_URL" ]; then
+            echo "Artifact $ARTIFACT_NAME not found in workflow run"
+            echo "Available artifacts:"
+            echo "$ARTIFACTS_RESPONSE" | jq -r '.artifacts[].name'
+            exit 1
+          fi
+
+          echo "Downloading artifact from: $ARTIFACT_URL"
+
+          # Download and extract artifact
+          curl -L \
+            -H "Authorization: Bearer ${{ secrets.LIQUIBASE_REPO_ACCESS_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            -o liquibase-artifact.zip \
+            "$ARTIFACT_URL"
+
+          # Extract the artifact
+          unzip -q liquibase-artifact.zip
+          echo "Artifact contents:"
+          ls -la
+
+          # Find the liquibase zip file inside the artifact
+          LIQUIBASE_ZIP=$(find . -name "liquibase-*.zip" -type f | head -1)
+          if [ -z "$LIQUIBASE_ZIP" ]; then
+            echo "No liquibase zip file found in artifact"
+            echo "Contents of extracted artifact:"
+            find . -type f
+            exit 1
+          fi
+
+          echo "Found liquibase zip: $LIQUIBASE_ZIP"
+
+          # Extract the liquibase zip
+          mkdir -p liquibase-build
+          unzip -q "$LIQUIBASE_ZIP" -d liquibase-build/
+
+          echo "Liquibase build extracted to liquibase-build/"
+          echo "Contents of liquibase-build:"
+          ls -la liquibase-build/
+          echo "artifact_path=liquibase-build" >> $GITHUB_OUTPUT
+
+      - name: Validate and prepare liquibase build
+        run: |
+          # Validate the liquibase build structure
+          if [ ! -f "liquibase-build/liquibase" ]; then
+            echo "Error: liquibase executable not found in build"
+            echo "Contents of liquibase-build:"
+            find liquibase-build -type f
+            exit 1
+          fi
+
+          # Make liquibase executable
+          chmod +x liquibase-build/liquibase
+
+          # Validate that liquibase can run
+          cd liquibase-build && ./liquibase --version && cd ..
+
+          echo "Liquibase build validation successful"
+          echo "Final liquibase-build contents:"
+          ls -la liquibase-build/
+
+      - name: Modify Dockerfiles for artifact-based build
+        run: |
+          echo "Modifying ${{ matrix.dockerfile }} to use downloaded artifact instead of GitHub releases..."
+
+          # Create backup
+          cp "${{ matrix.dockerfile }}" "${{ matrix.dockerfile }}.backup"
+
+          # Set version ARG based on dockerfile type
+          if [[ "${{ matrix.dockerfile }}" == "DockerfilePro" ]]; then
+            VERSION_ARG="LIQUIBASE_PRO_VERSION"
+          else
+            VERSION_ARG="LIQUIBASE_VERSION"
+          fi
+
+          # Replace version ARG with branch name
+          sed -i "s/ARG ${VERSION_ARG}=.*/ARG ${VERSION_ARG}=${{ inputs.liquibaseBranch }}/" "${{ matrix.dockerfile }}"
+
+          # Remove wget download and checksum validation lines for standard and alpine Dockerfiles
+          if [[ "${{ matrix.dockerfile }}" == "Dockerfile" ]]; then
+            # Remove wget download and related lines
+            sed -i '/wget.*github.com.*liquibase.*tar.gz/,/rm liquibase.*tar.gz/d' "${{ matrix.dockerfile }}"
+            # Remove SHA256 line
+            sed -i '/ARG LB_SHA256=/d' "${{ matrix.dockerfile }}"
+            sed -i '/echo.*LB_SHA256.*sha256sum/d' "${{ matrix.dockerfile }}"
+          elif [[ "${{ matrix.dockerfile }}" == "Dockerfile.alpine" ]]; then
+            # Remove wget download block for alpine
+            sed -i '/apk add.*wget/,/apk del.*fetch-deps/d' "${{ matrix.dockerfile }}"
+            # Remove SHA256 line
+            sed -i '/ARG LB_SHA256=/d' "${{ matrix.dockerfile }}"
+            sed -i '/echo.*LB_SHA256.*sha256sum/d' "${{ matrix.dockerfile }}"
+          elif [[ "${{ matrix.dockerfile }}" == "DockerfilePro" ]]; then
+            # Remove wget download and related lines for Pro
+            sed -i '/wget.*repo.liquibase.com.*tar.gz/,/rm liquibase-pro.*tar.gz/d' "${{ matrix.dockerfile }}"
+            # Remove SHA256 line
+            sed -i '/ARG LB_PRO_SHA256=/d' "${{ matrix.dockerfile }}"
+            sed -i '/echo.*LB_PRO_SHA256.*sha256sum/d' "${{ matrix.dockerfile }}"
+          fi
+
+          # Add COPY command for liquibase-build right after WORKDIR
+          sed -i '/^WORKDIR \/liquibase$/a\\n# Copy the extracted liquibase build from the build context\nCOPY liquibase-build\/ .\/\n' "${{ matrix.dockerfile }}"
+
+          echo "✓ Modified ${{ matrix.dockerfile }}"
+          echo "=== Changes made ==="
+          echo "- Set ${VERSION_ARG} to ${{ inputs.liquibaseBranch }}"
+          echo "- Removed wget download commands"
+          echo "- Removed SHA256 checksum validation"
+          echo "- Added COPY liquibase-build/ ./"
 
       - name: Configure AWS credentials for vault access
         uses: aws-actions/configure-aws-credentials@v4
@@ -108,18 +252,16 @@ jobs:
           platforms: linux/amd64,linux/arm64
           provenance: false
           tags: |
-            ${{ env.REPO_URL }}/${{ matrix.image_name }}:${{ inputs.liquibaseVersion }}-${{ inputs.liquibaseBranch }}
-            ${{ env.REPO_URL }}/${{ matrix.image_name }}:${{ inputs.liquibaseVersion }}
+            ${{ env.REPO_URL }}/${{ matrix.image_name }}:${{ inputs.liquibaseBranch }}
           labels: |
             org.opencontainers.image.source=https://github.com/liquibase/docker
             org.opencontainers.image.description=Liquibase QA Container Image${{ matrix.suffix }}
             org.opencontainers.image.licenses=Apache-2.0
             org.opencontainers.image.vendor=Liquibase
-            org.opencontainers.image.version=${{ inputs.liquibaseVersion }}
+            org.opencontainers.image.version=${{ inputs.liquibaseBranch }}
             org.opencontainers.image.documentation=https://docs.liquibase.com
             org.opencontainers.image.revision=${{ github.sha }}
             liquibase.branch=${{ inputs.liquibaseBranch }}
       - name: Image build summary
         run: |
-          echo "Successfully built and pushed: ${{ env.REPO_URL }}/${{ matrix.image_name }}:${{ inputs.liquibaseVersion }}-${{ inputs.liquibaseBranch }}"
-          echo "Also tagged as: ${{ env.REPO_URL }}/${{ matrix.image_name }}:${{ inputs.liquibaseVersion }}"
+          echo "Successfully built and pushed: ${{ env.REPO_URL }}/${{ matrix.image_name }}:${{ inputs.liquibaseBranch }}"
