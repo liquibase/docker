@@ -64,6 +64,21 @@ jobs:
     strategy:
       matrix: ${{ fromJSON(needs.set-matrix.outputs.matrix) }}
     steps:
+      
+      - name: Configure AWS credentials for vault access
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.LIQUIBASE_VAULT_OIDC_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Get secrets from vault
+        id: vault-secrets-liquibase
+        uses: aws-actions/aws-secretsmanager-get-secrets@v2
+        with:
+          secret-ids: |
+            ,/vault/liquibase
+          parse-json-secrets: true
+
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -215,20 +230,6 @@ jobs:
           echo "- Removed wget download commands"
           echo "- Removed SHA256 checksum validation"
           echo "- Added COPY liquibase-build/ ./"
-
-      - name: Configure AWS credentials for vault access
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.LIQUIBASE_VAULT_OIDC_ROLE_ARN }}
-          aws-region: us-east-1
-
-      - name: Get secrets from vault
-        id: vault-secrets-liquibase
-        uses: aws-actions/aws-secretsmanager-get-secrets@v2
-        with:
-          secret-ids: |
-            ,/vault/liquibase
-          parse-json-secrets: true
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
