@@ -77,7 +77,7 @@ jobs:
         run: |
           # Get the latest successful workflow run for the specified branch
           WORKFLOW_RUN=$(curl -s \
-            -H "Authorization: Bearer ${{ secrets.LIQUIBASE_REPO_ACCESS_TOKEN }}" \
+            -H "Authorization: Bearer ${{ env.LIQUIBOT_PAT_GPM_ACCESS }}" \
             -H "Accept: application/vnd.github.v3+json" \
             "https://api.github.com/repos/liquibase/liquibase/actions/workflows/run-tests.yml/runs?branch=${{ inputs.liquibaseBranch }}&status=completed&conclusion=success&per_page=1" \
             | jq -r '.workflow_runs[0].id')
@@ -98,7 +98,7 @@ jobs:
           echo "Looking for artifact: $ARTIFACT_NAME"
 
           ARTIFACTS_RESPONSE=$(curl -s \
-            -H "Authorization: Bearer ${{ secrets.LIQUIBASE_REPO_ACCESS_TOKEN }}" \
+            -H "Authorization: Bearer ${{ env.LIQUIBOT_PAT_GPM_ACCESS }}" \
             -H "Accept: application/vnd.github.v3+json" \
             "https://api.github.com/repos/liquibase/liquibase/actions/runs/${{ steps.get-workflow-run.outputs.workflow_run_id }}/artifacts")
 
@@ -118,7 +118,7 @@ jobs:
 
           # Download and extract artifact
           curl -L \
-            -H "Authorization: Bearer ${{ secrets.LIQUIBASE_REPO_ACCESS_TOKEN }}" \
+            -H "Authorization: Bearer ${{ env.LIQUIBOT_PAT_GPM_ACCESS }}" \
             -H "Accept: application/vnd.github.v3+json" \
             -o liquibase-artifact.zip \
             "$ARTIFACT_URL"
