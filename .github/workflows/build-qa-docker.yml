@@ -244,7 +244,7 @@ jobs:
           ref: ${{ inputs.liquibaseBranch }}
           wait-for-completion: true
           wait-for-completion-timeout: 60m
-          wait-for-completion-interval: 30s
+          wait-for-completion-interval: 10m
 
       - name: Download Pro build from S3 after workflow completion
         if: ${{ matrix.build_type == 'pro' && steps.download-artifact.outputs.trigger_pro_workflow == 'true' }}
