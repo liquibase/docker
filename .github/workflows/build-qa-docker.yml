@@ -64,7 +64,6 @@ jobs:
     strategy:
       matrix: ${{ fromJSON(needs.set-matrix.outputs.matrix) }}
     steps:
-
       - name: Configure AWS credentials for vault access
         uses: aws-actions/configure-aws-credentials@v4
         with:
