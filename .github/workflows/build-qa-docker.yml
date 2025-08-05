@@ -91,8 +91,20 @@ jobs:
         if: ${{ matrix.build_type == 'pro' }}
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_PROD_GITHUB_OIDC_ROLE_ARN_LIQUIBASE_PRO }}
+          role-to-assume: ${{ env.AWS_PROD_GITHUB_OIDC_ROLE_ARN_LIQUIBASE_PRO }}
           aws-region: us-east-1
+
+      - name: Get GitHub App token for Pro workflow trigger
+        if: ${{ matrix.build_type == 'pro' }}
+        id: get-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ env.LIQUIBASE_GITHUB_APP_ID }}
+          private-key: ${{ env.LIQUIBASE_GITHUB_APP_PRIVATE_KEY }}
+          owner: liquibase
+          repositories: liquibase-pro
+          permission-contents: write
+          permission-actions: write
 
       - name: Checkout code
         uses: actions/checkout@v4
@@ -132,22 +144,34 @@ jobs:
             S3_URL="s3://repo.liquibase.com/releases/pro/${{ inputs.liquibaseBranch }}/$LIQUIBASE_PRO_ZIP"
 
             echo "Downloading from S3: $S3_URL"
-            aws s3 cp "$S3_URL" "$LIQUIBASE_PRO_ZIP"
 
-            if [ ! -f "$LIQUIBASE_PRO_ZIP" ]; then
-              echo "Failed to download Pro build from S3"
-              echo "Trying to list available versions in S3..."
-              aws s3 ls "s3://repo.liquibase.com/releases/pro/${{ inputs.liquibaseBranch }}/" || echo "No files found for branch ${{ inputs.liquibaseBranch }}"
-              exit 1
+            # Try to download from S3 first
+            if ! aws s3 cp "$S3_URL" "$LIQUIBASE_PRO_ZIP" 2>/dev/null; then
+              echo "Failed to download Pro build from S3. File may not exist yet."
+
+              # Check if it's a 403/404 error (file doesn't exist)
+              if aws s3 ls "$S3_URL" >/dev/null 2>&1; then
+                echo "❌ File exists but access denied. Check permissions."
+                exit 1
+              else
+                echo "📦 Pro build not found in S3. Will trigger Pro release workflow..."
+                echo "trigger_pro_workflow=true" >> $GITHUB_OUTPUT
+              fi
+            else
+              echo "✅ Successfully downloaded Pro build from S3"
+              echo "trigger_pro_workflow=false" >> $GITHUB_OUTPUT
             fi
 
-            echo "Found Pro build: $LIQUIBASE_PRO_ZIP"
+            # Only process the file if we successfully downloaded it
+            if [ -f "$LIQUIBASE_PRO_ZIP" ]; then
+              echo "Found Pro build: $LIQUIBASE_PRO_ZIP"
 
-            # Extract the liquibase Pro zip
-            mkdir -p liquibase-build
-            unzip -q "$LIQUIBASE_PRO_ZIP" -d liquibase-build/
+              # Extract the liquibase Pro zip
+              mkdir -p liquibase-build
+              unzip -q "$LIQUIBASE_PRO_ZIP" -d liquibase-build/
 
-            echo "Liquibase Pro build extracted to liquibase-build/"
+              echo "Liquibase Pro build extracted to liquibase-build/"
+            fi
 
           else
             echo "Downloading OSS build from GitHub artifacts..."
@@ -157,7 +181,7 @@ jobs:
             echo "Looking for artifact: $ARTIFACT_NAME"
 
             ARTIFACTS_RESPONSE=$(curl -s \
-              -H "Authorization: Bearer ${{ secrets.LIQUIBASE_REPO_ACCESS_TOKEN }}" \
+              -H "Authorization: Bearer ${{ env.LIQUIBOT_PAT_GPM_ACCESS }}" \
               -H "Accept: application/vnd.github.v3+json" \
               "https://api.github.com/repos/liquibase/liquibase/actions/runs/${{ steps.get-workflow-run.outputs.workflow_run_id }}/artifacts")
 
@@ -177,7 +201,7 @@ jobs:
 
             # Download and extract artifact
             curl -L \
-              -H "Authorization: Bearer ${{ secrets.LIQUIBASE_REPO_ACCESS_TOKEN }}" \
+              -H "Authorization: Bearer ${{ env.LIQUIBOT_PAT_GPM_ACCESS }}" \
               -H "Accept: application/vnd.github.v3+json" \
               -o liquibase-artifact.zip \
               "$ARTIFACT_URL"
@@ -207,7 +231,44 @@ jobs:
 
           echo "Contents of liquibase-build:"
           ls -la liquibase-build/
-          echo "artifact_path=liquibase-build" >> $GITHUB_OUTPUT
+
+      - name: Trigger Pro Release Workflow
+        if: ${{ matrix.build_type == 'pro' && steps.download-artifact.outputs.trigger_pro_workflow == 'true' }}
+        id: trigger-pro-release
+        uses: the-actions-org/workflow-dispatch@v4
+        with:
+          workflow: pro-release-to-s3.yml
+          token: ${{ steps.get-token.outputs.token }}
+          repo: liquibase/liquibase-pro
+          inputs: '{"version": "${{ inputs.liquibaseBranch }}"}'
+          ref: main
+          wait-for-completion: true
+          wait-for-completion-timeout: 60m
+          wait-for-completion-interval: 30s
+
+      - name: Download Pro build from S3 after workflow completion
+        if: ${{ matrix.build_type == 'pro' && steps.download-artifact.outputs.trigger_pro_workflow == 'true' }}
+        run: |
+          LIQUIBASE_PRO_ZIP="liquibase-pro-${{ inputs.liquibaseBranch }}.zip"
+          S3_URL="s3://repo.liquibase.com/releases/pro/${{ inputs.liquibaseBranch }}/$LIQUIBASE_PRO_ZIP"
+
+          echo "⬇️ Downloading Pro build from S3 after workflow completion..."
+          aws s3 cp "$S3_URL" "$LIQUIBASE_PRO_ZIP"
+
+          if [ ! -f "$LIQUIBASE_PRO_ZIP" ]; then
+            echo "❌ Failed to download Pro build even after workflow completion"
+            exit 1
+          fi
+
+          echo "✅ Successfully downloaded Pro build after workflow completion"
+
+          # Extract the liquibase Pro zip
+          mkdir -p liquibase-build
+          unzip -q "$LIQUIBASE_PRO_ZIP" -d liquibase-build/
+
+          echo "Liquibase Pro build extracted to liquibase-build/"
+          echo "Contents of liquibase-build:"
+          ls -la liquibase-build/
 
       - name: Validate and prepare liquibase build
         run: |
