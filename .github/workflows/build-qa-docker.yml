@@ -64,7 +64,6 @@ jobs:
     strategy:
       matrix: ${{ fromJSON(needs.set-matrix.outputs.matrix) }}
     steps:
-      
       - name: Configure AWS credentials for vault access
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -200,29 +199,69 @@ jobs:
           # Replace version ARG with branch name
           sed -i "s/ARG ${VERSION_ARG}=.*/ARG ${VERSION_ARG}=${{ inputs.liquibaseBranch }}/" "${{ matrix.dockerfile }}"
 
-          # Remove wget download and checksum validation lines for standard and alpine Dockerfiles
-          if [[ "${{ matrix.dockerfile }}" == "Dockerfile" ]]; then
-            # Remove wget download and related lines
-            sed -i '/wget.*github.com.*liquibase.*tar.gz/,/rm liquibase.*tar.gz/d' "${{ matrix.dockerfile }}"
-            # Remove SHA256 line
-            sed -i '/ARG LB_SHA256=/d' "${{ matrix.dockerfile }}"
-            sed -i '/echo.*LB_SHA256.*sha256sum/d' "${{ matrix.dockerfile }}"
-          elif [[ "${{ matrix.dockerfile }}" == "Dockerfile.alpine" ]]; then
-            # Remove wget download block for alpine
-            sed -i '/apk add.*wget/,/apk del.*fetch-deps/d' "${{ matrix.dockerfile }}"
-            # Remove SHA256 line
-            sed -i '/ARG LB_SHA256=/d' "${{ matrix.dockerfile }}"
-            sed -i '/echo.*LB_SHA256.*sha256sum/d' "${{ matrix.dockerfile }}"
-          elif [[ "${{ matrix.dockerfile }}" == "DockerfilePro" ]]; then
-            # Remove wget download and related lines for Pro
-            sed -i '/wget.*repo.liquibase.com.*tar.gz/,/rm liquibase-pro.*tar.gz/d' "${{ matrix.dockerfile }}"
-            # Remove SHA256 line
-            sed -i '/ARG LB_PRO_SHA256=/d' "${{ matrix.dockerfile }}"
-            sed -i '/echo.*LB_PRO_SHA256.*sha256sum/d' "${{ matrix.dockerfile }}"
-          fi
+          # Create modified Dockerfile using awk for cleaner handling
+          cat "${{ matrix.dockerfile }}" | awk -v dockerfile="${{ matrix.dockerfile }}" -v branch="${{ inputs.liquibaseBranch }}" '
+          BEGIN {
+            in_wget_block = 0
+            skip_line = 0
+          }
 
-          # Add COPY command for liquibase-build right after WORKDIR
-          sed -i '/^WORKDIR \/liquibase$/a\\n# Copy the extracted liquibase build from the build context\nCOPY liquibase-build\/ .\/\n' "${{ matrix.dockerfile }}"
+          # Skip SHA256 ARG lines
+          /^ARG LB_SHA256=/ || /^ARG LB_PRO_SHA256=/ { next }
+
+          # Update version ARGs
+          /^ARG LIQUIBASE_VERSION=/ { print "ARG LIQUIBASE_VERSION=" branch; next }
+          /^ARG LIQUIBASE_PRO_VERSION=/ { print "ARG LIQUIBASE_PRO_VERSION=" branch; next }
+
+          # Handle standard Dockerfile wget block
+          dockerfile == "Dockerfile" && /^RUN wget.*github\.com.*liquibase.*tar\.gz/ {
+            print "# Copy the extracted liquibase build from the build context"
+            print "COPY liquibase-build/ ./"
+            print ""
+            print "RUN ln -s /liquibase/liquibase /usr/local/bin/liquibase && \\"
+            print "    ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \\"
+            print "    liquibase --version"
+            in_wget_block = 1
+            next
+          }
+
+          # Handle alpine Dockerfile wget block
+          dockerfile == "Dockerfile.alpine" && /^RUN set -x/ {
+            print "# Copy the extracted liquibase build from the build context"
+            print "COPY liquibase-build/ ./"
+            print ""
+            print "RUN ln -s /liquibase/liquibase /usr/local/bin/liquibase && \\"
+            print "    ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \\"
+            print "    liquibase --version"
+            in_wget_block = 1
+            next
+          }
+
+          # Handle Pro Dockerfile wget block
+          dockerfile == "DockerfilePro" && /^RUN wget.*repo\.liquibase\.com.*tar\.gz/ {
+            print "# Copy the extracted liquibase build from the build context"
+            print "COPY liquibase-build/ ./"
+            print ""
+            print "RUN ln -s /liquibase/liquibase /usr/local/bin/liquibase && \\"
+            print "    ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \\"
+            print "    liquibase --version"
+            in_wget_block = 1
+            next
+          }
+
+          # Skip lines until we reach the end of wget block
+          in_wget_block == 1 && /liquibase --version/ {
+            in_wget_block = 0
+            next
+          }
+          in_wget_block == 1 { next }
+
+          # Print all other lines
+          { print }
+          ' > "${{ matrix.dockerfile }}.tmp"
+
+          # Replace original with modified version
+          mv "${{ matrix.dockerfile }}.tmp" "${{ matrix.dockerfile }}"
 
           echo "✓ Modified ${{ matrix.dockerfile }}"
           echo "=== Changes made ==="
@@ -230,6 +269,12 @@ jobs:
           echo "- Removed wget download commands"
           echo "- Removed SHA256 checksum validation"
           echo "- Added COPY liquibase-build/ ./"
+
+          echo ""
+          echo "=== Modified Dockerfile content preview ==="
+          echo "First 30 lines of modified ${{ matrix.dockerfile }}:"
+          head -30 "${{ matrix.dockerfile }}"
+          echo "..."
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
