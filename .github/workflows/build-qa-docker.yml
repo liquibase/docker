@@ -64,6 +64,13 @@ jobs:
     strategy:
       matrix: ${{ fromJSON(needs.set-matrix.outputs.matrix) }}
     steps:
+      - name: Configure AWS credentials for Pro builds
+        if: ${{ inputs.buildLiquibaseProQA == true && matrix.dockerfile == 'DockerfilePro' }}
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_PROD_GITHUB_OIDC_ROLE_ARN_LIQUIBASE_PRO }}
+          aws-region: us-east-1
+
       - name: Configure AWS credentials for vault access
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -87,6 +94,7 @@ jobs:
           sudo apt-get install -y jq
 
       - name: Get latest workflow run for branch
+        if: ${{ inputs.buildLiquibaseProQA == false || matrix.dockerfile != 'DockerfilePro' }}
         id: get-workflow-run
         run: |
           # Get the latest successful workflow run for the specified branch
@@ -104,60 +112,90 @@ jobs:
           echo "Found workflow run ID: $WORKFLOW_RUN"
           echo "workflow_run_id=$WORKFLOW_RUN" >> $GITHUB_OUTPUT
 
-      - name: Download liquibase build artifact
+      - name: Download liquibase build artifact (OSS) or from S3 (Pro)
         id: download-artifact
         run: |
-          # Get artifact download URL
-          ARTIFACT_NAME="liquibase-zip-${{ inputs.liquibaseBranch }}"
-          echo "Looking for artifact: $ARTIFACT_NAME"
+          if [[ "${{ inputs.buildLiquibaseProQA }}" == "true" && "${{ matrix.dockerfile }}" == "DockerfilePro" ]]; then
+            echo "Downloading Liquibase Pro build from S3..."
 
-          ARTIFACTS_RESPONSE=$(curl -s \
-            -H "Authorization: Bearer ${{ env.LIQUIBOT_PAT_GPM_ACCESS }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/repos/liquibase/liquibase/actions/runs/${{ steps.get-workflow-run.outputs.workflow_run_id }}/artifacts")
+            # Download Pro build from S3
+            LIQUIBASE_PRO_ZIP="liquibase-pro-${{ inputs.liquibaseBranch }}.zip"
+            S3_URL="s3://repo.liquibase.com/releases/pro/${{ inputs.liquibaseBranch }}/$LIQUIBASE_PRO_ZIP"
 
-          echo "Available artifacts:"
-          echo "$ARTIFACTS_RESPONSE" | jq -r '.artifacts[].name'
+            echo "Downloading from S3: $S3_URL"
+            aws s3 cp "$S3_URL" "$LIQUIBASE_PRO_ZIP"
 
-          ARTIFACT_URL=$(echo "$ARTIFACTS_RESPONSE" | jq -r ".artifacts[] | select(.name == \"$ARTIFACT_NAME\") | .archive_download_url")
+            if [ ! -f "$LIQUIBASE_PRO_ZIP" ]; then
+              echo "Failed to download Pro build from S3"
+              echo "Trying to list available versions in S3..."
+              aws s3 ls "s3://repo.liquibase.com/releases/pro/${{ inputs.liquibaseBranch }}/" || echo "No files found for branch ${{ inputs.liquibaseBranch }}"
+              exit 1
+            fi
 
-          if [ "$ARTIFACT_URL" = "null" ] || [ -z "$ARTIFACT_URL" ]; then
-            echo "Artifact $ARTIFACT_NAME not found in workflow run"
+            echo "Found Pro build: $LIQUIBASE_PRO_ZIP"
+
+            # Extract the liquibase Pro zip
+            mkdir -p liquibase-build
+            unzip -q "$LIQUIBASE_PRO_ZIP" -d liquibase-build/
+
+            echo "Liquibase Pro build extracted to liquibase-build/"
+
+          else
+            echo "Downloading OSS build from GitHub artifacts..."
+
+            # Get artifact download URL
+            ARTIFACT_NAME="liquibase-zip-${{ inputs.liquibaseBranch }}"
+            echo "Looking for artifact: $ARTIFACT_NAME"
+
+            ARTIFACTS_RESPONSE=$(curl -s \
+              -H "Authorization: Bearer ${{ secrets.LIQUIBASE_REPO_ACCESS_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              "https://api.github.com/repos/liquibase/liquibase/actions/runs/${{ steps.get-workflow-run.outputs.workflow_run_id }}/artifacts")
+
             echo "Available artifacts:"
             echo "$ARTIFACTS_RESPONSE" | jq -r '.artifacts[].name'
-            exit 1
+
+            ARTIFACT_URL=$(echo "$ARTIFACTS_RESPONSE" | jq -r ".artifacts[] | select(.name == \"$ARTIFACT_NAME\") | .archive_download_url")
+
+            if [ "$ARTIFACT_URL" = "null" ] || [ -z "$ARTIFACT_URL" ]; then
+              echo "Artifact $ARTIFACT_NAME not found in workflow run"
+              echo "Available artifacts:"
+              echo "$ARTIFACTS_RESPONSE" | jq -r '.artifacts[].name'
+              exit 1
+            fi
+
+            echo "Downloading artifact from: $ARTIFACT_URL"
+
+            # Download and extract artifact
+            curl -L \
+              -H "Authorization: Bearer ${{ secrets.LIQUIBASE_REPO_ACCESS_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              -o liquibase-artifact.zip \
+              "$ARTIFACT_URL"
+
+            # Extract the artifact
+            unzip -q liquibase-artifact.zip
+            echo "Artifact contents:"
+            ls -la
+
+            # Find the liquibase zip file inside the artifact
+            LIQUIBASE_ZIP=$(find . -name "liquibase-*.zip" -type f | head -1)
+            if [ -z "$LIQUIBASE_ZIP" ]; then
+              echo "No liquibase zip file found in artifact"
+              echo "Contents of extracted artifact:"
+              find . -type f
+              exit 1
+            fi
+
+            echo "Found liquibase zip: $LIQUIBASE_ZIP"
+
+            # Extract the liquibase zip
+            mkdir -p liquibase-build
+            unzip -q "$LIQUIBASE_ZIP" -d liquibase-build/
+
+            echo "Liquibase build extracted to liquibase-build/"
           fi
 
-          echo "Downloading artifact from: $ARTIFACT_URL"
-
-          # Download and extract artifact
-          curl -L \
-            -H "Authorization: Bearer ${{ env.LIQUIBOT_PAT_GPM_ACCESS }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            -o liquibase-artifact.zip \
-            "$ARTIFACT_URL"
-
-          # Extract the artifact
-          unzip -q liquibase-artifact.zip
-          echo "Artifact contents:"
-          ls -la
-
-          # Find the liquibase zip file inside the artifact
-          LIQUIBASE_ZIP=$(find . -name "liquibase-*.zip" -type f | head -1)
-          if [ -z "$LIQUIBASE_ZIP" ]; then
-            echo "No liquibase zip file found in artifact"
-            echo "Contents of extracted artifact:"
-            find . -type f
-            exit 1
-          fi
-
-          echo "Found liquibase zip: $LIQUIBASE_ZIP"
-
-          # Extract the liquibase zip
-          mkdir -p liquibase-build
-          unzip -q "$LIQUIBASE_ZIP" -d liquibase-build/
-
-          echo "Liquibase build extracted to liquibase-build/"
           echo "Contents of liquibase-build:"
           ls -la liquibase-build/
           echo "artifact_path=liquibase-build" >> $GITHUB_OUTPUT
