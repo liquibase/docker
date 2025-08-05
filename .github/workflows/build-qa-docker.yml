@@ -241,7 +241,7 @@ jobs:
           token: ${{ steps.get-token.outputs.token }}
           repo: liquibase/liquibase-pro
           inputs: '{"version": "${{ inputs.liquibaseBranch }}"}'
-          ref: main
+          ref: ${{ inputs.liquibaseBranch }}
           wait-for-completion: true
           wait-for-completion-timeout: 60m
           wait-for-completion-interval: 30s
