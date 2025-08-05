@@ -156,20 +156,16 @@ jobs:
               else
                 echo "📦 Pro build not found in S3. Will trigger Pro release workflow..."
                 echo "trigger_pro_workflow=true" >> $GITHUB_OUTPUT
+                echo "build_ready=false" >> $GITHUB_OUTPUT
               fi
             else
               echo "✅ Successfully downloaded Pro build from S3"
               echo "trigger_pro_workflow=false" >> $GITHUB_OUTPUT
-            fi
-
-            # Only process the file if we successfully downloaded it
-            if [ -f "$LIQUIBASE_PRO_ZIP" ]; then
-              echo "Found Pro build: $LIQUIBASE_PRO_ZIP"
+              echo "build_ready=true" >> $GITHUB_OUTPUT
 
               # Extract the liquibase Pro zip
               mkdir -p liquibase-build
               unzip -q "$LIQUIBASE_PRO_ZIP" -d liquibase-build/
-
               echo "Liquibase Pro build extracted to liquibase-build/"
             fi
 
@@ -227,10 +223,14 @@ jobs:
             unzip -q "$LIQUIBASE_ZIP" -d liquibase-build/
 
             echo "Liquibase build extracted to liquibase-build/"
+            echo "build_ready=true" >> $GITHUB_OUTPUT
           fi
 
-          echo "Contents of liquibase-build:"
-          ls -la liquibase-build/
+          # Only show contents if build is ready
+          if [[ -d "liquibase-build" ]]; then
+            echo "Contents of liquibase-build:"
+            ls -la liquibase-build/
+          fi
 
       - name: Trigger Pro Release Workflow
         if: ${{ matrix.build_type == 'pro' && steps.download-artifact.outputs.trigger_pro_workflow == 'true' }}
@@ -248,6 +248,7 @@ jobs:
 
       - name: Download Pro build from S3 after workflow completion
         if: ${{ matrix.build_type == 'pro' && steps.download-artifact.outputs.trigger_pro_workflow == 'true' }}
+        id: download-after-trigger
         run: |
           LIQUIBASE_PRO_ZIP="liquibase-pro-${{ inputs.liquibaseBranch }}.zip"
           S3_URL="s3://repo.liquibase.com/releases/pro/${{ inputs.liquibaseBranch }}/$LIQUIBASE_PRO_ZIP"
@@ -269,8 +270,10 @@ jobs:
           echo "Liquibase Pro build extracted to liquibase-build/"
           echo "Contents of liquibase-build:"
           ls -la liquibase-build/
+          echo "build_ready=true" >> $GITHUB_OUTPUT
 
       - name: Validate and prepare liquibase build
+        if: ${{ (matrix.build_type == 'oss') || (matrix.build_type == 'pro' && (steps.download-artifact.outputs.build_ready == 'true' || steps.download-after-trigger.outputs.build_ready == 'true')) }}
         run: |
           # Validate the liquibase build structure
           if [ ! -f "liquibase-build/liquibase" ]; then
@@ -291,6 +294,7 @@ jobs:
           ls -la liquibase-build/
 
       - name: Modify Dockerfiles for artifact-based build
+        if: ${{ (matrix.build_type == 'oss') || (matrix.build_type == 'pro' && (steps.download-artifact.outputs.build_ready == 'true' || steps.download-after-trigger.outputs.build_ready == 'true')) }}
         run: |
           echo "Modifying ${{ matrix.dockerfile }} to use downloaded artifact instead of GitHub releases..."
 
@@ -385,12 +389,15 @@ jobs:
           echo "..."
 
       - name: Set up Docker Buildx
+        if: ${{ (matrix.build_type == 'oss') || (matrix.build_type == 'pro' && (steps.download-artifact.outputs.build_ready == 'true' || steps.download-after-trigger.outputs.build_ready == 'true')) }}
         uses: docker/setup-buildx-action@v3
 
       - name: Set up QEMU
+        if: ${{ (matrix.build_type == 'oss') || (matrix.build_type == 'pro' && (steps.download-artifact.outputs.build_ready == 'true' || steps.download-after-trigger.outputs.build_ready == 'true')) }}
         uses: docker/setup-qemu-action@v3
 
       - name: Log in to internal Nexus Docker Registry
+        if: ${{ (matrix.build_type == 'oss') || (matrix.build_type == 'pro' && (steps.download-artifact.outputs.build_ready == 'true' || steps.download-after-trigger.outputs.build_ready == 'true')) }}
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REPO_URL }}
@@ -398,6 +405,7 @@ jobs:
           password: ${{ env.REPO_PASSWORD }}
 
       - name: Build and push Docker image
+        if: ${{ (matrix.build_type == 'oss') || (matrix.build_type == 'pro' && (steps.download-artifact.outputs.build_ready == 'true' || steps.download-after-trigger.outputs.build_ready == 'true')) }}
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -417,5 +425,48 @@ jobs:
             org.opencontainers.image.revision=${{ github.sha }}
             liquibase.branch=${{ inputs.liquibaseBranch }}
       - name: Image build summary
+        if: ${{ (matrix.build_type == 'oss') || (matrix.build_type == 'pro' && (steps.download-artifact.outputs.build_ready == 'true' || steps.download-after-trigger.outputs.build_ready == 'true')) }}
         run: |
           echo "Successfully built and pushed: ${{ env.REPO_URL }}/${{ matrix.image_name }}:${{ inputs.liquibaseBranch }}"
+
+      - name: Workflow execution summary
+        if: always()
+        run: |
+          echo "=== QA Docker Build Workflow Summary ==="
+          echo "Branch: ${{ inputs.liquibaseBranch }}"
+          echo "Build Target: ${{ inputs.buildTargets }}"
+          echo "Dockerfile: ${{ matrix.dockerfile }}"
+          echo "Build Type: ${{ matrix.build_type }}"
+          echo ""
+
+          if [[ "${{ matrix.build_type }}" == "pro" ]]; then
+            if [[ "${{ steps.download-artifact.outputs.trigger_pro_workflow }}" == "true" ]]; then
+              echo "🔄 Pro Release Workflow Status: TRIGGERED"
+              echo "   - S3 build was missing for branch ${{ inputs.liquibaseBranch }}"
+              echo "   - Automatically triggered pro-release-to-s3.yml workflow"
+              if [[ "${{ steps.download-after-trigger.outputs.build_ready }}" == "true" ]]; then
+                echo "   - ✅ Pro workflow completed successfully"
+                echo "   - ✅ Pro build downloaded and Docker image built"
+              else
+                echo "   - ❌ Pro workflow may still be running or failed"
+                echo "   - 📋 Check: https://github.com/liquibase/liquibase-pro/actions/workflows/pro-release-to-s3.yml"
+              fi
+            else
+              if [[ "${{ steps.download-artifact.outputs.build_ready }}" == "true" ]]; then
+                echo "✅ Pro Build Status: SUCCESS (Direct S3 download)"
+              else
+                echo "❌ Pro Build Status: FAILED"
+              fi
+            fi
+          else
+            echo "✅ OSS Build Status: SUCCESS (GitHub artifact)"
+          fi
+
+          echo ""
+          if [[ "${{ job.status }}" == "success" ]]; then
+            echo "🎉 Overall Status: SUCCESS"
+            echo "📦 Image Available: ${{ env.REPO_URL }}/${{ matrix.image_name }}:${{ inputs.liquibaseBranch }}"
+          else
+            echo "❌ Overall Status: FAILED"
+            echo "🔍 Check the logs above for detailed error information"
+          fi
