@@ -13,18 +13,17 @@ on:
         required: true
         type: string
         default: "main"
-      buildLiquibaseQA:
-        description: "Build liquibase-qa (Dockerfile)"
-        type: boolean
-        default: true
-      buildLiquibaseAlpineQA:
-        description: "Build liquibase-qa-alpine (Dockerfile.alpine)"
-        type: boolean
-        default: true
-      buildLiquibaseProQA:
-        description: "Build liquibase-pro-qa (DockerfilePro)"
-        type: boolean
-        default: true
+      buildTargets:
+        description: "Select which Docker images to build"
+        required: true
+        type: choice
+        options:
+          - "All (OSS + Alpine + Pro)"
+          - "OSS Only (Standard + Alpine)"
+          - "Pro Only"
+          - "Standard OSS Only"
+          - "Alpine OSS Only"
+        default: "All (OSS + Alpine + Pro)"
 
 jobs:
   set-matrix:
@@ -38,22 +37,32 @@ jobs:
         run: |
           matrix_items=()
 
-          if [[ "${{ inputs.buildLiquibaseQA }}" == "true" ]]; then
-            matrix_items+=('{"dockerfile": "Dockerfile", "image_name": "liquibase-qa", "suffix": ""}')
-          fi
-
-          if [[ "${{ inputs.buildLiquibaseAlpineQA }}" == "true" ]]; then
-            matrix_items+=('{"dockerfile": "Dockerfile.alpine", "image_name": "liquibase-qa-alpine", "suffix": "-alpine"}')
-          fi
-
-          if [[ "${{ inputs.buildLiquibaseProQA }}" == "true" ]]; then
-            matrix_items+=('{"dockerfile": "DockerfilePro", "image_name": "liquibase-pro-qa", "suffix": "-pro"}')
-          fi
+          case "${{ inputs.buildTargets }}" in
+            "All (OSS + Alpine + Pro)")
+              matrix_items+=('{"dockerfile": "Dockerfile", "image_name": "liquibase-qa", "suffix": "", "build_type": "oss"}')
+              matrix_items+=('{"dockerfile": "Dockerfile.alpine", "image_name": "liquibase-qa-alpine", "suffix": "-alpine", "build_type": "oss"}')
+              matrix_items+=('{"dockerfile": "DockerfilePro", "image_name": "liquibase-pro-qa", "suffix": "-pro", "build_type": "pro"}')
+              ;;
+            "OSS Only (Standard + Alpine)")
+              matrix_items+=('{"dockerfile": "Dockerfile", "image_name": "liquibase-qa", "suffix": "", "build_type": "oss"}')
+              matrix_items+=('{"dockerfile": "Dockerfile.alpine", "image_name": "liquibase-qa-alpine", "suffix": "-alpine", "build_type": "oss"}')
+              ;;
+            "Pro Only")
+              matrix_items+=('{"dockerfile": "DockerfilePro", "image_name": "liquibase-pro-qa", "suffix": "-pro", "build_type": "pro"}')
+              ;;
+            "Standard OSS Only")
+              matrix_items+=('{"dockerfile": "Dockerfile", "image_name": "liquibase-qa", "suffix": "", "build_type": "oss"}')
+              ;;
+            "Alpine OSS Only")
+              matrix_items+=('{"dockerfile": "Dockerfile.alpine", "image_name": "liquibase-qa-alpine", "suffix": "-alpine", "build_type": "oss"}')
+              ;;
+          esac
 
           # Join array elements with commas
           IFS=','
           matrix_json="{\"include\":[${matrix_items[*]}]}"
 
+          echo "Selected build targets: ${{ inputs.buildTargets }}"
           echo "Generated matrix: $matrix_json"
           echo "matrix=$matrix_json" >> $GITHUB_OUTPUT
 
@@ -79,12 +88,12 @@ jobs:
           parse-json-secrets: true
 
       - name: Configure AWS credentials for Pro builds
-        if: ${{ inputs.buildLiquibaseProQA == true && matrix.dockerfile == 'DockerfilePro' }}
+        if: ${{ matrix.build_type == 'pro' }}
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ env.AWS_PROD_GITHUB_OIDC_ROLE_ARN_LIQUIBASE_PRO }}
+          role-to-assume: ${{ secrets.AWS_PROD_GITHUB_OIDC_ROLE_ARN_LIQUIBASE_PRO }}
           aws-region: us-east-1
-          
+
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -94,7 +103,7 @@ jobs:
           sudo apt-get install -y jq
 
       - name: Get latest workflow run for branch
-        if: ${{ inputs.buildLiquibaseProQA == false || matrix.dockerfile != 'DockerfilePro' }}
+        if: ${{ matrix.build_type == 'oss' }}
         id: get-workflow-run
         run: |
           # Get the latest successful workflow run for the specified branch
@@ -115,7 +124,7 @@ jobs:
       - name: Download liquibase build artifact (OSS) or from S3 (Pro)
         id: download-artifact
         run: |
-          if [[ "${{ inputs.buildLiquibaseProQA }}" == "true" && "${{ matrix.dockerfile }}" == "DockerfilePro" ]]; then
+          if [[ "${{ matrix.build_type }}" == "pro" ]]; then
             echo "Downloading Liquibase Pro build from S3..."
 
             # Download Pro build from S3
