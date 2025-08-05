@@ -64,12 +64,6 @@ jobs:
     strategy:
       matrix: ${{ fromJSON(needs.set-matrix.outputs.matrix) }}
     steps:
-      - name: Configure AWS credentials for Pro builds
-        if: ${{ inputs.buildLiquibaseProQA == true && matrix.dockerfile == 'DockerfilePro' }}
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.AWS_PROD_GITHUB_OIDC_ROLE_ARN_LIQUIBASE_PRO }}
-          aws-region: us-east-1
 
       - name: Configure AWS credentials for vault access
         uses: aws-actions/configure-aws-credentials@v4
@@ -85,6 +79,13 @@ jobs:
             ,/vault/liquibase
           parse-json-secrets: true
 
+      - name: Configure AWS credentials for Pro builds
+        if: ${{ inputs.buildLiquibaseProQA == true && matrix.dockerfile == 'DockerfilePro' }}
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.AWS_PROD_GITHUB_OIDC_ROLE_ARN_LIQUIBASE_PRO }}
+          aws-region: us-east-1
+          
       - name: Checkout code
         uses: actions/checkout@v4
 
