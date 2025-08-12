@@ -364,14 +364,26 @@ jobs:
           
           # Create test setup
           mkdir -p test-absolute-paths
-          echo '<?xml version="1.0" encoding="UTF-8"?><databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"></databaseChangeLog>' > test-absolute-paths/test-changelog.xml
+          cat > test-absolute-paths/test-changelog.xml << 'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                             xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+              <changeSet id="1" author="test">
+                  <sql>SELECT 'Test';</sql>
+              </changeSet>
+          </databaseChangeLog>
+          EOF
           
           # Test with absolute path (old way should still work)
-          docker run --rm -v $(pwd)/test-absolute-paths:/liquibase/changelog \
+          RESULT=$(docker run --rm -v $(pwd)/test-absolute-paths:/liquibase/changelog \
             liquibase/liquibase:${{ github.sha }} \
-            validate --changelogFile=/liquibase/changelog/test-changelog.xml --url=offline:postgresql
+            validate --changelogFile=/liquibase/changelog/test-changelog.xml --url=offline:postgresql 2>&1)
           
-          if [ $? -eq 0 ]; then
+          echo "Absolute path validation result: $RESULT"
+          
+          if echo "$RESULT" | grep -q "No validation errors found"; then
             echo "✅ SUCCESS: Absolute paths still work (backward compatible)"
           else
             echo "❌ FAIL: Absolute path compatibility broken"
