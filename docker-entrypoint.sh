@@ -47,11 +47,31 @@ else
     cd /liquibase/changelog
   fi
   
+  # Set search path based on whether we changed directories
+  EXTRA_SEARCH_PATH=""
+  if [ -d "/liquibase/changelog" ]; then
+    if [ "$SHOULD_CHANGE_DIR" = true ]; then
+      # If we changed to changelog directory, search current directory (.) for relative paths
+      EXTRA_SEARCH_PATH="--searchPath=./"
+    else
+      # If we stayed in /liquibase, search root (/) for absolute paths
+      EXTRA_SEARCH_PATH="--searchPath=/"
+    fi
+  fi
+  
   if [[ "$*" == *--defaultsFile* ]] || [[ "$*" == *--defaults-file* ]] || [[ "$*" == *--version* ]]; then
-    ## Just run as-is
-    exec /liquibase/liquibase "$@"
+    ## Just run as-is, but add search path if needed
+    if [ -n "$EXTRA_SEARCH_PATH" ]; then
+      exec /liquibase/liquibase "$EXTRA_SEARCH_PATH" "$@"
+    else
+      exec /liquibase/liquibase "$@"
+    fi
   else
-    ## Include standard defaultsFile
-    exec /liquibase/liquibase "--defaultsFile=/liquibase/liquibase.docker.properties" "$@"
+    ## Include standard defaultsFile and search path
+    if [ -n "$EXTRA_SEARCH_PATH" ]; then
+      exec /liquibase/liquibase "--defaultsFile=/liquibase/liquibase.docker.properties" "$EXTRA_SEARCH_PATH" "$@"
+    else
+      exec /liquibase/liquibase "--defaultsFile=/liquibase/liquibase.docker.properties" "$@"
+    fi
   fi
 fi
