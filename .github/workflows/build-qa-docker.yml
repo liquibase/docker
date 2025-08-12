@@ -127,11 +127,14 @@ jobs:
 
           if [ "$WORKFLOW_RUN" = "null" ] || [ -z "$WORKFLOW_RUN" ]; then
             echo "No successful workflow run found for branch ${{ inputs.liquibaseBranch }}"
-            exit 1
+            echo "Will build using standard Dockerfile from branch source instead"
+            echo "workflow_run_id=" >> $GITHUB_OUTPUT
+            echo "has_workflow_run=false" >> $GITHUB_OUTPUT
+          else
+            echo "Found workflow run ID: $WORKFLOW_RUN"
+            echo "workflow_run_id=$WORKFLOW_RUN" >> $GITHUB_OUTPUT
+            echo "has_workflow_run=true" >> $GITHUB_OUTPUT
           fi
-
-          echo "Found workflow run ID: $WORKFLOW_RUN"
-          echo "workflow_run_id=$WORKFLOW_RUN" >> $GITHUB_OUTPUT
 
       - name: Download liquibase build artifact (OSS) or from S3 (Pro)
         id: download-artifact
@@ -154,14 +157,16 @@ jobs:
                 echo "❌ File exists but access denied. Check permissions."
                 exit 1
               else
-                echo "📦 Pro build not found in S3. Will trigger Pro release workflow..."
+                echo "📦 Pro build not found in S3. Checking if we should trigger workflow or use fallback..."
                 echo "trigger_pro_workflow=true" >> $GITHUB_OUTPUT
                 echo "build_ready=false" >> $GITHUB_OUTPUT
+                echo "use_fallback=false" >> $GITHUB_OUTPUT
               fi
             else
               echo "✅ Successfully downloaded Pro build from S3"
               echo "trigger_pro_workflow=false" >> $GITHUB_OUTPUT
               echo "build_ready=true" >> $GITHUB_OUTPUT
+              echo "use_fallback=false" >> $GITHUB_OUTPUT
 
               # Extract the liquibase Pro zip
               mkdir -p liquibase-build
@@ -170,60 +175,72 @@ jobs:
             fi
 
           else
-            echo "Downloading OSS build from GitHub artifacts..."
+            # OSS build handling
+            if [[ "${{ steps.get-workflow-run.outputs.has_workflow_run }}" == "false" ]]; then
+              echo "No workflow run available, will use fallback build from branch source"
+              echo "build_ready=false" >> $GITHUB_OUTPUT
+              echo "use_fallback=true" >> $GITHUB_OUTPUT
+            else
+              echo "Downloading OSS build from GitHub artifacts..."
 
-            # Get artifact download URL
-            ARTIFACT_NAME="liquibase-zip-${{ inputs.liquibaseBranch }}"
-            echo "Looking for artifact: $ARTIFACT_NAME"
+              # Get artifact download URL
+              ARTIFACT_NAME="liquibase-zip-${{ inputs.liquibaseBranch }}"
+              echo "Looking for artifact: $ARTIFACT_NAME"
 
-            ARTIFACTS_RESPONSE=$(curl -s \
-              -H "Authorization: Bearer ${{ env.LIQUIBOT_PAT_GPM_ACCESS }}" \
-              -H "Accept: application/vnd.github.v3+json" \
-              "https://api.github.com/repos/liquibase/liquibase/actions/runs/${{ steps.get-workflow-run.outputs.workflow_run_id }}/artifacts")
+              ARTIFACTS_RESPONSE=$(curl -s \
+                -H "Authorization: Bearer ${{ env.LIQUIBOT_PAT_GPM_ACCESS }}" \
+                -H "Accept: application/vnd.github.v3+json" \
+                "https://api.github.com/repos/liquibase/liquibase/actions/runs/${{ steps.get-workflow-run.outputs.workflow_run_id }}/artifacts")
 
-            echo "Available artifacts:"
-            echo "$ARTIFACTS_RESPONSE" | jq -r '.artifacts[].name'
-
-            ARTIFACT_URL=$(echo "$ARTIFACTS_RESPONSE" | jq -r ".artifacts[] | select(.name == \"$ARTIFACT_NAME\") | .archive_download_url")
-
-            if [ "$ARTIFACT_URL" = "null" ] || [ -z "$ARTIFACT_URL" ]; then
-              echo "Artifact $ARTIFACT_NAME not found in workflow run"
               echo "Available artifacts:"
               echo "$ARTIFACTS_RESPONSE" | jq -r '.artifacts[].name'
-              exit 1
+
+              ARTIFACT_URL=$(echo "$ARTIFACTS_RESPONSE" | jq -r ".artifacts[] | select(.name == \"$ARTIFACT_NAME\") | .archive_download_url")
+
+              if [ "$ARTIFACT_URL" = "null" ] || [ -z "$ARTIFACT_URL" ]; then
+                echo "Artifact $ARTIFACT_NAME not found in workflow run"
+                echo "Available artifacts:"
+                echo "$ARTIFACTS_RESPONSE" | jq -r '.artifacts[].name'
+                echo "Will use fallback build from branch source instead"
+                echo "build_ready=false" >> $GITHUB_OUTPUT
+                echo "use_fallback=true" >> $GITHUB_OUTPUT
+              else
+                echo "Downloading artifact from: $ARTIFACT_URL"
+
+                # Download and extract artifact
+                curl -L \
+                  -H "Authorization: Bearer ${{ env.LIQUIBOT_PAT_GPM_ACCESS }}" \
+                  -H "Accept: application/vnd.github.v3+json" \
+                  -o liquibase-artifact.zip \
+                  "$ARTIFACT_URL"
+
+                # Extract the artifact
+                unzip -q liquibase-artifact.zip
+                echo "Artifact contents:"
+                ls -la
+
+                # Find the liquibase zip file inside the artifact
+                LIQUIBASE_ZIP=$(find . -name "liquibase-*.zip" -type f | head -1)
+                if [ -z "$LIQUIBASE_ZIP" ]; then
+                  echo "No liquibase zip file found in artifact"
+                  echo "Contents of extracted artifact:"
+                  find . -type f
+                  echo "Will use fallback build from branch source instead"
+                  echo "build_ready=false" >> $GITHUB_OUTPUT
+                  echo "use_fallback=true" >> $GITHUB_OUTPUT
+                else
+                  echo "Found liquibase zip: $LIQUIBASE_ZIP"
+
+                  # Extract the liquibase zip
+                  mkdir -p liquibase-build
+                  unzip -q "$LIQUIBASE_ZIP" -d liquibase-build/
+
+                  echo "Liquibase build extracted to liquibase-build/"
+                  echo "build_ready=true" >> $GITHUB_OUTPUT
+                  echo "use_fallback=false" >> $GITHUB_OUTPUT
+                fi
+              fi
             fi
-
-            echo "Downloading artifact from: $ARTIFACT_URL"
-
-            # Download and extract artifact
-            curl -L \
-              -H "Authorization: Bearer ${{ env.LIQUIBOT_PAT_GPM_ACCESS }}" \
-              -H "Accept: application/vnd.github.v3+json" \
-              -o liquibase-artifact.zip \
-              "$ARTIFACT_URL"
-
-            # Extract the artifact
-            unzip -q liquibase-artifact.zip
-            echo "Artifact contents:"
-            ls -la
-
-            # Find the liquibase zip file inside the artifact
-            LIQUIBASE_ZIP=$(find . -name "liquibase-*.zip" -type f | head -1)
-            if [ -z "$LIQUIBASE_ZIP" ]; then
-              echo "No liquibase zip file found in artifact"
-              echo "Contents of extracted artifact:"
-              find . -type f
-              exit 1
-            fi
-
-            echo "Found liquibase zip: $LIQUIBASE_ZIP"
-
-            # Extract the liquibase zip
-            mkdir -p liquibase-build
-            unzip -q "$LIQUIBASE_ZIP" -d liquibase-build/
-
-            echo "Liquibase build extracted to liquibase-build/"
-            echo "build_ready=true" >> $GITHUB_OUTPUT
           fi
 
           # Only show contents if build is ready
@@ -233,8 +250,9 @@ jobs:
           fi
 
       - name: Trigger Pro Release Workflow
-        if: ${{ matrix.build_type == 'pro' && steps.download-artifact.outputs.trigger_pro_workflow == 'true' }}
+        if: ${{ matrix.build_type == 'pro' && steps.download-artifact.outputs.trigger_pro_workflow == 'true' && steps.download-artifact.outputs.use_fallback != 'true' }}
         id: trigger-pro-release
+        continue-on-error: true
         uses: the-actions-org/workflow-dispatch@v4
         with:
           workflow: pro-release-to-s3.yml
@@ -247,18 +265,20 @@ jobs:
           wait-for-completion-interval: 10m
 
       - name: Download Pro build from S3 after workflow completion
-        if: ${{ matrix.build_type == 'pro' && steps.download-artifact.outputs.trigger_pro_workflow == 'true' }}
+        if: ${{ matrix.build_type == 'pro' && steps.download-artifact.outputs.trigger_pro_workflow == 'true' && steps.download-artifact.outputs.use_fallback != 'true' }}
         id: download-after-trigger
         run: |
           LIQUIBASE_PRO_ZIP="liquibase-pro-${{ inputs.liquibaseBranch }}.zip"
           S3_URL="s3://repo.liquibase.com/releases/pro/${{ inputs.liquibaseBranch }}/$LIQUIBASE_PRO_ZIP"
 
           echo "⬇️ Downloading Pro build from S3 after workflow completion..."
-          aws s3 cp "$S3_URL" "$LIQUIBASE_PRO_ZIP"
-
-          if [ ! -f "$LIQUIBASE_PRO_ZIP" ]; then
+          
+          if ! aws s3 cp "$S3_URL" "$LIQUIBASE_PRO_ZIP"; then
             echo "❌ Failed to download Pro build even after workflow completion"
-            exit 1
+            echo "Will use fallback build from branch source instead"
+            echo "build_ready=false" >> $GITHUB_OUTPUT
+            echo "use_fallback=true" >> $GITHUB_OUTPUT
+            exit 0
           fi
 
           echo "✅ Successfully downloaded Pro build after workflow completion"
@@ -271,30 +291,57 @@ jobs:
           echo "Contents of liquibase-build:"
           ls -la liquibase-build/
           echo "build_ready=true" >> $GITHUB_OUTPUT
+          echo "use_fallback=false" >> $GITHUB_OUTPUT
 
       - name: Validate and prepare liquibase build
-        if: ${{ (matrix.build_type == 'oss') || (matrix.build_type == 'pro' && (steps.download-artifact.outputs.build_ready == 'true' || steps.download-after-trigger.outputs.build_ready == 'true')) }}
+        if: ${{ (matrix.build_type == 'oss' && (steps.download-artifact.outputs.build_ready == 'true' || steps.download-artifact.outputs.use_fallback == 'true')) || matrix.build_type == 'pro' }}
+        id: validate-build
         run: |
-          # Validate the liquibase build structure
-          if [ ! -f "liquibase-build/liquibase" ]; then
-            echo "Error: liquibase executable not found in build"
-            echo "Contents of liquibase-build:"
-            find liquibase-build -type f
-            exit 1
+          # Determine build mode
+          USE_FALLBACK="false"
+          if [[ "${{ matrix.build_type }}" == "oss" && "${{ steps.download-artifact.outputs.use_fallback }}" == "true" ]]; then
+            USE_FALLBACK="true"
+          elif [[ "${{ matrix.build_type }}" == "pro" ]]; then
+            # Check for Pro fallback conditions
+            if [[ "${{ steps.download-artifact.outputs.use_fallback }}" == "true" ]] || [[ "${{ steps.download-after-trigger.outputs.use_fallback }}" == "true" ]]; then
+              USE_FALLBACK="true"
+            # Check if Pro workflow was triggered but failed
+            elif [[ "${{ steps.download-artifact.outputs.trigger_pro_workflow }}" == "true" ]] && [[ "${{ steps.trigger-pro-release.outcome }}" == "failure" ]]; then
+              echo "Pro workflow trigger failed, falling back to standard Dockerfile build"
+              USE_FALLBACK="true"
+            # Check if Pro workflow succeeded but download still failed (no build_ready=true from either step)
+            elif [[ "${{ steps.download-artifact.outputs.trigger_pro_workflow }}" == "true" ]] && [[ "${{ steps.download-artifact.outputs.build_ready }}" != "true" ]] && [[ "${{ steps.download-after-trigger.outputs.build_ready }}" != "true" ]]; then
+              echo "Pro workflow completed but build still not available, falling back to standard Dockerfile build"
+              USE_FALLBACK="true"
+            fi
+          fi
+          
+          if [[ "$USE_FALLBACK" == "true" ]]; then
+            echo "Using fallback mode - will build from standard Dockerfile using branch source"
+            echo "use_fallback_build=true" >> $GITHUB_OUTPUT
+          else
+            # Validate the liquibase build structure
+            if [ ! -f "liquibase-build/liquibase" ]; then
+              echo "Error: liquibase executable not found in build"
+              echo "Contents of liquibase-build:"
+              find liquibase-build -type f
+              exit 1
+            fi
+
+            # Make liquibase executable
+            chmod +x liquibase-build/liquibase
+
+            # Validate that liquibase can run
+            cd liquibase-build && ./liquibase --version && cd ..
+
+            echo "Liquibase build validation successful"
+            echo "Final liquibase-build contents:"
+            ls -la liquibase-build/
+            echo "use_fallback_build=false" >> $GITHUB_OUTPUT
           fi
 
-          # Make liquibase executable
-          chmod +x liquibase-build/liquibase
-
-          # Validate that liquibase can run
-          cd liquibase-build && ./liquibase --version && cd ..
-
-          echo "Liquibase build validation successful"
-          echo "Final liquibase-build contents:"
-          ls -la liquibase-build/
-
       - name: Modify Dockerfiles for artifact-based build
-        if: ${{ (matrix.build_type == 'oss') || (matrix.build_type == 'pro' && (steps.download-artifact.outputs.build_ready == 'true' || steps.download-after-trigger.outputs.build_ready == 'true')) }}
+        if: ${{ steps.validate-build.outputs.use_fallback_build == 'false' }}
         run: |
           echo "Modifying ${{ matrix.dockerfile }} to use downloaded artifact instead of GitHub releases..."
 
@@ -389,15 +436,15 @@ jobs:
           echo "..."
 
       - name: Set up Docker Buildx
-        if: ${{ (matrix.build_type == 'oss') || (matrix.build_type == 'pro' && (steps.download-artifact.outputs.build_ready == 'true' || steps.download-after-trigger.outputs.build_ready == 'true')) }}
+        if: ${{ steps.validate-build.outcome == 'success' }}
         uses: docker/setup-buildx-action@v3
 
       - name: Set up QEMU
-        if: ${{ (matrix.build_type == 'oss') || (matrix.build_type == 'pro' && (steps.download-artifact.outputs.build_ready == 'true' || steps.download-after-trigger.outputs.build_ready == 'true')) }}
+        if: ${{ steps.validate-build.outcome == 'success' }}
         uses: docker/setup-qemu-action@v3
 
       - name: Log in to internal Nexus Docker Registry
-        if: ${{ (matrix.build_type == 'oss') || (matrix.build_type == 'pro' && (steps.download-artifact.outputs.build_ready == 'true' || steps.download-after-trigger.outputs.build_ready == 'true')) }}
+        if: ${{ steps.validate-build.outcome == 'success' }}
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REPO_URL }}
@@ -405,7 +452,7 @@ jobs:
           password: ${{ env.REPO_PASSWORD }}
 
       - name: Build and push Docker image
-        if: ${{ (matrix.build_type == 'oss') || (matrix.build_type == 'pro' && (steps.download-artifact.outputs.build_ready == 'true' || steps.download-after-trigger.outputs.build_ready == 'true')) }}
+        if: ${{ steps.validate-build.outcome == 'success' }}
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -424,10 +471,13 @@ jobs:
             org.opencontainers.image.documentation=https://docs.liquibase.com
             org.opencontainers.image.revision=${{ github.sha }}
             liquibase.branch=${{ inputs.liquibaseBranch }}
+            liquibase.build.mode=${{ steps.validate-build.outputs.use_fallback_build == 'true' && 'fallback' || 'artifact' }}
       - name: Image build summary
-        if: ${{ (matrix.build_type == 'oss') || (matrix.build_type == 'pro' && (steps.download-artifact.outputs.build_ready == 'true' || steps.download-after-trigger.outputs.build_ready == 'true')) }}
+        if: ${{ steps.validate-build.outcome == 'success' }}
         run: |
+          BUILD_MODE="${{ steps.validate-build.outputs.use_fallback_build == 'true' && 'fallback (standard Dockerfile)' || 'artifact-based' }}"
           echo "Successfully built and pushed: ${{ env.REPO_URL }}/${{ matrix.image_name }}:${{ inputs.liquibaseBranch }}"
+          echo "Build mode: $BUILD_MODE"
 
       - name: Workflow execution summary
         if: always()
@@ -439,33 +489,45 @@ jobs:
           echo "Build Type: ${{ matrix.build_type }}"
           echo ""
 
-          if [[ "${{ matrix.build_type }}" == "pro" ]]; then
+          # Determine if fallback was used
+          USE_FALLBACK="false"
+          if [[ "${{ steps.validate-build.outputs.use_fallback_build }}" == "true" ]] || [[ "${{ steps.download-artifact.outputs.use_fallback }}" == "true" ]] || [[ "${{ steps.download-after-trigger.outputs.use_fallback }}" == "true" ]]; then
+            USE_FALLBACK="true"
+          fi
+
+          if [[ "$USE_FALLBACK" == "true" ]]; then
+            echo "🔄 Build Mode: FALLBACK (Standard Dockerfile from branch source)"
+            echo "   - No pre-built artifacts were available"
+            echo "   - Used standard Dockerfile without modification"
+            echo "   - Built directly from liquibase branch: ${{ inputs.liquibaseBranch }}"
+          elif [[ "${{ matrix.build_type }}" == "pro" ]]; then
             if [[ "${{ steps.download-artifact.outputs.trigger_pro_workflow }}" == "true" ]]; then
-              echo "🔄 Pro Release Workflow Status: TRIGGERED"
+              echo "🔄 Build Mode: ARTIFACT-BASED (Pro workflow triggered)"
               echo "   - S3 build was missing for branch ${{ inputs.liquibaseBranch }}"
               echo "   - Automatically triggered pro-release-to-s3.yml workflow"
               if [[ "${{ steps.download-after-trigger.outputs.build_ready }}" == "true" ]]; then
                 echo "   - ✅ Pro workflow completed successfully"
                 echo "   - ✅ Pro build downloaded and Docker image built"
               else
-                echo "   - ❌ Pro workflow may still be running or failed"
+                echo "   - ❌ Pro workflow may have failed"
                 echo "   - 📋 Check: https://github.com/liquibase/liquibase-pro/actions/workflows/pro-release-to-s3.yml"
               fi
             else
-              if [[ "${{ steps.download-artifact.outputs.build_ready }}" == "true" ]]; then
-                echo "✅ Pro Build Status: SUCCESS (Direct S3 download)"
-              else
-                echo "❌ Pro Build Status: FAILED"
-              fi
+              echo "✅ Build Mode: ARTIFACT-BASED (Direct S3 download)"
+              echo "   - Pro build downloaded from S3"
             fi
           else
-            echo "✅ OSS Build Status: SUCCESS (GitHub artifact)"
+            echo "✅ Build Mode: ARTIFACT-BASED (GitHub artifact)"
+            echo "   - OSS build downloaded from GitHub workflow artifacts"
           fi
 
           echo ""
           if [[ "${{ job.status }}" == "success" ]]; then
             echo "🎉 Overall Status: SUCCESS"
             echo "📦 Image Available: ${{ env.REPO_URL }}/${{ matrix.image_name }}:${{ inputs.liquibaseBranch }}"
+            if [[ "$USE_FALLBACK" == "true" ]]; then
+              echo "ℹ️ Built using fallback mode - standard Dockerfile from branch source"
+            fi
           else
             echo "❌ Overall Status: FAILED"
             echo "🔍 Check the logs above for detailed error information"
