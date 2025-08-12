@@ -238,7 +238,7 @@ jobs:
           
           # Test that working directory changes when /liquibase/changelog is mounted
           # If working directory changed, it should find test.properties with relative path
-          RESULT=$(docker run --rm -v $(pwd)/test-compatibility:/liquibase/changelog \
+          RESULT=$(docker run --rm --env LIQUIBASE_LICENSE_KEY=${{ env.PRO_LICENSE_KEY }} -v $(pwd)/test-compatibility:/liquibase/changelog \
             liquibase/liquibase:${{ github.sha }} \
             --defaultsFile=test.properties validate 2>&1)
           
@@ -277,7 +277,7 @@ jobs:
           EOF
           
           # Test updateSQL with relative path to generate SQL output file
-          docker run --rm -v $(pwd)/test-file-creation:/liquibase/changelog \
+          docker run --rm --env LIQUIBASE_LICENSE_KEY=${{ env.PRO_LICENSE_KEY }} -v $(pwd)/test-file-creation:/liquibase/changelog \
             liquibase/liquibase:${{ github.sha }} \
             updateSQL --changelogFile=test-changelog.xml --url=offline:postgresql --outputFile=generated-update.sql
           
@@ -292,7 +292,7 @@ jobs:
             ls -la test-file-creation/
             # Also check if the file was created in container root (wrong location)
             echo "Testing if file was created in wrong location..."
-            WRONG_LOCATION=$(docker run --rm -v $(pwd)/test-file-creation:/liquibase/changelog \
+            WRONG_LOCATION=$(docker run --rm --env LIQUIBASE_LICENSE_KEY=${{ env.PRO_LICENSE_KEY }} -v $(pwd)/test-file-creation:/liquibase/changelog \
               liquibase/liquibase:${{ github.sha }} \
               sh -c "ls -la /liquibase/generated-update.sql 2>/dev/null || echo 'NOT_FOUND'")
             echo "Check for file in container root: $WRONG_LOCATION"
@@ -328,7 +328,7 @@ jobs:
           EOF
           
           # Test that properties file can be resolved with relative path
-          RESULT=$(docker run --rm -v $(pwd)/test-properties:/liquibase/changelog \
+          RESULT=$(docker run --rm --env LIQUIBASE_LICENSE_KEY=${{ env.PRO_LICENSE_KEY }} -v $(pwd)/test-properties:/liquibase/changelog \
             liquibase/liquibase:${{ github.sha }} \
             --defaultsFile=test.properties validate 2>&1)
           
@@ -349,7 +349,7 @@ jobs:
           echo "Testing backward compatibility when no /liquibase/changelog is mounted..."
           
           # Test container works normally without changelog mount (backward compatibility)
-          RESULT=$(docker run --rm liquibase/liquibase:${{ github.sha }} --version)
+          RESULT=$(docker run --rm --env LIQUIBASE_LICENSE_KEY=${{ env.PRO_LICENSE_KEY }} liquibase/liquibase:${{ github.sha }} --version)
           
           if echo "$RESULT" | grep -q "Liquibase Version"; then
             echo "✅ SUCCESS: Container works without changelog mount (backward compatible)"
@@ -377,7 +377,7 @@ jobs:
           EOF
           
           # Test with absolute path (old way should still work)
-          RESULT=$(docker run --rm -v $(pwd)/test-absolute-paths:/liquibase/changelog \
+          RESULT=$(docker run --rm --env LIQUIBASE_LICENSE_KEY=${{ env.PRO_LICENSE_KEY }} -v $(pwd)/test-absolute-paths:/liquibase/changelog \
             liquibase/liquibase:${{ github.sha }} \
             validate --changelogFile=/liquibase/changelog/test-changelog.xml --url=offline:postgresql 2>&1)
           
@@ -431,7 +431,7 @@ jobs:
           EOF
           
           # Test complex scenario with includes and relative paths
-          RESULT=$(docker run --rm -v $(pwd)/test-complex/changelog:/liquibase/changelog -v $(pwd)/test-complex:/liquibase/app \
+          RESULT=$(docker run --rm --env LIQUIBASE_LICENSE_KEY=${{ env.PRO_LICENSE_KEY }} -v $(pwd)/test-complex/changelog:/liquibase/changelog -v $(pwd)/test-complex:/liquibase/app \
             liquibase/liquibase:${{ github.sha }} \
             --defaultsFile=../app/app.properties validate 2>&1)
           
