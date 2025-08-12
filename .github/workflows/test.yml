@@ -216,21 +216,40 @@ jobs:
           docker stop $CONTAINER_NAME || true
           docker rm $CONTAINER_NAME || true
           
-          # Create test directory and file to verify working directory
+          # Create test directory with a properties file to verify working directory
           mkdir -p test-compatibility
-          echo "test content" > test-compatibility/test-file.txt
+          cat > test-compatibility/test.properties << EOF
+          changelogFile=test-changelog.xml
+          url=offline:postgresql
+          driver=org.postgresql.Driver
+          EOF
+          
+          cat > test-compatibility/test-changelog.xml << 'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                             xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+              <changeSet id="1" author="test">
+                  <sql>SELECT 'Test';</sql>
+              </changeSet>
+          </databaseChangeLog>
+          EOF
           
           # Test that working directory changes when /liquibase/changelog is mounted
+          # If working directory changed, it should find test.properties with relative path
           RESULT=$(docker run --rm -v $(pwd)/test-compatibility:/liquibase/changelog \
-            liquibase/liquibase:${{ github.sha }} sh -c "pwd && ls -la test-file.txt 2>/dev/null && echo 'FILE_FOUND' || echo 'FILE_NOT_FOUND'")
+            liquibase/liquibase:${{ github.sha }} \
+            --defaultsFile=test.properties validate 2>&1)
           
           echo "Container output: $RESULT"
           
-          # Check if file was found (meaning we're in the mounted directory)
-          if echo "$RESULT" | grep -q "FILE_FOUND"; then
+          # If working directory changed correctly, validation should succeed
+          if echo "$RESULT" | grep -q "No validation errors found"; then
             echo "✅ SUCCESS: Working directory correctly changed to mounted changelog directory"
           else
-            echo "❌ FAIL: Working directory did not change to changelog directory"
+            echo "❌ FAIL: Working directory did not change to changelog directory or validation failed"
+            echo "This indicates the properties file was not found with relative path"
             exit 1
           fi
           
