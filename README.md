@@ -129,6 +129,29 @@ Mount your changelog directory to the `/liquibase/changelog` volume and use rela
 docker run --rm -v /path/to/changelog:/liquibase/changelog liquibase/liquibase --changeLogFile=changelog.xml update
 ```
 
+### 🔄 CLI-Docker Compatibility
+
+Starting with this version, Docker containers now behave consistently with CLI usage for file path handling. When you mount your changelog directory to `/liquibase/changelog`, the container automatically changes its working directory to match, making relative file paths work the same way in both CLI and Docker environments.
+
+**Before this enhancement:**
+- CLI: `liquibase generateChangeLog --changelogFile=mychangelog.xml` (creates file in current directory)
+- Docker: `liquibase generateChangeLog --changelogFile=changelog/mychangelog.xml` (had to include path prefix)
+
+**Now (improved):**
+- CLI: `liquibase generateChangeLog --changelogFile=mychangelog.xml` (creates file in current directory)
+- Docker: `liquibase generateChangeLog --changelogFile=mychangelog.xml` (creates file in mounted changelog directory)
+
+Both approaches now work identically, making it easier to switch between local CLI and CI/CD Docker usage without modifying your commands or file paths.
+
+#### How it works
+
+When you mount a directory to `/liquibase/changelog`, the container automatically:
+1. Detects the presence of the mounted changelog directory
+2. Changes the working directory to `/liquibase/changelog`  
+3. Executes Liquibase commands from that location
+
+This ensures that relative paths in your commands work consistently whether you're using CLI locally or Docker containers in CI/CD pipelines.
+
 ### ⚙️ Using a Configuration File
 
 To use a default configuration file, mount it in your changelog volume and reference it with the `--defaultsFile` argument.

@@ -70,6 +70,7 @@ docker-compose -f docker-compose.local.yml up --build
 - **Liquibase**: Database migration tool (OSS: GitHub releases, Pro: repo.liquibase.com)
 - **LPM**: Liquibase Package Manager for extensions
 - **Default Config**: `liquibase.docker.properties` sets headless mode
+- **CLI-Docker Compatibility**: Auto-detects `/liquibase/changelog` mount and changes working directory for consistent behavior
 
 ### Version Management
 - Liquibase versions are controlled via `LIQUIBASE_VERSION` (OSS) and `LIQUIBASE_PRO_VERSION` (Pro) ARGs
