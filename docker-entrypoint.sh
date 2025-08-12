@@ -9,6 +9,12 @@ if [[ "$1" != "history" ]] && [[ "$1" != "init" ]] && type "$1" > /dev/null 2>&1
   ## First argument is an actual OS command (except if the command is history or init as it is a liquibase command). Run it
   exec "$@"
 else
+  # Check if changelog directory exists (common mount point) and change to it
+  # This makes Docker behavior match CLI behavior for relative paths
+  if [ -d "/liquibase/changelog" ]; then
+    cd /liquibase/changelog
+  fi
+  
   if [[ "$*" == *--defaultsFile* ]] || [[ "$*" == *--defaults-file* ]] || [[ "$*" == *--version* ]]; then
     ## Just run as-is
     exec /liquibase/liquibase "$@"
