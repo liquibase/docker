@@ -55,6 +55,13 @@ jobs:
             ,/vault/liquibase
           parse-json-secrets: true
 
+      - name: Debug available environment variables
+        run: |
+          echo "Available environment variables containing LICENSE:"
+          env | grep -i license || echo "No LICENSE variables found"
+          echo "Available environment variables containing PRO:"
+          env | grep -i pro || echo "No PRO variables found"
+
       - name: Test liquibase init start-h2
         run: |
           LOG_STRING="The database does not persist data"
