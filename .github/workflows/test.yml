@@ -55,13 +55,6 @@ jobs:
             ,/vault/liquibase
           parse-json-secrets: true
 
-      - name: Debug available environment variables
-        run: |
-          echo "Available environment variables containing LICENSE:"
-          env | grep -i license || echo "No LICENSE variables found"
-          echo "Available environment variables containing PRO:"
-          env | grep -i pro || echo "No PRO variables found"
-
       - name: Test liquibase init start-h2
         run: |
           LOG_STRING="The database does not persist data"
@@ -356,12 +349,15 @@ jobs:
           echo "Testing backward compatibility when no /liquibase/changelog is mounted..."
           
           # Test container works normally without changelog mount (backward compatibility)
-          RESULT=$(docker run --rm --env LIQUIBASE_LICENSE_KEY=${{ env.PRO_LICENSE_KEY }} liquibase/liquibase:${{ github.sha }} --version)
+          RESULT=$(docker run --rm --env LIQUIBASE_LICENSE_KEY=${{ env.PRO_LICENSE_KEY }} liquibase/liquibase:${{ github.sha }} --version 2>&1)
           
-          if echo "$RESULT" | grep -q "Liquibase Version"; then
+          echo "Container output: $RESULT"
+          
+          if echo "$RESULT" | grep -q "Liquibase.*Version"; then
             echo "✅ SUCCESS: Container works without changelog mount (backward compatible)"
           else
             echo "❌ FAIL: Container broken when no changelog directory mounted"
+            echo "Full output: $RESULT"
             exit 1
           fi
 
