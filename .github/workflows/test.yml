@@ -206,3 +206,192 @@ jobs:
           docker build -f $(pwd)/.github/test/Dockerfile -t liquibase:test $(pwd)/.github/test/
           # Get the logs and check if the desired string is present
           docker run --rm --env LIQUIBASE_LICENSE_KEY=${{ env.PRO_LICENSE_KEY }} --name liquibase-test --entrypoint="/scripts/liquibase_command.sh" -v $(pwd)/.github/test:/liquibase/changelog liquibase:test "version"
+
+      # CLI-Docker Compatibility Feature Tests
+      - name: Test CLI-Docker compatibility - Working directory change
+        run: |
+          echo "Testing that working directory changes to /liquibase/changelog when mounted..."
+          
+          # Stop and remove existing container
+          docker stop $CONTAINER_NAME || true
+          docker rm $CONTAINER_NAME || true
+          
+          # Create test directory and file to verify working directory
+          mkdir -p test-compatibility
+          echo "test content" > test-compatibility/test-file.txt
+          
+          # Test that working directory changes when /liquibase/changelog is mounted
+          RESULT=$(docker run --rm -v $(pwd)/test-compatibility:/liquibase/changelog \
+            liquibase/liquibase:${{ github.sha }} sh -c "pwd && ls -la test-file.txt 2>/dev/null && echo 'FILE_FOUND' || echo 'FILE_NOT_FOUND'")
+          
+          echo "Container output: $RESULT"
+          
+          # Check if file was found (meaning we're in the mounted directory)
+          if echo "$RESULT" | grep -q "FILE_FOUND"; then
+            echo "✅ SUCCESS: Working directory correctly changed to mounted changelog directory"
+          else
+            echo "❌ FAIL: Working directory did not change to changelog directory"
+            exit 1
+          fi
+          
+          # Cleanup
+          rm -rf test-compatibility
+
+      - name: Test CLI-Docker compatibility - Relative path file creation  
+        run: |
+          echo "Testing relative path file creation with new CLI-Docker compatibility..."
+          
+          # Create test directory structure
+          mkdir -p test-file-creation
+          echo '<?xml version="1.0" encoding="UTF-8"?><databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"></databaseChangeLog>' > test-file-creation/empty-changelog.xml
+          
+          # Test generateChangeLog with relative path (should work like CLI now)
+          docker run --rm -v $(pwd)/test-file-creation:/liquibase/changelog \
+            liquibase/liquibase:${{ github.sha }} \
+            generateChangeLog --changelogFile=generated-test.xml --url=offline:postgresql
+          
+          # Verify file was created in the mounted directory (not container root)
+          if [ -f "test-file-creation/generated-test.xml" ]; then
+            echo "✅ SUCCESS: File created in mounted directory with relative path"
+          else
+            echo "❌ FAIL: File not created in expected location"
+            echo "Files in test directory:"
+            ls -la test-file-creation/
+            exit 1
+          fi
+          
+          # Cleanup
+          rm -rf test-file-creation
+
+      - name: Test CLI-Docker compatibility - Properties file resolution
+        run: |
+          echo "Testing properties file resolution with relative paths..."
+          
+          # Create test directory with properties file
+          mkdir -p test-properties
+          cat > test-properties/test.properties << EOF
+          changelogFile=test-changelog.xml
+          url=offline:postgresql
+          driver=org.postgresql.Driver
+          EOF
+          
+          cat > test-properties/test-changelog.xml << 'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                             xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+              <changeSet id="1" author="test">
+                  <comment>Test changeset</comment>
+                  <sql>SELECT 'Test';</sql>
+              </changeSet>
+          </databaseChangeLog>
+          EOF
+          
+          # Test that properties file can be resolved with relative path
+          RESULT=$(docker run --rm -v $(pwd)/test-properties:/liquibase/changelog \
+            liquibase/liquibase:${{ github.sha }} \
+            --defaultsFile=test.properties validate 2>&1)
+          
+          echo "Validation result: $RESULT"
+          
+          if echo "$RESULT" | grep -q "No validation errors found"; then
+            echo "✅ SUCCESS: Properties file resolved correctly with relative path"
+          else
+            echo "❌ FAIL: Properties file resolution failed"
+            exit 1
+          fi
+          
+          # Cleanup
+          rm -rf test-properties
+
+      - name: Test backward compatibility - No changelog directory
+        run: |
+          echo "Testing backward compatibility when no /liquibase/changelog is mounted..."
+          
+          # Test container works normally without changelog mount (backward compatibility)
+          RESULT=$(docker run --rm liquibase/liquibase:${{ github.sha }} --version)
+          
+          if echo "$RESULT" | grep -q "Liquibase Version"; then
+            echo "✅ SUCCESS: Container works without changelog mount (backward compatible)"
+          else
+            echo "❌ FAIL: Container broken when no changelog directory mounted"
+            exit 1
+          fi
+
+      - name: Test backward compatibility - Absolute paths still work
+        run: |
+          echo "Testing that absolute paths still work (backward compatibility)..."
+          
+          # Create test setup
+          mkdir -p test-absolute-paths
+          echo '<?xml version="1.0" encoding="UTF-8"?><databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"></databaseChangeLog>' > test-absolute-paths/test-changelog.xml
+          
+          # Test with absolute path (old way should still work)
+          docker run --rm -v $(pwd)/test-absolute-paths:/liquibase/changelog \
+            liquibase/liquibase:${{ github.sha }} \
+            validate --changelogFile=/liquibase/changelog/test-changelog.xml --url=offline:postgresql
+          
+          if [ $? -eq 0 ]; then
+            echo "✅ SUCCESS: Absolute paths still work (backward compatible)"
+          else
+            echo "❌ FAIL: Absolute path compatibility broken"
+            exit 1
+          fi
+          
+          # Cleanup
+          rm -rf test-absolute-paths
+
+      - name: Test CLI-Docker compatibility - Complex scenario  
+        run: |
+          echo "Testing complex scenario with multiple relative paths..."
+          
+          # Create complex test structure
+          mkdir -p test-complex/{changelog,lib}
+          
+          cat > test-complex/changelog/db.changelog-root.xml << 'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                             xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+              <include file="001-tables.xml" relativeToChangelogFile="true"/>
+          </databaseChangeLog>
+          EOF
+          
+          cat > test-complex/changelog/001-tables.xml << 'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                             xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+              <changeSet id="1" author="test">
+                  <createTable tableName="test_table">
+                      <column name="id" type="int"/>
+                  </createTable>
+              </changeSet>
+          </databaseChangeLog>
+          EOF
+          
+          cat > test-complex/app.properties << EOF
+          changelogFile=db.changelog-root.xml  
+          url=offline:postgresql
+          driver=org.postgresql.Driver
+          EOF
+          
+          # Test complex scenario with includes and relative paths
+          RESULT=$(docker run --rm -v $(pwd)/test-complex/changelog:/liquibase/changelog -v $(pwd)/test-complex:/liquibase/app \
+            liquibase/liquibase:${{ github.sha }} \
+            --defaultsFile=../app/app.properties validate 2>&1)
+          
+          echo "Complex validation result: $RESULT"  
+          
+          if echo "$RESULT" | grep -q "No validation errors found"; then
+            echo "✅ SUCCESS: Complex relative path scenario works"
+          else
+            echo "❌ FAIL: Complex relative path scenario failed"
+            exit 1
+          fi
+          
+          # Cleanup
+          rm -rf test-complex
