@@ -94,6 +94,7 @@ docker-compose -f docker-compose.local.yml up --build
 - `INSTALL_MYSQL=true`: Auto-install MySQL driver at runtime
 - `LIQUIBASE_HOME=/liquibase`: Liquibase installation directory
 - `DOCKER_LIQUIBASE=true`: Marker for Docker environment
+- `SHOULD_CHANGE_DIR`: Override automatic working directory detection (true/false). When set, prevents the entrypoint from guessing whether to change to `/liquibase/changelog` directory based on command arguments
 
 ## Extending Images
 
