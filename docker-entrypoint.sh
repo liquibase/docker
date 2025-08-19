@@ -21,9 +21,11 @@ else
   if [ "$SHOULD_CHANGE_DIR" = "false" ]; then
     # Check if any arguments contain relative paths (not starting with / or containing :/ for URLs)
     for arg in "$@"; do
-      case "$arg" in
-        --changelogFile=*|--changelog-file=*|--defaultsFile=*|--defaults-file=*|--outputFile=*|--output-file=*)
-          value="${arg#*=}"
+      # Convert argument to lowercase for case-insensitive matching
+      lower_arg=$(echo "$arg" | tr '[:upper:]' '[:lower:]')
+      case "$lower_arg" in
+        --changelogfile=*|--changelog-file=*|--defaultsfile=*|--defaults-file=*|--outputfile=*|--output-file=*)
+          value="${arg#*=}"  # Use original arg to preserve case in the value
           # If the value doesn't start with / and doesn't contain :/ (for URLs), it's likely a relative path
           if [[ "$value" != /* && "$value" != *://* && "$value" != "" ]]; then
             SHOULD_CHANGE_DIR=true
@@ -35,9 +37,11 @@ else
     
     # Also check if there's a properties file being used that might contain relative paths
     for arg in "$@"; do
-      case "$arg" in
-        --defaultsFile=*|--defaults-file=*)
-          value="${arg#*=}"
+      # Convert argument to lowercase for case-insensitive matching
+      lower_arg=$(echo "$arg" | tr '[:upper:]' '[:lower:]')
+      case "$lower_arg" in
+        --defaultsfile=*|--defaults-file=*)
+          value="${arg#*=}"  # Use original arg to preserve case in the value
           # If this is a relative path to a properties file, change directory
           if [[ "$value" != /* && "$value" != *://* && "$value" != "" ]]; then
             SHOULD_CHANGE_DIR=true
