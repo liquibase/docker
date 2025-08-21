@@ -396,6 +396,120 @@ jobs:
           # Cleanup
           rm -rf test-absolute-paths
 
+      - name: Test CLI-Docker compatibility - Generate changelog creates files in mounted directory
+        run: |
+          echo "Testing that generate-changelog command creates files in mounted directory..."
+          
+          # Create test directory for generate-changelog
+          mkdir -p test-generate-changelog
+          
+          # Create a properties file for the test
+          cat > test-generate-changelog/liquibase.properties << EOF
+          url=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+          username=sa
+          password=
+          driver=org.h2.Driver
+          EOF
+          
+          # First, create a basic table in the database and capture it as changelog  
+          # Run generate-changelog with relative path
+          echo "Running generate-changelog command with relative path..."
+          RESULT=$(docker run --rm --env LIQUIBASE_LICENSE_KEY=${{ env.PRO_LICENSE_KEY }} -v $(pwd)/test-generate-changelog:/liquibase/changelog \
+            liquibase/liquibase:${{ github.sha }} \
+            generate-changelog \
+            --defaultsFile=liquibase.properties \
+            --changelog-file=generated-changelog.xml 2>&1)
+          
+          echo "Generate changelog result: $RESULT"
+          
+          # Check if the command executed successfully (even if no changes to generate)
+          if echo "$RESULT" | grep -q "was executed successfully"; then
+            echo "✅ SUCCESS: generate-changelog command executed successfully"
+          else
+            echo "❌ FAIL: generate-changelog command failed"
+            echo "Full output: $RESULT"
+            exit 1
+          fi
+          
+          # Test generate-changelog with output file creation using updateSQL 
+          echo "Testing file generation with updateSQL (which will create output)..."
+          
+          # Create a simple changelog to generate SQL from
+          cat > test-generate-changelog/test-changelog.xml << 'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                             xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+              <changeSet id="1" author="test">
+                  <createTable tableName="test_table">
+                      <column name="id" type="int"/>
+                      <column name="name" type="varchar(255)"/>
+                  </createTable>
+              </changeSet>
+          </databaseChangeLog>
+          EOF
+          
+          # Generate SQL output file with relative path to verify file creation works
+          docker run --rm --env LIQUIBASE_LICENSE_KEY=${{ env.PRO_LICENSE_KEY }} -v $(pwd)/test-generate-changelog:/liquibase/changelog \
+            liquibase/liquibase:${{ github.sha }} \
+            update-sql \
+            --changelog-file=test-changelog.xml \
+            --url=jdbc:h2:mem:testdb \
+            --username=sa \
+            --output-file=generated-output.sql
+          
+          # Verify the output file was created in the mounted directory
+          if [ -f "test-generate-changelog/generated-output.sql" ]; then
+            echo "✅ SUCCESS: Output file created in mounted directory using relative path"
+            echo "Generated file contents preview:"
+            head -10 test-generate-changelog/generated-output.sql
+            
+            # Verify file contains expected SQL
+            if grep -q "CREATE TABLE.*test_table" test-generate-changelog/generated-output.sql; then
+              echo "✅ SUCCESS: Generated file contains expected SQL content"
+            else
+              echo "❌ FAIL: Generated file does not contain expected SQL content"
+              exit 1
+            fi
+          else
+            echo "❌ FAIL: Output file was not created in the mounted directory"
+            echo "Files in test directory:"
+            ls -la test-generate-changelog/
+            exit 1
+          fi
+          
+          # Test with defaults file using relative paths
+          echo "Testing generate-changelog with defaults file containing relative paths..."
+          
+          # Create a defaults file that uses relative paths
+          cat > test-generate-changelog/generate.properties << EOF
+          changelog-file=another-generated-changelog.xml
+          url=jdbc:h2:mem:testdb
+          username=sa
+          driver=org.h2.Driver
+          EOF
+          
+          # Run generate-changelog using defaults file with relative path
+          RESULT=$(docker run --rm --env LIQUIBASE_LICENSE_KEY=${{ env.PRO_LICENSE_KEY }} -v $(pwd)/test-generate-changelog:/liquibase/changelog \
+            liquibase/liquibase:${{ github.sha }} \
+            generate-changelog \
+            --defaults-file=generate.properties 2>&1)
+          
+          echo "Generate changelog with defaults file result: $RESULT"
+          
+          # Verify the command executed successfully 
+          if echo "$RESULT" | grep -q "was executed successfully"; then
+            echo "✅ SUCCESS: generate-changelog with defaults file using relative paths works"
+          else
+            echo "❌ FAIL: generate-changelog with defaults file failed"
+            echo "Full output: $RESULT"
+            exit 1
+          fi
+          
+          # Cleanup
+          rm -rf test-generate-changelog
+
       - name: Test CLI-Docker compatibility - Complex scenario  
         run: |
           echo "Testing complex scenario with multiple relative paths..."

@@ -11,61 +11,37 @@ if [[ "$1" != "history" ]] && [[ "$1" != "init" ]] && type "$1" > /dev/null 2>&1
 else
   # Check if changelog directory exists (common mount point) and change to it
   # This makes Docker behavior match CLI behavior for relative paths
-  # Only change directory if we detect relative paths being used (unless overridden)
   # Allow SHOULD_CHANGE_DIR to be set via environment variable to override automatic detection
   if [ -z "$SHOULD_CHANGE_DIR" ]; then
-    SHOULD_CHANGE_DIR=false
+    # Default behavior: always change to /liquibase/changelog if it exists and is a mount point
+    # This ensures generated files go to the mounted volume
+    if [ -d "/liquibase/changelog" ]; then
+      # Check if the changelog directory appears to be a mount point (has files or is writable)
+      if [ "$(ls -A /liquibase/changelog 2>/dev/null)" ] || touch /liquibase/changelog/.test 2>/dev/null; then
+        SHOULD_CHANGE_DIR=true
+      else
+        SHOULD_CHANGE_DIR=false
+      fi
+    else
+      SHOULD_CHANGE_DIR=false
+    fi
   fi
   
-  # Only perform automatic detection if SHOULD_CHANGE_DIR wasn't explicitly set
-  if [ "$SHOULD_CHANGE_DIR" = "false" ]; then
-    # Check if any arguments contain relative paths (not starting with / or containing :/ for URLs)
-    for arg in "$@"; do
-      # Convert argument to lowercase for case-insensitive matching
-      lower_arg=$(echo "$arg" | tr '[:upper:]' '[:lower:]')
-      case "$lower_arg" in
-        --changelogfile=*|--changelog-file=*|--defaultsfile=*|--defaults-file=*|--outputfile=*|--output-file=*)
-          value="${arg#*=}"  # Use original arg to preserve case in the value
-          # If the value doesn't start with / and doesn't contain :/ (for URLs), it's likely a relative path
-          if [[ "$value" != /* && "$value" != *://* && "$value" != "" ]]; then
-            SHOULD_CHANGE_DIR=true
-            break
-          fi
-          ;;
-      esac
-    done
-    
-    # Also check if there's a properties file being used that might contain relative paths
-    for arg in "$@"; do
-      # Convert argument to lowercase for case-insensitive matching
-      lower_arg=$(echo "$arg" | tr '[:upper:]' '[:lower:]')
-      case "$lower_arg" in
-        --defaultsfile=*|--defaults-file=*)
-          value="${arg#*=}"  # Use original arg to preserve case in the value
-          # If this is a relative path to a properties file, change directory
-          if [[ "$value" != /* && "$value" != *://* && "$value" != "" ]]; then
-            SHOULD_CHANGE_DIR=true
-            break
-          fi
-          ;;
-      esac
-    done
-  fi
-  
-  # Change directory only if we detected relative paths and the changelog directory exists
+  # Change directory to the changelog directory if it's mounted
+  # This ensures all relative paths and generated files end up in the mounted volume
   if [ -d "/liquibase/changelog" ] && [ "$SHOULD_CHANGE_DIR" = true ]; then
     cd /liquibase/changelog
   fi
   
   # Set search path based on whether we changed directories
   EXTRA_SEARCH_PATH=""
-  if [ -d "/liquibase/changelog" ]; then
-    if [ "$SHOULD_CHANGE_DIR" = true ]; then
-      # If we changed to changelog directory, search current directory (.) for relative paths
-      EXTRA_SEARCH_PATH="--searchPath=./"
-    else
-      # If we stayed in /liquibase, search root (/) for absolute paths
-      EXTRA_SEARCH_PATH="--searchPath=/"
+  if [ "$SHOULD_CHANGE_DIR" = true ]; then
+    # If we changed to changelog directory, search current directory first, then parent
+    EXTRA_SEARCH_PATH="--searchPath=."
+  else
+    # If we stayed in /liquibase, search changelog directory first, then current
+    if [ -d "/liquibase/changelog" ]; then
+      EXTRA_SEARCH_PATH="--searchPath=/liquibase/changelog"
     fi
   fi
   
