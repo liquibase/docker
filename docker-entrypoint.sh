@@ -13,17 +13,32 @@ else
   # This makes Docker behavior match CLI behavior for relative paths
   # Allow SHOULD_CHANGE_DIR to be set via environment variable to override automatic detection
   if [ -z "$SHOULD_CHANGE_DIR" ]; then
-    # Default behavior: always change to /liquibase/changelog if it exists and is a mount point
-    # This ensures generated files go to the mounted volume
+    # Check if we should change directory based on relative paths being used
+    SHOULD_CHANGE_DIR=false
+    
+    # Only change directory if changelog directory is mounted AND we detect relative paths
     if [ -d "/liquibase/changelog" ]; then
       # Check if the changelog directory appears to be a mount point (has files or is writable)
       if [ "$(ls -A /liquibase/changelog 2>/dev/null)" ] || touch /liquibase/changelog/.test 2>/dev/null; then
-        SHOULD_CHANGE_DIR=true
-      else
-        SHOULD_CHANGE_DIR=false
+        # Remove test file if created
+        rm -f /liquibase/changelog/.test 2>/dev/null
+        
+        # Check if any arguments contain relative paths (not starting with / or containing :/ for URLs)
+        for arg in "$@"; do
+          # Convert argument to lowercase for case-insensitive matching
+          lower_arg=$(echo "$arg" | tr '[:upper:]' '[:lower:]')
+          case "$lower_arg" in
+            --changelogfile=*|--changelog-file=*|--defaultsfile=*|--defaults-file=*|--outputfile=*|--output-file=*)
+              value="${arg#*=}"  # Use original arg to preserve case in the value
+              # If the value doesn't start with / and doesn't contain :/ (for URLs), it's likely a relative path
+              if [[ "$value" != /* && "$value" != *://* && "$value" != "" ]]; then
+                SHOULD_CHANGE_DIR=true
+                break
+              fi
+              ;;
+          esac
+        done
       fi
-    else
-      SHOULD_CHANGE_DIR=false
     fi
   fi
   
@@ -36,12 +51,13 @@ else
   # Set search path based on whether we changed directories
   EXTRA_SEARCH_PATH=""
   if [ "$SHOULD_CHANGE_DIR" = true ]; then
-    # If we changed to changelog directory, search current directory first, then parent
-    EXTRA_SEARCH_PATH="--searchPath=."
+    # If we changed to changelog directory, search current directory
+    EXTRA_SEARCH_PATH="--search-path=."
   else
-    # If we stayed in /liquibase, search changelog directory first, then current
+    # If we stayed in /liquibase and changelog directory exists, add it to search path
+    # This helps when using absolute paths like /liquibase/changelog/file.xml
     if [ -d "/liquibase/changelog" ]; then
-      EXTRA_SEARCH_PATH="--searchPath=/liquibase/changelog"
+      EXTRA_SEARCH_PATH="--search-path=/liquibase/changelog"
     fi
   fi
   
