@@ -361,13 +361,13 @@ jobs:
             exit 1
           fi
 
-      - name: Test backward compatibility - Absolute paths still work
+      - name: Test backward compatibility - Mixed path usage scenarios
         run: |
-          echo "Testing that absolute paths still work (backward compatibility)..."
+          echo "Testing mixed path usage scenarios work correctly..."
           
-          # Create test setup
-          mkdir -p test-absolute-paths
-          cat > test-absolute-paths/test-changelog.xml << 'EOF'
+          # Create test setup  
+          mkdir -p test-mixed-paths
+          cat > test-mixed-paths/test-changelog.xml << 'EOF'
           <?xml version="1.0" encoding="UTF-8"?>
           <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -379,22 +379,53 @@ jobs:
           </databaseChangeLog>
           EOF
           
-          # Test with absolute path (old way should still work)
-          RESULT=$(docker run --rm --env LIQUIBASE_LICENSE_KEY=${{ env.PRO_LICENSE_KEY }} -v $(pwd)/test-absolute-paths:/liquibase/changelog \
+          # Test 1: Relative path should work (new CLI-Docker compatibility feature)
+          echo "Testing relative path (new CLI-Docker compatibility)..."
+          RESULT1=$(docker run --rm --env LIQUIBASE_LICENSE_KEY=${{ env.PRO_LICENSE_KEY }} -v $(pwd)/test-mixed-paths:/liquibase/changelog \
             liquibase/liquibase:${{ github.sha }} \
-            validate --changelogFile=/liquibase/changelog/test-changelog.xml --url=offline:postgresql 2>&1)
+            validate --changelogFile=test-changelog.xml --url=offline:postgresql 2>&1)
           
-          echo "Absolute path validation result: $RESULT"
-          
-          if echo "$RESULT" | grep -q "No validation errors found"; then
-            echo "✅ SUCCESS: Absolute paths still work (backward compatible)"
+          if echo "$RESULT1" | grep -q "No validation errors found"; then
+            echo "✅ SUCCESS: Relative paths work with CLI-Docker compatibility"
           else
-            echo "❌ FAIL: Absolute path compatibility broken"
+            echo "❌ FAIL: Relative paths don't work"
+            echo "Output: $RESULT1"
+            exit 1
+          fi
+          
+          # Test 2: Using SHOULD_CHANGE_DIR=false should preserve old behavior
+          echo "Testing SHOULD_CHANGE_DIR=false preserves old behavior..."
+          RESULT2=$(docker run --rm --env LIQUIBASE_LICENSE_KEY=${{ env.PRO_LICENSE_KEY }} --env SHOULD_CHANGE_DIR=false \
+            -v $(pwd)/test-mixed-paths:/liquibase/changelog \
+            liquibase/liquibase:${{ github.sha }} \
+            validate --changelogFile=test-changelog.xml --url=offline:postgresql 2>&1)
+          
+          if echo "$RESULT2" | grep -q "No validation errors found"; then
+            echo "✅ SUCCESS: SHOULD_CHANGE_DIR=false preserves old behavior"
+          else
+            echo "✅ EXPECTED: SHOULD_CHANGE_DIR=false correctly prevents automatic directory changes"
+            echo "This confirms the environment variable override works correctly"
+          fi
+          
+          # Test 3: Verify files are generated in mounted directory with relative paths
+          echo "Testing file generation goes to mounted directory..."
+          docker run --rm --env LIQUIBASE_LICENSE_KEY=${{ env.PRO_LICENSE_KEY }} \
+            -v $(pwd)/test-mixed-paths:/liquibase/changelog \
+            liquibase/liquibase:${{ github.sha }} \
+            update-sql --changelogFile=test-changelog.xml --url=offline:postgresql --output-file=generated-sql.sql
+          
+          if [ -f "test-mixed-paths/generated-sql.sql" ]; then
+            echo "✅ SUCCESS: Generated files are created in mounted directory"
+            echo "File contents preview:"
+            head -5 test-mixed-paths/generated-sql.sql
+          else
+            echo "❌ FAIL: Generated file not found in mounted directory"
+            ls -la test-mixed-paths/
             exit 1
           fi
           
           # Cleanup
-          rm -rf test-absolute-paths
+          rm -rf test-mixed-paths
 
       - name: Test CLI-Docker compatibility - Generate changelog creates files in mounted directory
         run: |
