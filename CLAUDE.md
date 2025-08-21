@@ -8,6 +8,7 @@ This is the official Liquibase Docker image repository that builds and publishes
 
 - **Dockerfile**: Standard Liquibase OSS image
 - **DockerfilePro**: Liquibase Pro image with enterprise features
+- **DockerfileSecure**: Liquibase Secure image (enterprise features)
 - **Dockerfile.alpine**: Alpine Linux variant (lightweight)
 - **Examples**: Database-specific extensions (AWS CLI, SQL Server, PostgreSQL, Oracle)
 - **Docker Compose**: Complete example with PostgreSQL
@@ -15,7 +16,7 @@ This is the official Liquibase Docker image repository that builds and publishes
 ## Image Publishing
 
 Images are published to multiple registries:
-- Docker Hub: `liquibase/liquibase` (OSS) and `liquibase/liquibase-pro` (Pro)
+- Docker Hub: `liquibase/liquibase` (OSS), `liquibase/liquibase-pro` (Pro), and `liquibase/liquibase-secure` (Secure)
 - GitHub Container Registry: `ghcr.io/liquibase/liquibase*`
 - Amazon ECR Public: `public.ecr.aws/liquibase/liquibase*`
 
@@ -30,6 +31,9 @@ docker build -f Dockerfile -t liquibase/liquibase:latest .
 # Build Pro image
 docker build -f DockerfilePro -t liquibase/liquibase-pro:latest .
 
+# Build Secure image
+docker build -f DockerfileSecure -t liquibase/liquibase-secure:latest .
+
 # Build Alpine variant
 docker build -f Dockerfile.alpine -t liquibase/liquibase:latest-alpine .
 ```
@@ -42,6 +46,9 @@ docker run --rm liquibase/liquibase:latest --version
 
 # Test Pro image (requires license)
 docker run --rm -e LIQUIBASE_LICENSE_KEY="your-key" liquibase/liquibase-pro:latest --version
+
+# Test Secure image (requires license)
+docker run --rm -e LIQUIBASE_LICENSE_KEY="your-key" liquibase/liquibase-secure:latest --version
 
 # Run with example changelog
 docker run --rm -v $(pwd)/examples/docker-compose/changelog:/liquibase/changelog liquibase/liquibase:latest --changelog-file=db.changelog-master.xml validate
@@ -56,6 +63,9 @@ docker-compose up
 
 # Use local build for testing
 docker-compose -f docker-compose.local.yml up --build
+
+# Run with Liquibase Secure
+docker-compose -f docker-compose.secure.yml up
 ```
 
 ## Architecture
@@ -67,12 +77,12 @@ docker-compose -f docker-compose.local.yml up --build
 - **Entrypoint**: `docker-entrypoint.sh` with automatic MySQL driver installation
 
 ### Key Components
-- **Liquibase**: Database migration tool (OSS: GitHub releases, Pro: repo.liquibase.com)
+- **Liquibase**: Database migration tool (OSS: GitHub releases, Pro/Secure: repo.liquibase.com)
 - **LPM**: Liquibase Package Manager for extensions
 - **Default Config**: `liquibase.docker.properties` sets headless mode
 
 ### Version Management
-- Liquibase versions are controlled via `LIQUIBASE_VERSION` (OSS) and `LIQUIBASE_PRO_VERSION` (Pro) ARGs
+- Liquibase versions are controlled via `LIQUIBASE_VERSION` (OSS) and `LIQUIBASE_PRO_VERSION` (Pro/Secure) ARGs
 - SHA256 checksums are validated for security
 - LPM version is specified via `LPM_VERSION` ARG
 
@@ -84,8 +94,8 @@ docker-compose -f docker-compose.local.yml up --build
 - `LIQUIBASE_COMMAND_PASSWORD`: Database password
 - `LIQUIBASE_COMMAND_CHANGELOG_FILE`: Path to changelog file
 
-### Pro Features (DockerfilePro only)
-- `LIQUIBASE_LICENSE_KEY`: Required for Pro features
+### Pro/Secure Features (DockerfilePro and DockerfileSecure only)
+- `LIQUIBASE_LICENSE_KEY`: Required for Pro/Secure features
 - `LIQUIBASE_PRO_POLICY_CHECKS_ENABLED`: Enable policy checks
 - `LIQUIBASE_PRO_QUALITY_CHECKS_ENABLED`: Enable quality checks
 
@@ -100,6 +110,12 @@ docker-compose -f docker-compose.local.yml up --build
 ```dockerfile
 FROM liquibase/liquibase:latest
 RUN lpm add mysql --global
+```
+
+### Using Liquibase Secure
+```dockerfile
+FROM liquibase/liquibase-secure:latest
+ENV LIQUIBASE_LICENSE_KEY=your-license-key
 ```
 
 ### Adding Tools (e.g., AWS CLI)

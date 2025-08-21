@@ -18,12 +18,13 @@ on:
         required: true
         type: choice
         options:
-          - "All (OSS + Alpine + Pro)"
+          - "All (OSS + Alpine + Pro + Secure)"
           - "OSS Only (Standard + Alpine)"
           - "Pro Only"
+          - "Secure Only"
           - "Standard OSS Only"
           - "Alpine OSS Only"
-        default: "All (OSS + Alpine + Pro)"
+        default: "All (OSS + Alpine + Pro + Secure)"
 
 jobs:
   set-matrix:
@@ -38,10 +39,11 @@ jobs:
           matrix_items=()
 
           case "${{ inputs.buildTargets }}" in
-            "All (OSS + Alpine + Pro)")
+            "All (OSS + Alpine + Pro + Secure)")
               matrix_items+=('{"dockerfile": "Dockerfile", "image_name": "liquibase-qa", "suffix": "", "build_type": "oss"}')
               matrix_items+=('{"dockerfile": "Dockerfile.alpine", "image_name": "liquibase-qa-alpine", "suffix": "-alpine", "build_type": "oss"}')
               matrix_items+=('{"dockerfile": "DockerfilePro", "image_name": "liquibase-pro-qa", "suffix": "-pro", "build_type": "pro"}')
+              matrix_items+=('{"dockerfile": "DockerfileSecure", "image_name": "liquibase-secure-qa", "suffix": "-secure", "build_type": "secure"}')
               ;;
             "OSS Only (Standard + Alpine)")
               matrix_items+=('{"dockerfile": "Dockerfile", "image_name": "liquibase-qa", "suffix": "", "build_type": "oss"}')
@@ -49,6 +51,9 @@ jobs:
               ;;
             "Pro Only")
               matrix_items+=('{"dockerfile": "DockerfilePro", "image_name": "liquibase-pro-qa", "suffix": "-pro", "build_type": "pro"}')
+              ;;
+            "Secure Only")
+              matrix_items+=('{"dockerfile": "DockerfileSecure", "image_name": "liquibase-secure-qa", "suffix": "-secure", "build_type": "secure"}')
               ;;
             "Standard OSS Only")
               matrix_items+=('{"dockerfile": "Dockerfile", "image_name": "liquibase-qa", "suffix": "", "build_type": "oss"}')
@@ -87,15 +92,15 @@ jobs:
             ,/vault/liquibase
           parse-json-secrets: true
 
-      - name: Configure AWS credentials for Pro builds
-        if: ${{ matrix.build_type == 'pro' }}
+      - name: Configure AWS credentials for Pro/Secure builds
+        if: ${{ matrix.build_type == 'pro' || matrix.build_type == 'secure' }}
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.AWS_PROD_GITHUB_OIDC_ROLE_ARN_LIQUIBASE_PRO }}
           aws-region: us-east-1
 
-      - name: Get GitHub App token for Pro workflow trigger
-        if: ${{ matrix.build_type == 'pro' }}
+      - name: Get GitHub App token for Pro/Secure workflow trigger
+        if: ${{ matrix.build_type == 'pro' || matrix.build_type == 'secure' }}
         id: get-token
         uses: actions/create-github-app-token@v2
         with:
@@ -139,10 +144,10 @@ jobs:
       - name: Download liquibase build artifact (OSS) or from S3 (Pro)
         id: download-artifact
         run: |
-          if [[ "${{ matrix.build_type }}" == "pro" ]]; then
+          if [[ "${{ matrix.build_type }}" == "pro" || "${{ matrix.build_type }}" == "secure" ]]; then
             echo "Downloading Liquibase Pro build from S3..."
 
-            # Download Pro build from S3
+            # Download Pro build from S3 (same binary for both Pro and Secure)
             LIQUIBASE_PRO_ZIP="liquibase-pro-${{ inputs.liquibaseBranch }}.zip"
             S3_URL="s3://repo.liquibase.com/releases/pro/${{ inputs.liquibaseBranch }}/$LIQUIBASE_PRO_ZIP"
 
@@ -250,7 +255,7 @@ jobs:
           fi
 
       - name: Trigger Pro Release Workflow
-        if: ${{ matrix.build_type == 'pro' && steps.download-artifact.outputs.trigger_pro_workflow == 'true' && steps.download-artifact.outputs.use_fallback != 'true' }}
+        if: ${{ (matrix.build_type == 'pro' || matrix.build_type == 'secure') && steps.download-artifact.outputs.trigger_pro_workflow == 'true' && steps.download-artifact.outputs.use_fallback != 'true' }}
         id: trigger-pro-release
         continue-on-error: true
         uses: the-actions-org/workflow-dispatch@v4
@@ -265,7 +270,7 @@ jobs:
           wait-for-completion-interval: 10m
 
       - name: Download Pro build from S3 after workflow completion
-        if: ${{ matrix.build_type == 'pro' && steps.download-artifact.outputs.trigger_pro_workflow == 'true' && steps.download-artifact.outputs.use_fallback != 'true' }}
+        if: ${{ (matrix.build_type == 'pro' || matrix.build_type == 'secure') && steps.download-artifact.outputs.trigger_pro_workflow == 'true' && steps.download-artifact.outputs.use_fallback != 'true' }}
         id: download-after-trigger
         run: |
           LIQUIBASE_PRO_ZIP="liquibase-pro-${{ inputs.liquibaseBranch }}.zip"
@@ -294,15 +299,15 @@ jobs:
           echo "use_fallback=false" >> $GITHUB_OUTPUT
 
       - name: Validate and prepare liquibase build
-        if: ${{ (matrix.build_type == 'oss' && (steps.download-artifact.outputs.build_ready == 'true' || steps.download-artifact.outputs.use_fallback == 'true')) || matrix.build_type == 'pro' }}
+        if: ${{ (matrix.build_type == 'oss' && (steps.download-artifact.outputs.build_ready == 'true' || steps.download-artifact.outputs.use_fallback == 'true')) || matrix.build_type == 'pro' || matrix.build_type == 'secure' }}
         id: validate-build
         run: |
           # Determine build mode
           USE_FALLBACK="false"
           if [[ "${{ matrix.build_type }}" == "oss" && "${{ steps.download-artifact.outputs.use_fallback }}" == "true" ]]; then
             USE_FALLBACK="true"
-          elif [[ "${{ matrix.build_type }}" == "pro" ]]; then
-            # Check for Pro fallback conditions
+          elif [[ "${{ matrix.build_type }}" == "pro" || "${{ matrix.build_type }}" == "secure" ]]; then
+            # Check for Pro/Secure fallback conditions
             if [[ "${{ steps.download-artifact.outputs.use_fallback }}" == "true" ]] || [[ "${{ steps.download-after-trigger.outputs.use_fallback }}" == "true" ]]; then
               USE_FALLBACK="true"
             # Check if Pro workflow was triggered but failed
@@ -349,7 +354,7 @@ jobs:
           cp "${{ matrix.dockerfile }}" "${{ matrix.dockerfile }}.backup"
 
           # Set version ARG based on dockerfile type
-          if [[ "${{ matrix.dockerfile }}" == "DockerfilePro" ]]; then
+          if [[ "${{ matrix.dockerfile }}" == "DockerfilePro" || "${{ matrix.dockerfile }}" == "DockerfileSecure" ]]; then
             VERSION_ARG="LIQUIBASE_PRO_VERSION"
           else
             VERSION_ARG="LIQUIBASE_VERSION"
@@ -398,6 +403,18 @@ jobs:
 
           # Handle Pro Dockerfile wget block
           dockerfile == "DockerfilePro" && /^RUN wget.*repo\.liquibase\.com.*tar\.gz/ {
+            print "# Copy the extracted liquibase build from the build context"
+            print "COPY liquibase-build/ ./"
+            print ""
+            print "RUN ln -s /liquibase/liquibase /usr/local/bin/liquibase && \\"
+            print "    ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \\"
+            print "    liquibase --version"
+            in_wget_block = 1
+            next
+          }
+
+          # Handle Secure Dockerfile wget block
+          dockerfile == "DockerfileSecure" && /^RUN wget.*repo\.liquibase\.com.*tar\.gz/ {
             print "# Copy the extracted liquibase build from the build context"
             print "COPY liquibase-build/ ./"
             print ""
