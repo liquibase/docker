@@ -8,7 +8,7 @@ permissions:
   
 on:
   repository_dispatch:
-    types: [liquibase-release, liquibase-pro-release, liquibase-secure-release]
+    types: [liquibase-release, liquibase-secure-release]
   workflow_dispatch:
     inputs:
       releaseType:
@@ -18,7 +18,6 @@ on:
         type: choice
         options:
           - liquibase-release
-          - liquibase-pro-release
           - liquibase-secure-release
       liquibaseVersion:
         description: "Liquibase Version"
@@ -165,34 +164,14 @@ jobs:
           git fetch origin
           git reset --hard origin/${{ github.ref_name }}
           
-          if [[ "${{ steps.collect-data.outputs.releaseType }}" == "liquibase-pro-release" ]]; then
-            file_list=("DockerfilePro")
-            LIQUIBASE_PRO_SHA=$(curl -LsS https://repo.liquibase.com/releases/pro/${{ steps.collect-data.outputs.liquibaseVersion }}/liquibase-pro-${{ steps.collect-data.outputs.liquibaseVersion }}.tar.gz | sha256sum | awk '{ print $1 }')
-            LPM_SHA=$(curl -LsS https://github.com/liquibase/liquibase-package-manager/releases/download/v${{ env.LPM_VERSION }}/lpm-${{ env.LPM_VERSION }}-linux.zip | sha256sum | awk '{ print $1 }')
-            LPM_SHA_ARM=$(curl -LsS https://github.com/liquibase/liquibase-package-manager/releases/download/v${{ env.LPM_VERSION }}/lpm-${{ env.LPM_VERSION }}-linux-arm64.zip | sha256sum | awk '{ print $1 }')
-            for file in "${file_list[@]}"; do
-              sed -i 's/^ARG LIQUIBASE_PRO_VERSION=.*/ARG LIQUIBASE_PRO_VERSION='"${{ steps.collect-data.outputs.liquibaseVersion }}"'/' "${{ github.workspace }}/${file}"
-              sed -i 's/^ARG LB_PRO_SHA256=.*/ARG LB_PRO_SHA256='"$LIQUIBASE_PRO_SHA"'/' "${{ github.workspace }}/${file}"
-              sed -i 's/^ARG LPM_SHA256=.*/ARG LPM_SHA256='"$LPM_SHA"'/' "${{ github.workspace }}/${file}"
-              sed -i 's/^ARG LPM_SHA256_ARM=.*/ARG LPM_SHA256_ARM='"$LPM_SHA_ARM"'/' "${{ github.workspace }}/${file}"
-              git add "${file}"
-            done
-            if git diff-index --cached --quiet HEAD --; then
-              echo "Nothing new to commit"
-              echo "changes_made=false" >> $GITHUB_OUTPUT
-            else
-              COMMIT_MSG="Liquibase PRO Version Bumped to ${{ steps.collect-data.outputs.liquibaseVersion }}"
-              git commit -m "${COMMIT_MSG}"
-              echo "changes_made=true" >> $GITHUB_OUTPUT
-            fi
-          elif [[ "${{ steps.collect-data.outputs.releaseType }}" == "liquibase-secure-release" ]]; then
+          if [[ "${{ steps.collect-data.outputs.releaseType }}" == "liquibase-secure-release" ]]; then
             file_list=("DockerfileSecure")
-            LIQUIBASE_PRO_SHA=$(curl -LsS https://repo.liquibase.com/releases/pro/${{ steps.collect-data.outputs.liquibaseVersion }}/liquibase-pro-${{ steps.collect-data.outputs.liquibaseVersion }}.tar.gz | sha256sum | awk '{ print $1 }')
+            LIQUIBASE_SECURE_SHA=$(curl -LsS https://repo.liquibase.com/releases/pro/${{ steps.collect-data.outputs.liquibaseVersion }}/liquibase-pro-${{ steps.collect-data.outputs.liquibaseVersion }}.tar.gz | sha256sum | awk '{ print $1 }')
             LPM_SHA=$(curl -LsS https://github.com/liquibase/liquibase-package-manager/releases/download/v${{ env.LPM_VERSION }}/lpm-${{ env.LPM_VERSION }}-linux.zip | sha256sum | awk '{ print $1 }')
             LPM_SHA_ARM=$(curl -LsS https://github.com/liquibase/liquibase-package-manager/releases/download/v${{ env.LPM_VERSION }}/lpm-${{ env.LPM_VERSION }}-linux-arm64.zip | sha256sum | awk '{ print $1 }')
             for file in "${file_list[@]}"; do
-              sed -i 's/^ARG LIQUIBASE_PRO_VERSION=.*/ARG LIQUIBASE_PRO_VERSION='"${{ steps.collect-data.outputs.liquibaseVersion }}"'/' "${{ github.workspace }}/${file}"
-              sed -i 's/^ARG LB_PRO_SHA256=.*/ARG LB_PRO_SHA256='"$LIQUIBASE_PRO_SHA"'/' "${{ github.workspace }}/${file}"
+              sed -i 's/^ARG LIQUIBASE_SECURE_VERSION=.*/ARG LIQUIBASE_SECURE_VERSION='"${{ steps.collect-data.outputs.liquibaseVersion }}"'/' "${{ github.workspace }}/${file}"
+              sed -i 's/^ARG LB_SECURE_SHA256=.*/ARG LB_SECURE_SHA256='"$LIQUIBASE_SECURE_SHA"'/' "${{ github.workspace }}/${file}"
               sed -i 's/^ARG LPM_SHA256=.*/ARG LPM_SHA256='"$LPM_SHA"'/' "${{ github.workspace }}/${file}"
               sed -i 's/^ARG LPM_SHA256_ARM=.*/ARG LPM_SHA256_ARM='"$LPM_SHA_ARM"'/' "${{ github.workspace }}/${file}"
               git add "${file}"
@@ -235,11 +214,7 @@ jobs:
           EXTENSION_VERSION="${{ steps.collect-data.outputs.extensionVersion }}"
           RELEASE_TYPE="${{ steps.collect-data.outputs.releaseType }}"
           
-          if [[ "${RELEASE_TYPE}" == "liquibase-pro-release" ]]; then
-            TAG_NAME="v${VERSION}-PRO"
-            COMMIT_MSG="Liquibase PRO Version Bumped to ${VERSION}"
-            TAG_MSG="Version Bumped to ${VERSION} PRO"
-          elif [[ "${RELEASE_TYPE}" == "liquibase-secure-release" ]]; then
+          if [[ "${RELEASE_TYPE}" == "liquibase-secure-release" ]]; then
             TAG_NAME="v${VERSION}-SECURE"
             COMMIT_MSG="Liquibase Secure Version Bumped to ${VERSION}"
             TAG_MSG="Version Bumped to ${VERSION} Secure"
@@ -282,11 +257,6 @@ jobs:
             suffix: "-alpine"
             latest_tag: "alpine"
             type: liquibase-release
-          - dockerfile: DockerfilePro
-            name: liquibase/liquibase-pro
-            suffix: ""
-            latest_tag: "latest"
-            type: liquibase-pro-release
           - dockerfile: DockerfileSecure
             name: liquibase/liquibase-secure
             suffix: ""
@@ -324,14 +294,14 @@ jobs:
           distribution: "adopt"
 
       - name: Release Notes
-        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' && ((needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' && matrix.type == 'liquibase-release') || (needs.update-dockerfiles.outputs.releaseType == 'liquibase-pro-release' && matrix.type == 'liquibase-pro-release') || (needs.update-dockerfiles.outputs.releaseType == 'liquibase-secure-release' && matrix.type == 'liquibase-secure-release')) }}
+        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' && ((needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' && matrix.type == 'liquibase-release') || (needs.update-dockerfiles.outputs.releaseType == 'liquibase-secure-release' && matrix.type == 'liquibase-secure-release')) }}
         uses: softprops/action-gh-release@v2
         with:
-          name: ${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-pro-release' && format('v{0} PRO', needs.update-dockerfiles.outputs.extensionVersion) || needs.update-dockerfiles.outputs.releaseType == 'liquibase-secure-release' && format('v{0} SECURE', needs.update-dockerfiles.outputs.extensionVersion) || format('v{0}', needs.update-dockerfiles.outputs.extensionVersion) }}
+          name: ${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-secure-release' && format('v{0} SECURE', needs.update-dockerfiles.outputs.extensionVersion) || format('v{0}', needs.update-dockerfiles.outputs.extensionVersion) }}
           tag_name: v${{ needs.update-dockerfiles.outputs.extensionVersion }}
           draft: true
           body: |
-            ${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-pro-release' && format('Support for Liquibase PRO {0}.', needs.update-dockerfiles.outputs.liquibaseVersion) || needs.update-dockerfiles.outputs.releaseType == 'liquibase-secure-release' && format('Support for Liquibase Secure {0}.', needs.update-dockerfiles.outputs.liquibaseVersion) || format('Support for Liquibase {0}.', needs.update-dockerfiles.outputs.liquibaseVersion) }}
+            ${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-secure-release' && format('Support for Liquibase Secure {0}.', needs.update-dockerfiles.outputs.liquibaseVersion) || format('Support for Liquibase {0}.', needs.update-dockerfiles.outputs.liquibaseVersion) }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -346,10 +316,6 @@ jobs:
             echo "DOCKERHUB_REPO=${{ matrix.name }}" >> $GITHUB_OUTPUT
             echo "ECR_REPO=public.ecr.aws/liquibase/liquibase" >> $GITHUB_OUTPUT
             echo "GHCR_REPO=ghcr.io/liquibase/liquibase" >> $GITHUB_OUTPUT
-          elif [[ "${{ matrix.type }}" == "liquibase-pro-release" ]]; then
-            echo "DOCKERHUB_REPO=${{ matrix.name }}" >> $GITHUB_OUTPUT
-            echo "ECR_REPO=public.ecr.aws/liquibase/liquibase-pro" >> $GITHUB_OUTPUT
-            echo "GHCR_REPO=ghcr.io/liquibase/liquibase-pro" >> $GITHUB_OUTPUT
           elif [[ "${{ matrix.type }}" == "liquibase-secure-release" ]]; then
             echo "DOCKERHUB_REPO=${{ matrix.name }}" >> $GITHUB_OUTPUT
             echo "ECR_REPO=public.ecr.aws/liquibase/liquibase-secure" >> $GITHUB_OUTPUT
@@ -471,7 +437,7 @@ jobs:
           # Labels applied to each architecture-specific image
           labels: |
             org.opencontainers.image.source=https://github.com/liquibase/docker
-            org.opencontainers.image.description=${{ matrix.type == 'liquibase-pro-release' && 'Liquibase PRO Container Image' || matrix.type == 'liquibase-secure-release' && 'Liquibase Secure Container Image' || format('Liquibase Container Image{0}', matrix.suffix == '-alpine' && ' (Alpine)' || '') }}
+            org.opencontainers.image.description=${{ matrix.type == 'liquibase-secure-release' && 'Liquibase Secure Container Image' || format('Liquibase Container Image{0}', matrix.suffix == '-alpine' && ' (Alpine)' || '') }}
             org.opencontainers.image.licenses=Apache-2.0
             org.opencontainers.image.vendor=Liquibase
             org.opencontainers.image.version=${{ needs.update-dockerfiles.outputs.extensionVersion }}
@@ -479,7 +445,7 @@ jobs:
           # Annotations applied to the manifest list (important for multi-arch images)
           annotations: |
             org.opencontainers.image.source=https://github.com/liquibase/docker
-            org.opencontainers.image.description=${{ matrix.type == 'liquibase-pro-release' && 'Liquibase PRO Container Image' || matrix.type == 'liquibase-secure-release' && 'Liquibase Secure Container Image' || format('Liquibase Container Image{0}', matrix.suffix == '-alpine' && ' (Alpine)' || '') }}
+            org.opencontainers.image.description=${{ matrix.type == 'liquibase-secure-release' && 'Liquibase Secure Container Image' || format('Liquibase Container Image{0}', matrix.suffix == '-alpine' && ' (Alpine)' || '') }}
             org.opencontainers.image.licenses=Apache-2.0
             org.opencontainers.image.vendor=Liquibase
             org.opencontainers.image.version=${{ needs.update-dockerfiles.outputs.extensionVersion }}

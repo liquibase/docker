@@ -14,9 +14,9 @@ We publish this image to multiple registries:
 
 | Registry | OSS Image | Pro Image |
 |----------|----------------|-----------|
-| **Docker Hub (default)** | `liquibase/liquibase` | `liquibase/liquibase-pro` |
-| **GitHub Container Registry** | `ghcr.io/liquibase/liquibase` | `ghcr.io/liquibase/liquibase-pro` |
-| **Amazon ECR Public** | `public.ecr.aws/liquibase/liquibase` | `public.ecr.aws/liquibase/liquibase-pro` |
+| **Docker Hub (default)** | `liquibase/liquibase` | `liquibase/liquibase-secure` |
+| **GitHub Container Registry** | `ghcr.io/liquibase/liquibase` | `ghcr.io/liquibase/liquibase-secure` |
+| **Amazon ECR Public** | `public.ecr.aws/liquibase/liquibase` | `public.ecr.aws/liquibase/liquibase-secure` |
 
 ## Dockerfile
 
@@ -41,17 +41,17 @@ docker pull ghcr.io/liquibase/liquibase
 docker pull public.ecr.aws/liquibase/liquibase
 ```
 
-### Pro Edition
+### Liquibase Secure Edition
 
 ```bash
 # Docker Hub (default)
-docker pull liquibase/liquibase-pro
+docker pull liquibase/liquibase-secure
 
 # GitHub Container Registry
-docker pull ghcr.io/liquibase/liquibase-pro
+docker pull ghcr.io/liquibase/liquibase-secure
 
 # Amazon ECR Public
-docker pull public.ecr.aws/liquibase/liquibase-pro
+docker pull public.ecr.aws/liquibase/liquibase-secure
 ```
 
 ### Pulling the Latest or Specific Version
@@ -70,18 +70,18 @@ docker pull ghcr.io/liquibase/liquibase:4.32.0
 docker pull public.ecr.aws/liquibase/liquibase:4.32.0
 ```
 
-#### Pro Edition
+#### Liquibase Secure Edition
 
 ```bash
 # Latest
-docker pull liquibase/liquibase-pro:latest
-docker pull ghcr.io/liquibase/liquibase-pro:latest
-docker pull public.ecr.aws/liquibase/liquibase-pro:latest
+docker pull liquibase/liquibase-secure:latest
+docker pull ghcr.io/liquibase/liquibase-secure:latest
+docker pull public.ecr.aws/liquibase/liquibase-secure:latest
 
 # Specific version (example: 4.32.0)
-docker pull liquibase/liquibase-pro:4.32.0
-docker pull ghcr.io/liquibase/liquibase-pro:4.32.0
-docker pull public.ecr.aws/liquibase/liquibase-pro:4.32.0
+docker pull liquibase/liquibase-secure:4.32.0
+docker pull ghcr.io/liquibase/liquibase-secure:4.32.0
+docker pull public.ecr.aws/liquibase/liquibase-secure:4.32.0
 ```
 
 For any questions or support, please visit our [Liquibase Community Forum](https://forum.liquibase.org/).
@@ -195,7 +195,7 @@ url: jdbc:postgresql://<IP OR HOSTNAME>:5432/<DATABASE>?currentSchema=<SCHEMA NA
 changeLogFile: changelog.xml
 username: <USERNAME>
 password: <PASSWORD>
-liquibaseProLicenseKey=<PASTE LB PRO LICENSE KEY HERE>
+liquibaseSecureLicenseKey=<PASTE LB Secure LICENSE KEY HERE>
 ```
 
 CLI:
