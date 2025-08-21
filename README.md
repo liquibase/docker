@@ -12,7 +12,7 @@ Please update your Dockerfiles and scripts to pull from the new official image:
 
 We publish this image to multiple registries:
 
-| Registry | OSS Image | Pro Image |
+| Registry | OSS Image | Secure Image |
 |----------|----------------|-----------|
 | **Docker Hub (default)** | `liquibase/liquibase` | `liquibase/liquibase-secure` |
 | **GitHub Container Registry** | `ghcr.io/liquibase/liquibase` | `ghcr.io/liquibase/liquibase-secure` |
