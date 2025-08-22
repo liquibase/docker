@@ -5,10 +5,15 @@ if [[ "$INSTALL_MYSQL" ]]; then
   lpm add mysql --global
 fi
 
-if [[ "$1" != "history" ]] && [[ "$1" != "init" ]] && type "$1" > /dev/null 2>&1; then
-  ## First argument is an actual OS command (except if the command is history or init as it is a liquibase command). Run it
+if [[ "$1" != "history" ]] && [[ "$1" != "init" ]] && [[ "$1" != "liquibase" ]] && type "$1" > /dev/null 2>&1; then
+  ## First argument is an actual OS command (except if the command is history, init, or liquibase). Run it
   exec "$@"
 else
+  # If first argument is 'liquibase', remove it since we'll be calling /liquibase/liquibase anyway
+  if [ "$1" = "liquibase" ]; then
+    shift
+  fi
+
   # Check if changelog directory exists (common mount point) and change to it
   # This makes Docker behavior match CLI behavior for relative paths
   # Allow SHOULD_CHANGE_DIR to be set via environment variable to override automatic detection
