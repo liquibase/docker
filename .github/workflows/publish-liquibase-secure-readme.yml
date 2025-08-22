@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'README-secure.md'
+      - 'README-pro.md'
     branches:
       - main
   workflow_dispatch:
