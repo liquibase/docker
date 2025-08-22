@@ -154,12 +154,12 @@ This ensures that relative paths in your commands work consistently whether you'
 
 ### ⚙️ Using a Configuration File
 
-To use a default configuration file, mount it in your changelog volume and reference it with the `--defaultsFile` argument.
+To use a default configuration file, mount it in your liquibase.properties file and reference it with the `--defaultsFile` argument.
 
 #### Example
 
 ```shell
-docker run --rm -v /path/to/changelog:/liquibase/changelog liquibase/liquibase --defaultsFile=liquibase.properties update
+docker run --rm -v /path/to/liquibase.properties:/liquibase/liquibase.properties/liquibase --defaultsFile=liquibase.properties update
 ```
 
 ### 📚 Including Drivers and Extensions
