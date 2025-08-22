@@ -1,4 +1,4 @@
-# Official Liquibase-Secure Docker Images
+# Official Liquibase-Secure Docker Images formerly called Liquibase-Pro
 
 **Liquibase Secure** is the enterprise edition of Liquibase that provides advanced database DevOps capabilities for teams requiring enhanced security, performance, and governance features.
 
