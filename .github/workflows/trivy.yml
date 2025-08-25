@@ -30,7 +30,7 @@ jobs:
         image: [ 
           {dockerfile: Dockerfile, name: liquibase/liquibase, suffix: ""},
           {dockerfile: Dockerfile.alpine, name: liquibase/liquibase, suffix: "-alpine"},
-          {dockerfile: DockerfilePro, name: liquibase/liquibase-pro, suffix: "-pro"},
+          {dockerfile: DockerfileSecure, name: liquibase/liquibase-pro, suffix: "-secure"},
           ]
     name: Trivy
     runs-on: "ubuntu-22.04"
@@ -110,7 +110,7 @@ jobs:
         image: [ 
           {dockerfile: Dockerfile, name: liquibase/liquibase, suffix: ""},
           {dockerfile: Dockerfile.alpine, name: liquibase/liquibase, suffix: "-alpine"},
-          {dockerfile: DockerfilePro, name: liquibase/liquibase-pro, suffix: "-pro"},
+          {dockerfile: DockerfileSecure, name: liquibase/liquibase-pro, suffix: "-secure"},
           ]
     name: Scout
     runs-on: "ubuntu-22.04"
