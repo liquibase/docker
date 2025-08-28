@@ -9,8 +9,8 @@ RUN groupadd --gid 1001 liquibase && \
 # Download and install Liquibase
 WORKDIR /liquibase
 
-ARG LIQUIBASE_SECURE_VERSION=5-secure-release-test
-ARG LB_SECURE_SHA256=d40fca9a209f2ad224e6c8d4d5cd02f2119c85684514606356c2b8facec337f7
+ARG LIQUIBASE_SECURE_VERSION=4.33.0
+ARG LB_SECURE_SHA256=f36d71194927a1fea1325f0ce17e1995b169a2a6d4de3166797230cb01791b0d
 
 # Add metadata labels
 LABEL org.opencontainers.image.description="Liquibase Secure Container Image"
