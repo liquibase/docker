@@ -1,9 +1,8 @@
-name: Publish Liquibase Secure README to Docker Hub
+name: Publish Liquibase Pro README to Docker Hub
 
 on:
   push:
     paths:
-      - 'README-secure.md'
       - 'README-pro.md'
     branches:
       - main
@@ -14,7 +13,7 @@ permissions:
   id-token: write
   
 jobs:
-  update-liquibase-secure-readme:
+  update-liquibase-pro-readme:
     runs-on: ubuntu-latest
     
     steps:
@@ -40,11 +39,11 @@ jobs:
           decoded_username=$(echo "${{ env.DOCKERHUB_USERNAME }}" | base64 -d)
           echo "DOCKERHUB_USERNAME_DECODED=$decoded_username" >> $GITHUB_ENV
 
-      - name: Update Liquibase Secure README on Docker Hub
+      - name: Update Liquibase Pro README on Docker Hub
         uses: peter-evans/dockerhub-description@v4
         with:
           username: ${{ env.DOCKERHUB_USERNAME_DECODED }}
           password: ${{ env.DOCKERHUB_UPDATE_README }}
           repository: liquibase/liquibase-pro
-          readme-filepath: ./README-secure.md
-          short-description: "Liquibase Secure"
+          readme-filepath: ./README-pro.md
+          short-description: "Liquibase Pro"

@@ -1,11 +1,3 @@
-# ⚠️ Docker Image Name Change
-> The official Docker image formerly known as **`liquibase-pro`** (i.e. `liquibase/liquibase-pro`) has been renamed to **`liquibase-secure`** (`liquibase/liquibase-secure`).  
-> Existing functionality remains unchanged — just update your Docker pull or run commands to reflect the new image name.
->
-> **Examples:**
-> - Old: `docker pull liquibase/liquibase-pro:TAG`  
-> - New: `docker pull liquibase/liquibase-secure:TAG`
-
 # Official Liquibase-Pro Docker Images
 
 **Liquibase Pro** is the enterprise edition of Liquibase that provides advanced database DevOps capabilities for teams requiring enhanced security, performance, and governance features.

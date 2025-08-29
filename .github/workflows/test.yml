@@ -24,7 +24,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        dockerfile: [Dockerfile, Dockerfile.alpine, DockerfileSecure]
+        dockerfile: [Dockerfile, Dockerfile.alpine, DockerfilePro]
         os: [ubuntu-latest, macos-13]
 
     name: Build & Test ${{ matrix.dockerfile }} - ${{ matrix.os }}
