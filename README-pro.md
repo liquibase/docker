@@ -1,10 +1,10 @@
 # ⚠️ Docker Image Name Change
-> The official Docker image formerly known as **`liquibase-pro`** (i.e. `liquibase/liquibase-pro`) has been renamed to **`liquibase-secure`** (`liquibase/liquibase-secure`).  
+> The official Docker image formerly known as **`liquibase-secure`** (i.e. `liquibase/liquibase-secure`) has been renamed to **`liquibase-pro`** (`liquibase/liquibase-pro`).  
 > Existing functionality remains unchanged — just update your Docker pull or run commands to reflect the new image name.
 >
 > **Examples:**
-> - Old: `docker pull liquibase/liquibase-pro:TAG`  
-> - New: `docker pull liquibase/liquibase-secure:TAG`
+> - Old: `docker pull liquibase/liquibase-secure:TAG`  
+> - New: `docker pull liquibase/liquibase-pro:TAG`
 
 # Official Liquibase-Pro Docker Images
 
