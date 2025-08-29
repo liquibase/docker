@@ -9,23 +9,23 @@ RUN groupadd --gid 1001 liquibase && \
 # Download and install Liquibase
 WORKDIR /liquibase
 
-ARG LIQUIBASE_SECURE_VERSION=4.33.0
-ARG LB_SECURE_SHA256=f36d71194927a1fea1325f0ce17e1995b169a2a6d4de3166797230cb01791b0d
+ARG LIQUIBASE_PRO_VERSION=4.33.0
+ARG LB_PRO_SHA256=f36d71194927a1fea1325f0ce17e1995b169a2a6d4de3166797230cb01791b0d
 
 # Add metadata labels
-LABEL org.opencontainers.image.description="Liquibase Secure Container Image"
+LABEL org.opencontainers.image.description="Liquibase Pro Container Image"
 LABEL org.opencontainers.image.licenses="Apache-2.0"
 LABEL org.opencontainers.image.vendor="Liquibase"
-LABEL org.opencontainers.image.version="${LIQUIBASE_SECURE_VERSION}"
+LABEL org.opencontainers.image.version="${LIQUIBASE_PRO_VERSION}"
 LABEL org.opencontainers.image.documentation="https://docs.liquibase.com"
 
 # Download and install Liquibase
 WORKDIR /liquibase
 
-RUN wget -q -O liquibase-secure-${LIQUIBASE_SECURE_VERSION}.tar.gz "https://repo.liquibase.com/releases/secure/${LIQUIBASE_SECURE_VERSION}/liquibase-secure-${LIQUIBASE_SECURE_VERSION}.tar.gz" && \
-    echo "$LB_SECURE_SHA256 *liquibase-secure-${LIQUIBASE_SECURE_VERSION}.tar.gz" | sha256sum -c - && \
-    tar -xzf liquibase-secure-${LIQUIBASE_SECURE_VERSION}.tar.gz && \
-    rm liquibase-secure-${LIQUIBASE_SECURE_VERSION}.tar.gz && \
+RUN wget -q -O liquibase-pro-${LIQUIBASE_PRO_VERSION}.tar.gz "https://repo.liquibase.com/releases/pro/${LIQUIBASE_PRO_VERSION}/liquibase-pro-${LIQUIBASE_PRO_VERSION}.tar.gz" && \
+    echo "$LB_PRO_SHA256 *liquibase-pro-${LIQUIBASE_PRO_VERSION}.tar.gz" | sha256sum -c - && \
+    tar -xzf liquibase-pro-${LIQUIBASE_PRO_VERSION}.tar.gz && \
+    rm liquibase-pro-${LIQUIBASE_PRO_VERSION}.tar.gz && \
     ln -s /liquibase/liquibase /usr/local/bin/liquibase && \
     ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \
     liquibase --version

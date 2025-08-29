@@ -58,7 +58,7 @@ docker-compose up
 docker-compose -f docker-compose.local.yml up --build
 
 # Run with Liquibase Pro
-docker-compose -f docker-compose.secure.yml up
+docker-compose -f docker-compose.pro.yml up
 ```
 
 ## Architecture
