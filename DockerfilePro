@@ -22,7 +22,7 @@ LABEL org.opencontainers.image.documentation="https://docs.liquibase.com"
 # Download and install Liquibase
 WORKDIR /liquibase
 
-RUN wget -q -O liquibase-pro-${LIQUIBASE_PRO_VERSION}.tar.gz "https://repo.liquibase.com/releases/pro/${LIQUIBASE_PRO_VERSION}/liquibase-pro-${LIQUIBASE_PRO_VERSION}.tar.gz" && \
+RUN wget -q -O liquibase-secure-${LIQUIBASE_SECURE_VERSION}.tar.gz "https://package.liquibase.com/downloads/dockerhub/secure/liquibase-secure-${LIQUIBASE_SECURE_VERSION}.tar.gz" && \
     echo "$LB_PRO_SHA256 *liquibase-pro-${LIQUIBASE_PRO_VERSION}.tar.gz" | sha256sum -c - && \
     tar -xzf liquibase-pro-${LIQUIBASE_PRO_VERSION}.tar.gz && \
     rm liquibase-pro-${LIQUIBASE_PRO_VERSION}.tar.gz && \
