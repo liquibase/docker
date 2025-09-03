@@ -22,13 +22,15 @@ LABEL org.opencontainers.image.documentation="https://docs.liquibase.com"
 # Download and install Liquibase
 WORKDIR /liquibase
 
-RUN wget -q -O liquibase-pro-${LIQUIBASE_PRO_VERSION}.tar.gz "https://repo.liquibase.com/releases/pro/${LIQUIBASE_PRO_VERSION}/liquibase-pro-${LIQUIBASE_PRO_VERSION}.tar.gz" && \
-    echo "$LB_PRO_SHA256 *liquibase-pro-${LIQUIBASE_PRO_VERSION}.tar.gz" | sha256sum -c - && \
-    tar -xzf liquibase-pro-${LIQUIBASE_PRO_VERSION}.tar.gz && \
-    rm liquibase-pro-${LIQUIBASE_PRO_VERSION}.tar.gz && \
-    ln -s /liquibase/liquibase /usr/local/bin/liquibase && \
-    ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \
-    liquibase --version
+RUN wget -q -O liquibase-pro-${LIQUIBASE_PRO_VERSION}.tar.gz \
+  "https://package.liquibase.com/downloads/dockerhub/official/liquibase-pro-${LIQUIBASE_PRO_VERSION}" && \
+  echo "$LB_PRO_SHA256 *liquibase-pro-${LIQUIBASE_PRO_VERSION}.tar.gz" | sha256sum -c - && \
+  tar -xzf liquibase-pro-${LIQUIBASE_PRO_VERSION}.tar.gz && \
+  rm liquibase-pro-${LIQUIBASE_PRO_VERSION}.tar.gz && \
+  ln -s /liquibase/liquibase /usr/local/bin/liquibase && \
+  ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \
+  liquibase --version
+
     
 ARG LPM_VERSION=0.2.11
 ARG LPM_SHA256=d07d1373446d2a9f11010649d705eba2ebefc23aedffec58d4d0a117c9a195b7
