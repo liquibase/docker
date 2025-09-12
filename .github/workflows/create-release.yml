@@ -51,7 +51,7 @@ on:
 jobs:
   update-dockerfiles:
     env:
-      LPM_VERSION: "0.2.10"
+      LPM_VERSION: "0.2.12"
     name: "Update Dockerfiles"
     runs-on: ubuntu-latest
     outputs:

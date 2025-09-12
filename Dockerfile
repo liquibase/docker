@@ -20,9 +20,9 @@ RUN wget -q -O liquibase-${LIQUIBASE_VERSION}.tar.gz "https://package.liquibase.
     ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \
     liquibase --version
     
-ARG LPM_VERSION=0.2.11
-ARG LPM_SHA256=d07d1373446d2a9f11010649d705eba2ebefc23aedffec58d4d0a117c9a195b7
-ARG LPM_SHA256_ARM=77c8cf8369ad07ed536c3b4c352e40815f32f89b111cafabf8e3cfc102d912f8
+ARG LPM_VERSION=0.2.12
+ARG LPM_SHA256=93748cc512761fd0a77cdf556b02519b7d9ab47f3b547aa394b6e3a02576c5d2
+ARG LPM_SHA256_ARM=d891808746cbc0f86b396b95823519d430759006386b2f13973dbd60829e8b86
     
 # Add metadata labels
 LABEL org.opencontainers.image.description="Liquibase Container Image"
