@@ -272,7 +272,7 @@ jobs:
           S3_URL="s3://repo.liquibase.com/releases/pro/${{ inputs.liquibaseBranch }}/$LIQUIBASE_PRO_ZIP"
 
           echo "⬇️ Downloading Liquibase Pro build from S3 after workflow completion..."
-          
+
           if ! aws s3 cp "$S3_URL" "$LIQUIBASE_PRO_ZIP"; then
             echo "❌ Failed to download Liquibase Pro build even after workflow completion"
             echo "Will use fallback build from branch source instead"
@@ -315,7 +315,7 @@ jobs:
               USE_FALLBACK="true"
             fi
           fi
-          
+
           if [[ "$USE_FALLBACK" == "true" ]]; then
             echo "Using fallback mode - will build from standard Dockerfile using branch source"
             echo "use_fallback_build=true" >> $GITHUB_OUTPUT
@@ -373,7 +373,7 @@ jobs:
           /^ARG LIQUIBASE_PRO_VERSION=/ { print "ARG LIQUIBASE_PRO_VERSION=" branch; next }
 
           # Handle standard Dockerfile wget block
-          dockerfile == "Dockerfile" && /^RUN wget.*github\.com.*liquibase.*tar\.gz/ {
+          dockerfile == "Dockerfile" && /^RUN wget.*package\.liquibase\.com/ {
             print "# Copy the extracted liquibase build from the build context"
             print "COPY liquibase-build/ ./"
             print ""
@@ -381,6 +381,7 @@ jobs:
             print "    ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \\"
             print "    liquibase --version"
             in_wget_block = 1
+            # Skip the rest of this line and continue skipping until we find the end
             next
           }
 
@@ -397,7 +398,7 @@ jobs:
           }
 
           # Handle Pro Dockerfile wget block
-          dockerfile == "DockerfilePro" && /^RUN wget.*repo\.liquibase\.com.*tar\.gz/ {
+          dockerfile == "DockerfilePro" && /^RUN wget.*package\.liquibase\.com/ {
             print "# Copy the extracted liquibase build from the build context"
             print "COPY liquibase-build/ ./"
             print ""
@@ -408,12 +409,14 @@ jobs:
             next
           }
 
-          # Skip lines until we reach the end of wget block
-          in_wget_block == 1 && /liquibase --version/ {
-            in_wget_block = 0
+          # Skip all lines in the wget block until we find the end marker
+          in_wget_block == 1 {
+            # Look for the end of the RUN block (line ending without backslash, and contains version check)
+            if (/liquibase --version/ && !/\\$/) {
+              in_wget_block = 0
+            }
             next
           }
-          in_wget_block == 1 { next }
 
           # Print all other lines
           { print }
