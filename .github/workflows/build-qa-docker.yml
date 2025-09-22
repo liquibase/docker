@@ -119,19 +119,27 @@ jobs:
         id: get-workflow-run
         run: |
           # Get the latest successful workflow run for the specified branch
-          WORKFLOW_RUN=$(curl -s \
+          echo "🔍 Searching for latest successful workflow run for branch: ${{ inputs.liquibaseBranch }}"
+
+          # Get workflow runs with more detailed filtering
+          WORKFLOW_RUNS_JSON=$(curl -s \
             -H "Authorization: Bearer ${{ env.LIQUIBOT_PAT_GPM_ACCESS }}" \
             -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/repos/liquibase/liquibase/actions/workflows/run-tests.yml/runs?branch=${{ inputs.liquibaseBranch }}&status=completed&conclusion=success&per_page=1" \
-            | jq -r '.workflow_runs[0].id')
+            "https://api.github.com/repos/liquibase/liquibase/actions/workflows/run-tests.yml/runs?branch=${{ inputs.liquibaseBranch }}&status=completed&per_page=10")
+
+          echo "📊 Analyzing recent workflow runs..."
+          echo "$WORKFLOW_RUNS_JSON" | jq -r '.workflow_runs[] | "ID: \(.id) | Status: \(.status) | Conclusion: \(.conclusion) | Created: \(.created_at)"'
+
+          # Find the first (most recent) workflow run with conclusion=success
+          WORKFLOW_RUN=$(echo "$WORKFLOW_RUNS_JSON" | jq -r '.workflow_runs[] | select(.conclusion == "success") | .id' | head -1)
 
           if [ "$WORKFLOW_RUN" = "null" ] || [ -z "$WORKFLOW_RUN" ]; then
-            echo "No successful workflow run found for branch ${{ inputs.liquibaseBranch }}"
+            echo "❌ No successful workflow run found for branch ${{ inputs.liquibaseBranch }}"
             echo "Will build using standard Dockerfile from branch source instead"
             echo "workflow_run_id=" >> $GITHUB_OUTPUT
             echo "has_workflow_run=false" >> $GITHUB_OUTPUT
           else
-            echo "Found workflow run ID: $WORKFLOW_RUN"
+            echo "✅ Found latest successful workflow run ID: $WORKFLOW_RUN"
             echo "workflow_run_id=$WORKFLOW_RUN" >> $GITHUB_OUTPUT
             echo "has_workflow_run=true" >> $GITHUB_OUTPUT
           fi
