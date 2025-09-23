@@ -263,7 +263,7 @@ jobs:
         continue-on-error: true
         uses: the-actions-org/workflow-dispatch@v4
         with:
-          workflow: pro-release-to-s3.yml
+          workflow: secure-release-to-s3.yml
           token: ${{ steps.get-token.outputs.token }}
           repo: liquibase/liquibase-pro
           inputs: '{"version": "${{ inputs.liquibaseBranch }}"}'
