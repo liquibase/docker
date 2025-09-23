@@ -381,7 +381,7 @@ jobs:
           /^ARG LIQUIBASE_PRO_VERSION=/ { print "ARG LIQUIBASE_PRO_VERSION=" branch; next }
 
           # Handle standard Dockerfile wget block
-          dockerfile == "Dockerfile" && /^RUN wget.*package\.liquibase\.com/ {
+          dockerfile == "Dockerfile" && /^RUN wget/ {
             print "# Copy the extracted liquibase build from the build context"
             print "COPY liquibase-build/ ./"
             print ""
@@ -405,8 +405,8 @@ jobs:
             next
           }
 
-          # Handle Pro Dockerfile wget block
-          dockerfile == "DockerfilePro" && /^RUN wget.*package\.liquibase\.com/ {
+          # Handle Pro Dockerfile wget block (starts with RUN wget but may not have package.liquibase.com on same line)
+          dockerfile == "DockerfilePro" && /^RUN wget/ {
             print "# Copy the extracted liquibase build from the build context"
             print "COPY liquibase-build/ ./"
             print ""
