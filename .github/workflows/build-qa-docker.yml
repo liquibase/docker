@@ -385,7 +385,8 @@ jobs:
             print "# Copy the extracted liquibase build from the build context"
             print "COPY liquibase-build/ ./"
             print ""
-            print "RUN ln -s /liquibase/liquibase /usr/local/bin/liquibase && \\"
+            print "RUN chown -R liquibase:liquibase /liquibase && \\"
+            print "    ln -s /liquibase/liquibase /usr/local/bin/liquibase && \\"
             print "    ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \\"
             print "    liquibase --version"
             in_wget_block = 1
@@ -398,7 +399,8 @@ jobs:
             print "# Copy the extracted liquibase build from the build context"
             print "COPY liquibase-build/ ./"
             print ""
-            print "RUN ln -s /liquibase/liquibase /usr/local/bin/liquibase && \\"
+            print "RUN chown -R liquibase:liquibase /liquibase && \\"
+            print "    ln -s /liquibase/liquibase /usr/local/bin/liquibase && \\"
             print "    ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \\"
             print "    liquibase --version"
             in_wget_block = 1
@@ -410,7 +412,8 @@ jobs:
             print "# Copy the extracted liquibase build from the build context"
             print "COPY liquibase-build/ ./"
             print ""
-            print "RUN ln -s /liquibase/liquibase /usr/local/bin/liquibase && \\"
+            print "RUN chown -R liquibase:liquibase /liquibase && \\"
+            print "    ln -s /liquibase/liquibase /usr/local/bin/liquibase && \\"
             print "    ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \\"
             print "    liquibase --version"
             in_wget_block = 1
