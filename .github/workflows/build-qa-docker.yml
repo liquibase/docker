@@ -373,6 +373,18 @@ jobs:
             skip_line = 0
           }
 
+          # Function to handle wget block replacement
+          function replace_wget_block() {
+            print "# Copy the extracted liquibase build from the build context"
+            print "COPY liquibase-build/ ./"
+            print ""
+            print "RUN chown -R liquibase:liquibase /liquibase && \\"
+            print "    ln -s /liquibase/liquibase /usr/local/bin/liquibase && \\"
+            print "    ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \\"
+            print "    liquibase --version"
+            in_wget_block = 1
+          }
+
           # Skip SHA256 ARG lines
           /^ARG LB_SHA256=/ || /^ARG LB_PRO_SHA256=/ { next }
 
@@ -380,43 +392,11 @@ jobs:
           /^ARG LIQUIBASE_VERSION=/ { print "ARG LIQUIBASE_VERSION=" branch; next }
           /^ARG LIQUIBASE_PRO_VERSION=/ { print "ARG LIQUIBASE_PRO_VERSION=" branch; next }
 
-          # Handle standard Dockerfile wget block
-          dockerfile == "Dockerfile" && /^RUN wget.*package\.liquibase\.com/ {
-            print "# Copy the extracted liquibase build from the build context"
-            print "COPY liquibase-build/ ./"
-            print ""
-            print "RUN chown -R liquibase:liquibase /liquibase && \\"
-            print "    ln -s /liquibase/liquibase /usr/local/bin/liquibase && \\"
-            print "    ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \\"
-            print "    liquibase --version"
-            in_wget_block = 1
-            # Skip the rest of this line and continue skipping until we find the end
-            next
-          }
-
-          # Handle alpine Dockerfile wget block
-          dockerfile == "Dockerfile.alpine" && /^RUN set -x/ {
-            print "# Copy the extracted liquibase build from the build context"
-            print "COPY liquibase-build/ ./"
-            print ""
-            print "RUN chown -R liquibase:liquibase /liquibase && \\"
-            print "    ln -s /liquibase/liquibase /usr/local/bin/liquibase && \\"
-            print "    ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \\"
-            print "    liquibase --version"
-            in_wget_block = 1
-            next
-          }
-
-          # Handle Pro Dockerfile wget block
-          dockerfile == "DockerfilePro" && /^RUN wget.*package\.liquibase\.com/ {
-            print "# Copy the extracted liquibase build from the build context"
-            print "COPY liquibase-build/ ./"
-            print ""
-            print "RUN chown -R liquibase:liquibase /liquibase && \\"
-            print "    ln -s /liquibase/liquibase /usr/local/bin/liquibase && \\"
-            print "    ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \\"
-            print "    liquibase --version"
-            in_wget_block = 1
+          # Handle different Dockerfile wget blocks
+          (dockerfile == "Dockerfile" && /^RUN wget.*package\.liquibase\.com/) ||
+          (dockerfile == "Dockerfile.alpine" && /^RUN set -x/) ||
+          (dockerfile == "DockerfilePro" && /^RUN wget.*package\.liquibase\.com/) {
+            replace_wget_block()
             next
           }
 
