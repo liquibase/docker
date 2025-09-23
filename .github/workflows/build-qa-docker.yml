@@ -271,6 +271,8 @@ jobs:
           wait-for-completion: true
           wait-for-completion-timeout: 60m
           wait-for-completion-interval: 10m
+        secrets: inherit
+
 
       - name: Download Liquibase Pro build from S3 after workflow completion
         if: ${{ matrix.build_type == 'pro' && steps.download-artifact.outputs.trigger_liquibase_pro_workflow == 'true' && steps.download-artifact.outputs.use_fallback != 'true' }}
