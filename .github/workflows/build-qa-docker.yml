@@ -276,7 +276,7 @@ jobs:
         if: ${{ matrix.build_type == 'pro' && steps.download-artifact.outputs.trigger_liquibase_pro_workflow == 'true' && steps.download-artifact.outputs.use_fallback != 'true' }}
         id: download-after-trigger
         run: |
-          LIQUIBASE_PRO_ZIP="liquibase-pro-${{ inputs.liquibaseBranch }}.zip"
+          LIQUIBASE_PRO_ZIP="liquibase-secure-${{ inputs.liquibaseBranch }}.zip"
           S3_URL="s3://repo.liquibase.com/releases/secure/${{ inputs.liquibaseBranch }}/$LIQUIBASE_PRO_ZIP"
 
           echo "⬇️ Downloading Liquibase Pro build from S3 after workflow completion..."
