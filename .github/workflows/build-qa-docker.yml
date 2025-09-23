@@ -152,7 +152,7 @@ jobs:
 
             # Download Liquibase Pro build from S3
             LIQUIBASE_PRO_ZIP="liquibase-pro-${{ inputs.liquibaseBranch }}.zip"
-            S3_URL="s3://repo.liquibase.com/releases/pro/${{ inputs.liquibaseBranch }}/$LIQUIBASE_PRO_ZIP"
+            S3_URL="s3://repo.liquibase.com/releases/secure/${{ inputs.liquibaseBranch }}/$LIQUIBASE_PRO_ZIP"
 
             echo "Downloading from S3: $S3_URL"
 
@@ -277,7 +277,7 @@ jobs:
         id: download-after-trigger
         run: |
           LIQUIBASE_PRO_ZIP="liquibase-pro-${{ inputs.liquibaseBranch }}.zip"
-          S3_URL="s3://repo.liquibase.com/releases/pro/${{ inputs.liquibaseBranch }}/$LIQUIBASE_PRO_ZIP"
+          S3_URL="s3://repo.liquibase.com/releases/secure/${{ inputs.liquibaseBranch }}/$LIQUIBASE_PRO_ZIP"
 
           echo "⬇️ Downloading Liquibase Pro build from S3 after workflow completion..."
 
