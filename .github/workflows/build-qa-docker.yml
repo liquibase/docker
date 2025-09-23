@@ -151,7 +151,7 @@ jobs:
             echo "Downloading Liquibase Pro build from S3..."
 
             # Download Liquibase Pro build from S3
-            LIQUIBASE_PRO_ZIP="liquibase-pro-${{ inputs.liquibaseBranch }}.zip"
+            LIQUIBASE_PRO_ZIP="liquibase-secure-${{ inputs.liquibaseBranch }}.zip"
             S3_URL="s3://repo.liquibase.com/releases/secure/${{ inputs.liquibaseBranch }}/$LIQUIBASE_PRO_ZIP"
 
             echo "Downloading from S3: $S3_URL"
