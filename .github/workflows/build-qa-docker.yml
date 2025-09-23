@@ -420,7 +420,7 @@ jobs:
           # Skip all lines in the wget block until we find the end marker
           in_wget_block == 1 {
             # Look for the end of the RUN block (line ending without backslash, and contains version check)
-            if (/liquibase --version/ && !/\\$/) {
+            if (/liquibase --version/ && !/\\\\$/) {
               in_wget_block = 0
             }
             next
