@@ -446,6 +446,13 @@ jobs:
           head -30 "${{ matrix.dockerfile }}"
           echo "..."
 
+      - name: Print modified Dockerfile
+        if: ${{ steps.validate-build.outputs.use_fallback_build == 'false' }}
+        run: |
+          echo "=== Complete modified ${{ matrix.dockerfile }} content ==="
+          cat "${{ matrix.dockerfile }}"
+          echo "=== End of ${{ matrix.dockerfile }} ==="
+
       - name: Set up Docker Buildx
         if: ${{ steps.validate-build.outcome == 'success' }}
         uses: docker/setup-buildx-action@v3
