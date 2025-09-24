@@ -151,8 +151,8 @@ jobs:
             echo "Downloading Liquibase Pro build from S3..."
 
             # Download Liquibase Pro build from S3
-            LIQUIBASE_PRO_ZIP="liquibase-pro-${{ inputs.liquibaseBranch }}.zip"
-            S3_URL="s3://repo.liquibase.com/releases/pro/${{ inputs.liquibaseBranch }}/$LIQUIBASE_PRO_ZIP"
+            LIQUIBASE_PRO_ZIP="liquibase-secure-${{ inputs.liquibaseBranch }}.zip"
+            S3_URL="s3://repo.liquibase.com/releases/secure/${{ inputs.liquibaseBranch }}/$LIQUIBASE_PRO_ZIP"
 
             echo "Downloading from S3: $S3_URL"
 
@@ -263,7 +263,7 @@ jobs:
         continue-on-error: true
         uses: the-actions-org/workflow-dispatch@v4
         with:
-          workflow: pro-release-to-s3.yml
+          workflow: secure-release-to-s3.yml
           token: ${{ steps.get-token.outputs.token }}
           repo: liquibase/liquibase-pro
           inputs: '{"version": "${{ inputs.liquibaseBranch }}"}'
@@ -276,8 +276,8 @@ jobs:
         if: ${{ matrix.build_type == 'pro' && steps.download-artifact.outputs.trigger_liquibase_pro_workflow == 'true' && steps.download-artifact.outputs.use_fallback != 'true' }}
         id: download-after-trigger
         run: |
-          LIQUIBASE_PRO_ZIP="liquibase-pro-${{ inputs.liquibaseBranch }}.zip"
-          S3_URL="s3://repo.liquibase.com/releases/pro/${{ inputs.liquibaseBranch }}/$LIQUIBASE_PRO_ZIP"
+          LIQUIBASE_PRO_ZIP="liquibase-secure-${{ inputs.liquibaseBranch }}.zip"
+          S3_URL="s3://repo.liquibase.com/releases/secure/${{ inputs.liquibaseBranch }}/$LIQUIBASE_PRO_ZIP"
 
           echo "⬇️ Downloading Liquibase Pro build from S3 after workflow completion..."
 
@@ -373,8 +373,15 @@ jobs:
             skip_line = 0
           }
 
-          # Function to handle wget block replacement
-          function replace_wget_block() {
+          # Skip SHA256 ARG lines
+          /^ARG LB_SHA256=/ || /^ARG LB_PRO_SHA256=/ { next }
+
+          # Update version ARGs
+          /^ARG LIQUIBASE_VERSION=/ { print "ARG LIQUIBASE_VERSION=" branch; next }
+          /^ARG LIQUIBASE_PRO_VERSION=/ { print "ARG LIQUIBASE_PRO_VERSION=" branch; next }
+
+          # Handle standard Dockerfile wget block
+          dockerfile == "Dockerfile" && /^RUN wget/ {
             print "# Copy the extracted liquibase build from the build context"
             print "COPY liquibase-build/ ./"
             print ""
@@ -383,27 +390,40 @@ jobs:
             print "    ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \\"
             print "    liquibase --version"
             in_wget_block = 1
+            # Skip the rest of this line and continue skipping until we find the end
+            next
           }
 
-          # Skip SHA256 ARG lines
-          /^ARG LB_SHA256=/ || /^ARG LB_PRO_SHA256=/ { next }
+          # Handle alpine Dockerfile wget block
+          dockerfile == "Dockerfile.alpine" && /^RUN set -x/ {
+            print "# Copy the extracted liquibase build from the build context"
+            print "COPY liquibase-build/ ./"
+            print ""
+            print "RUN chown -R liquibase:liquibase /liquibase && \\"
+            print "    ln -s /liquibase/liquibase /usr/local/bin/liquibase && \\"
+            print "    ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \\"
+            print "    liquibase --version"
+            in_wget_block = 1
+            next
+          }
 
-          # Update version ARGs
-          /^ARG LIQUIBASE_VERSION=/ { print "ARG LIQUIBASE_VERSION=" branch; next }
-          /^ARG LIQUIBASE_PRO_VERSION=/ { print "ARG LIQUIBASE_PRO_VERSION=" branch; next }
-
-          # Handle different Dockerfile wget blocks
-          (dockerfile == "Dockerfile" && /^RUN wget.*package\.liquibase\.com/) ||
-          (dockerfile == "Dockerfile.alpine" && /^RUN set -x/) ||
-          (dockerfile == "DockerfilePro" && /^RUN wget.*package\.liquibase\.com/) {
-            replace_wget_block()
+          # Handle Pro Dockerfile wget block (starts with RUN wget but may not have package.liquibase.com on same line)
+          dockerfile == "DockerfilePro" && /^RUN wget/ {
+            print "# Copy the extracted liquibase build from the build context"
+            print "COPY liquibase-build/ ./"
+            print ""
+            print "RUN chown -R liquibase:liquibase /liquibase && \\"
+            print "    ln -s /liquibase/liquibase /usr/local/bin/liquibase && \\"
+            print "    ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \\"
+            print "    liquibase --version"
+            in_wget_block = 1
             next
           }
 
           # Skip all lines in the wget block until we find the end marker
           in_wget_block == 1 {
             # Look for the end of the RUN block (line ending without backslash, and contains version check)
-            if (/liquibase --version/ && !/\\$/) {
+            if (/liquibase --version/ && !/\\\\$/) {
               in_wget_block = 0
             }
             next
