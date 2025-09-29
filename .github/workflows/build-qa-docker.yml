@@ -41,24 +41,39 @@ jobs:
         run: |
           matrix_items=()
 
+          # Determine if this is an RC build (secure-version contains "-RC")
+          IS_RC_BUILD="false"
+          if [[ -n "${{ inputs.secure-version }}" && "${{ inputs.secure-version }}" =~ -RC[0-9]+$ ]]; then
+            IS_RC_BUILD="true"
+            echo "Detected RC build with version: ${{ inputs.secure-version }}"
+          fi
+
           case "${{ inputs.buildTargets }}" in
             "All (OSS + Alpine + Secure)")
-              matrix_items+=('{"dockerfile": "Dockerfile", "image_name": "liquibase-qa", "suffix": "", "build_type": "oss"}')
-              matrix_items+=('{"dockerfile": "Dockerfile.alpine", "image_name": "liquibase-qa-alpine", "suffix": "-alpine", "build_type": "oss"}')
-              matrix_items+=('{"dockerfile": "DockerfileSecure", "image_name": "liquibase-secure-qa", "suffix": "-secure", "build_type": "secure"}')
+              matrix_items+=('{"dockerfile": "Dockerfile", "image_name": "liquibase-qa", "suffix": "", "build_type": "oss", "is_rc": false}')
+              matrix_items+=('{"dockerfile": "Dockerfile.alpine", "image_name": "liquibase-qa-alpine", "suffix": "-alpine", "build_type": "oss", "is_rc": false}')
+              if [[ "$IS_RC_BUILD" == "true" ]]; then
+                matrix_items+=('{"dockerfile": "DockerfileSecure", "image_name": "liquibase-secure-rc", "suffix": "-secure", "build_type": "secure", "is_rc": true}')
+              else
+                matrix_items+=('{"dockerfile": "DockerfileSecure", "image_name": "liquibase-secure-qa", "suffix": "-secure", "build_type": "secure", "is_rc": false}')
+              fi
               ;;
             "OSS Only (Standard + Alpine)")
-              matrix_items+=('{"dockerfile": "Dockerfile", "image_name": "liquibase-qa", "suffix": "", "build_type": "oss"}')
-              matrix_items+=('{"dockerfile": "Dockerfile.alpine", "image_name": "liquibase-qa-alpine", "suffix": "-alpine", "build_type": "oss"}')
+              matrix_items+=('{"dockerfile": "Dockerfile", "image_name": "liquibase-qa", "suffix": "", "build_type": "oss", "is_rc": false}')
+              matrix_items+=('{"dockerfile": "Dockerfile.alpine", "image_name": "liquibase-qa-alpine", "suffix": "-alpine", "build_type": "oss", "is_rc": false}')
               ;;
             "Secure Only")
-              matrix_items+=('{"dockerfile": "DockerfileSecure", "image_name": "liquibase-secure-qa", "suffix": "-secure", "build_type": "secure"}')
+              if [[ "$IS_RC_BUILD" == "true" ]]; then
+                matrix_items+=('{"dockerfile": "DockerfileSecure", "image_name": "liquibase-secure-rc", "suffix": "-secure", "build_type": "secure", "is_rc": true}')
+              else
+                matrix_items+=('{"dockerfile": "DockerfileSecure", "image_name": "liquibase-secure-qa", "suffix": "-secure", "build_type": "secure", "is_rc": false}')
+              fi
               ;;
             "Standard OSS Only")
-              matrix_items+=('{"dockerfile": "Dockerfile", "image_name": "liquibase-qa", "suffix": "", "build_type": "oss"}')
+              matrix_items+=('{"dockerfile": "Dockerfile", "image_name": "liquibase-qa", "suffix": "", "build_type": "oss", "is_rc": false}')
               ;;
             "Alpine OSS Only")
-              matrix_items+=('{"dockerfile": "Dockerfile.alpine", "image_name": "liquibase-qa-alpine", "suffix": "-alpine", "build_type": "oss"}')
+              matrix_items+=('{"dockerfile": "Dockerfile.alpine", "image_name": "liquibase-qa-alpine", "suffix": "-alpine", "build_type": "oss", "is_rc": false}')
               ;;
           esac
 
@@ -67,6 +82,7 @@ jobs:
           matrix_json="{\"include\":[${matrix_items[*]}]}"
 
           echo "Selected build targets: ${{ inputs.buildTargets }}"
+          echo "Is RC build: $IS_RC_BUILD"
           echo "Generated matrix: $matrix_json"
           echo "matrix=$matrix_json" >> $GITHUB_OUTPUT
 
@@ -518,13 +534,13 @@ jobs:
           platforms: linux/amd64,linux/arm64
           provenance: false
           tags: |
-            ${{ env.REPO_URL }}/${{ matrix.image_name }}:${{ inputs.liquibaseBranch }}
+            ${{ env.REPO_URL }}/${{ matrix.image_name }}:${{ matrix.is_rc == true && inputs.secure-version || inputs.liquibaseBranch }}
           labels: |
             org.opencontainers.image.source=https://github.com/liquibase/docker
             org.opencontainers.image.description=Liquibase QA Container Image${{ matrix.suffix }}
             org.opencontainers.image.licenses=Apache-2.0
             org.opencontainers.image.vendor=Liquibase
-            org.opencontainers.image.version=${{ inputs.liquibaseBranch }}
+            org.opencontainers.image.version=${{ matrix.is_rc == true && inputs.secure-version || inputs.liquibaseBranch }}
             org.opencontainers.image.documentation=https://docs.liquibase.com
             org.opencontainers.image.revision=${{ github.sha }}
             liquibase.branch=${{ inputs.liquibaseBranch }}
@@ -533,7 +549,8 @@ jobs:
         if: ${{ steps.validate-build.outcome == 'success' }}
         run: |
           BUILD_MODE="${{ steps.validate-build.outputs.use_fallback_build == 'true' && 'fallback (standard Dockerfile)' || 'artifact-based' }}"
-          echo "Successfully built and pushed: ${{ env.REPO_URL }}/${{ matrix.image_name }}:${{ inputs.liquibaseBranch }}"
+          IMAGE_TAG="${{ matrix.is_rc == true && inputs.secure-version || inputs.liquibaseBranch }}"
+          echo "Successfully built and pushed: ${{ env.REPO_URL }}/${{ matrix.image_name }}:$IMAGE_TAG"
           echo "Build mode: $BUILD_MODE"
 
       - name: Workflow execution summary
@@ -581,7 +598,8 @@ jobs:
           echo ""
           if [[ "${{ job.status }}" == "success" ]]; then
             echo "🎉 Overall Status: SUCCESS"
-            echo "📦 Image Available: ${{ env.REPO_URL }}/${{ matrix.image_name }}:${{ inputs.liquibaseBranch }}"
+            IMAGE_TAG="${{ matrix.is_rc == true && inputs.secure-version || inputs.liquibaseBranch }}"
+            echo "📦 Image Available: ${{ env.REPO_URL }}/${{ matrix.image_name }}:$IMAGE_TAG"
             if [[ "$USE_FALLBACK" == "true" ]]; then
               echo "ℹ️ Built using fallback mode - standard Dockerfile from branch source"
             fi
