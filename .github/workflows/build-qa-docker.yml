@@ -24,6 +24,10 @@ on:
           - "Standard OSS Only"
           - "Alpine OSS Only"
         default: "All (OSS + Alpine + Secure)"
+      secure-version:
+        description: "Secure version to use for 'Secure Only' builds (e.g., 5.0.0-RC10). When set, downloads from S3 instead of building from branch."
+        required: false
+        type: string
 
 jobs:
   set-matrix:
@@ -142,9 +146,29 @@ jobs:
           if [[ "${{ matrix.build_type }}" == "secure" ]]; then
             echo "Downloading Liquibase Secure build from S3..."
 
-            # Download Liquibase-Secure build from S3
-            LIQUIBASE_SECURE_ZIP="liquibase-pro-${{ inputs.liquibaseBranch }}.zip"
-            S3_URL="s3://repo.liquibase.com/releases/pro/${{ inputs.liquibaseBranch }}/$LIQUIBASE_SECURE_ZIP"
+            # Determine S3 path based on whether secure-version is provided
+            if [[ -n "${{ inputs.secure-version }}" ]]; then
+              echo "Using secure-version: ${{ inputs.secure-version }}"
+              # Extract base version and RC number for RC versions
+              VERSION="${{ inputs.secure-version }}"
+              if [[ "$VERSION" =~ ^([0-9]+\.[0-9]+\.[0-9]+)-RC([0-9]+)$ ]]; then
+                BASE_VERSION="${BASH_REMATCH[1]}"
+                RC_NUMBER="${BASH_REMATCH[2]}"
+                LIQUIBASE_SECURE_ZIP="liquibase-secure-${VERSION}.zip"
+                S3_URL="s3://repo.liquibase.com/release-candidates/${BASE_VERSION}/RC${RC_NUMBER}/${LIQUIBASE_SECURE_ZIP}"
+                echo "Using RC S3 path: $S3_URL"
+              else
+                # Regular production version
+                LIQUIBASE_SECURE_ZIP="liquibase-secure-${VERSION}.zip"
+                S3_URL="s3://repo.liquibase.com/releases/secure/${VERSION}/${LIQUIBASE_SECURE_ZIP}"
+                echo "Using production S3 path: $S3_URL"
+              fi
+            else
+              echo "Using branch-based build: ${{ inputs.liquibaseBranch }}"
+              # Original branch-based logic
+              LIQUIBASE_SECURE_ZIP="liquibase-secure-${{ inputs.liquibaseBranch }}.zip"
+              S3_URL="s3://repo.liquibase.com/releases/secure/${{ inputs.liquibaseBranch }}/$LIQUIBASE_SECURE_ZIP"
+            fi
 
             echo "Downloading from S3: $S3_URL"
 
@@ -157,10 +181,19 @@ jobs:
                 echo "❌ File exists but access denied. Check permissions."
                 exit 1
               else
-                echo "📦 Liquibase-Secure build not found in S3. Checking if we should trigger workflow or use fallback..."
-                echo "trigger_liquibase_secure_workflow=true" >> $GITHUB_OUTPUT
-                echo "build_ready=false" >> $GITHUB_OUTPUT
-                echo "use_fallback=false" >> $GITHUB_OUTPUT
+                echo "📦 Liquibase-Secure build not found in S3."
+                # If secure-version is provided, don't trigger workflow - the build should exist
+                if [[ -n "${{ inputs.secure-version }}" ]]; then
+                  echo "❌ ERROR: secure-version specified but build not found in S3. Build should already exist for version ${{ inputs.secure-version }}"
+                  echo "trigger_liquibase_secure_workflow=false" >> $GITHUB_OUTPUT
+                  echo "build_ready=false" >> $GITHUB_OUTPUT
+                  echo "use_fallback=true" >> $GITHUB_OUTPUT
+                else
+                  echo "📦 Branch-based build not found. Will trigger workflow to create it..."
+                  echo "trigger_liquibase_secure_workflow=true" >> $GITHUB_OUTPUT
+                  echo "build_ready=false" >> $GITHUB_OUTPUT
+                  echo "use_fallback=false" >> $GITHUB_OUTPUT
+                fi
               fi
             else
               echo "✅ Successfully downloaded Liquibase-Secure build from S3"
@@ -255,7 +288,7 @@ jobs:
         continue-on-error: true
         uses: the-actions-org/workflow-dispatch@v4
         with:
-          workflow: pro-release-to-s3.yml
+          workflow: secure-release-to-s3.yml
           token: ${{ steps.get-token.outputs.token }}
           repo: liquibase/liquibase-pro
           inputs: '{"version": "${{ inputs.liquibaseBranch }}"}'
@@ -268,8 +301,23 @@ jobs:
         if: ${{ matrix.build_type == 'secure' && steps.download-artifact.outputs.trigger_liquibase_secure_workflow == 'true' && steps.download-artifact.outputs.use_fallback != 'true' }}
         id: download-after-trigger
         run: |
-          LIQUIBASE_SECURE_ZIP="liquibase-pro-${{ inputs.liquibaseBranch }}.zip"
-          S3_URL="s3://repo.liquibase.com/releases/pro/${{ inputs.liquibaseBranch }}/$LIQUIBASE_SECURE_ZIP"
+          # Determine S3 path based on whether secure-version is provided (same logic as initial download)
+          if [[ -n "${{ inputs.secure-version }}" ]]; then
+            echo "Using secure-version: ${{ inputs.secure-version }}"
+            VERSION="${{ inputs.secure-version }}"
+            if [[ "$VERSION" =~ ^([0-9]+\.[0-9]+\.[0-9]+)-RC([0-9]+)$ ]]; then
+              BASE_VERSION="${BASH_REMATCH[1]}"
+              RC_NUMBER="${BASH_REMATCH[2]}"
+              LIQUIBASE_SECURE_ZIP="liquibase-secure-${VERSION}.zip"
+              S3_URL="s3://repo.liquibase.com/release-candidates/${BASE_VERSION}/RC${RC_NUMBER}/${LIQUIBASE_SECURE_ZIP}"
+            else
+              LIQUIBASE_SECURE_ZIP="liquibase-secure-${VERSION}.zip"
+              S3_URL="s3://repo.liquibase.com/releases/secure/${VERSION}/${LIQUIBASE_SECURE_ZIP}"
+            fi
+          else
+            LIQUIBASE_SECURE_ZIP="liquibase-secure-${{ inputs.liquibaseBranch }}.zip"
+            S3_URL="s3://repo.liquibase.com/releases/secure/${{ inputs.liquibaseBranch }}/$LIQUIBASE_SECURE_ZIP"
+          fi
 
           echo "⬇️ Downloading Liquibase Secure build from S3 after workflow completion..."
 
@@ -510,7 +558,7 @@ jobs:
                 echo "   - ✅ Liquibase-Secure build downloaded and Docker image built"
               else
                 echo "   - ❌ Liquibase-Secure workflow may have failed"
-                echo "   - 📋 Check: https://github.com/liquibase/liquibase-pro/actions/workflows/pro-release-to-s3.yml"
+                echo "   - 📋 Check: https://github.com/liquibase/liquibase-pro/actions/workflows/secure-release-to-s3.yml"
               fi
             else
               echo "✅ Build Mode: ARTIFACT-BASED (Direct S3 download)"
