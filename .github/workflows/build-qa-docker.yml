@@ -154,8 +154,8 @@ jobs:
               if [[ "$VERSION" =~ ^([0-9]+\.[0-9]+\.[0-9]+)-RC([0-9]+)$ ]]; then
                 BASE_VERSION="${BASH_REMATCH[1]}"
                 RC_NUMBER="${BASH_REMATCH[2]}"
-                LIQUIBASE_SECURE_ZIP="liquibase-secure-${VERSION}.zip"
-                S3_URL="s3://repo.liquibase.com/release-candidates/${BASE_VERSION}/RC${RC_NUMBER}/${LIQUIBASE_SECURE_ZIP}"
+                LIQUIBASE_SECURE_ZIP="liquibase-secure-${VERSION}.tar.gz"
+                S3_URL="s3://repo.liquibase.com/releases/rc/${VERSION}/${LIQUIBASE_SECURE_ZIP}"
                 echo "Using RC S3 path: $S3_URL"
               else
                 # Regular production version
@@ -201,10 +201,15 @@ jobs:
               echo "build_ready=true" >> $GITHUB_OUTPUT
               echo "use_fallback=false" >> $GITHUB_OUTPUT
 
-              # Extract the liquibase Secure zip
+              # Extract the liquibase Secure archive
               mkdir -p liquibase-build
-              unzip -q "$LIQUIBASE_SECURE_ZIP" -d liquibase-build/
-              echo "Liquibase Secure build extracted to liquibase-build/"
+              if [[ "$LIQUIBASE_SECURE_ZIP" == *.tar.gz ]]; then
+                tar -xzf "$LIQUIBASE_SECURE_ZIP" -C liquibase-build/
+                echo "Liquibase Secure build extracted from tar.gz to liquibase-build/"
+              else
+                unzip -q "$LIQUIBASE_SECURE_ZIP" -d liquibase-build/
+                echo "Liquibase Secure build extracted from zip to liquibase-build/"
+              fi
             fi
 
           else
@@ -308,8 +313,8 @@ jobs:
             if [[ "$VERSION" =~ ^([0-9]+\.[0-9]+\.[0-9]+)-RC([0-9]+)$ ]]; then
               BASE_VERSION="${BASH_REMATCH[1]}"
               RC_NUMBER="${BASH_REMATCH[2]}"
-              LIQUIBASE_SECURE_ZIP="liquibase-secure-${VERSION}.zip"
-              S3_URL="s3://repo.liquibase.com/release-candidates/${BASE_VERSION}/RC${RC_NUMBER}/${LIQUIBASE_SECURE_ZIP}"
+              LIQUIBASE_SECURE_ZIP="liquibase-secure-${VERSION}.tar.gz"
+              S3_URL="s3://repo.liquibase.com/releases/rc/${VERSION}/${LIQUIBASE_SECURE_ZIP}"
             else
               LIQUIBASE_SECURE_ZIP="liquibase-secure-${VERSION}.zip"
               S3_URL="s3://repo.liquibase.com/releases/secure/${VERSION}/${LIQUIBASE_SECURE_ZIP}"
@@ -331,11 +336,15 @@ jobs:
 
           echo "✅ Successfully downloaded Liquibase Secure build after workflow completion"
 
-          # Extract the liquibase Secure zip
+          # Extract the liquibase Secure archive
           mkdir -p liquibase-build
-          unzip -q "$LIQUIBASE_SECURE_ZIP" -d liquibase-build/
-
-          echo "Liquibase Secure build extracted to liquibase-build/"
+          if [[ "$LIQUIBASE_SECURE_ZIP" == *.tar.gz ]]; then
+            tar -xzf "$LIQUIBASE_SECURE_ZIP" -C liquibase-build/
+            echo "Liquibase Secure build extracted from tar.gz to liquibase-build/"
+          else
+            unzip -q "$LIQUIBASE_SECURE_ZIP" -d liquibase-build/
+            echo "Liquibase Secure build extracted from zip to liquibase-build/"
+          fi
           echo "Contents of liquibase-build:"
           ls -la liquibase-build/
           echo "build_ready=true" >> $GITHUB_OUTPUT
