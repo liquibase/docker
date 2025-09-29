@@ -166,7 +166,7 @@ jobs:
 
           if [[ "${{ steps.collect-data.outputs.releaseType }}" == "liquibase-secure-release" ]]; then
             file_list=("DockerfileSecure")
-            LIQUIBASE_SECURE_SHA=$(curl -LsS https://repo.liquibase.com/releases/pro/${{ steps.collect-data.outputs.liquibaseVersion }}/liquibase-pro-${{ steps.collect-data.outputs.liquibaseVersion }}.tar.gz | sha256sum | awk '{ print $1 }')
+            LIQUIBASE_SECURE_SHA=$(curl -LsS https://repo.liquibase.com/releases/secure/${{ steps.collect-data.outputs.liquibaseVersion }}/liquibase-secure-${{ steps.collect-data.outputs.liquibaseVersion }}.tar.gz | sha256sum | awk '{ print $1 }')
             LPM_SHA=$(curl -LsS https://github.com/liquibase/liquibase-package-manager/releases/download/v${{ env.LPM_VERSION }}/lpm-${{ env.LPM_VERSION }}-linux.zip | sha256sum | awk '{ print $1 }')
             LPM_SHA_ARM=$(curl -LsS https://github.com/liquibase/liquibase-package-manager/releases/download/v${{ env.LPM_VERSION }}/lpm-${{ env.LPM_VERSION }}-linux-arm64.zip | sha256sum | awk '{ print $1 }')
             for file in "${file_list[@]}"; do
