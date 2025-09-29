@@ -542,14 +542,3 @@ jobs:
 
       - name: Adding Official Docker PR to job summary
         run: echo '### 🚀 Official Docker PR -> ${{ env.PR_URL }}' >> $GITHUB_STEP_SUMMARY
-
-  trigger-aws-marketplace-listing:
-    runs-on: ubuntu-latest
-    needs: [update-dockerfiles, setup-update-draft-build]
-    steps:
-      - name: Trigger AWS Marketplace Listing
-        uses: peter-evans/repository-dispatch@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          event-type: trigger-aws-marketplace-listing
-          repository: liquibase/liquibase-aws-license-service
