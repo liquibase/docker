@@ -107,7 +107,7 @@ jobs:
           permission-actions: write
 
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install jq
         run: |
@@ -272,7 +272,7 @@ jobs:
           S3_URL="s3://repo.liquibase.com/releases/pro/${{ inputs.liquibaseBranch }}/$LIQUIBASE_SECURE_ZIP"
 
           echo "⬇️ Downloading Liquibase Secure build from S3 after workflow completion..."
-          
+
           if ! aws s3 cp "$S3_URL" "$LIQUIBASE_SECURE_ZIP"; then
             echo "❌ Failed to download Liquibase Secure build even after workflow completion"
             echo "Will use fallback build from branch source instead"
@@ -315,7 +315,7 @@ jobs:
               USE_FALLBACK="true"
             fi
           fi
-          
+
           if [[ "$USE_FALLBACK" == "true" ]]; then
             echo "Using fallback mode - will build from standard Dockerfile using branch source"
             echo "use_fallback_build=true" >> $GITHUB_OUTPUT
