@@ -13,7 +13,7 @@ Starting with **Liquibase 5.0**, we have introduced a clear separation between o
 
 ### 🚨 Breaking Change: Drivers and Extensions No Longer Included
 
-As of **Liquibase 5.0**, the OSS edition (`liquibase/liquibase`) and the official Docker image **no longer include database drivers or extensions by default**. This change affects both Community and Secure editions.
+As of **Liquibase 5.0**, the OSS edition (`liquibase/liquibase`) and the official Docker image **no longer include database drivers or extensions by default**.
 
 **What this means for you:**
 - You must now explicitly add database drivers using the Liquibase Package Manager (LPM)
@@ -34,9 +34,9 @@ RUN lpm add mssql --global
 
 ---
 
-## 🚨 Notice: New Official Liquibase Docker Image 🚨
+## 🚨 Notice: New Official Liquibase OSS Docker Image 🚨
 
-We are excited to announce that a new official Liquibase Docker image is now available at [https://hub.docker.com/_/liquibase](https://hub.docker.com/_/liquibase) starting with liquibase 4.27.0 and newer. We recommend all users to start using this image for the latest updates and support. Any versions prior to 4.27.0 will only be available on the existing `liquibase/liquibase` community image.
+We are excited to announce that a new official Liquibase OSS Docker image is now available at [https://hub.docker.com/_/liquibase](https://hub.docker.com/_/liquibase) starting with liquibase 4.27.0 and newer. We recommend all users to start using this image for the latest updates and support. Any versions prior to 4.27.0 will only be available on the existing `liquibase/liquibase` community image.
 
 ### 🔧 Action Required
 
