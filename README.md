@@ -1,5 +1,39 @@
 # Official Liquibase Docker Images
 
+## 🚨 Important: Liquibase 5.0 Changes 🚨
+
+### Liquibase OSS vs Liquibase Secure
+
+Starting with **Liquibase 5.0**, we have introduced a clear separation between our open source Community edition and our commercial Secure offering:
+
+- **`liquibase/liquibase`** (OSS Edition): Community version under the Functional Source License (FSL)
+- **`liquibase/liquibase-secure`** (Secure Edition): Commercial version with enterprise features
+
+**If you have a valid Liquibase License Key, you should now use `liquibase/liquibase-secure` instead of `liquibase/liquibase`.**
+
+### 🚨 Breaking Change: Drivers and Extensions No Longer Included
+
+As of **Liquibase 5.0**, the OSS edition (`liquibase/liquibase`) and the official Docker image **no longer include database drivers or extensions by default**. This change affects both Community and Secure editions.
+
+**What this means for you:**
+- You must now explicitly add database drivers using the Liquibase Package Manager (LPM)
+- Extensions must be manually installed or mounted into the container
+- MySQL driver installation via `INSTALL_MYSQL=true` environment variable is still supported
+
+**Learn more:** [Liquibase 5.0 Release Announcement](https://www.liquibase.com/blog/liquibase-5-0-release)
+
+### Adding Drivers with LPM
+
+```dockerfile
+FROM liquibase/liquibase:latest
+# Add database drivers as needed
+RUN lpm add mysql --global
+RUN lpm add postgresql --global
+RUN lpm add mssql --global
+```
+
+---
+
 ## 🚨 Notice: New Official Liquibase Docker Image 🚨
 
 We are excited to announce that a new official Liquibase Docker image is now available at [https://hub.docker.com/_/liquibase](https://hub.docker.com/_/liquibase) starting with liquibase 4.27.0 and newer. We recommend all users to start using this image for the latest updates and support. Any versions prior to 4.27.0 will only be available on the existing `liquibase/liquibase` community image.
