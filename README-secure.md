@@ -1,27 +1,19 @@
-# ⚠️ Docker Image Name Change
-> The official Docker image formerly known as **`liquibase-pro`** (i.e. `liquibase/liquibase-pro`) has been renamed to **`liquibase-secure`** (`liquibase/liquibase-secure`).  
-> Existing functionality remains unchanged — just update your Docker pull or run commands to reflect the new image name.
->
-> **Examples:**
-> - Old: `docker pull liquibase/liquibase-pro:TAG`  
-> - New: `docker pull liquibase/liquibase-secure:TAG`
+# Official Liquibase-Secure Docker Images formerly called Liquibase-Pro
 
-# Official Liquibase-Pro Docker Images
-
-**Liquibase Pro** is the enterprise edition of Liquibase that provides advanced database DevOps capabilities for teams requiring enhanced security, performance, and governance features.
+**Liquibase Secure** is the enterprise edition of Liquibase that provides advanced database DevOps capabilities for teams requiring enhanced security, performance, and governance features.
 
 ## ⚠️ License Requirements
 
-> **WARNING**: Liquibase Pro requires a valid license key to use Pro features. Without a license, the container will run in Liquibase Community mode with limited functionality.
+> **WARNING**: Liquibase Secure requires a valid license key to use Secure features. Without a license, the container will run in Liquibase Community mode with limited functionality.
 >
-> - Contact [Liquibase Sales](https://www.liquibase.com/community/contact) to obtain a Pro license
-> - Existing customers receive their Pro license keys in an email.
+> - Contact [Liquibase Sales](https://www.liquibase.com/community/contact) to obtain a Liquibase Secure license
+> - Existing customers receive their Secure license keys in an email.
 
-## 📋 Pro Features
+## 📋 Secure Features
 
-Liquibase Pro is the enterprise edition of [Liquibase](https://www.liquibase.com/) that provides advanced database DevOps capabilities for teams requiring enhanced security, performance, and governance features.
+Liquibase Secure is the enterprise edition of [Liquibase](https://www.liquibase.com/) that provides advanced database DevOps capabilities for teams requiring enhanced security, performance, and governance features.
 
-Liquibase Pro includes all Community features plus:
+Liquibase Secure includes all Community features plus:
 
 ### 🔐 Security & Governance
 
@@ -35,11 +27,11 @@ Liquibase Pro includes all Community features plus:
 
 ## 🔧 Environment Variables
 
-### Pro License Environment Variable
+### Secure License Environment Variable
 
 | Variable | Description | Example |
 |----------|-------------|---------|
-| `LIQUIBASE_LICENSE_KEY` | Your Liquibase Pro license key | `ABcd-1234-EFGH-5678` |
+| `LIQUIBASE_LICENSE_KEY` | Your Liquibase Secure license key | `ABcd-1234-EFGH-5678` |
 
 ### 🔧 Action Required
 
@@ -49,58 +41,58 @@ Please update your Dockerfiles and scripts to pull from the new official image:
 
 We publish this image to multiple registries:
 
-| Registry | Pro Image |
+| Registry | Secure Image |
 |----------|-----------|
-| **Docker Hub (default)** | `liquibase/liquibase-pro` |
-| **GitHub Container Registry** | `ghcr.io/liquibase/liquibase-pro` |
-| **Amazon ECR Public** | `public.ecr.aws/liquibase/liquibase-pro` |
+| **Docker Hub (default)** | `liquibase/liquibase-secure` |
+| **GitHub Container Registry** | `ghcr.io/liquibase/liquibase-secure` |
+| **Amazon ECR Public** | `public.ecr.aws/liquibase/liquibase-secure` |
 
 ## Dockerfile
 
 ```dockerfile
-FROM liquibase/liquibase-pro:latest
-# OR ghcr.io/liquibase/liquibase-pro:latest    # GHCR  
-# OR public.ecr.aws/liquibase/liquibase-pro:latest   # Amazon ECR Public
+FROM liquibase/liquibase-secure:latest
+# OR ghcr.io/liquibase/liquibase-secure:latest    # GHCR  
+# OR public.ecr.aws/liquibase/liquibase-secure:latest   # Amazon ECR Public
 ```
 
 ## Scripts
 
-### Pro Edition
+### Liquibase Secure Edition
 
 ```bash
 # Docker Hub (default)
-docker pull liquibase/liquibase-pro
+docker pull liquibase/liquibase-secure
 
 # GitHub Container Registry
-docker pull ghcr.io/liquibase/liquibase-pro
+docker pull ghcr.io/liquibase/liquibase-secure
 
 # Amazon ECR Public
-docker pull public.ecr.aws/liquibase/liquibase-pro
+docker pull public.ecr.aws/liquibase/liquibase-secure
 ```
 
 ### Pulling the Latest or Specific Version
 
-#### Pulling Pro Edition Images
+#### Pulling Liquibase Secure Edition Images
 
 ```bash
 # Latest
-docker pull liquibase/liquibase-pro:latest
-docker pull ghcr.io/liquibase/liquibase-pro:latest
-docker pull public.ecr.aws/liquibase/liquibase-pro:latest
+docker pull liquibase/liquibase-secure:latest
+docker pull ghcr.io/liquibase/liquibase-secure:latest
+docker pull public.ecr.aws/liquibase/liquibase-secure:latest
 
 # Specific version (example: 4.32.0)
-docker pull liquibase/liquibase-pro:4.32.0
-docker pull ghcr.io/liquibase/liquibase-pro:4.32.0
-docker pull public.ecr.aws/liquibase/liquibase-pro:4.32.0
+docker pull liquibase/liquibase-secure:4.32.0
+docker pull ghcr.io/liquibase/liquibase-secure:4.32.0
+docker pull public.ecr.aws/liquibase/liquibase-secure:4.32.0
 ```
 
 For any questions or support, please visit our [Liquibase Community Forum](https://forum.liquibase.org/).
 
 ## 🏷️ Supported Tags
 
-The following tags are officially supported and can be found on [Docker Hub](https://hub.docker.com/r/liquibase/liquibase-pro/tags):
+The following tags are officially supported and can be found on [Docker Hub](https://hub.docker.com/r/liquibase/liquibase-secure/tags):
 
-- `liquibase/liquibase-pro:<version>`
+- `liquibase/liquibase-secure:<version>`
 
 ### Database Connection Variables
 
@@ -111,24 +103,24 @@ The following tags are officially supported and can be found on [Docker Hub](htt
 | `LIQUIBASE_COMMAND_PASSWORD` | Database password | `dbpass` |
 | `LIQUIBASE_COMMAND_CHANGELOG_FILE` | Path to changelog file | `/liquibase/changelog/changelog.xml` |
 
-### Pro-Specific Configuration
+### Liquibase Secure-Specific Configuration
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `LIQUIBASE_PRO_POLICY_CHECKS_ENABLED` | Enable policy checks | `true` |
-| `LIQUIBASE_PRO_QUALITY_CHECKS_ENABLED` | Enable quality checks | `true` |
+| `LIQUIBASE_SECURE_POLICY_CHECKS_ENABLED` | Enable policy checks | `true` |
+| `LIQUIBASE_SECURE_QUALITY_CHECKS_ENABLED` | Enable quality checks | `true` |
 | `LIQUIBASE_REPORTS_ENABLED` | Enable HTML reports | `true` |
 | `LIQUIBASE_REPORTS_PATH` | Reports output directory | `/tmp/reports` |
 
 ## Required License Configuration
 
-Set your Liquibase Pro license key using the `LIQUIBASE_LICENSE_KEY` environment variable:
+Set your Liquibase Secure license key using the `LIQUIBASE_LICENSE_KEY` environment variable:
 
 ```bash
 $ docker run --rm \
     -e LIQUIBASE_LICENSE_KEY="YOUR_LICENSE_KEY_HERE" \
     -v /path/to/changelog:/liquibase/changelog \
-    liquibase/liquibase-pro \
+    liquibase/liquibase-secure \
     --changelog-file=example-changelog.xml \
     --url="jdbc:postgresql://host.docker.internal:5432/testdb" \
     --username=postgres \
@@ -145,7 +137,7 @@ Mount your changelog directory to the `/liquibase/changelog` volume and use the 
 $ docker run --rm \
     -e LIQUIBASE_LICENSE_KEY="YOUR_LICENSE_KEY_HERE" \
     -v "$(pwd)":/liquibase/changelog \
-    liquibase/liquibase-pro \
+    liquibase/liquibase-secure \
     --changelog-file=example-changelog.xml \
     --search-path=/liquibase/changelog/ \
     update
@@ -159,7 +151,7 @@ To use a default configuration file, mount it in your changelog volume and refer
 $ docker run --rm \
     -e LIQUIBASE_LICENSE_KEY="YOUR_LICENSE_KEY_HERE" \
     -v /path/to/changelog:/liquibase/changelog \
-    liquibase/liquibase-pro \
+    liquibase/liquibase-secure \
     --defaults-file=liquibase.properties update
 ```
 
@@ -171,7 +163,7 @@ username=postgres
 password=password
 changelog-file=example-changelog.xml
 search-path=/liquibase/changelog/
-licenseKey=<PASTE LB PRO LICENSE KEY HERE>
+licenseKey=<PASTE LB SECURE LICENSE KEY HERE>
 ```
 
 ## Adding Additional JARs
@@ -183,13 +175,13 @@ $ docker run --rm \
     -e LIQUIBASE_LICENSE_KEY="YOUR_LICENSE_KEY_HERE" \
     -v /path/to/changelog:/liquibase/changelog \
     -v /path/to/lib:/liquibase/lib \
-    liquibase/liquibase-pro update
+    liquibase/liquibase-secure update
 
 ## 📦 Using the Docker Image
 
 ### 🏷️ Standard Image
 
-The `liquibase/liquibase-pro:<version>` image is the standard choice. Use it as a disposable container or a foundational building block for other images.
+The `liquibase/liquibase-secure:<version>` image is the standard choice. Use it as a disposable container or a foundational building block for other images.
 
 For examples of extending the standard image, see the [standard image examples](https://github.com/liquibase/docker/tree/main/examples).
 
@@ -198,7 +190,7 @@ For examples of extending the standard image, see the [standard image examples](
 
 ```bash
 # Build the image
-docker build . -t liquibase-pro-aws
+docker build . -t liquibase-secure-aws
 
 # Run with AWS credentials
 docker run --rm \
@@ -206,7 +198,7 @@ docker run --rm \
   -e AWS_SECRET_ACCESS_KEY="your-secret-key" \
   -e LIQUIBASE_LICENSE_KEY="your-license-key" \
   -v "$(pwd)":/liquibase/changelog \
-  liquibase-pro-aws \
+  liquibase-secure-aws \
   --changelog-file=changelog.xml \
   --search-path=/liquibase/changelog/ \
   update
@@ -220,7 +212,7 @@ For a complete example using Docker Compose with PostgreSQL:
 version: '3.8'
 services:
   liquibase:
-    image: liquibase/liquibase-pro:latest
+    image: liquibase/liquibase-secure:latest
     environment:
       LIQUIBASE_LICENSE_KEY: "${LIQUIBASE_LICENSE_KEY}"
       LIQUIBASE_COMMAND_URL: "jdbc:postgresql://postgres:5432/example"
@@ -245,7 +237,7 @@ services:
 
 ## License
 
-This Docker image contains Liquibase Pro software which requires a valid commercial license for use.
+This Docker image contains Liquibase Secure software which requires a valid commercial license for use.
 
 For licensing questions, please contact [Liquibase Sales](https://www.liquibase.com/contact).
 

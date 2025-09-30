@@ -18,12 +18,16 @@ on:
         required: true
         type: choice
         options:
-          - "All (OSS + Alpine + Pro)"
+          - "All (OSS + Alpine + Secure)"
           - "OSS Only (Standard + Alpine)"
-          - "Pro Only"
+          - "Secure Only"
           - "Standard OSS Only"
           - "Alpine OSS Only"
-        default: "All (OSS + Alpine + Pro)"
+        default: "All (OSS + Alpine + Secure)"
+      secure-version:
+        description: "Secure version to use for 'Secure Only' builds (e.g., 5.0.0-RC10). When set, downloads from S3 instead of building from branch."
+        required: false
+        type: string
 
 jobs:
   set-matrix:
@@ -37,24 +41,39 @@ jobs:
         run: |
           matrix_items=()
 
+          # Determine if this is an RC build (secure-version contains "-RC")
+          IS_RC_BUILD="false"
+          if [[ -n "${{ inputs.secure-version }}" && "${{ inputs.secure-version }}" =~ -RC[0-9]+$ ]]; then
+            IS_RC_BUILD="true"
+            echo "Detected RC build with version: ${{ inputs.secure-version }}"
+          fi
+
           case "${{ inputs.buildTargets }}" in
-            "All (OSS + Alpine + Pro)")
-              matrix_items+=('{"dockerfile": "Dockerfile", "image_name": "liquibase-qa", "suffix": "", "build_type": "oss"}')
-              matrix_items+=('{"dockerfile": "Dockerfile.alpine", "image_name": "liquibase-qa-alpine", "suffix": "-alpine", "build_type": "oss"}')
-              matrix_items+=('{"dockerfile": "DockerfilePro", "image_name": "liquibase-pro-qa", "suffix": "-pro", "build_type": "pro"}')
+            "All (OSS + Alpine + Secure)")
+              matrix_items+=('{"dockerfile": "Dockerfile", "image_name": "liquibase-qa", "suffix": "", "build_type": "oss", "is_rc": false}')
+              matrix_items+=('{"dockerfile": "Dockerfile.alpine", "image_name": "liquibase-qa-alpine", "suffix": "-alpine", "build_type": "oss", "is_rc": false}')
+              if [[ "$IS_RC_BUILD" == "true" ]]; then
+                matrix_items+=('{"dockerfile": "DockerfileSecure", "image_name": "liquibase-secure-rc", "suffix": "-secure", "build_type": "secure", "is_rc": true}')
+              else
+                matrix_items+=('{"dockerfile": "DockerfileSecure", "image_name": "liquibase-secure-qa", "suffix": "-secure", "build_type": "secure", "is_rc": false}')
+              fi
               ;;
             "OSS Only (Standard + Alpine)")
-              matrix_items+=('{"dockerfile": "Dockerfile", "image_name": "liquibase-qa", "suffix": "", "build_type": "oss"}')
-              matrix_items+=('{"dockerfile": "Dockerfile.alpine", "image_name": "liquibase-qa-alpine", "suffix": "-alpine", "build_type": "oss"}')
+              matrix_items+=('{"dockerfile": "Dockerfile", "image_name": "liquibase-qa", "suffix": "", "build_type": "oss", "is_rc": false}')
+              matrix_items+=('{"dockerfile": "Dockerfile.alpine", "image_name": "liquibase-qa-alpine", "suffix": "-alpine", "build_type": "oss", "is_rc": false}')
               ;;
-            "Pro Only")
-              matrix_items+=('{"dockerfile": "DockerfilePro", "image_name": "liquibase-pro-qa", "suffix": "-pro", "build_type": "pro"}')
+            "Secure Only")
+              if [[ "$IS_RC_BUILD" == "true" ]]; then
+                matrix_items+=('{"dockerfile": "DockerfileSecure", "image_name": "liquibase-secure-rc", "suffix": "-secure", "build_type": "secure", "is_rc": true}')
+              else
+                matrix_items+=('{"dockerfile": "DockerfileSecure", "image_name": "liquibase-secure-qa", "suffix": "-secure", "build_type": "secure", "is_rc": false}')
+              fi
               ;;
             "Standard OSS Only")
-              matrix_items+=('{"dockerfile": "Dockerfile", "image_name": "liquibase-qa", "suffix": "", "build_type": "oss"}')
+              matrix_items+=('{"dockerfile": "Dockerfile", "image_name": "liquibase-qa", "suffix": "", "build_type": "oss", "is_rc": false}')
               ;;
             "Alpine OSS Only")
-              matrix_items+=('{"dockerfile": "Dockerfile.alpine", "image_name": "liquibase-qa-alpine", "suffix": "-alpine", "build_type": "oss"}')
+              matrix_items+=('{"dockerfile": "Dockerfile.alpine", "image_name": "liquibase-qa-alpine", "suffix": "-alpine", "build_type": "oss", "is_rc": false}')
               ;;
           esac
 
@@ -63,6 +82,7 @@ jobs:
           matrix_json="{\"include\":[${matrix_items[*]}]}"
 
           echo "Selected build targets: ${{ inputs.buildTargets }}"
+          echo "Is RC build: $IS_RC_BUILD"
           echo "Generated matrix: $matrix_json"
           echo "matrix=$matrix_json" >> $GITHUB_OUTPUT
 
@@ -87,15 +107,15 @@ jobs:
             ,/vault/liquibase
           parse-json-secrets: true
 
-      - name: Configure AWS credentials for Liquibase Pro builds
-        if: ${{ matrix.build_type == 'pro' }}
+      - name: Configure AWS credentials for Liquibase-Secure builds
+        if: ${{ matrix.build_type == 'secure' }}
         uses: aws-actions/configure-aws-credentials@v5
         with:
           role-to-assume: ${{ env.AWS_PROD_GITHUB_OIDC_ROLE_ARN_LIQUIBASE_PRO }}
           aws-region: us-east-1
 
-      - name: Get GitHub App token for Liquibase Pro workflow trigger
-        if: ${{ matrix.build_type == 'pro' }}
+      - name: Get GitHub App token for Liquibase-Secure workflow trigger
+        if: ${{ matrix.build_type == 'secure' }}
         id: get-token
         uses: actions/create-github-app-token@v2
         with:
@@ -119,67 +139,93 @@ jobs:
         id: get-workflow-run
         run: |
           # Get the latest successful workflow run for the specified branch
-          echo "🔍 Searching for latest successful workflow run for branch: ${{ inputs.liquibaseBranch }}"
-
-          # Get workflow runs with more detailed filtering
-          WORKFLOW_RUNS_JSON=$(curl -s \
+          WORKFLOW_RUN=$(curl -s \
             -H "Authorization: Bearer ${{ env.LIQUIBOT_PAT_GPM_ACCESS }}" \
             -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/repos/liquibase/liquibase/actions/workflows/run-tests.yml/runs?branch=${{ inputs.liquibaseBranch }}&status=completed&per_page=10")
-
-          echo "📊 Analyzing recent workflow runs..."
-          echo "$WORKFLOW_RUNS_JSON" | jq -r '.workflow_runs[] | "ID: \(.id) | Status: \(.status) | Conclusion: \(.conclusion) | Created: \(.created_at)"'
-
-          # Find the first (most recent) workflow run with conclusion=success
-          WORKFLOW_RUN=$(echo "$WORKFLOW_RUNS_JSON" | jq -r '.workflow_runs[] | select(.conclusion == "success") | .id' | head -1)
+            "https://api.github.com/repos/liquibase/liquibase/actions/workflows/run-tests.yml/runs?branch=${{ inputs.liquibaseBranch }}&status=completed&conclusion=success&per_page=1" \
+            | jq -r '.workflow_runs[0].id')
 
           if [ "$WORKFLOW_RUN" = "null" ] || [ -z "$WORKFLOW_RUN" ]; then
-            echo "❌ No successful workflow run found for branch ${{ inputs.liquibaseBranch }}"
+            echo "No successful workflow run found for branch ${{ inputs.liquibaseBranch }}"
             echo "Will build using standard Dockerfile from branch source instead"
             echo "workflow_run_id=" >> $GITHUB_OUTPUT
             echo "has_workflow_run=false" >> $GITHUB_OUTPUT
           else
-            echo "✅ Found latest successful workflow run ID: $WORKFLOW_RUN"
+            echo "Found workflow run ID: $WORKFLOW_RUN"
             echo "workflow_run_id=$WORKFLOW_RUN" >> $GITHUB_OUTPUT
             echo "has_workflow_run=true" >> $GITHUB_OUTPUT
           fi
 
-      - name: Download liquibase build artifact (OSS) or from S3 (Liquibase Pro)
+      - name: Download liquibase build artifact (OSS) or from S3 (Liquibase-Secure)
         id: download-artifact
         run: |
-          if [[ "${{ matrix.build_type }}" == "pro" ]]; then
-            echo "Downloading Liquibase Pro build from S3..."
+          if [[ "${{ matrix.build_type }}" == "secure" ]]; then
+            echo "Downloading Liquibase Secure build from S3..."
 
-            # Download Liquibase Pro build from S3
-            LIQUIBASE_PRO_ZIP="liquibase-secure-${{ inputs.liquibaseBranch }}.zip"
-            S3_URL="s3://repo.liquibase.com/releases/secure/${{ inputs.liquibaseBranch }}/$LIQUIBASE_PRO_ZIP"
+            # Determine S3 path based on whether secure-version is provided
+            if [[ -n "${{ inputs.secure-version }}" ]]; then
+              echo "Using secure-version: ${{ inputs.secure-version }}"
+              # Extract base version and RC number for RC versions
+              VERSION="${{ inputs.secure-version }}"
+              if [[ "$VERSION" =~ ^([0-9]+\.[0-9]+\.[0-9]+)-RC([0-9]+)$ ]]; then
+                BASE_VERSION="${BASH_REMATCH[1]}"
+                RC_NUMBER="${BASH_REMATCH[2]}"
+                LIQUIBASE_SECURE_ZIP="liquibase-secure-${VERSION}.tar.gz"
+                S3_URL="s3://repo.liquibase.com/releases/rc/${VERSION}/${LIQUIBASE_SECURE_ZIP}"
+                echo "Using RC S3 path: $S3_URL"
+              else
+                # Regular production version
+                LIQUIBASE_SECURE_ZIP="liquibase-secure-${VERSION}.zip"
+                S3_URL="s3://repo.liquibase.com/releases/secure/${VERSION}/${LIQUIBASE_SECURE_ZIP}"
+                echo "Using production S3 path: $S3_URL"
+              fi
+            else
+              echo "Using branch-based build: ${{ inputs.liquibaseBranch }}"
+              # Original branch-based logic
+              LIQUIBASE_SECURE_ZIP="liquibase-secure-${{ inputs.liquibaseBranch }}.zip"
+              S3_URL="s3://repo.liquibase.com/releases/secure/${{ inputs.liquibaseBranch }}/$LIQUIBASE_SECURE_ZIP"
+            fi
 
             echo "Downloading from S3: $S3_URL"
 
             # Try to download from S3 first
-            if ! aws s3 cp "$S3_URL" "$LIQUIBASE_PRO_ZIP" 2>/dev/null; then
-              echo "Failed to download liquibase-pro build from S3. File may not exist yet."
+            if ! aws s3 cp "$S3_URL" "$LIQUIBASE_SECURE_ZIP" 2>/dev/null; then
+              echo "Failed to download liquibase-secure build from S3. File may not exist yet."
 
               # Check if it's a 403/404 error (file doesn't exist)
               if aws s3 ls "$S3_URL" >/dev/null 2>&1; then
                 echo "❌ File exists but access denied. Check permissions."
                 exit 1
               else
-                echo "📦 Liquibase Pro build not found in S3. Checking if we should trigger workflow or use fallback..."
-                echo "trigger_liquibase_pro_workflow=true" >> $GITHUB_OUTPUT
-                echo "build_ready=false" >> $GITHUB_OUTPUT
-                echo "use_fallback=false" >> $GITHUB_OUTPUT
+                echo "📦 Liquibase-Secure build not found in S3."
+                # If secure-version is provided, don't trigger workflow - the build should exist
+                if [[ -n "${{ inputs.secure-version }}" ]]; then
+                  echo "❌ ERROR: secure-version specified but build not found in S3. Build should already exist for version ${{ inputs.secure-version }}"
+                  echo "trigger_liquibase_secure_workflow=false" >> $GITHUB_OUTPUT
+                  echo "build_ready=false" >> $GITHUB_OUTPUT
+                  echo "use_fallback=true" >> $GITHUB_OUTPUT
+                else
+                  echo "📦 Branch-based build not found. Will trigger workflow to create it..."
+                  echo "trigger_liquibase_secure_workflow=true" >> $GITHUB_OUTPUT
+                  echo "build_ready=false" >> $GITHUB_OUTPUT
+                  echo "use_fallback=false" >> $GITHUB_OUTPUT
+                fi
               fi
             else
-              echo "✅ Successfully downloaded Liquibase Pro build from S3"
-              echo "trigger_liquibase_pro_workflow=false" >> $GITHUB_OUTPUT
+              echo "✅ Successfully downloaded Liquibase-Secure build from S3"
+              echo "trigger_liquibase_secure_workflow=false" >> $GITHUB_OUTPUT
               echo "build_ready=true" >> $GITHUB_OUTPUT
               echo "use_fallback=false" >> $GITHUB_OUTPUT
 
-              # Extract the liquibase Pro zip
+              # Extract the liquibase Secure archive
               mkdir -p liquibase-build
-              unzip -q "$LIQUIBASE_PRO_ZIP" -d liquibase-build/
-              echo "Liquibase Pro build extracted to liquibase-build/"
+              if [[ "$LIQUIBASE_SECURE_ZIP" == *.tar.gz ]]; then
+                tar -xzf "$LIQUIBASE_SECURE_ZIP" -C liquibase-build/
+                echo "Liquibase Secure build extracted from tar.gz to liquibase-build/"
+              else
+                unzip -q "$LIQUIBASE_SECURE_ZIP" -d liquibase-build/
+                echo "Liquibase Secure build extracted from zip to liquibase-build/"
+              fi
             fi
 
           else
@@ -257,9 +303,9 @@ jobs:
             ls -la liquibase-build/
           fi
 
-      - name: Trigger Liquibase Pro Release Workflow
-        if: ${{ matrix.build_type == 'pro' && steps.download-artifact.outputs.trigger_liquibase_pro_workflow == 'true' && steps.download-artifact.outputs.use_fallback != 'true' }}
-        id: trigger-liquibase-pro-release
+      - name: Trigger Liquibase Secure Release Workflow
+        if: ${{ matrix.build_type == 'secure' && steps.download-artifact.outputs.trigger_liquibase_secure_workflow == 'true' && steps.download-artifact.outputs.use_fallback != 'true' }}
+        id: trigger-liquibase-secure-release
         continue-on-error: true
         uses: the-actions-org/workflow-dispatch@v4
         with:
@@ -272,54 +318,73 @@ jobs:
           wait-for-completion-timeout: 60m
           wait-for-completion-interval: 10m
 
-      - name: Download Liquibase Pro build from S3 after workflow completion
-        if: ${{ matrix.build_type == 'pro' && steps.download-artifact.outputs.trigger_liquibase_pro_workflow == 'true' && steps.download-artifact.outputs.use_fallback != 'true' }}
+      - name: Download Liquibase Secure build from S3 after workflow completion
+        if: ${{ matrix.build_type == 'secure' && steps.download-artifact.outputs.trigger_liquibase_secure_workflow == 'true' && steps.download-artifact.outputs.use_fallback != 'true' }}
         id: download-after-trigger
         run: |
-          LIQUIBASE_PRO_ZIP="liquibase-secure-${{ inputs.liquibaseBranch }}.zip"
-          S3_URL="s3://repo.liquibase.com/releases/secure/${{ inputs.liquibaseBranch }}/$LIQUIBASE_PRO_ZIP"
+          # Determine S3 path based on whether secure-version is provided (same logic as initial download)
+          if [[ -n "${{ inputs.secure-version }}" ]]; then
+            echo "Using secure-version: ${{ inputs.secure-version }}"
+            VERSION="${{ inputs.secure-version }}"
+            if [[ "$VERSION" =~ ^([0-9]+\.[0-9]+\.[0-9]+)-RC([0-9]+)$ ]]; then
+              BASE_VERSION="${BASH_REMATCH[1]}"
+              RC_NUMBER="${BASH_REMATCH[2]}"
+              LIQUIBASE_SECURE_ZIP="liquibase-secure-${VERSION}.tar.gz"
+              S3_URL="s3://repo.liquibase.com/releases/rc/${VERSION}/${LIQUIBASE_SECURE_ZIP}"
+            else
+              LIQUIBASE_SECURE_ZIP="liquibase-secure-${VERSION}.zip"
+              S3_URL="s3://repo.liquibase.com/releases/secure/${VERSION}/${LIQUIBASE_SECURE_ZIP}"
+            fi
+          else
+            LIQUIBASE_SECURE_ZIP="liquibase-secure-${{ inputs.liquibaseBranch }}.zip"
+            S3_URL="s3://repo.liquibase.com/releases/secure/${{ inputs.liquibaseBranch }}/$LIQUIBASE_SECURE_ZIP"
+          fi
 
-          echo "⬇️ Downloading Liquibase Pro build from S3 after workflow completion..."
+          echo "⬇️ Downloading Liquibase Secure build from S3 after workflow completion..."
 
-          if ! aws s3 cp "$S3_URL" "$LIQUIBASE_PRO_ZIP"; then
-            echo "❌ Failed to download Liquibase Pro build even after workflow completion"
+          if ! aws s3 cp "$S3_URL" "$LIQUIBASE_SECURE_ZIP"; then
+            echo "❌ Failed to download Liquibase Secure build even after workflow completion"
             echo "Will use fallback build from branch source instead"
             echo "build_ready=false" >> $GITHUB_OUTPUT
             echo "use_fallback=true" >> $GITHUB_OUTPUT
             exit 0
           fi
 
-          echo "✅ Successfully downloaded Liquibase Pro build after workflow completion"
+          echo "✅ Successfully downloaded Liquibase Secure build after workflow completion"
 
-          # Extract the liquibase Pro zip
+          # Extract the liquibase Secure archive
           mkdir -p liquibase-build
-          unzip -q "$LIQUIBASE_PRO_ZIP" -d liquibase-build/
-
-          echo "Liquibase Pro build extracted to liquibase-build/"
+          if [[ "$LIQUIBASE_SECURE_ZIP" == *.tar.gz ]]; then
+            tar -xzf "$LIQUIBASE_SECURE_ZIP" -C liquibase-build/
+            echo "Liquibase Secure build extracted from tar.gz to liquibase-build/"
+          else
+            unzip -q "$LIQUIBASE_SECURE_ZIP" -d liquibase-build/
+            echo "Liquibase Secure build extracted from zip to liquibase-build/"
+          fi
           echo "Contents of liquibase-build:"
           ls -la liquibase-build/
           echo "build_ready=true" >> $GITHUB_OUTPUT
           echo "use_fallback=false" >> $GITHUB_OUTPUT
 
       - name: Validate and prepare liquibase build
-        if: ${{ (matrix.build_type == 'oss' && (steps.download-artifact.outputs.build_ready == 'true' || steps.download-artifact.outputs.use_fallback == 'true')) || matrix.build_type == 'pro' }}
+        if: ${{ (matrix.build_type == 'oss' && (steps.download-artifact.outputs.build_ready == 'true' || steps.download-artifact.outputs.use_fallback == 'true')) || matrix.build_type == 'secure' }}
         id: validate-build
         run: |
           # Determine build mode
           USE_FALLBACK="false"
           if [[ "${{ matrix.build_type }}" == "oss" && "${{ steps.download-artifact.outputs.use_fallback }}" == "true" ]]; then
             USE_FALLBACK="true"
-          elif [[ "${{ matrix.build_type }}" == "pro" ]]; then
-            # Check for Pro fallback conditions
+          elif [[ "${{ matrix.build_type }}" == "secure" ]]; then
+            # Check for Secure fallback conditions
             if [[ "${{ steps.download-artifact.outputs.use_fallback }}" == "true" ]] || [[ "${{ steps.download-after-trigger.outputs.use_fallback }}" == "true" ]]; then
               USE_FALLBACK="true"
-            # Check if Liquibase Pro workflow was triggered but failed
-            elif [[ "${{ steps.download-artifact.outputs.trigger_liquibase_pro_workflow }}" == "true" ]] && [[ "${{ steps.trigger-liquibase-pro-release.outcome }}" == "failure" ]]; then
-              echo "Liquibase Pro workflow trigger failed, falling back to standard Dockerfile build"
+            # Check if Liquibase Secure workflow was triggered but failed
+            elif [[ "${{ steps.download-artifact.outputs.trigger_liquibase_secure_workflow }}" == "true" ]] && [[ "${{ steps.trigger-liquibase-secure-release.outcome }}" == "failure" ]]; then
+              echo "Liquibase Secure workflow trigger failed, falling back to standard Dockerfile build"
               USE_FALLBACK="true"
-            # Check if Liquibase Pro workflow succeeded but download still failed (no build_ready=true from either step)
-            elif [[ "${{ steps.download-artifact.outputs.trigger_liquibase_pro_workflow }}" == "true" ]] && [[ "${{ steps.download-artifact.outputs.build_ready }}" != "true" ]] && [[ "${{ steps.download-after-trigger.outputs.build_ready }}" != "true" ]]; then
-              echo "Liquibase Pro workflow completed but build still not available, falling back to standard Dockerfile build"
+            # Check if Liquibase Secure workflow succeeded but download still failed (no build_ready=true from either step)
+            elif [[ "${{ steps.download-artifact.outputs.trigger_liquibase_secure_workflow }}" == "true" ]] && [[ "${{ steps.download-artifact.outputs.build_ready }}" != "true" ]] && [[ "${{ steps.download-after-trigger.outputs.build_ready }}" != "true" ]]; then
+              echo "Liquibase Secure workflow completed but build still not available, falling back to standard Dockerfile build"
               USE_FALLBACK="true"
             fi
           fi
@@ -357,8 +422,8 @@ jobs:
           cp "${{ matrix.dockerfile }}" "${{ matrix.dockerfile }}.backup"
 
           # Set version ARG based on dockerfile type
-          if [[ "${{ matrix.dockerfile }}" == "DockerfilePro" ]]; then
-            VERSION_ARG="LIQUIBASE_PRO_VERSION"
+          if [[ "${{ matrix.dockerfile }}" == "DockerfileSecure" ]]; then
+            VERSION_ARG="LIQUIBASE_SECURE_VERSION"
           else
             VERSION_ARG="LIQUIBASE_VERSION"
           fi
@@ -374,23 +439,21 @@ jobs:
           }
 
           # Skip SHA256 ARG lines
-          /^ARG LB_SHA256=/ || /^ARG LB_PRO_SHA256=/ { next }
+          /^ARG LB_SHA256=/ || /^ARG LB_SECURE_SHA256=/ { next }
 
           # Update version ARGs
           /^ARG LIQUIBASE_VERSION=/ { print "ARG LIQUIBASE_VERSION=" branch; next }
-          /^ARG LIQUIBASE_PRO_VERSION=/ { print "ARG LIQUIBASE_PRO_VERSION=" branch; next }
+          /^ARG LIQUIBASE_SECURE_VERSION=/ { print "ARG LIQUIBASE_SECURE_VERSION=" branch; next }
 
           # Handle standard Dockerfile wget block
-          dockerfile == "Dockerfile" && /^RUN wget/ {
+          dockerfile == "Dockerfile" && /^RUN wget.*github\.com.*liquibase.*tar\.gz/ {
             print "# Copy the extracted liquibase build from the build context"
             print "COPY liquibase-build/ ./"
             print ""
-            print "RUN chown -R liquibase:liquibase /liquibase && \\"
-            print "    ln -s /liquibase/liquibase /usr/local/bin/liquibase && \\"
+            print "RUN ln -s /liquibase/liquibase /usr/local/bin/liquibase && \\"
             print "    ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \\"
             print "    liquibase --version"
             in_wget_block = 1
-            # Skip the rest of this line and continue skipping until we find the end
             next
           }
 
@@ -399,35 +462,31 @@ jobs:
             print "# Copy the extracted liquibase build from the build context"
             print "COPY liquibase-build/ ./"
             print ""
-            print "RUN chown -R liquibase:liquibase /liquibase && \\"
-            print "    ln -s /liquibase/liquibase /usr/local/bin/liquibase && \\"
+            print "RUN ln -s /liquibase/liquibase /usr/local/bin/liquibase && \\"
             print "    ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \\"
             print "    liquibase --version"
             in_wget_block = 1
             next
           }
 
-          # Handle Pro Dockerfile wget block (starts with RUN wget but may not have package.liquibase.com on same line)
-          dockerfile == "DockerfilePro" && /^RUN wget/ {
+          # Handle Secure Dockerfile wget block
+          dockerfile == "DockerfileSecure" && /^RUN wget.*repo\.liquibase\.com.*tar\.gz/ {
             print "# Copy the extracted liquibase build from the build context"
             print "COPY liquibase-build/ ./"
             print ""
-            print "RUN chown -R liquibase:liquibase /liquibase && \\"
-            print "    ln -s /liquibase/liquibase /usr/local/bin/liquibase && \\"
+            print "RUN ln -s /liquibase/liquibase /usr/local/bin/liquibase && \\"
             print "    ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \\"
             print "    liquibase --version"
             in_wget_block = 1
             next
           }
 
-          # Skip all lines in the wget block until we find the end marker
-          in_wget_block == 1 {
-            # Look for the end of the RUN block (line ending without backslash, and contains version check)
-            if (/liquibase --version/ && !/\\\\$/) {
-              in_wget_block = 0
-            }
+          # Skip lines until we reach the end of wget block
+          in_wget_block == 1 && /liquibase --version/ {
+            in_wget_block = 0
             next
           }
+          in_wget_block == 1 { next }
 
           # Print all other lines
           { print }
@@ -448,13 +507,6 @@ jobs:
           echo "First 30 lines of modified ${{ matrix.dockerfile }}:"
           head -30 "${{ matrix.dockerfile }}"
           echo "..."
-
-      - name: Print modified Dockerfile
-        if: ${{ steps.validate-build.outputs.use_fallback_build == 'false' }}
-        run: |
-          echo "=== Complete modified ${{ matrix.dockerfile }} content ==="
-          cat "${{ matrix.dockerfile }}"
-          echo "=== End of ${{ matrix.dockerfile }} ==="
 
       - name: Set up Docker Buildx
         if: ${{ steps.validate-build.outcome == 'success' }}
@@ -482,13 +534,13 @@ jobs:
           platforms: linux/amd64,linux/arm64
           provenance: false
           tags: |
-            ${{ env.REPO_URL }}/${{ matrix.image_name }}:${{ inputs.liquibaseBranch }}
+            ${{ env.REPO_URL }}/${{ matrix.image_name }}:${{ matrix.is_rc == true && inputs.secure-version || inputs.liquibaseBranch }}
           labels: |
             org.opencontainers.image.source=https://github.com/liquibase/docker
             org.opencontainers.image.description=Liquibase QA Container Image${{ matrix.suffix }}
             org.opencontainers.image.licenses=Apache-2.0
             org.opencontainers.image.vendor=Liquibase
-            org.opencontainers.image.version=${{ inputs.liquibaseBranch }}
+            org.opencontainers.image.version=${{ matrix.is_rc == true && inputs.secure-version || inputs.liquibaseBranch }}
             org.opencontainers.image.documentation=https://docs.liquibase.com
             org.opencontainers.image.revision=${{ github.sha }}
             liquibase.branch=${{ inputs.liquibaseBranch }}
@@ -497,7 +549,8 @@ jobs:
         if: ${{ steps.validate-build.outcome == 'success' }}
         run: |
           BUILD_MODE="${{ steps.validate-build.outputs.use_fallback_build == 'true' && 'fallback (standard Dockerfile)' || 'artifact-based' }}"
-          echo "Successfully built and pushed: ${{ env.REPO_URL }}/${{ matrix.image_name }}:${{ inputs.liquibaseBranch }}"
+          IMAGE_TAG="${{ matrix.is_rc == true && inputs.secure-version || inputs.liquibaseBranch }}"
+          echo "Successfully built and pushed: ${{ env.REPO_URL }}/${{ matrix.image_name }}:$IMAGE_TAG"
           echo "Build mode: $BUILD_MODE"
 
       - name: Workflow execution summary
@@ -521,21 +574,21 @@ jobs:
             echo "   - No pre-built artifacts were available"
             echo "   - Used standard Dockerfile without modification"
             echo "   - Built directly from liquibase branch: ${{ inputs.liquibaseBranch }}"
-          elif [[ "${{ matrix.build_type }}" == "pro" ]]; then
-            if [[ "${{ steps.download-artifact.outputs.trigger_liquibase_pro_workflow }}" == "true" ]]; then
-              echo "🔄 Build Mode: ARTIFACT-BASED (Pro workflow triggered)"
+          elif [[ "${{ matrix.build_type }}" == "secure" ]]; then
+            if [[ "${{ steps.download-artifact.outputs.trigger_liquibase_secure_workflow }}" == "true" ]]; then
+              echo "🔄 Build Mode: ARTIFACT-BASED (Secure workflow triggered)"
               echo "   - S3 build was missing for branch ${{ inputs.liquibaseBranch }}"
               echo "   - Automatically triggered pro-release-to-s3.yml workflow"
               if [[ "${{ steps.download-after-trigger.outputs.build_ready }}" == "true" ]]; then
-                echo "   - ✅ Liquibase Pro workflow completed successfully"
-                echo "   - ✅ Liquibase Pro build downloaded and Docker image built"
+                echo "   - ✅ Liquibase-Secure workflow completed successfully"
+                echo "   - ✅ Liquibase-Secure build downloaded and Docker image built"
               else
-                echo "   - ❌ Liquibase Pro workflow may have failed"
-                echo "   - 📋 Check: https://github.com/liquibase/liquibase-pro/actions/workflows/pro-release-to-s3.yml"
+                echo "   - ❌ Liquibase-Secure workflow may have failed"
+                echo "   - 📋 Check: https://github.com/liquibase/liquibase-pro/actions/workflows/secure-release-to-s3.yml"
               fi
             else
               echo "✅ Build Mode: ARTIFACT-BASED (Direct S3 download)"
-              echo "   - Liquibase Pro build downloaded from S3"
+              echo "   - Liquibase-Secure build downloaded from S3"
             fi
           else
             echo "✅ Build Mode: ARTIFACT-BASED (GitHub artifact)"
@@ -545,7 +598,8 @@ jobs:
           echo ""
           if [[ "${{ job.status }}" == "success" ]]; then
             echo "🎉 Overall Status: SUCCESS"
-            echo "📦 Image Available: ${{ env.REPO_URL }}/${{ matrix.image_name }}:${{ inputs.liquibaseBranch }}"
+            IMAGE_TAG="${{ matrix.is_rc == true && inputs.secure-version || inputs.liquibaseBranch }}"
+            echo "📦 Image Available: ${{ env.REPO_URL }}/${{ matrix.image_name }}:$IMAGE_TAG"
             if [[ "$USE_FALLBACK" == "true" ]]; then
               echo "ℹ️ Built using fallback mode - standard Dockerfile from branch source"
             fi
