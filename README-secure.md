@@ -4,9 +4,9 @@
 
 ## ⚠️ License Requirements
 
-> **WARNING**: Liquibase Secure requires a valid license key to use Secure features. Without a license, the container will run in Liquibase Community mode with limited functionality.
+> **WARNING**: Liquibase Secure requires a valid license key to use Secure features. Without a license, the container will show an invalid license error.
 >
-> - Contact [Liquibase Sales](https://www.liquibase.com/community/contact) to obtain a Liquibase Secure license
+> - Contact [Liquibase Sales](https://www.liquibase.com/contact-us) to obtain a Liquibase Secure license
 > - Existing customers receive their Secure license keys in an email.
 
 ## 📋 Secure Features
@@ -17,8 +17,7 @@ Liquibase Secure includes all Community features plus:
 
 ### 🔐 Security & Governance
 
-- **Policy Checks**: Enforce database standards and best practices
-- **Quality Checks**: Advanced validation rules for changesets  
+- **Policy Checks**: Enforce database standards and best practices and advanced validation rules for changesets
 - **Rollback SQL**: Generate rollback scripts for any deployment
 - **Targeted Rollback**: Rollback specific changesets without affecting others
 - **Advanced Database Support**: Enhanced support for Oracle, SQL Server, and other enterprise databases
