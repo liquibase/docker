@@ -42,7 +42,7 @@ jobs:
         uses: peter-evans/dockerhub-description@v4
         with:
           username: ${{ env.DOCKERHUB_USERNAME_DECODED }}
-          password: ${{ env.DOCKERHUB_UPDATE_README }}
+          password: ${{ env.DOCKERHUB_TOKEN }}
           repository: liquibase/liquibase
           readme-filepath: README.md
           short-description: "Liquibase OSS"
