@@ -43,8 +43,8 @@ jobs:
       - name: Update Liquibase Secure README on Docker Hub
         uses: peter-evans/dockerhub-description@v4
         with:
-          username: ${{ env.DOCKERHUB_USERNAME_DECODED }}
-          password: ${{ env.DOCKERHUB_UPDATE_README }}
+          username: ${{ env.DOCKERHUB_USERNAME }}
+          password: ${{ env.DOCKERHUB_TOKEN }}
           repository: liquibase/liquibase-pro
           readme-filepath: ./README-secure.md
           short-description: "Liquibase Secure"
