@@ -13,7 +13,7 @@ Starting with **Liquibase 5.0**, we have introduced a clear separation between o
 
 ### 🚨 Breaking Change: Drivers and Extensions No Longer Included
 
-As of **Liquibase 5.0**, the OSS edition (`liquibase/liquibase`) and the official Docker image **no longer include database drivers or extensions by default**.
+As of **Liquibase 5.0**, the OSS edition (`liquibase/liquibase`) and the official Docker OSS liquibase image **no longer include database drivers or extensions by default**.
 
 **What this means for you:**
 - You must now explicitly add database drivers using the Liquibase Package Manager (LPM)
