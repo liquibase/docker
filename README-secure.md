@@ -238,7 +238,7 @@ services:
 
 This Docker image contains Liquibase Secure software which requires a valid commercial license for use.
 
-For licensing questions, please contact [Liquibase Sales](https://www.liquibase.com/contact).
+For licensing questions, please contact [Liquibase Sales](https://www.liquibase.com/contact-us).
 
 View [license information](https://www.liquibase.com/eula) for the software contained in this image.
 
