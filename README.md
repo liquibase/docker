@@ -9,7 +9,7 @@ Starting with **Liquibase 5.0**, we have introduced a clear separation between o
 - **`liquibase/liquibase`** (OSS Edition): Community version under the Functional Source License (FSL)
 - **`liquibase/liquibase-secure`** (Secure Edition): Commercial version with enterprise features
 
-**If you have a valid Liquibase Secure license key, you should now use `liquibase/liquibase-secure` instead of `liquibase/liquibase`.**
+**If you have a valid Liquibase License Key, you should now use `liquibase/liquibase-secure` instead of `liquibase/liquibase`.**
 
 ### 🚨 Breaking Change: Drivers and Extensions No Longer Included
 
