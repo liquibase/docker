@@ -4,7 +4,6 @@ on:
   push:
     paths:
       - 'README-secure.md'
-      - 'README-pro.md'
     branches:
       - main
   workflow_dispatch:
@@ -43,7 +42,7 @@ jobs:
       - name: Update Liquibase Secure README on Docker Hub
         uses: peter-evans/dockerhub-description@v4
         with:
-          username: ${{ env.DOCKERHUB_USERNAME }}
+          username: ${{ env.DOCKERHUB_USERNAME_DECODED}}
           password: ${{ env.DOCKERHUB_UPDATE_README }}
           repository: liquibase/liquibase-pro
           readme-filepath: ./README-secure.md
