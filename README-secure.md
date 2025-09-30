@@ -79,13 +79,13 @@ docker pull liquibase/liquibase-secure:latest
 docker pull ghcr.io/liquibase/liquibase-secure:latest
 docker pull public.ecr.aws/liquibase/liquibase-secure:latest
 
-# Specific version (example: 4.32.0)
-docker pull liquibase/liquibase-secure:4.32.0
-docker pull ghcr.io/liquibase/liquibase-secure:4.32.0
-docker pull public.ecr.aws/liquibase/liquibase-secure:4.32.0
+# Specific version (example: 5.0.0)
+docker pull liquibase/liquibase-secure:5.0.0
+docker pull ghcr.io/liquibase/liquibase-secure:5.0.0
+docker pull public.ecr.aws/liquibase/liquibase-secure:5.0.0
 ```
 
-For any questions or support, please visit our [Liquibase Community Forum](https://forum.liquibase.org/).
+For any questions or support, please visit our [Liquibase Support](https://forum.liquibase.org/).
 
 ## 🏷️ Supported Tags
 
