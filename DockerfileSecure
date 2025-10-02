@@ -14,7 +14,8 @@ ARG LB_SECURE_SHA256=47c96bcfc1efb06d1906faeca308a609a99013bf2349ccb61e287edfb8d
 
 # Add metadata labels
 LABEL org.opencontainers.image.description="Liquibase Secure Container Image"
-LABEL org.opencontainers.image.licenses="Apache-2.0"
+LABEL org.opencontainers.image.licenses="LicenseRef-Liquibase-EULA"
+LABEL org.opencontainers.image.licenses.url="https://www.liquibase.com/eula"
 LABEL org.opencontainers.image.vendor="Liquibase"
 LABEL org.opencontainers.image.version="${LIQUIBASE_SECURE_VERSION}"
 LABEL org.opencontainers.image.documentation="https://docs.liquibase.com"

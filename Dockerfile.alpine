@@ -32,7 +32,7 @@ ARG LPM_SHA256_ARM=541a220aa3c3227cc0fb40b15976b11011568a06a6499af090258bf604f45
 
 # Add metadata labels
 LABEL org.opencontainers.image.description="Liquibase Container Image (Alpine)"
-LABEL org.opencontainers.image.licenses="Apache-2.0"
+LABEL org.opencontainers.image.licenses="FSL-1.1-ALv2"
 LABEL org.opencontainers.image.vendor="Liquibase"
 LABEL org.opencontainers.image.version="${LIQUIBASE_VERSION}"
 LABEL org.opencontainers.image.documentation="https://docs.liquibase.com"
