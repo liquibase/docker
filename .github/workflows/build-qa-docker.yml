@@ -538,7 +538,8 @@ jobs:
           labels: |
             org.opencontainers.image.source=https://github.com/liquibase/docker
             org.opencontainers.image.description=Liquibase QA Container Image${{ matrix.suffix }}
-            org.opencontainers.image.licenses=Apache-2.0
+            org.opencontainers.image.licenses=${{ matrix.build_type == 'secure' && 'LicenseRef-Liquibase-EULA' || 'FSL-1.1-ALv2' }}
+            ${{ matrix.build_type == 'secure' && 'org.opencontainers.image.licenses.url=https://www.liquibase.com/eula' || '' }}
             org.opencontainers.image.vendor=Liquibase
             org.opencontainers.image.version=${{ matrix.is_rc == true && inputs.secure-version || inputs.liquibaseBranch }}
             org.opencontainers.image.documentation=https://docs.liquibase.com
