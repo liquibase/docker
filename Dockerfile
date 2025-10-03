@@ -4,7 +4,8 @@ FROM eclipse-temurin:21-jre-jammy
 # Create liquibase user
 RUN groupadd --gid 1001 liquibase && \
     useradd --uid 1001 --gid liquibase --create-home --home-dir /liquibase liquibase && \
-    chown liquibase /liquibase
+    chown liquibase:root /liquibase && \
+    chmod g+rx /liquibase
 
 # Download and install Liquibase
 WORKDIR /liquibase
