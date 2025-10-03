@@ -438,7 +438,8 @@ jobs:
           labels: |
             org.opencontainers.image.source=https://github.com/liquibase/docker
             org.opencontainers.image.description=${{ matrix.type == 'liquibase-secure-release' && 'Liquibase Secure Container Image' || format('Liquibase Container Image{0}', matrix.suffix == '-alpine' && ' (Alpine)' || '') }}
-            org.opencontainers.image.licenses=Apache-2.0
+            org.opencontainers.image.licenses=${{ matrix.type == 'liquibase-secure-release' && 'LicenseRef-Liquibase-EULA' || 'FSL-1.1-ALv2' }}
+            ${{ matrix.type == 'liquibase-secure-release' && 'org.opencontainers.image.licenses.url=https://www.liquibase.com/eula' || '' }}
             org.opencontainers.image.vendor=Liquibase
             org.opencontainers.image.version=${{ needs.update-dockerfiles.outputs.extensionVersion }}
             org.opencontainers.image.documentation=https://docs.liquibase.com
@@ -446,7 +447,8 @@ jobs:
           annotations: |
             org.opencontainers.image.source=https://github.com/liquibase/docker
             org.opencontainers.image.description=${{ matrix.type == 'liquibase-secure-release' && 'Liquibase Secure Container Image' || format('Liquibase Container Image{0}', matrix.suffix == '-alpine' && ' (Alpine)' || '') }}
-            org.opencontainers.image.licenses=Apache-2.0
+            org.opencontainers.image.licenses=${{ matrix.type == 'liquibase-secure-release' && 'LicenseRef-Liquibase-EULA' || 'FSL-1.1-ALv2' }}
+            ${{ matrix.type == 'liquibase-secure-release' && 'org.opencontainers.image.licenses.url=https://www.liquibase.com/eula' || '' }}
             org.opencontainers.image.vendor=Liquibase
             org.opencontainers.image.version=${{ needs.update-dockerfiles.outputs.extensionVersion }}
             org.opencontainers.image.documentation=https://docs.liquibase.com
