@@ -171,7 +171,7 @@ jobs:
                 BASE_VERSION="${BASH_REMATCH[1]}"
                 RC_NUMBER="${BASH_REMATCH[2]}"
                 LIQUIBASE_SECURE_ZIP="liquibase-secure-${VERSION}.tar.gz"
-                S3_URL="s3://repo.liquibase.com/releases/rc/${VERSION}/${LIQUIBASE_SECURE_ZIP}"
+                S3_URL="s3://repo.liquibase.com/non-releases/secure/${VERSION}/${LIQUIBASE_SECURE_ZIP}"
                 echo "Using RC S3 path: $S3_URL"
               else
                 # Regular production version
@@ -330,7 +330,7 @@ jobs:
               BASE_VERSION="${BASH_REMATCH[1]}"
               RC_NUMBER="${BASH_REMATCH[2]}"
               LIQUIBASE_SECURE_ZIP="liquibase-secure-${VERSION}.tar.gz"
-              S3_URL="s3://repo.liquibase.com/releases/rc/${VERSION}/${LIQUIBASE_SECURE_ZIP}"
+              S3_URL="s3://repo.liquibase.com/non-releases/secure/${VERSION}/${LIQUIBASE_SECURE_ZIP}"
             else
               LIQUIBASE_SECURE_ZIP="liquibase-secure-${VERSION}.zip"
               S3_URL="s3://repo.liquibase.com/releases/secure/${VERSION}/${LIQUIBASE_SECURE_ZIP}"
