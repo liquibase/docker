@@ -26,9 +26,9 @@ RUN set -x && \
     ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \
     liquibase --version
     
-ARG LPM_VERSION=0.2.14
-ARG LPM_SHA256=28750d84bf76d32ba3a2d51674a1b4e14205523c87e4655b2cd8de68b916758e
-ARG LPM_SHA256_ARM=541a220aa3c3227cc0fb40b15976b11011568a06a6499af090258bf604f45cc0
+ARG LPM_VERSION=0.2.15
+ARG LPM_SHA256=bd237e854aad6f268c5fc34315d94fa18a895d7fc0dacae9c31925ba2e652b63
+ARG LPM_SHA256_ARM=09e02d625cd3b30843c8467340006aa34243e1f716e0acd35bd7f306066bfda5
 
 # Add metadata labels
 LABEL org.opencontainers.image.description="Liquibase Container Image (Alpine)"
