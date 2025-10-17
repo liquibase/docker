@@ -19,6 +19,22 @@ Images are published to multiple registries:
 - GitHub Container Registry: `ghcr.io/liquibase/liquibase*`
 - Amazon ECR Public: `public.ecr.aws/liquibase/liquibase*`
 
+### Release Tagging Strategy
+
+The repository uses distinct tagging strategies for OSS and SECURE releases to prevent conflicts:
+
+**OSS Releases** (from `liquibase-release` workflow):
+- Git tag: `v{version}` (e.g., `v5.0.1`)
+- GitHub Release: `v{version}`
+- Docker images: `liquibase/liquibase:{version}`, `liquibase/liquibase:{major.minor}`, `liquibase/liquibase:latest`
+
+**SECURE Releases** (from `liquibase-secure-release` workflow):
+- Git tag: `v{version}-SECURE` (e.g., `v5.0.1-SECURE`)
+- GitHub Release: `v{version}-SECURE`
+- Docker images: `liquibase/liquibase-secure:{version}`, `liquibase/liquibase-secure:{major.minor}`, `liquibase/liquibase-secure:latest`
+
+This ensures that OSS and SECURE releases maintain separate version histories and do not create conflicting tags in Git or GitHub releases.
+
 ## Common Development Commands
 
 ### Building Images

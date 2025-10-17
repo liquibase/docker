@@ -293,12 +293,20 @@ jobs:
           java-version: "8"
           distribution: "adopt"
 
+      # Create GitHub release for OSS (v{version}) or SECURE (v{version}-SECURE)
+      # This ensures OSS and SECURE releases have distinct tags and don't conflict
       - name: Release Notes
+        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' && ((needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' && matrix.type == 'liquibase-release') || (needs.update-dockerfiles.outputs.releaseType == 'liquibase-secure-release' && matrix.type == 'liquibase-secure-release')) }}
+        run: |
+          TAG_NAME="${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-secure-release' && format('v{0}-SECURE', needs.update-dockerfiles.outputs.extensionVersion) || format('v{0}', needs.update-dockerfiles.outputs.extensionVersion) }}"
+          echo "::notice::Creating GitHub release for ${{ needs.update-dockerfiles.outputs.releaseType }} on tag: ${TAG_NAME}"
+
+      - name: Create GitHub Release
         if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' && ((needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' && matrix.type == 'liquibase-release') || (needs.update-dockerfiles.outputs.releaseType == 'liquibase-secure-release' && matrix.type == 'liquibase-secure-release')) }}
         uses: softprops/action-gh-release@v2
         with:
           name: ${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-secure-release' && format('v{0} SECURE', needs.update-dockerfiles.outputs.extensionVersion) || format('v{0}', needs.update-dockerfiles.outputs.extensionVersion) }}
-          tag_name: v${{ needs.update-dockerfiles.outputs.extensionVersion }}
+          tag_name: ${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-secure-release' && format('v{0}-SECURE', needs.update-dockerfiles.outputs.extensionVersion) || format('v{0}', needs.update-dockerfiles.outputs.extensionVersion) }}
           draft: true
           body: |
             ${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-secure-release' && format('Support for Liquibase Secure {0}.', needs.update-dockerfiles.outputs.liquibaseVersion) || format('Support for Liquibase {0}.', needs.update-dockerfiles.outputs.liquibaseVersion) }}
