@@ -295,18 +295,27 @@ jobs:
 
       # Create GitHub release for OSS (v{version}) or SECURE (v{version}-SECURE)
       # This ensures OSS and SECURE releases have distinct tags and don't conflict
-      - name: Release Notes
+      - name: Determine Release Tag
+        id: release-tag
         if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' && ((needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' && matrix.type == 'liquibase-release') || (needs.update-dockerfiles.outputs.releaseType == 'liquibase-secure-release' && matrix.type == 'liquibase-secure-release')) }}
         run: |
-          TAG_NAME="${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-secure-release' && format('v{0}-SECURE', needs.update-dockerfiles.outputs.extensionVersion) || format('v{0}', needs.update-dockerfiles.outputs.extensionVersion) }}"
+          if [[ "${{ needs.update-dockerfiles.outputs.releaseType }}" == "liquibase-secure-release" ]]; then
+            TAG_NAME="v${{ needs.update-dockerfiles.outputs.extensionVersion }}-SECURE"
+            RELEASE_NAME="v${{ needs.update-dockerfiles.outputs.extensionVersion }} SECURE"
+          else
+            TAG_NAME="v${{ needs.update-dockerfiles.outputs.extensionVersion }}"
+            RELEASE_NAME="v${{ needs.update-dockerfiles.outputs.extensionVersion }}"
+          fi
+          echo "tag_name=${TAG_NAME}" >> $GITHUB_OUTPUT
+          echo "release_name=${RELEASE_NAME}" >> $GITHUB_OUTPUT
           echo "::notice::Creating GitHub release for ${{ needs.update-dockerfiles.outputs.releaseType }} on tag: ${TAG_NAME}"
 
       - name: Create GitHub Release
         if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' && ((needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' && matrix.type == 'liquibase-release') || (needs.update-dockerfiles.outputs.releaseType == 'liquibase-secure-release' && matrix.type == 'liquibase-secure-release')) }}
         uses: softprops/action-gh-release@v2
         with:
-          name: ${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-secure-release' && format('v{0} SECURE', needs.update-dockerfiles.outputs.extensionVersion) || format('v{0}', needs.update-dockerfiles.outputs.extensionVersion) }}
-          tag_name: ${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-secure-release' && format('v{0}-SECURE', needs.update-dockerfiles.outputs.extensionVersion) || format('v{0}', needs.update-dockerfiles.outputs.extensionVersion) }}
+          name: ${{ steps.release-tag.outputs.release_name }}
+          tag_name: ${{ steps.release-tag.outputs.tag_name }}
           draft: true
           body: |
             ${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-secure-release' && format('Support for Liquibase Secure {0}.', needs.update-dockerfiles.outputs.liquibaseVersion) || format('Support for Liquibase {0}.', needs.update-dockerfiles.outputs.liquibaseVersion) }}
@@ -392,7 +401,7 @@ jobs:
             TAGS="${TAGS},${{ env.PRIVATE_ECR_DRY_RUN_REPO }}:${MINOR_VERSION}${SUFFIX}"
           else
             # Not in dry-run mode, apply normal tag selection logic
-            
+
             # Add DockerHub tags if selected
             if [[ "${PUSH_DOCKERHUB}" == "true" ]]; then
               TAGS="${{ steps.set-registries.outputs.DOCKERHUB_REPO }}:${LATEST_TAG}${SUFFIX}"
