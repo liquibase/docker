@@ -295,9 +295,10 @@ jobs:
 
       # Create GitHub release for OSS (v{version}) or SECURE (v{version}-SECURE)
       # This ensures OSS and SECURE releases have distinct tags and don't conflict
+      # Only create the release once per release type (using the base Dockerfile without suffix)
       - name: Determine Release Tag
         id: release-tag
-        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' && ((needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' && matrix.type == 'liquibase-release') || (needs.update-dockerfiles.outputs.releaseType == 'liquibase-secure-release' && matrix.type == 'liquibase-secure-release')) }}
+        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' && matrix.suffix == '' && ((needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' && matrix.type == 'liquibase-release') || (needs.update-dockerfiles.outputs.releaseType == 'liquibase-secure-release' && matrix.type == 'liquibase-secure-release')) }}
         run: |
           if [[ "${{ needs.update-dockerfiles.outputs.releaseType }}" == "liquibase-secure-release" ]]; then
             TAG_NAME="v${{ needs.update-dockerfiles.outputs.extensionVersion }}-SECURE"
@@ -311,7 +312,7 @@ jobs:
           echo "::notice::Creating GitHub release for ${{ needs.update-dockerfiles.outputs.releaseType }} on tag: ${TAG_NAME}"
 
       - name: Create GitHub Release
-        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' && ((needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' && matrix.type == 'liquibase-release') || (needs.update-dockerfiles.outputs.releaseType == 'liquibase-secure-release' && matrix.type == 'liquibase-secure-release')) }}
+        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' && matrix.suffix == '' && ((needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' && matrix.type == 'liquibase-release') || (needs.update-dockerfiles.outputs.releaseType == 'liquibase-secure-release' && matrix.type == 'liquibase-secure-release')) }}
         uses: softprops/action-gh-release@v2
         with:
           name: ${{ steps.release-tag.outputs.release_name }}
