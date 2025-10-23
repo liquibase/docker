@@ -293,8 +293,8 @@ jobs:
           java-version: "8"
           distribution: "adopt"
 
-      # Create GitHub release for OSS (v{version}) or SECURE (v{version}-SECURE)
-      # This ensures OSS and SECURE releases have distinct tags and don't conflict
+      # Create GitHub release for Community (v{version}) or SECURE (v{version}-SECURE)
+      # This ensures Community and SECURE releases have distinct tags and don't conflict
       # Only create the release once per release type (using the base Dockerfile without suffix)
       - name: Determine Release Tag
         id: release-tag
