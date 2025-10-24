@@ -18,12 +18,12 @@ on:
         required: true
         type: choice
         options:
-          - "All (OSS + Alpine + Secure)"
-          - "OSS Only (Standard + Alpine)"
+          - "All (Community + Alpine + Secure)"
+          - "Community Only (Standard + Alpine)"
           - "Secure Only"
-          - "Standard OSS Only"
-          - "Alpine OSS Only"
-        default: "All (OSS + Alpine + Secure)"
+          - "Standard Community Only"
+          - "Alpine Community Only"
+        default: "All (Community + Alpine + Secure)"
       secure-version:
         description: "Secure version to use for 'Secure Only' builds (e.g., 5.0.0-RC10). When set, downloads from S3 instead of building from branch."
         required: false
@@ -49,18 +49,18 @@ jobs:
           fi
 
           case "${{ inputs.buildTargets }}" in
-            "All (OSS + Alpine + Secure)")
-              matrix_items+=('{"dockerfile": "Dockerfile", "image_name": "liquibase-qa", "suffix": "", "build_type": "oss", "is_rc": false}')
-              matrix_items+=('{"dockerfile": "Dockerfile.alpine", "image_name": "liquibase-qa-alpine", "suffix": "-alpine", "build_type": "oss", "is_rc": false}')
+            "All (Community + Alpine + Secure)")
+              matrix_items+=('{"dockerfile": "Dockerfile", "image_name": "liquibase-qa", "suffix": "", "build_type": "Community", "is_rc": false}')
+              matrix_items+=('{"dockerfile": "Dockerfile.alpine", "image_name": "liquibase-qa-alpine", "suffix": "-alpine", "build_type": "Community", "is_rc": false}')
               if [[ "$IS_RC_BUILD" == "true" ]]; then
                 matrix_items+=('{"dockerfile": "DockerfileSecure", "image_name": "liquibase-secure-rc", "suffix": "-secure", "build_type": "secure", "is_rc": true}')
               else
                 matrix_items+=('{"dockerfile": "DockerfileSecure", "image_name": "liquibase-secure-qa", "suffix": "-secure", "build_type": "secure", "is_rc": false}')
               fi
               ;;
-            "OSS Only (Standard + Alpine)")
-              matrix_items+=('{"dockerfile": "Dockerfile", "image_name": "liquibase-qa", "suffix": "", "build_type": "oss", "is_rc": false}')
-              matrix_items+=('{"dockerfile": "Dockerfile.alpine", "image_name": "liquibase-qa-alpine", "suffix": "-alpine", "build_type": "oss", "is_rc": false}')
+            "Community Only (Standard + Alpine)")
+              matrix_items+=('{"dockerfile": "Dockerfile", "image_name": "liquibase-qa", "suffix": "", "build_type": "Community", "is_rc": false}')
+              matrix_items+=('{"dockerfile": "Dockerfile.alpine", "image_name": "liquibase-qa-alpine", "suffix": "-alpine", "build_type": "Community", "is_rc": false}')
               ;;
             "Secure Only")
               if [[ "$IS_RC_BUILD" == "true" ]]; then
@@ -69,11 +69,11 @@ jobs:
                 matrix_items+=('{"dockerfile": "DockerfileSecure", "image_name": "liquibase-secure-qa", "suffix": "-secure", "build_type": "secure", "is_rc": false}')
               fi
               ;;
-            "Standard OSS Only")
-              matrix_items+=('{"dockerfile": "Dockerfile", "image_name": "liquibase-qa", "suffix": "", "build_type": "oss", "is_rc": false}')
+            "Standard Community Only")
+              matrix_items+=('{"dockerfile": "Dockerfile", "image_name": "liquibase-qa", "suffix": "", "build_type": "Community", "is_rc": false}')
               ;;
-            "Alpine OSS Only")
-              matrix_items+=('{"dockerfile": "Dockerfile.alpine", "image_name": "liquibase-qa-alpine", "suffix": "-alpine", "build_type": "oss", "is_rc": false}')
+            "Alpine Community Only")
+              matrix_items+=('{"dockerfile": "Dockerfile.alpine", "image_name": "liquibase-qa-alpine", "suffix": "-alpine", "build_type": "Community", "is_rc": false}')
               ;;
           esac
 
@@ -135,7 +135,7 @@ jobs:
           sudo apt-get install -y jq
 
       - name: Get latest workflow run for branch
-        if: ${{ matrix.build_type == 'oss' }}
+        if: ${{ matrix.build_type == 'Community' }}
         id: get-workflow-run
         run: |
           # Get the latest successful workflow run for the specified branch
@@ -156,7 +156,7 @@ jobs:
             echo "has_workflow_run=true" >> $GITHUB_OUTPUT
           fi
 
-      - name: Download liquibase build artifact (OSS) or from S3 (Liquibase-Secure)
+      - name: Download liquibase build artifact (Community) or from S3 (Liquibase-Secure)
         id: download-artifact
         run: |
           if [[ "${{ matrix.build_type }}" == "secure" ]]; then
@@ -229,13 +229,13 @@ jobs:
             fi
 
           else
-            # OSS build handling
+            # Community build handling
             if [[ "${{ steps.get-workflow-run.outputs.has_workflow_run }}" == "false" ]]; then
               echo "No workflow run available, will use fallback build from branch source"
               echo "build_ready=false" >> $GITHUB_OUTPUT
               echo "use_fallback=true" >> $GITHUB_OUTPUT
             else
-              echo "Downloading OSS build from GitHub artifacts..."
+              echo "Downloading Community build from GitHub artifacts..."
 
               # Get artifact download URL
               ARTIFACT_NAME="liquibase-zip-${{ inputs.liquibaseBranch }}"
@@ -367,12 +367,12 @@ jobs:
           echo "use_fallback=false" >> $GITHUB_OUTPUT
 
       - name: Validate and prepare liquibase build
-        if: ${{ (matrix.build_type == 'oss' && (steps.download-artifact.outputs.build_ready == 'true' || steps.download-artifact.outputs.use_fallback == 'true')) || matrix.build_type == 'secure' }}
+        if: ${{ (matrix.build_type == 'Community' && (steps.download-artifact.outputs.build_ready == 'true' || steps.download-artifact.outputs.use_fallback == 'true')) || matrix.build_type == 'secure' }}
         id: validate-build
         run: |
           # Determine build mode
           USE_FALLBACK="false"
-          if [[ "${{ matrix.build_type }}" == "oss" && "${{ steps.download-artifact.outputs.use_fallback }}" == "true" ]]; then
+          if [[ "${{ matrix.build_type }}" == "Community" && "${{ steps.download-artifact.outputs.use_fallback }}" == "true" ]]; then
             USE_FALLBACK="true"
           elif [[ "${{ matrix.build_type }}" == "secure" ]]; then
             # Check for Secure fallback conditions
@@ -593,7 +593,7 @@ jobs:
             fi
           else
             echo "✅ Build Mode: ARTIFACT-BASED (GitHub artifact)"
-            echo "   - OSS build downloaded from GitHub workflow artifacts"
+            echo "   - Community build downloaded from GitHub workflow artifacts"
           fi
 
           echo ""

@@ -2,20 +2,21 @@
 
 ## 🚨 Important: Liquibase 5.0 Changes 🚨
 
-### Liquibase OSS vs Liquibase Secure
+### Liquibase Community vs Liquibase Secure
 
 Starting with **Liquibase 5.0**, we have introduced a clear separation between our open source Community edition and our commercial Secure offering:
 
-- **`liquibase/liquibase`** (OSS Edition): Community version under the Functional Source License (FSL)
+- **`liquibase/liquibase`** (Community Edition): Community version under the Functional Source License (FSL)
 - **`liquibase/liquibase-secure`** (Secure Edition): Commercial version with enterprise features
 
 **If you have a valid Liquibase License Key, you should now use `liquibase/liquibase-secure` instead of `liquibase/liquibase`.**
 
 ### 🚨 Breaking Change: Drivers and Extensions No Longer Included
 
-As of **Liquibase 5.0**, the OSS edition (`liquibase/liquibase`) and the official Docker OSS liquibase image **no longer include database drivers or extensions by default**.
+As of **Liquibase 5.0**, the Community edition (`liquibase/liquibase`) and the official Docker Community liquibase image **no longer include database drivers or extensions by default**.
 
 **What this means for you:**
+
 - You must now explicitly add database drivers using the Liquibase Package Manager (LPM)
 - Extensions must be manually installed or mounted into the container
 - MySQL driver installation via `INSTALL_MYSQL=true` environment variable is still supported
@@ -34,9 +35,9 @@ RUN lpm add mssql --global
 
 ---
 
-## 🚨 Notice: New Official Liquibase OSS Docker Image 🚨
+## 🚨 Notice: New Official Liquibase Community Docker Image 🚨
 
-We are excited to announce that a new official Liquibase OSS Docker image is now available at [https://hub.docker.com/_/liquibase](https://hub.docker.com/_/liquibase) starting with liquibase 4.27.0 and newer. We recommend all users to start using this image for the latest updates and support. Any versions prior to 4.27.0 will only be available on the existing `liquibase/liquibase` community image.
+We are excited to announce that a new official Liquibase Community Docker image is now available at [https://hub.docker.com/\_/liquibase](https://hub.docker.com/_/liquibase) starting with liquibase 4.27.0 and newer. We recommend all users to start using this image for the latest updates and support. Any versions prior to 4.27.0 will only be available on the existing `liquibase/liquibase` community image.
 
 ### 🔧 Action Required
 
@@ -46,23 +47,23 @@ Please update your Dockerfiles and scripts to pull from the new official image:
 
 We publish this image to multiple registries:
 
-| Registry | OSS Image | Secure Image |
-|----------|----------------|-----------|
-| **Docker Hub (default)** | `liquibase/liquibase` | `liquibase/liquibase-secure` |
-| **GitHub Container Registry** | `ghcr.io/liquibase/liquibase` | `ghcr.io/liquibase/liquibase-secure` |
-| **Amazon ECR Public** | `public.ecr.aws/liquibase/liquibase` | `public.ecr.aws/liquibase/liquibase-secure` |
+| Registry                      | Community Image                      | Secure Image                                |
+| ----------------------------- | ------------------------------------ | ------------------------------------------- |
+| **Docker Hub (default)**      | `liquibase/liquibase`                | `liquibase/liquibase-secure`                |
+| **GitHub Container Registry** | `ghcr.io/liquibase/liquibase`        | `ghcr.io/liquibase/liquibase-secure`        |
+| **Amazon ECR Public**         | `public.ecr.aws/liquibase/liquibase` | `public.ecr.aws/liquibase/liquibase-secure` |
 
 ## Dockerfile
 
 ```dockerfile
 FROM liquibase:latest
-# OR ghcr.io/liquibase/liquibase:latest    # GHCR  
+# OR ghcr.io/liquibase/liquibase:latest    # GHCR
 # OR public.ecr.aws/liquibase/liquibase:latest   # Amazon ECR Public
 ```
 
 ## Scripts
 
-### OSS Edition
+### Community Edition
 
 ```bash
 # Docker Hub (default)
@@ -90,7 +91,7 @@ docker pull public.ecr.aws/liquibase/liquibase-secure
 
 ### Pulling the Latest or Specific Version
 
-#### OSS Edition
+#### Community Edition
 
 ```bash
 # Latest
@@ -168,10 +169,12 @@ docker run --rm -v /path/to/changelog:/liquibase/changelog liquibase/liquibase -
 Starting with this version, Docker containers now behave consistently with CLI usage for file path handling. When you mount your changelog directory to `/liquibase/changelog`, the container automatically changes its working directory to match, making relative file paths work the same way in both CLI and Docker environments.
 
 **Before this enhancement:**
+
 - CLI: `liquibase generateChangeLog --changelogFile=mychangelog.xml` (creates file in current directory)
 - Docker: `liquibase generateChangeLog --changelogFile=changelog/mychangelog.xml` (had to include path prefix)
 
 **Now (improved):**
+
 - CLI: `liquibase generateChangeLog --changelogFile=mychangelog.xml` (creates file in current directory)
 - Docker: `liquibase generateChangeLog --changelogFile=mychangelog.xml` (creates file in mounted changelog directory)
 
@@ -180,8 +183,9 @@ Both approaches now work identically, making it easier to switch between local C
 #### How it works
 
 When you mount a directory to `/liquibase/changelog`, the container automatically:
+
 1. Detects the presence of the mounted changelog directory
-2. Changes the working directory to `/liquibase/changelog`  
+2. Changes the working directory to `/liquibase/changelog`
 3. Executes Liquibase commands from that location
 
 This ensures that relative paths in your commands work consistently whether you're using CLI locally or Docker containers in CI/CD pipelines.
