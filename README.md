@@ -18,9 +18,9 @@ Starting with **Liquibase 5.0**, we have introduced a clear separation between o
 | **5.0+** | `liquibase/liquibase` | `liquibase/liquibase-secure` | FSL* / Commercial | ❌ No** |
 | **4.x** | `liquibase:4.x` | `liquibase/liquibase-secure` | Apache 2.0 / Commercial | ✅ Yes*** (Community only) |
 
-*FSL = Functional Source License (See [Liquibase License Information](#license-information))
-**For Liquibase 5.0+, use the community registry image `liquibase/liquibase` (not available as official Docker image).
-***Liquibase 4 community image is available as the official Docker image at [https://hub.docker.com/\_/liquibase](https://hub.docker.com/_/liquibase). Pull using `docker pull liquibase:4.x`.
+- *FSL = Functional Source License (See [Liquibase License Information](#license-information))
+- **For Liquibase 5.0+, use the community registry image `liquibase/liquibase` (not available as official Docker image).
+- ***Liquibase 4 community image is available as the official Docker image at [https://hub.docker.com/\_/liquibase](https://hub.docker.com/_/liquibase). Pull using `docker pull liquibase:4.x`.
 
 ### 🚨 Breaking Change: Drivers and Extensions No Longer Included
 
