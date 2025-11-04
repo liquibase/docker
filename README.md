@@ -330,7 +330,6 @@ Liquibase Docker images use semantic versioning with the following tag strategie
 | `<version>`        | `liquibase/liquibase:5.0.0`         | Specific version (exact match) |
 | `<version>-alpine` | `liquibase/liquibase:5.0.0-alpine`  | Specific Alpine version        |
 | `<major>.<minor>`  | `liquibase/liquibase:5.0`           | Latest patch for major.minor   |
-| `<major>`          | `liquibase/liquibase:5`             | Latest patch for major version |
 
 ### Community vs Secure Image Tags
 
@@ -348,7 +347,6 @@ The following tags are officially supported and can be found on [Docker Hub](htt
 **Community Image:**
 
 - `liquibase/liquibase:latest` - Latest 5.0+ release
-- `liquibase/liquibase:5` - Latest 5.x release
 - `liquibase/liquibase:5.0` - Latest 5.0.x release
 - `liquibase/liquibase:latest-alpine` - Latest Alpine variant
 - `liquibase/liquibase:4.x` - Liquibase 4 versions (Apache 2.0)
