@@ -216,7 +216,7 @@ Liquibase 4 versions continue to use the [Apache 2.0 license](https://www.apache
 
 ### Commercial License - Liquibase Secure
 
-The Liquibase Secure edition requires a commercial license and provides:
+The [Liquibase Secure edition](https://www.liquibase.com/liquibase-secure) requires a commercial license and provides:
 
 - Enterprise features (Policy Checks, Quality Checks)
 - Priority support
