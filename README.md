@@ -17,7 +17,6 @@ Starting with **Liquibase 5.0**, we have introduced a clear separation between o
 | ------------- | --------------------- | ---------------------------- | ----------------------- | ----------------------------- |
 | **5.0+**      | `liquibase/liquibase` | `liquibase/liquibase-secure` | FSL\* / Commercial      | ❌ No\*\*                     |
 | **4.x**       | `liquibase:4.x`\*\*\* | `liquibase/liquibase-secure` | Apache 2.0 / Commercial | ✅ Yes\*\*\* (Community only) |
-|               | `liquibase/liquibase` |                              |                         |                               |
 
 - \*FSL = Functional Source License (See [Liquibase License Information](#license-information))
 - \*\*For Liquibase 5.0+, use the community registry image `liquibase/liquibase` (not available as official Docker image).
