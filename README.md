@@ -15,13 +15,12 @@ Starting with **Liquibase 5.0**, we have introduced a clear separation between o
 
 | Version Range | Community Image | Secure Image | License | Docker Official |
 |---|---|---|---|---|
-| **5.0.0+** | `liquibase/liquibase` | `liquibase/liquibase-secure` | FSL* / Commercial | ✅ Yes** (`liquibase:5.0.1`) |
-| **4.27.0 - 4.x** | `liquibase/liquibase` | `liquibase/liquibase-secure` | Apache 2.0 / Commercial | ✅ Yes*** (`liquibase:4.x`) |
-| **< 4.27.0** | `liquibase/liquibase` | Limited availability | Apache 2.0 | N/A |
+| **5.0+** | `liquibase/liquibase` | `liquibase/liquibase-secure` | FSL* / Commercial | ✅ Yes** |
+| **4.x** | `liquibase/liquibase` | `liquibase/liquibase-secure` | Apache 2.0 / Commercial | ✅ Yes*** |
 
 *FSL = Functional Source License (See [Liquibase License Information](#license-information))
-**For 5.0+, the official Docker image is available at [https://hub.docker.com/\_/liquibase](https://hub.docker.com/_/liquibase). Pull using `docker pull liquibase:5.0.1` (official format) or `docker pull liquibase/liquibase:5.0.1` (community registry).
-***4.27.0+ is available as the official image at [https://hub.docker.com/\_/liquibase](https://hub.docker.com/_/liquibase). Pull using `docker pull liquibase:4.27.0` (official format) or `docker pull liquibase/liquibase:4.27.0` (community registry).
+**For Liquibase 5.0+, the official Docker image is available at [https://hub.docker.com/\_/liquibase](https://hub.docker.com/_/liquibase).
+***Liquibase 4 versions are available as the official image at [https://hub.docker.com/\_/liquibase](https://hub.docker.com/_/liquibase).
 
 ### 🚨 Breaking Change: Drivers and Extensions No Longer Included
 
@@ -90,27 +89,24 @@ docker run --rm \
   liquibase/liquibase-secure update
 ```
 
-### For Liquibase 4.x Users (Legacy)
+### For Liquibase 4 Users (Legacy)
 
-If you're still using Liquibase 4.x, you can use the official image or community registry:
+If you're still using Liquibase 4, you can continue using the same images:
 
 ```bash
-# Pull from official image (recommended)
-docker pull liquibase:4.27.0
-
-# OR pull from community registry
-docker pull liquibase/liquibase:4.27.0
+# Pull from community registry
+docker pull liquibase/liquibase:4.x
 ```
 
 ---
 
-## 📖 Upgrading from Liquibase 4.x to 5.0
+## 📖 Upgrading from Liquibase 4 to 5.0
 
-If you're upgrading from Liquibase 4.x to 5.0, follow these steps:
+If you're upgrading from Liquibase 4 to 5.0, follow these steps:
 
 ### Step 1: Understand License Requirements
 
-- **Liquibase 4.x**: Uses Apache 2.0 license (always available)
+- **Liquibase 4**: Uses Apache 2.0 license (always available)
 - **Liquibase 5.0 Community**: Uses Functional Source License (FSL)
 - **Liquibase 5.0 Secure**: Requires a commercial license
 
@@ -130,34 +126,24 @@ Read more: [Liquibase License Information](#license-information)
 
 ### Step 3: Update Your Image Reference
 
-**If using Community Edition (Official Image - Recommended):**
+**If using Community Edition:**
 
 ```bash
-# Before (4.x)
-FROM liquibase:4.27.0
+# Before (Liquibase 4)
+FROM liquibase/liquibase:4.x
 
-# After (5.0+)
-FROM liquibase:5.0.1  # or :latest
-```
-
-**If using Community Edition (Community Registry - Alternative):**
-
-```bash
-# Before (4.x)
-FROM liquibase/liquibase:4.27.0
-
-# After (5.0+)
-FROM liquibase/liquibase:5.0.1  # or :latest
+# After (Liquibase 5.0+)
+FROM liquibase/liquibase:5.0  # or :latest
 ```
 
 **If using Secure Edition:**
 
 ```bash
-# Before (if available)
-FROM liquibase/liquibase-secure:4.27.0
+# Before (Liquibase 4)
+FROM liquibase/liquibase-secure:4.x
 
-# After (5.0+)
-FROM liquibase/liquibase-secure:5.0.1  # or :latest
+# After (Liquibase 5.0+)
+FROM liquibase/liquibase-secure:5.0  # or :latest
 ```
 
 ### Step 4: Update Driver Installation
@@ -188,7 +174,7 @@ docker run --rm \
   -e LIQUIBASE_COMMAND_URL="jdbc:postgresql://test-db:5432/testdb" \
   -e LIQUIBASE_COMMAND_USERNAME="username" \
   -e LIQUIBASE_COMMAND_PASSWORD="password" \
-  liquibase/liquibase:5.0.0 validate
+  liquibase/liquibase:5.0 validate
 ```
 
 ### Step 6: Complete Production Migration
@@ -212,9 +198,9 @@ The Liquibase 5.0 Community edition is available under the Functional Source Lic
 
 Read the full license: [Functional Source License on fsl.software](https://fsl.software/)
 
-### Apache 2.0 License - Liquibase 4.x
+### Apache 2.0 License - Liquibase 4
 
-Liquibase 4.x versions continue to use the Apache 2.0 license, which is unrestricted for any organization size.
+Liquibase 4 versions continue to use the Apache 2.0 license, which is unrestricted for any organization size.
 
 ### Commercial License - Liquibase Secure
 
@@ -336,21 +322,20 @@ The following tags are officially supported and can be found on [Docker Hub](htt
 - `liquibase/liquibase:latest` - Latest 5.0+ release
 - `liquibase/liquibase:5` - Latest 5.x release
 - `liquibase/liquibase:5.0` - Latest 5.0.x release
-- `liquibase/liquibase:5.0.0` - Specific version
 - `liquibase/liquibase:latest-alpine` - Latest Alpine variant
-- `liquibase/liquibase:4.27.0` - 4.x versions (Apache 2.0)
+- `liquibase/liquibase:4.x` - Liquibase 4 versions (Apache 2.0)
 
 **Secure Image:**
 - `liquibase/liquibase-secure:latest` - Latest Secure release
-- `liquibase/liquibase-secure:5.0.0` - Specific Secure version
+- `liquibase/liquibase-secure:5.0` - Latest 5.0.x release
 - `liquibase/liquibase-secure:latest-alpine` - Latest Secure Alpine variant
 
 ### Choosing the Right Tag
 
-- **For production**: Use specific version tags (`5.0.0`) for reproducibility
+- **For production**: Use major.minor tags (e.g., `5.0`) for reproducibility with latest patches
 - **For development**: Use `latest` or `latest-alpine` for convenience
 - **For Alpine Linux**: Append `-alpine` for smaller image size
-- **For Liquibase 4.x**: Use `4.27.0` or other 4.x specific versions (Apache 2.0 license)
+- **For Liquibase 4**: Use `4.x` versions (Apache 2.0 license)
 
 ## 📦 Using the Docker Image
 
