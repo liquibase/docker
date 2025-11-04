@@ -76,8 +76,8 @@ docker run --rm \
 ### For Secure Edition Users
 
 ```bash
-# Pull the latest secure image
-docker pull liquibase/liquibase-secure:latest
+# Pull the secure image
+docker pull liquibase/liquibase-secure:5.0.1
 
 # Run with a changelog and license key
 docker run --rm \
@@ -86,7 +86,7 @@ docker run --rm \
   -e LIQUIBASE_COMMAND_USERNAME="username" \
   -e LIQUIBASE_COMMAND_PASSWORD="password" \
   -e LIQUIBASE_LICENSE_KEY="your-license-key" \
-  liquibase/liquibase-secure update
+  liquibase/liquibase-secure:5.0.1 update
 ```
 
 ### For Liquibase 4 Users (Legacy)
