@@ -13,14 +13,15 @@ Starting with **Liquibase 5.0**, we have introduced a clear separation between o
 
 ### 📋 Image Availability Matrix
 
-| Version Range | Community Image | Secure Image | License | Docker Official |
-|---|---|---|---|---|
-| **5.0+** | `liquibase/liquibase` | `liquibase/liquibase-secure` | FSL* / Commercial | ❌ No** |
-| **4.x** | `liquibase:4.x` | `liquibase/liquibase-secure` | Apache 2.0 / Commercial | ✅ Yes*** (Community only) |
+| Version Range | Community Image       | Secure Image                 | License                 | Docker Official               |
+| ------------- | --------------------- | ---------------------------- | ----------------------- | ----------------------------- |
+| **5.0+**      | `liquibase/liquibase` | `liquibase/liquibase-secure` | FSL\* / Commercial      | ❌ No\*\*                     |
+| **4.x**       | `liquibase:4.x`\*\*\* | `liquibase/liquibase-secure` | Apache 2.0 / Commercial | ✅ Yes\*\*\* (Community only) |
+|               | `liquibase/liquibase` |                              |                         |                               |
 
-- *FSL = Functional Source License (See [Liquibase License Information](#license-information))
-- **For Liquibase 5.0+, use the community registry image `liquibase/liquibase` (not available as official Docker image).
-- ***Liquibase 4 community image is available as the official Docker image at [https://hub.docker.com/\_/liquibase](https://hub.docker.com/_/liquibase). Pull using `docker pull liquibase:4.x`.
+- \*FSL = Functional Source License (See [Liquibase License Information](#license-information))
+- \*\*For Liquibase 5.0+, use the community registry image `liquibase/liquibase` (not available as official Docker image).
+- \*\*\*Liquibase 4 community image is available as the official Docker image at [https://hub.docker.com/\_/liquibase](https://hub.docker.com/_/liquibase). Pull using `docker pull liquibase:4.x`.
 
 ### 🚨 Breaking Change: Drivers and Extensions No Longer Included
 
@@ -127,11 +128,13 @@ Read more: [Liquibase License Information](#license-information)
 ### Step 2: Determine Which Edition You Need
 
 **Use Community Edition if:**
+
 - You are an open source user
 - You accept the Functional Source License terms
 - You do not require enterprise features
 
 **Use Secure Edition if:**
+
 - You have a commercial Liquibase license
 - You need enterprise features like Policy Checks, Quality Checks, or Advanced Rollback
 - Your organization requires commercial support
@@ -217,6 +220,7 @@ Liquibase 4 versions continue to use the Apache 2.0 license, which is unrestrict
 ### Commercial License - Liquibase Secure
 
 The Liquibase Secure edition requires a commercial license and provides:
+
 - Enterprise features (Policy Checks, Quality Checks)
 - Priority support
 - Advanced rollback capabilities
@@ -308,14 +312,14 @@ Liquibase Docker images use semantic versioning with the following tag strategie
 
 ### Tag Formats
 
-| Tag Format | Example | Description |
-|---|---|---|
-| `latest` | `liquibase/liquibase:latest` | Latest stable release |
-| `latest-alpine` | `liquibase/liquibase:latest-alpine` | Latest stable Alpine variant |
-| `<version>` | `liquibase/liquibase:5.0.0` | Specific version (exact match) |
-| `<version>-alpine` | `liquibase/liquibase:5.0.0-alpine` | Specific Alpine version |
-| `<major>.<minor>` | `liquibase/liquibase:5.0` | Latest patch for major.minor |
-| `<major>` | `liquibase/liquibase:5` | Latest patch for major version |
+| Tag Format         | Example                             | Description                    |
+| ------------------ | ----------------------------------- | ------------------------------ |
+| `latest`           | `liquibase/liquibase:latest`        | Latest stable release          |
+| `latest-alpine`    | `liquibase/liquibase:latest-alpine` | Latest stable Alpine variant   |
+| `<version>`        | `liquibase/liquibase:5.0.0`         | Specific version (exact match) |
+| `<version>-alpine` | `liquibase/liquibase:5.0.0-alpine`  | Specific Alpine version        |
+| `<major>.<minor>`  | `liquibase/liquibase:5.0`           | Latest patch for major.minor   |
+| `<major>`          | `liquibase/liquibase:5`             | Latest patch for major version |
 
 ### Community vs Secure Image Tags
 
@@ -331,6 +335,7 @@ Both are available across all registries (Docker Hub, GHCR, Amazon ECR Public).
 The following tags are officially supported and can be found on [Docker Hub](https://hub.docker.com/r/liquibase/liquibase/tags):
 
 **Community Image:**
+
 - `liquibase/liquibase:latest` - Latest 5.0+ release
 - `liquibase/liquibase:5` - Latest 5.x release
 - `liquibase/liquibase:5.0` - Latest 5.0.x release
@@ -338,6 +343,7 @@ The following tags are officially supported and can be found on [Docker Hub](htt
 - `liquibase/liquibase:4.x` - Liquibase 4 versions (Apache 2.0)
 
 **Secure Image:**
+
 - `liquibase/liquibase-secure:latest` - Latest Secure release
 - `liquibase/liquibase-secure:5.0` - Latest 5.0.x release
 - `liquibase/liquibase-secure:latest-alpine` - Latest Secure Alpine variant
