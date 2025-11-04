@@ -24,7 +24,7 @@ Starting with **Liquibase 5.0**, we have introduced a clear separation between o
 
 ### 🚨 Breaking Change: Drivers and Extensions No Longer Included
 
-As of **Liquibase 5.0**, the Community edition (`liquibase/liquibase`) **no longer includes database drivers or extensions by default**.
+As of **Liquibase 5.0**, the Community edition (`liquibase/liquibase`) and the official Docker Community liquibase image **no longer include database drivers or extensions by default**.
 
 **What this means for you:**
 
