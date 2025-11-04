@@ -89,7 +89,7 @@ docker run --rm \
   liquibase/liquibase-secure:5.0.1 update
 ```
 
-### For Liquibase 4 Users (Legacy)
+### For Liquibase 4 Users
 
 If you're still using Liquibase 4, you can pull from either the official Docker repository or the community registry:
 
@@ -204,17 +204,15 @@ Once testing is successful, update your production deployments to use the new im
 The Liquibase 5.0 Community edition is available under the Functional Source License (FSL). This license:
 
 - Allows you to freely use Liquibase for database migrations
-- Is limited to organizations with less than $50M in annual revenue
-- Includes automatic transition to Apache 2.0 after 4 years
-- Provides full source code access
-
-**For organizations exceeding the revenue threshold or requiring unrestricted use, please consider the Liquibase Secure edition.**
+- Prohibits commercial use that competes with Liquibase’s products or services
+- Automatically transitions to the Apache 2.0 license after two years
+- Provides full source code access (but not OSI-approved open source)
 
 Read the full license: [Functional Source License on fsl.software](https://fsl.software/)
 
 ### Apache 2.0 License - Liquibase 4
 
-Liquibase 4 versions continue to use the Apache 2.0 license, which is unrestricted for any organization size.
+Liquibase 4 versions continue to use the [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0).
 
 ### Commercial License - Liquibase Secure
 
