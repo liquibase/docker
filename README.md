@@ -56,7 +56,6 @@ We publish Liquibase images to multiple registries for flexibility:
 | **Docker Hub (default)**      | `liquibase/liquibase`                | `liquibase/liquibase-secure`                |
 | **GitHub Container Registry** | `ghcr.io/liquibase/liquibase`        | `ghcr.io/liquibase/liquibase-secure`        |
 | **Amazon ECR Public**         | `public.ecr.aws/liquibase/liquibase` | `public.ecr.aws/liquibase/liquibase-secure` |
-| **Quay.io**                   | `quay.io/liquibase/liquibase`        | `quay.io/liquibase/liquibase-secure`        |
 
 ## 🚀 Quick Start
 
@@ -314,7 +313,7 @@ The same tag structure applies to both image types:
 - **Community**: `liquibase/liquibase:5.0.0`
 - **Secure**: `liquibase/liquibase-secure:5.0.0`
 
-Both are available across all registries (Docker Hub, GHCR, Amazon ECR Public, Quay.io).
+Both are available across all registries (Docker Hub, GHCR, Amazon ECR Public).
 
 ### Supported Tags
 
