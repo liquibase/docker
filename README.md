@@ -216,14 +216,28 @@ Liquibase 4 versions continue to use the [Apache 2.0 license](https://www.apache
 
 ### Commercial License - Liquibase Secure
 
-The [Liquibase Secure edition](https://www.liquibase.com/liquibase-secure) requires a commercial license and provides:
+The [Liquibase Secure edition](https://www.liquibase.com/liquibase-secure) requires a commercial license and provides enterprise-grade database change management with advanced capabilities:
 
-- Enterprise features (Policy Checks, Quality Checks)
-- Priority support
-- Advanced rollback capabilities
-- Compliance features
+**Developer Productivity:**
+- VS Code Extension for IDE-native operations
+- Liquibase Flows for environment consistency
+- Policy Checks to enforce standards and block risky changes
+- Support for 60+ database types
 
-For licensing inquiries, visit [liquibase.com/get-liquibase](https://www.liquibase.com/get-liquibase)
+**Secure Automation:**
+- CI/CD deployment automation with policy enforcement
+- Targeted rollbacks for precise recovery
+- Advanced drift detection and alerting
+- Secrets management and RBAC enforcement
+- Multi-environment deployment capabilities
+
+**Change Insights & Compliance:**
+- Unified change tracking with full audit context
+- Real-time drift detection
+- Audit-ready compliance reporting (SOX, HIPAA, PCI, SOC2, GDPR)
+- Risk scoring for change assessment
+
+For more information and licensing inquiries, visit [liquibase.com/get-liquibase](https://www.liquibase.com/get-liquibase)
 
 ---
 
