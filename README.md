@@ -13,9 +13,9 @@ Starting with **Liquibase 5.0**, we have introduced a clear separation between o
 
 ### 📋 Image Availability Matrix
 
-| Version Range | Community Image       | Secure Image                 | License                 | Docker Official               |
-| ------------- | --------------------- | ---------------------------- | ----------------------- | ----------------------------- |
-| **5.0+**      | `liquibase/liquibase` | `liquibase/liquibase-secure` | FSL\* / Commercial      | ❌ No\*\*                     |
+| Version Range | Community Image                                 | Secure Image                 | License                 | Docker Official               |
+| ------------- | ----------------------------------------------- | ---------------------------- | ----------------------- | ----------------------------- |
+| **5.0+**      | `liquibase/liquibase`                           | `liquibase/liquibase-secure` | FSL\* / Commercial      | ❌ No\*\*                     |
 | **4.x**       | `liquibase:4.x`\*\*\*<br/>`liquibase/liquibase` | `liquibase/liquibase-secure` | Apache 2.0 / Commercial | ✅ Yes\*\*\* (Community only) |
 
 - \*FSL = Functional Source License (See [Liquibase License Information](#license-information))
@@ -93,7 +93,7 @@ docker run --rm \
 
 If you're still using Liquibase 4, you can pull from either the official Docker repository or the community registry:
 
-**Official Docker Repository (Recommended):**
+**Official Docker Repository:**
 
 ```bash
 # Pull the latest Liquibase 4 image
@@ -103,7 +103,7 @@ docker pull liquibase:latest
 docker pull liquibase:4.x
 ```
 
-**Community Registry (Alternative):**
+**Community Registry:**
 
 ```bash
 # Pull from community registry
@@ -232,7 +232,7 @@ For licensing inquiries, visit [liquibase.com/get-liquibase](https://www.liquiba
 ## Dockerfile
 
 ```dockerfile
-FROM liquibase:latest
+FROM liquibase/liquibase:latest
 # OR ghcr.io/liquibase/liquibase:latest    # GHCR
 # OR public.ecr.aws/liquibase/liquibase:latest   # Amazon ECR Public
 ```
