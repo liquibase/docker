@@ -91,7 +91,19 @@ docker run --rm \
 
 ### For Liquibase 4 Users (Legacy)
 
-If you're still using Liquibase 4, you can continue using the same images:
+If you're still using Liquibase 4, you can pull from either the official Docker repository or the community registry:
+
+**Official Docker Repository (Recommended):**
+
+```bash
+# Pull the latest Liquibase 4 image
+docker pull liquibase:latest
+
+# Or pull a specific version
+docker pull liquibase:4.x
+```
+
+**Community Registry (Alternative):**
 
 ```bash
 # Pull from community registry
