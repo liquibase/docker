@@ -150,11 +150,11 @@ FROM liquibase/liquibase:4.x
 FROM liquibase/liquibase:5.0  # or :latest
 ```
 
-**If using Secure Edition:**
+**If using PRO Edition:**
 
 ```bash
 # Before (Liquibase 4)
-FROM liquibase/liquibase-secure:4.x
+FROM liquibase/liquibase-pro:4.x
 
 # After (Liquibase 5.0+)
 FROM liquibase/liquibase-secure:5.0  # or :latest
