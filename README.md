@@ -416,7 +416,87 @@ When you mount a directory to `/liquibase/changelog`, the container automaticall
 2. Changes the working directory to `/liquibase/changelog`
 3. Executes Liquibase commands from that location
 
-This ensures that relative paths in your commands work consistently whether you're using CLI locally or Docker containers in CI/CD pipelines.
+This ensures that relative paths in your commands work consistently whether you're using CLI locally or Docker containers in CI/CD pipelines. In most cases, this automatic behavior works seamlessly without any manual intervention.
+
+### 🔍 Search Path Configuration
+
+Liquibase Docker images automatically manage the search path to help locate changelog files and dependencies. The search path is configured with the following priority (highest to lowest):
+
+1. **User-provided `--search-path` CLI argument** (highest priority)
+2. **User-provided `LIQUIBASE_SEARCH_PATH` environment variable**
+3. **Automatic search path injection** (lowest priority)
+
+#### Understanding Search Path Behavior
+
+When you mount a changelog directory to `/liquibase/changelog`:
+
+- **With relative paths** (`--changelogFile=mychangelog.xml`): The container automatically sets `--search-path=.` to search the current directory (working directory).
+- **Without mount or with absolute paths**: The container sets `--search-path=/liquibase/changelog` to help locate files in the default location.
+
+#### Custom Search Paths
+
+If you need to use a custom search path (for example, to include S3 buckets or remote storage locations), the container respects your configuration and **will not override** user-provided search paths:
+
+**Example 1: Using environment variable with multiple search paths**
+
+```bash
+docker run --rm \
+  --env LIQUIBASE_SEARCH_PATH="/liquibase/changelog,s3://my-bucket/snapshots/" \
+  -v /path/to/changelog:/liquibase/changelog \
+  liquibase/liquibase --changelogFile=mychangelog.xml update
+```
+
+**Example 2: Using CLI argument**
+
+```bash
+docker run --rm \
+  -v /path/to/changelog:/liquibase/changelog \
+  liquibase/liquibase \
+  --changelogFile=mychangelog.xml \
+  --search-path=/custom/path \
+  update
+```
+
+**Example 3: Combining relative paths with custom search paths (Correct approach)**
+
+```bash
+docker run --rm \
+  --env LIQUIBASE_SEARCH_PATH="/liquibase/changelog,/liquibase/shared-changesets" \
+  -v /path/to/changelog:/liquibase/changelog \
+  -v /path/to/shared:/liquibase/shared-changesets \
+  liquibase/liquibase --changelogFile=main.xml update
+```
+
+In this example:
+- The relative path `main.xml` is found in the working directory (`/liquibase/changelog`)
+- Included files are searched **only** in the paths specified by `LIQUIBASE_SEARCH_PATH` (`/liquibase/shared-changesets`). The current directory (`.`) is **not** automatically included. If you want to search both the current directory and a custom path, include both in your configuration: `LIQUIBASE_SEARCH_PATH="/liquibase/changelog,/liquibase/shared-changesets"`
+
+#### Troubleshooting Search Path Issues
+
+If you're experiencing file-not-found errors with custom search paths:
+
+1. **Verify the environment variable is set correctly**: Check that `LIQUIBASE_SEARCH_PATH` is properly formatted (comma-separated for multiple paths)
+2. **Check path permissions**: Ensure the Docker container can access mounted directories
+3. **Use absolute paths**: For clarity, use absolute paths in your search path configuration
+4. **Review Liquibase logs**: Liquibase will output which search path it's using during execution
+
+#### Important: Search Path Behavior with Custom Paths
+
+When you set `LIQUIBASE_SEARCH_PATH` to a custom value:
+
+- **Only the paths you specify are searched** for included files
+- The current directory (`.`) is **not automatically added**
+- If you want to search multiple locations, **include all of them** in your `LIQUIBASE_SEARCH_PATH` configuration
+
+**Example:** If you want to search both `/liquibase/changelog` and `/liquibase/shared-changesets`:
+
+```bash
+# ✓ CORRECT: Include both paths
+--env LIQUIBASE_SEARCH_PATH="/liquibase/changelog,/liquibase/shared-changesets"
+
+# ✗ INCORRECT: Only includes shared-changesets, NOT the current directory
+--env LIQUIBASE_SEARCH_PATH="/liquibase/shared-changesets"
+```
 
 ### ⚙️ Using a Configuration File
 

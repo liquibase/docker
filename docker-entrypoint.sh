@@ -54,15 +54,38 @@ else
   fi
   
   # Set search path based on whether we changed directories
+  # BUT: Only inject our default search path if user hasn't already provided one
+  # This respects Liquibase's configuration precedence: CLI args > env vars > properties files
   EXTRA_SEARCH_PATH=""
-  if [ "$SHOULD_CHANGE_DIR" = true ]; then
-    # If we changed to changelog directory, search current directory
-    EXTRA_SEARCH_PATH="--search-path=."
-  else
-    # If we stayed in /liquibase and changelog directory exists, add it to search path
-    # This helps when using absolute paths like /liquibase/changelog/file.xml
-    if [ -d "/liquibase/changelog" ]; then
-      EXTRA_SEARCH_PATH="--search-path=/liquibase/changelog"
+
+  # Check if user already provided a search path
+  USER_HAS_SEARCH_PATH=false
+  for arg in "$@"; do
+    # Check for both --search-path and --searchPath (case variations)
+    case "$arg" in
+      --search-path=*|--searchPath=*)
+        USER_HAS_SEARCH_PATH=true
+        break
+        ;;
+    esac
+  done
+
+  # Also check if user provided LIQUIBASE_SEARCH_PATH environment variable
+  if [ -n "$LIQUIBASE_SEARCH_PATH" ]; then
+    USER_HAS_SEARCH_PATH=true
+  fi
+
+  # Only inject our default search path if user didn't provide one
+  if [ "$USER_HAS_SEARCH_PATH" = false ]; then
+    if [ "$SHOULD_CHANGE_DIR" = true ]; then
+      # If we changed to changelog directory, search current directory
+      EXTRA_SEARCH_PATH="--search-path=."
+    else
+      # If we stayed in /liquibase and changelog directory exists, add it to search path
+      # This helps when using absolute paths like /liquibase/changelog/file.xml
+      if [ -d "/liquibase/changelog" ]; then
+        EXTRA_SEARCH_PATH="--search-path=/liquibase/changelog"
+      fi
     fi
   fi
   
