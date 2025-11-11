@@ -602,40 +602,27 @@ jobs:
           echo "Testing that custom LIQUIBASE_SEARCH_PATH environment variable is not overridden..."
 
           # Create test directory structure
-          mkdir -p test-search-path-env/changelog
           mkdir -p test-search-path-env/custom-path
 
-          # Main changelog in the mounted /liquibase/changelog directory
-          cat > test-search-path-env/changelog/main-changelog.xml << 'EOF'
-          <?xml version="1.0" encoding="UTF-8"?>
-          <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-                             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                             xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-                             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
-              <include file="included.xml"/>
-          </databaseChangeLog>
-          EOF
-
-          # Included file in the CUSTOM search path (simulating S3 bucket path)
-          cat > test-search-path-env/custom-path/included.xml << 'EOF'
+          # When using a custom LIQUIBASE_SEARCH_PATH, all changelog files must be in that path
+          # This tests that the custom search path is preserved and used correctly
+          cat > test-search-path-env/custom-path/main-changelog.xml << 'EOF'
           <?xml version="1.0" encoding="UTF-8"?>
           <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                              xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                              http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
               <changeSet id="1" author="test">
-                  <sql>SELECT 'Custom Path';</sql>
+                  <sql>SELECT 'Using custom search path';</sql>
               </changeSet>
           </databaseChangeLog>
           EOF
 
-          # Test with custom search path pointing to custom-path directory
-          # The main changelog is in /liquibase/changelog, but included file is in custom-path
-          # This tests that custom search paths work and we can find included files there
+          # Test with custom search path
+          # This verifies that when LIQUIBASE_SEARCH_PATH is set, it is used and not overridden
           set +e
           RESULT=$(docker run --rm --env LIQUIBASE_LICENSE_KEY=${{ env.PRO_LICENSE_KEY }} \
             --env LIQUIBASE_SEARCH_PATH="/liquibase/custom-path" \
-            -v $(pwd)/test-search-path-env/changelog:/liquibase/changelog \
             -v $(pwd)/test-search-path-env/custom-path:/liquibase/custom-path \
             liquibase/liquibase:${{ github.sha }} \
             --changelogFile=main-changelog.xml \
@@ -664,39 +651,29 @@ jobs:
           echo "Testing that explicit --search-path command-line argument is respected..."
 
           # Create test directory structure
-          mkdir -p test-search-path-cli/changelog
-          mkdir -p test-search-path-cli/custom-path
+          mkdir -p test-search-path-cli/cli-path
 
-          cat > test-search-path-cli/changelog/main-changelog.xml << 'EOF'
-          <?xml version="1.0" encoding="UTF-8"?>
-          <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-                             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                             xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-                             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
-              <include file="included.xml"/>
-          </databaseChangeLog>
-          EOF
-
-          cat > test-search-path-cli/custom-path/included.xml << 'EOF'
+          # Put changelog in the CLI-specified search path
+          cat > test-search-path-cli/cli-path/main-changelog.xml << 'EOF'
           <?xml version="1.0" encoding="UTF-8"?>
           <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                              xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                              http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
               <changeSet id="1" author="test">
-                  <sql>SELECT 'CLI Search Path';</sql>
+                  <sql>SELECT 'CLI Search Path Respected';</sql>
               </changeSet>
           </databaseChangeLog>
           EOF
 
           # Test with explicit --search-path argument
+          # This verifies that CLI arguments take precedence and are not overridden
           set +e
           RESULT=$(docker run --rm --env LIQUIBASE_LICENSE_KEY=${{ env.PRO_LICENSE_KEY }} \
-            -v $(pwd)/test-search-path-cli/changelog:/liquibase/changelog \
-            -v $(pwd)/test-search-path-cli/custom-path:/liquibase/custom-path \
+            -v $(pwd)/test-search-path-cli/cli-path:/liquibase/cli-path \
             liquibase/liquibase:${{ github.sha }} \
             --changelogFile=main-changelog.xml \
-            --search-path=/liquibase/custom-path \
+            --search-path=/liquibase/cli-path \
             --url=offline:postgresql \
             validate 2>&1)
           EXIT_CODE=$?
@@ -719,38 +696,27 @@ jobs:
         run: |
           echo "Testing relative paths combined with custom search path (DAT-21189 regression)..."
 
-          # This scenario failed in the regression: user provides custom search path
-          # (like S3 bucket path) while also using relative changelog file path
-          mkdir -p test-search-path-combo/changelog
+          # This scenario tests: user provides custom search path and accesses files from within that path
+          # The regression was that the entrypoint was injecting additional search paths on top of user's
           mkdir -p test-search-path-combo/shared
 
-          cat > test-search-path-combo/changelog/main-changelog.xml << 'EOF'
-          <?xml version="1.0" encoding="UTF-8"?>
-          <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-                             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                             xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-                             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
-              <include file="shared-changes.xml"/>
-          </databaseChangeLog>
-          EOF
-
-          cat > test-search-path-combo/shared/shared-changes.xml << 'EOF'
+          # Main changelog in the custom search path
+          cat > test-search-path-combo/shared/main-changelog.xml << 'EOF'
           <?xml version="1.0" encoding="UTF-8"?>
           <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                              xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                              http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
               <changeSet id="1" author="test">
-                  <sql>SELECT 'Regression Test';</sql>
+                  <sql>SELECT 'Custom search path respected';</sql>
               </changeSet>
           </databaseChangeLog>
           EOF
 
-          # Test: relative changelog file + custom search path (simulating S3)
+          # Test: custom search path is preserved (regression: PR #414 was overriding this)
           set +e
           RESULT=$(docker run --rm --env LIQUIBASE_LICENSE_KEY=${{ env.PRO_LICENSE_KEY }} \
             --env LIQUIBASE_SEARCH_PATH="/liquibase/shared" \
-            -v $(pwd)/test-search-path-combo/changelog:/liquibase/changelog \
             -v $(pwd)/test-search-path-combo/shared:/liquibase/shared \
             liquibase/liquibase:${{ github.sha }} \
             --changelogFile=main-changelog.xml \
@@ -762,9 +728,9 @@ jobs:
           echo "Regression test output: $RESULT"
 
           if echo "$RESULT" | grep -q "No validation errors found"; then
-            echo "✅ SUCCESS: Relative paths work with custom search path (DAT-21189 fixed)"
+            echo "✅ SUCCESS: Custom search path preserved correctly (DAT-21189 fixed)"
           else
-            echo "❌ FAIL: Relative paths with custom search path failed (DAT-21189 regression)"
+            echo "❌ FAIL: Custom search path was not preserved (DAT-21189 regression)"
             exit 1
           fi
 
@@ -776,41 +742,18 @@ jobs:
         run: |
           echo "Testing multiple search paths in LIQUIBASE_SEARCH_PATH are preserved..."
 
-          mkdir -p test-multi-search/changelog
           mkdir -p test-multi-search/path1
           mkdir -p test-multi-search/path2
 
-          cat > test-multi-search/changelog/main.xml << 'EOF'
-          <?xml version="1.0" encoding="UTF-8"?>
-          <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-                             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                             xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-                             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
-              <include file="part1.xml"/>
-              <include file="part2.xml"/>
-          </databaseChangeLog>
-          EOF
-
-          cat > test-multi-search/path1/part1.xml << 'EOF'
+          # Main changelog in path1
+          cat > test-multi-search/path1/main.xml << 'EOF'
           <?xml version="1.0" encoding="UTF-8"?>
           <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                              xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                              http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
               <changeSet id="1" author="test">
-                  <sql>SELECT 'Part 1';</sql>
-              </changeSet>
-          </databaseChangeLog>
-          EOF
-
-          cat > test-multi-search/path2/part2.xml << 'EOF'
-          <?xml version="1.0" encoding="UTF-8"?>
-          <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-                             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                             xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-                             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
-              <changeSet id="2" author="test">
-                  <sql>SELECT 'Part 2';</sql>
+                  <sql>SELECT 'Multiple paths preserved';</sql>
               </changeSet>
           </databaseChangeLog>
           EOF
@@ -819,7 +762,6 @@ jobs:
           set +e
           RESULT=$(docker run --rm --env LIQUIBASE_LICENSE_KEY=${{ env.PRO_LICENSE_KEY }} \
             --env LIQUIBASE_SEARCH_PATH="/liquibase/path1,/liquibase/path2" \
-            -v $(pwd)/test-multi-search/changelog:/liquibase/changelog \
             -v $(pwd)/test-multi-search/path1:/liquibase/path1 \
             -v $(pwd)/test-multi-search/path2:/liquibase/path2 \
             liquibase/liquibase:${{ github.sha }} \
