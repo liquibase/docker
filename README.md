@@ -469,11 +469,11 @@ docker run --rm \
   update
 ```
 
-**Example 3: Combining relative paths with custom search paths**
+**Example 3: Combining relative paths with custom search paths (Correct approach)**
 
 ```bash
 docker run --rm \
-  --env LIQUIBASE_SEARCH_PATH="/liquibase/shared-changesets" \
+  --env LIQUIBASE_SEARCH_PATH="/liquibase/changelog,/liquibase/shared-changesets" \
   -v /path/to/changelog:/liquibase/changelog \
   -v /path/to/shared:/liquibase/shared-changesets \
   liquibase/liquibase --changelogFile=main.xml update
@@ -481,7 +481,7 @@ docker run --rm \
 
 In this example:
 - The relative path `main.xml` is found in the working directory (`/liquibase/changelog`)
-- Included files are searched first in the current directory (`.`), then in the custom path (`/liquibase/shared-changesets`)
+- Included files are searched **only** in the paths specified by `LIQUIBASE_SEARCH_PATH` (`/liquibase/shared-changesets`). The current directory (`.`) is **not** automatically included. If you want to search both the current directory and a custom path, include both in your configuration: `LIQUIBASE_SEARCH_PATH="/liquibase/changelog,/liquibase/shared-changesets"`
 
 #### Troubleshooting Search Path Issues
 
@@ -491,6 +491,24 @@ If you're experiencing file-not-found errors with custom search paths:
 2. **Check path permissions**: Ensure the Docker container can access mounted directories
 3. **Use absolute paths**: For clarity, use absolute paths in your search path configuration
 4. **Review Liquibase logs**: Liquibase will output which search path it's using during execution
+
+#### Important: Search Path Behavior with Custom Paths
+
+When you set `LIQUIBASE_SEARCH_PATH` to a custom value:
+
+- **Only the paths you specify are searched** for included files
+- The current directory (`.`) is **not automatically added**
+- If you want to search multiple locations, **include all of them** in your `LIQUIBASE_SEARCH_PATH` configuration
+
+**Example:** If you want to search both `/liquibase/changelog` and `/liquibase/shared-changesets`:
+
+```bash
+# ✓ CORRECT: Include both paths
+--env LIQUIBASE_SEARCH_PATH="/liquibase/changelog,/liquibase/shared-changesets"
+
+# ✗ INCORRECT: Only includes shared-changesets, NOT the current directory
+--env LIQUIBASE_SEARCH_PATH="/liquibase/shared-changesets"
+```
 
 ### ⚙️ Using a Configuration File
 
