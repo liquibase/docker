@@ -416,19 +416,7 @@ When you mount a directory to `/liquibase/changelog`, the container automaticall
 2. Changes the working directory to `/liquibase/changelog`
 3. Executes Liquibase commands from that location
 
-This ensures that relative paths in your commands work consistently whether you're using CLI locally or Docker containers in CI/CD pipelines.
-
-#### Controlling Working Directory Behavior
-
-The automatic working directory change can be controlled using the `SHOULD_CHANGE_DIR` environment variable:
-
-```bash
-# Disable automatic working directory change
-docker run --rm \
-  --env SHOULD_CHANGE_DIR=false \
-  -v /path/to/changelog:/liquibase/changelog \
-  liquibase/liquibase --changelogFile=/liquibase/changelog/changelog.xml update
-```
+This ensures that relative paths in your commands work consistently whether you're using CLI locally or Docker containers in CI/CD pipelines. In most cases, this automatic behavior works seamlessly without any manual intervention.
 
 ### 🔍 Search Path Configuration
 
