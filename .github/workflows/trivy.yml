@@ -67,10 +67,24 @@ jobs:
             ,/vault/liquibase
           parse-json-secrets: true
 
-      - name: Export vault secrets to environment
-        if: always()
+      - name: Debug vault secrets
         run: |
-          echo "DOCKER_SLACK_WEBHOOK_URL=${{ env.vault_liquibase_DOCKER_SLACK_WEBHOOK_URL }}" >> $GITHUB_ENV
+          echo "=== Checking for SLACK variables ==="
+          env | grep -i slack || echo "No SLACK variables found"
+          echo "=== Checking for DOCKER variables ==="
+          env | grep -i docker || echo "No DOCKER variables found"
+          echo "=== Checking all vault_liquibase variables ==="
+          env | grep vault_liquibase || echo "No vault_liquibase variables found"
+
+      - name: Export vault secrets to environment
+        run: |
+          if [ -n "${{ env.DOCKER_SLACK_WEBHOOK_URL }}" ]; then
+            echo "DOCKER_SLACK_WEBHOOK_URL=${{ env.DOCKER_SLACK_WEBHOOK_URL }}" >> $GITHUB_ENV
+          elif [ -n "${{ env.vault_liquibase_DOCKER_SLACK_WEBHOOK_URL }}" ]; then
+            echo "DOCKER_SLACK_WEBHOOK_URL=${{ env.vault_liquibase_DOCKER_SLACK_WEBHOOK_URL }}" >> $GITHUB_ENV
+          else
+            echo "::warning::Could not find DOCKER_SLACK_WEBHOOK_URL in vault secrets"
+          fi
 
       - name: Notify Slack on Build Failure
         if: failure()
@@ -141,10 +155,24 @@ jobs:
             ,/vault/liquibase
           parse-json-secrets: true
 
-      - name: Export vault secrets to environment
-        if: always()
+      - name: Debug vault secrets
         run: |
-          echo "DOCKER_SLACK_WEBHOOK_URL=${{ env.vault_liquibase_DOCKER_SLACK_WEBHOOK_URL }}" >> $GITHUB_ENV
+          echo "=== Checking for SLACK variables ==="
+          env | grep -i slack || echo "No SLACK variables found"
+          echo "=== Checking for DOCKER variables ==="
+          env | grep -i docker || echo "No DOCKER variables found"
+          echo "=== Checking all vault_liquibase variables ==="
+          env | grep vault_liquibase || echo "No vault_liquibase variables found"
+
+      - name: Export vault secrets to environment
+        run: |
+          if [ -n "${{ env.DOCKER_SLACK_WEBHOOK_URL }}" ]; then
+            echo "DOCKER_SLACK_WEBHOOK_URL=${{ env.DOCKER_SLACK_WEBHOOK_URL }}" >> $GITHUB_ENV
+          elif [ -n "${{ env.vault_liquibase_DOCKER_SLACK_WEBHOOK_URL }}" ]; then
+            echo "DOCKER_SLACK_WEBHOOK_URL=${{ env.vault_liquibase_DOCKER_SLACK_WEBHOOK_URL }}" >> $GITHUB_ENV
+          else
+            echo "::warning::Could not find DOCKER_SLACK_WEBHOOK_URL in vault secrets"
+          fi
 
       - name: Decode DOCKERHUB_USERNAME
         run: |
