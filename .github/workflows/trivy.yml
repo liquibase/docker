@@ -67,6 +67,10 @@ jobs:
             ,/vault/liquibase
           parse-json-secrets: true
 
+      - name: Export vault secrets to environment
+        run: |
+          echo "DOCKER_SLACK_WEBHOOK_URL=${{ env.vault_liquibase_DOCKER_SLACK_WEBHOOK_URL }}" >> $GITHUB_ENV
+
       - name: Notify Slack on Build Failure
         if: failure()
         uses: rtCamp/action-slack-notify@v2
@@ -135,6 +139,10 @@ jobs:
           secret-ids: |
             ,/vault/liquibase
           parse-json-secrets: true
+
+      - name: Export vault secrets to environment
+        run: |
+          echo "DOCKER_SLACK_WEBHOOK_URL=${{ env.vault_liquibase_DOCKER_SLACK_WEBHOOK_URL }}" >> $GITHUB_ENV
 
       - name: Decode DOCKERHUB_USERNAME
         run: |
