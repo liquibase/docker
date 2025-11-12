@@ -68,6 +68,7 @@ jobs:
           parse-json-secrets: true
 
       - name: Export vault secrets to environment
+        if: always()
         run: |
           echo "DOCKER_SLACK_WEBHOOK_URL=${{ env.vault_liquibase_DOCKER_SLACK_WEBHOOK_URL }}" >> $GITHUB_ENV
 
@@ -141,6 +142,7 @@ jobs:
           parse-json-secrets: true
 
       - name: Export vault secrets to environment
+        if: always()
         run: |
           echo "DOCKER_SLACK_WEBHOOK_URL=${{ env.vault_liquibase_DOCKER_SLACK_WEBHOOK_URL }}" >> $GITHUB_ENV
 
