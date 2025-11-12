@@ -53,39 +53,6 @@ jobs:
           exit-code: '1'
           limit-severities-for-sarif: true
 
-      - name: Configure AWS credentials for vault access
-        uses: aws-actions/configure-aws-credentials@v5
-        with:
-          role-to-assume: ${{ secrets.LIQUIBASE_VAULT_OIDC_ROLE_ARN }}
-          aws-region: us-east-1
-
-      - name: Get secrets from vault
-        id: vault-secrets
-        uses: aws-actions/aws-secretsmanager-get-secrets@v2
-        with:
-          secret-ids: |
-            ,/vault/liquibase
-          parse-json-secrets: true
-
-      - name: Debug vault secrets
-        run: |
-          echo "=== Checking for SLACK variables ==="
-          env | grep -i slack || echo "No SLACK variables found"
-          echo "=== Checking for DOCKER variables ==="
-          env | grep -i docker || echo "No DOCKER variables found"
-          echo "=== Checking all vault_liquibase variables ==="
-          env | grep vault_liquibase || echo "No vault_liquibase variables found"
-
-      - name: Export vault secrets to environment
-        run: |
-          if [ -n "${{ env.DOCKER_SLACK_WEBHOOK_URL }}" ]; then
-            echo "DOCKER_SLACK_WEBHOOK_URL=${{ env.DOCKER_SLACK_WEBHOOK_URL }}" >> $GITHUB_ENV
-          elif [ -n "${{ env.vault_liquibase_DOCKER_SLACK_WEBHOOK_URL }}" ]; then
-            echo "DOCKER_SLACK_WEBHOOK_URL=${{ env.vault_liquibase_DOCKER_SLACK_WEBHOOK_URL }}" >> $GITHUB_ENV
-          else
-            echo "::warning::Could not find DOCKER_SLACK_WEBHOOK_URL in vault secrets"
-          fi
-
       - name: Notify Slack on Build Failure
         if: failure()
         uses: rtCamp/action-slack-notify@v2
@@ -94,7 +61,7 @@ jobs:
           SLACK_MESSAGE: "View details on GitHub Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Triggered by repository: ${{ github.repository }} and job: ${{ github.job }}"
           SLACK_TITLE: "❌ ${{ github.repository }} ❌ Trivy failed on branch ${{ github.ref_name }} for commit ${{ github.sha }} in repository ${{ github.repository }}"
           SLACK_USERNAME: liquibot
-          SLACK_WEBHOOK: ${{ env.DOCKER_SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK: ${{ secrets.DOCKER_SLACK_WEBHOOK_URL }}
           SLACK_ICON_EMOJI: ":whale:"
           SLACK_FOOTER: "${{ github.repository }} - ${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}"
           SLACK_LINK_NAMES: true
@@ -155,25 +122,6 @@ jobs:
             ,/vault/liquibase
           parse-json-secrets: true
 
-      - name: Debug vault secrets
-        run: |
-          echo "=== Checking for SLACK variables ==="
-          env | grep -i slack || echo "No SLACK variables found"
-          echo "=== Checking for DOCKER variables ==="
-          env | grep -i docker || echo "No DOCKER variables found"
-          echo "=== Checking all vault_liquibase variables ==="
-          env | grep vault_liquibase || echo "No vault_liquibase variables found"
-
-      - name: Export vault secrets to environment
-        run: |
-          if [ -n "${{ env.DOCKER_SLACK_WEBHOOK_URL }}" ]; then
-            echo "DOCKER_SLACK_WEBHOOK_URL=${{ env.DOCKER_SLACK_WEBHOOK_URL }}" >> $GITHUB_ENV
-          elif [ -n "${{ env.vault_liquibase_DOCKER_SLACK_WEBHOOK_URL }}" ]; then
-            echo "DOCKER_SLACK_WEBHOOK_URL=${{ env.vault_liquibase_DOCKER_SLACK_WEBHOOK_URL }}" >> $GITHUB_ENV
-          else
-            echo "::warning::Could not find DOCKER_SLACK_WEBHOOK_URL in vault secrets"
-          fi
-
       - name: Decode DOCKERHUB_USERNAME
         run: |
           decoded_username=$(echo "${{ env.DOCKERHUB_USERNAME }}" | base64 -d)
@@ -204,7 +152,7 @@ jobs:
           SLACK_MESSAGE: "View details on GitHub Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Triggered by repository: ${{ github.repository }} and job: ${{ github.job }}"
           SLACK_TITLE: "❌ ${{ github.repository }} ❌ Docker Scout failed on branch ${{ github.ref_name }} for commit ${{ github.sha }} in repository ${{ github.repository }}"
           SLACK_USERNAME: liquibot
-          SLACK_WEBHOOK: ${{ env.DOCKER_SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK: ${{ secrets.DOCKER_SLACK_WEBHOOK_URL }}
           SLACK_ICON_EMOJI: ":whale:"
           SLACK_FOOTER: "${{ github.repository }} - ${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}"
           SLACK_LINK_NAMES: true
