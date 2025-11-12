@@ -44,6 +44,6 @@ jobs:
         with:
           username: ${{ env.DOCKERHUB_USERNAME_DECODED}}
           password: ${{ env.DOCKERHUB_UPDATE_README }}
-          repository: liquibase/liquibase-pro
+          repository: liquibase/liquibase-secure
           readme-filepath: ./README-secure.md
           short-description: "Liquibase Secure"
