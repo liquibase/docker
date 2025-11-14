@@ -154,8 +154,8 @@ jobs:
 
       - name: Configure git user
         run: |
-          git config user.name "liquibot"
-          git config user.email "liquibot@liquibase.org"
+          git config user.name "liquibase-workflows[bot]"
+          git config user.email "1241802+liquibase-workflows[bot]@users.noreply.github.com"
 
       - name: Update Dockerfile(s) and commit changes
         id: update-dockerfiles
@@ -537,8 +537,8 @@ jobs:
             then
               echo "Nothing new to commit"
             else
-              git config user.name "liquibot"
-              git config user.email "liquibot@liquibase.org"
+              git config user.name "liquibase-workflows[bot]"
+              git config user.email "1241802+liquibase-workflows[bot]@users.noreply.github.com"
               git commit -m "Update library/liquibase to ${{ needs.update-dockerfiles.outputs.liquibaseVersion }}"
               git push
           fi
