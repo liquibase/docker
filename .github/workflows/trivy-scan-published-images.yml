@@ -37,7 +37,7 @@ jobs:
           MATRIX_INCLUDE="["
           FIRST=true
 
-          for IMAGE in "liquibase/liquibase" "liquibase/liquibase-pro"; do
+          for IMAGE in "liquibase/liquibase" "liquibase/liquibase-secure"; do
             echo "Getting tags for $IMAGE..."
             REPO=$(basename "$IMAGE")
             TAGS=""
@@ -194,7 +194,7 @@ jobs:
     if: always()
     strategy:
      matrix:
-        image: ["liquibase/liquibase", "liquibase/liquibase-pro"]
+        image: ["liquibase/liquibase", "liquibase/liquibase-secure"]
     steps:
       - name: "Check failures for ${{ matrix.image }}"
         id: check_failures
