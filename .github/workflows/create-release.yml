@@ -50,8 +50,6 @@ on:
 
 jobs:
   update-dockerfiles:
-    env:
-      LPM_VERSION: "0.2.14"
     name: "Update Dockerfiles"
     runs-on: ubuntu-latest
     outputs:
@@ -167,13 +165,9 @@ jobs:
           if [[ "${{ steps.collect-data.outputs.releaseType }}" == "liquibase-secure-release" ]]; then
             file_list=("DockerfileSecure")
             LIQUIBASE_SECURE_SHA=$(curl -LsS https://repo.liquibase.com/releases/secure/${{ steps.collect-data.outputs.liquibaseVersion }}/liquibase-secure-${{ steps.collect-data.outputs.liquibaseVersion }}.tar.gz | sha256sum | awk '{ print $1 }')
-            LPM_SHA=$(curl -LsS https://github.com/liquibase/liquibase-package-manager/releases/download/v${{ env.LPM_VERSION }}/lpm-${{ env.LPM_VERSION }}-linux.zip | sha256sum | awk '{ print $1 }')
-            LPM_SHA_ARM=$(curl -LsS https://github.com/liquibase/liquibase-package-manager/releases/download/v${{ env.LPM_VERSION }}/lpm-${{ env.LPM_VERSION }}-linux-arm64.zip | sha256sum | awk '{ print $1 }')
             for file in "${file_list[@]}"; do
               sed -i 's/^ARG LIQUIBASE_SECURE_VERSION=.*/ARG LIQUIBASE_SECURE_VERSION='"${{ steps.collect-data.outputs.liquibaseVersion }}"'/' "${{ github.workspace }}/${file}"
               sed -i 's/^ARG LB_SECURE_SHA256=.*/ARG LB_SECURE_SHA256='"$LIQUIBASE_SECURE_SHA"'/' "${{ github.workspace }}/${file}"
-              sed -i 's/^ARG LPM_SHA256=.*/ARG LPM_SHA256='"$LPM_SHA"'/' "${{ github.workspace }}/${file}"
-              sed -i 's/^ARG LPM_SHA256_ARM=.*/ARG LPM_SHA256_ARM='"$LPM_SHA_ARM"'/' "${{ github.workspace }}/${file}"
               git add "${file}"
             done
             if git diff-index --cached --quiet HEAD --; then
@@ -187,13 +181,9 @@ jobs:
           else
             file_list=("Dockerfile" "Dockerfile.alpine")
             LIQUIBASE_SHA=$(curl -LsS https://github.com/liquibase/liquibase/releases/download/v${{ steps.collect-data.outputs.liquibaseVersion }}/liquibase-${{ steps.collect-data.outputs.liquibaseVersion }}.tar.gz | sha256sum | awk '{ print $1 }')
-            LPM_SHA=$(curl -LsS https://github.com/liquibase/liquibase-package-manager/releases/download/v${{ env.LPM_VERSION }}/lpm-${{ env.LPM_VERSION }}-linux.zip | sha256sum | awk '{ print $1 }')
-            LPM_SHA_ARM=$(curl -LsS https://github.com/liquibase/liquibase-package-manager/releases/download/v${{ env.LPM_VERSION }}/lpm-${{ env.LPM_VERSION }}-linux-arm64.zip | sha256sum | awk '{ print $1 }')
             for file in "${file_list[@]}"; do
               sed -i 's/^ARG LIQUIBASE_VERSION=.*/ARG LIQUIBASE_VERSION='"${{ steps.collect-data.outputs.liquibaseVersion }}"'/' "${{ github.workspace }}/${file}"
               sed -i 's/^ARG LB_SHA256=.*/ARG LB_SHA256='"$LIQUIBASE_SHA"'/' "${{ github.workspace }}/${file}"
-              sed -i 's/^ARG LPM_SHA256=.*/ARG LPM_SHA256='"$LPM_SHA"'/' "${{ github.workspace }}/${file}"
-              sed -i 's/^ARG LPM_SHA256_ARM=.*/ARG LPM_SHA256_ARM='"$LPM_SHA_ARM"'/' "${{ github.workspace }}/${file}"
               git add "${file}"
             done
             if git diff-index --cached --quiet HEAD --; then
