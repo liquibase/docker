@@ -11,6 +11,17 @@ Starting with **Liquibase 5.0**, we have introduced a clear separation between o
 
 **If you have a valid Liquibase License Key, you should now use `liquibase/liquibase-secure` instead of `liquibase/liquibase`.**
 
+### 📋 Image Availability Matrix
+
+| Version Range | Community Image                                 | Secure Image                 | License                 | Docker Official               |
+| ------------- | ----------------------------------------------- | ---------------------------- | ----------------------- | ----------------------------- |
+| **5.0+**      | `liquibase/liquibase`                           | `liquibase/liquibase-secure` | FSL\* / Commercial      | ❌ No\*\*                     |
+| **4.x**       | `liquibase:4.x`\*\*\*<br/>`liquibase/liquibase` | `liquibase/liquibase-secure` | Apache 2.0 / Commercial | ✅ Yes\*\*\* (Community only) |
+
+- \*FSL = Functional Source License (See [Liquibase License Information](#license-information))
+- \*\*For Liquibase 5.0+, use the community registry image `liquibase/liquibase` (not available as official Docker image).
+- \*\*\*Liquibase 4 community image is available as the official Docker image at [https://hub.docker.com/\_/liquibase](https://hub.docker.com/_/liquibase). Pull using `docker pull liquibase:4.x`.
+
 ### 🚨 Breaking Change: Drivers and Extensions No Longer Included
 
 As of **Liquibase 5.0**, the Community edition (`liquibase/liquibase`) and the official Docker Community liquibase image **no longer include database drivers or extensions by default**.
@@ -35,17 +46,9 @@ RUN lpm add mssql --global
 
 ---
 
-## 🚨 Notice: New Official Liquibase Community Docker Image 🚨
+## 🌍 Available Registries
 
-We are excited to announce that a new official Liquibase Community Docker image is now available at [https://hub.docker.com/\_/liquibase](https://hub.docker.com/_/liquibase) starting with liquibase 4.27.0 and newer. We recommend all users to start using this image for the latest updates and support. Any versions prior to 4.27.0 will only be available on the existing `liquibase/liquibase` community image.
-
-### 🔧 Action Required
-
-Please update your Dockerfiles and scripts to pull from the new official image:
-
-## Available Registries
-
-We publish this image to multiple registries:
+We publish Liquibase images to multiple registries for flexibility:
 
 | Registry                      | Community Image                      | Secure Image                                |
 | ----------------------------- | ------------------------------------ | ------------------------------------------- |
@@ -53,10 +56,195 @@ We publish this image to multiple registries:
 | **GitHub Container Registry** | `ghcr.io/liquibase/liquibase`        | `ghcr.io/liquibase/liquibase-secure`        |
 | **Amazon ECR Public**         | `public.ecr.aws/liquibase/liquibase` | `public.ecr.aws/liquibase/liquibase-secure` |
 
+## 🚀 Quick Start
+
+### For Community Users (Liquibase 5.0+)
+
+```bash
+# Pull the community image
+docker pull liquibase/liquibase:5.0.1
+
+# Run with a changelog
+docker run --rm \
+  -v /path/to/changelog:/liquibase/changelog \
+  -e LIQUIBASE_COMMAND_URL="jdbc:postgresql://localhost:5432/mydb" \
+  -e LIQUIBASE_COMMAND_USERNAME="username" \
+  -e LIQUIBASE_COMMAND_PASSWORD="password" \
+  liquibase/liquibase update
+```
+
+### For Secure Edition Users
+
+```bash
+# Pull the secure image
+docker pull liquibase/liquibase-secure:5.0.1
+
+# Run with a changelog and license key
+docker run --rm \
+  -v /path/to/changelog:/liquibase/changelog \
+  -e LIQUIBASE_COMMAND_URL="jdbc:postgresql://localhost:5432/mydb" \
+  -e LIQUIBASE_COMMAND_USERNAME="username" \
+  -e LIQUIBASE_COMMAND_PASSWORD="password" \
+  -e LIQUIBASE_LICENSE_KEY="your-license-key" \
+  liquibase/liquibase-secure:5.0.1 update
+```
+
+### For Liquibase 4 Users
+
+If you're still using Liquibase 4, you can pull from either the official Docker repository or the community registry:
+
+**Official Docker Repository:**
+
+```bash
+# Pull the latest Liquibase 4 image
+docker pull liquibase:latest
+
+# Or pull a specific version
+docker pull liquibase:4.x
+```
+
+**Community Registry:**
+
+```bash
+# Pull from community registry
+docker pull liquibase/liquibase:4.x
+```
+
+---
+
+## 📖 Upgrading from Liquibase 4 to 5.0
+
+If you're upgrading from Liquibase 4 to 5.0, follow these steps:
+
+### Step 1: Understand License Requirements
+
+- **Liquibase 4**: Uses Apache 2.0 license (always available)
+- **Liquibase 5.0 Community**: Uses Functional Source License (FSL)
+- **Liquibase 5.0 Secure**: Requires a commercial license
+
+Read more: [Liquibase License Information](#license-information)
+
+### Step 2: Determine Which Edition You Need
+
+**Use Community Edition if:**
+
+- You are an open source user
+- You accept the Functional Source License terms
+- You do not require enterprise features
+
+**Use Secure Edition if:**
+
+- You have a commercial Liquibase license
+- You need enterprise features like Policy Checks, Quality Checks, or Advanced Rollback
+- Your organization requires commercial support
+
+### Step 3: Update Your Image Reference
+
+**If using Community Edition:**
+
+```bash
+# Before (Liquibase 4)
+FROM liquibase/liquibase:4.x
+
+# After (Liquibase 5.0+)
+FROM liquibase/liquibase:5.0  # or :latest
+```
+
+**If using PRO Edition:**
+
+```bash
+# Before (Liquibase 4)
+FROM liquibase/liquibase-pro:4.x
+
+# After (Liquibase 5.0+)
+FROM liquibase/liquibase-secure:5.0  # or :latest
+```
+
+### Step 4: Update Driver Installation
+
+**Liquibase 5.0+ no longer includes drivers by default.** Add drivers explicitly:
+
+```dockerfile
+FROM liquibase/liquibase:latest
+
+# Add required database drivers
+RUN lpm add postgresql --global
+RUN lpm add mysql --global
+RUN lpm add mssql --global
+```
+
+Or at runtime using environment variables:
+
+```bash
+docker run -e INSTALL_MYSQL=true liquibase/liquibase:latest update
+```
+
+### Step 5: Test in Non-Production First
+
+```bash
+# Test your changelogs against a test database
+docker run --rm \
+  -v /path/to/changelog:/liquibase/changelog \
+  -e LIQUIBASE_COMMAND_URL="jdbc:postgresql://test-db:5432/testdb" \
+  -e LIQUIBASE_COMMAND_USERNAME="username" \
+  -e LIQUIBASE_COMMAND_PASSWORD="password" \
+  liquibase/liquibase:5.0 validate
+```
+
+### Step 6: Complete Production Migration
+
+Once testing is successful, update your production deployments to use the new image.
+
+---
+
+## 🔐 License Information
+
+### Functional Source License (FSL) - Liquibase 5.0 Community
+
+The Liquibase 5.0 Community edition is available under the Functional Source License (FSL). This license:
+
+- Allows you to freely use Liquibase for database migrations
+- Prohibits commercial use that competes with Liquibase’s products or services
+- Automatically transitions to the Apache 2.0 license after two years
+- Provides full source code access (but not OSI-approved open source)
+
+Read the full license: [Functional Source License on fsl.software](https://fsl.software/)
+
+### Apache 2.0 License - Liquibase 4
+
+Liquibase 4 versions continue to use the [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0).
+
+### Commercial License - Liquibase Secure
+
+The [Liquibase Secure edition](https://www.liquibase.com/liquibase-secure) requires a commercial license and provides enterprise-grade database change management with advanced capabilities:
+
+**Developer Productivity:**
+- VS Code Extension for IDE-native operations
+- Liquibase Flows for environment consistency
+- Policy Checks to enforce standards and block risky changes
+- Support for 60+ database types
+
+**Secure Automation:**
+- CI/CD deployment automation with policy enforcement
+- Targeted rollbacks for precise recovery
+- Advanced drift detection and alerting
+- Secrets management and RBAC enforcement
+- Multi-environment deployment capabilities
+
+**Change Insights & Compliance:**
+- Unified change tracking with full audit context
+- Real-time drift detection
+- Audit-ready compliance reporting (SOX, HIPAA, PCI, SOC2, GDPR)
+- Risk scoring for change assessment
+
+For more information and licensing inquiries, visit [liquibase.com/get-liquibase](https://www.liquibase.com/get-liquibase)
+
+---
+
 ## Dockerfile
 
 ```dockerfile
-FROM liquibase:latest
+FROM liquibase/liquibase:latest
 # OR ghcr.io/liquibase/liquibase:latest    # GHCR
 # OR public.ecr.aws/liquibase/liquibase:latest   # Amazon ECR Public
 ```
@@ -129,12 +317,52 @@ This is the community repository for [Liquibase](https://download.liquibase.org/
 
 Support for Snowflake database has been moved from the external extension liquibase-snowflake into the main Liquibase artifact. This means that Snowflake is now included in the main docker image. If you are using the snowflake extension, remove it from your lib directory or however you are including it in your project. If you are using the Docker image, use the main v4.12+ as there will no longer be a snowflake separate docker image produced. The latest separate Snowflake image will be v4.11. You need to update your reference to either latest to use the main one that includes Snowflake or the version tag you prefer. <https://github.com/liquibase/liquibase/pull/2841>
 
-## 🏷️ Supported Tags
+## 🏷️ Image Tags and Versions
+
+Liquibase Docker images use semantic versioning with the following tag strategies:
+
+### Tag Formats
+
+| Tag Format         | Example                             | Description                    |
+| ------------------ | ----------------------------------- | ------------------------------ |
+| `latest`           | `liquibase/liquibase:latest`        | Latest stable release          |
+| `latest-alpine`    | `liquibase/liquibase:latest-alpine` | Latest stable Alpine variant   |
+| `<version>`        | `liquibase/liquibase:5.0.0`         | Specific version (exact match) |
+| `<version>-alpine` | `liquibase/liquibase:5.0.0-alpine`  | Specific Alpine version        |
+| `<major>.<minor>`  | `liquibase/liquibase:5.0`           | Latest patch for major.minor   |
+
+### Community vs Secure Image Tags
+
+The same tag structure applies to both image types:
+
+- **Community**: `liquibase/liquibase:5.0.0`
+- **Secure**: `liquibase/liquibase-secure:5.0.0`
+
+Both are available across all registries (Docker Hub, GHCR, Amazon ECR Public).
+
+### Supported Tags
 
 The following tags are officially supported and can be found on [Docker Hub](https://hub.docker.com/r/liquibase/liquibase/tags):
 
-- `liquibase/liquibase:<version>`
-- `liquibase/liquibase:<version>-alpine`
+**Community Image:**
+
+- `liquibase/liquibase:latest` - Latest 5.0+ release
+- `liquibase/liquibase:5.0` - Latest 5.0.x release
+- `liquibase/liquibase:latest-alpine` - Latest Alpine variant
+- `liquibase/liquibase:4.x` - Liquibase 4 versions (Apache 2.0)
+
+**Secure Image:**
+
+- `liquibase/liquibase-secure:latest` - Latest Secure release
+- `liquibase/liquibase-secure:5.0` - Latest 5.0.x release
+- `liquibase/liquibase-secure:latest-alpine` - Latest Secure Alpine variant
+
+### Choosing the Right Tag
+
+- **For production**: Use major.minor tags (e.g., `5.0`) for reproducibility with latest patches
+- **For development**: Use `latest` or `latest-alpine` for convenience
+- **For Alpine Linux**: Append `-alpine` for smaller image size
+- **For Liquibase 4**: Use `4.x` versions (Apache 2.0 license)
 
 ## 📦 Using the Docker Image
 
@@ -188,7 +416,87 @@ When you mount a directory to `/liquibase/changelog`, the container automaticall
 2. Changes the working directory to `/liquibase/changelog`
 3. Executes Liquibase commands from that location
 
-This ensures that relative paths in your commands work consistently whether you're using CLI locally or Docker containers in CI/CD pipelines.
+This ensures that relative paths in your commands work consistently whether you're using CLI locally or Docker containers in CI/CD pipelines. In most cases, this automatic behavior works seamlessly without any manual intervention.
+
+### 🔍 Search Path Configuration
+
+Liquibase Docker images automatically manage the search path to help locate changelog files and dependencies. The search path is configured with the following priority (highest to lowest):
+
+1. **User-provided `--search-path` CLI argument** (highest priority)
+2. **User-provided `LIQUIBASE_SEARCH_PATH` environment variable**
+3. **Automatic search path injection** (lowest priority)
+
+#### Understanding Search Path Behavior
+
+When you mount a changelog directory to `/liquibase/changelog`:
+
+- **With relative paths** (`--changelogFile=mychangelog.xml`): The container automatically sets `--search-path=.` to search the current directory (working directory).
+- **Without mount or with absolute paths**: The container sets `--search-path=/liquibase/changelog` to help locate files in the default location.
+
+#### Custom Search Paths
+
+If you need to use a custom search path (for example, to include S3 buckets or remote storage locations), the container respects your configuration and **will not override** user-provided search paths:
+
+**Example 1: Using environment variable with multiple search paths**
+
+```bash
+docker run --rm \
+  --env LIQUIBASE_SEARCH_PATH="/liquibase/changelog,s3://my-bucket/snapshots/" \
+  -v /path/to/changelog:/liquibase/changelog \
+  liquibase/liquibase --changelogFile=mychangelog.xml update
+```
+
+**Example 2: Using CLI argument**
+
+```bash
+docker run --rm \
+  -v /path/to/changelog:/liquibase/changelog \
+  liquibase/liquibase \
+  --changelogFile=mychangelog.xml \
+  --search-path=/custom/path \
+  update
+```
+
+**Example 3: Combining relative paths with custom search paths (Correct approach)**
+
+```bash
+docker run --rm \
+  --env LIQUIBASE_SEARCH_PATH="/liquibase/changelog,/liquibase/shared-changesets" \
+  -v /path/to/changelog:/liquibase/changelog \
+  -v /path/to/shared:/liquibase/shared-changesets \
+  liquibase/liquibase --changelogFile=main.xml update
+```
+
+In this example:
+- The relative path `main.xml` is found in the working directory (`/liquibase/changelog`)
+- Included files are searched **only** in the paths specified by `LIQUIBASE_SEARCH_PATH` (`/liquibase/shared-changesets`). The current directory (`.`) is **not** automatically included. If you want to search both the current directory and a custom path, include both in your configuration: `LIQUIBASE_SEARCH_PATH="/liquibase/changelog,/liquibase/shared-changesets"`
+
+#### Troubleshooting Search Path Issues
+
+If you're experiencing file-not-found errors with custom search paths:
+
+1. **Verify the environment variable is set correctly**: Check that `LIQUIBASE_SEARCH_PATH` is properly formatted (comma-separated for multiple paths)
+2. **Check path permissions**: Ensure the Docker container can access mounted directories
+3. **Use absolute paths**: For clarity, use absolute paths in your search path configuration
+4. **Review Liquibase logs**: Liquibase will output which search path it's using during execution
+
+#### Important: Search Path Behavior with Custom Paths
+
+When you set `LIQUIBASE_SEARCH_PATH` to a custom value:
+
+- **Only the paths you specify are searched** for included files
+- The current directory (`.`) is **not automatically added**
+- If you want to search multiple locations, **include all of them** in your `LIQUIBASE_SEARCH_PATH` configuration
+
+**Example:** If you want to search both `/liquibase/changelog` and `/liquibase/shared-changesets`:
+
+```bash
+# ✓ CORRECT: Include both paths
+--env LIQUIBASE_SEARCH_PATH="/liquibase/changelog,/liquibase/shared-changesets"
+
+# ✗ INCORRECT: Only includes shared-changesets, NOT the current directory
+--env LIQUIBASE_SEARCH_PATH="/liquibase/shared-changesets"
+```
 
 ### ⚙️ Using a Configuration File
 
