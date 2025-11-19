@@ -101,7 +101,7 @@ jobs:
 
       - name: Upload Security Report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: security-report-trivy${{ matrix.image.suffix }}
           path: ./reports/trivy${{ matrix.image.suffix }}/summary.pdf
@@ -192,7 +192,7 @@ jobs:
 
       - name: Upload Security Report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: security-report-scout${{ matrix.image.suffix }}
           path: ./reports/scout${{ matrix.image.suffix }}/summary.pdf
