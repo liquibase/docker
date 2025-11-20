@@ -27,10 +27,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: [ 
+        image: [
           {dockerfile: Dockerfile, name: liquibase/liquibase, suffix: ""},
           {dockerfile: Dockerfile.alpine, name: liquibase/liquibase, suffix: "-alpine"},
-          {dockerfile: DockerfileSecure, name: liquibase/liquibase-secure, suffix: ""},
+          {dockerfile: DockerfileSecure, name: liquibase/liquibase-secure, suffix: "-secure"},
           ]
     name: Trivy
     runs-on: "ubuntu-22.04"
@@ -111,10 +111,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: [ 
+        image: [
           {dockerfile: Dockerfile, name: liquibase/liquibase, suffix: ""},
           {dockerfile: Dockerfile.alpine, name: liquibase/liquibase, suffix: "-alpine"},
-          {dockerfile: DockerfileSecure, name: liquibase/liquibase-secure, suffix: ""},
+          {dockerfile: DockerfileSecure, name: liquibase/liquibase-secure, suffix: "-secure"},
           ]
     name: Scout
     runs-on: "ubuntu-22.04"
