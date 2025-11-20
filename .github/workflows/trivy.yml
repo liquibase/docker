@@ -27,31 +27,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: [ 
+        image: [
           {dockerfile: Dockerfile, name: liquibase/liquibase, suffix: ""},
           {dockerfile: Dockerfile.alpine, name: liquibase/liquibase, suffix: "-alpine"},
-          {dockerfile: DockerfileSecure, name: liquibase/liquibase-secure, suffix: ""},
+          {dockerfile: DockerfileSecure, name: liquibase/liquibase-secure, suffix: "-secure"},
           ]
     name: Trivy
     runs-on: "ubuntu-22.04"
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
-
-      - name: Build ${{ matrix.image.name }}${{ matrix.image.suffix }} from Dockerfile
-        run: |
-          docker build -f ${{ matrix.image.dockerfile }} -t ${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }} .
-
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.33.1
-        with:
-          image-ref: '${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}'
-          vuln-type: 'os,library'
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-          severity: 'HIGH,CRITICAL'
-          exit-code: '1'
-          limit-severities-for-sarif: true
 
       - name: Configure AWS credentials for vault access
         uses: aws-actions/configure-aws-credentials@v5
@@ -67,9 +52,20 @@ jobs:
             ,/vault/liquibase
           parse-json-secrets: true
 
-      - name: Export vault secrets to environment
+      - name: Build ${{ matrix.image.name }}${{ matrix.image.suffix }} from Dockerfile
         run: |
-          echo "DOCKER_SLACK_WEBHOOK_URL=${{ env.vault_liquibase_DOCKER_SLACK_WEBHOOK_URL }}" >> $GITHUB_ENV
+          docker build -f ${{ matrix.image.dockerfile }} -t ${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }} .
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          image-ref: '${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}'
+          vuln-type: 'os,library'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'HIGH,CRITICAL'
+          exit-code: '1'
+          limit-severities-for-sarif: true
 
       - name: Notify Slack on Build Failure
         if: failure()
@@ -111,10 +107,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: [ 
+        image: [
           {dockerfile: Dockerfile, name: liquibase/liquibase, suffix: ""},
           {dockerfile: Dockerfile.alpine, name: liquibase/liquibase, suffix: "-alpine"},
-          {dockerfile: DockerfileSecure, name: liquibase/liquibase-secure, suffix: ""},
+          {dockerfile: DockerfileSecure, name: liquibase/liquibase-secure, suffix: "-secure"},
           ]
     name: Scout
     runs-on: "ubuntu-22.04"
