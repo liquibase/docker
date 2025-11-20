@@ -30,7 +30,7 @@ jobs:
         image: [
           {dockerfile: Dockerfile, name: liquibase/liquibase, suffix: ""},
           {dockerfile: Dockerfile.alpine, name: liquibase/liquibase, suffix: "-alpine"},
-          {dockerfile: DockerfileSecure, name: liquibase/liquibase-secure, suffix: "-secure"},
+          {dockerfile: DockerfileSecure, name: liquibase/liquibase-secure, suffix: ""},
           ]
     name: Trivy
     runs-on: "ubuntu-22.04"
@@ -92,15 +92,15 @@ jobs:
         uses: rsdmike/github-security-report-action@v3.0.4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          outputDir: ./reports/trivy${{ matrix.image.suffix }}/
+          outputDir: ./reports/trivy${{ matrix.image.dockerfile == 'DockerfileSecure' && '-secure' || matrix.image.suffix }}/
           sarifReportDir: .
 
       - name: Upload Security Report
         if: always()
         uses: actions/upload-artifact@v5
         with:
-          name: security-report-trivy${{ matrix.image.suffix }}
-          path: ./reports/trivy${{ matrix.image.suffix }}/summary.pdf
+          name: security-report-trivy${{ matrix.image.dockerfile == 'DockerfileSecure' && '-secure' || matrix.image.suffix }}
+          path: ./reports/trivy${{ matrix.image.dockerfile == 'DockerfileSecure' && '-secure' || matrix.image.suffix }}/summary.pdf
 
 
   scout:
@@ -110,7 +110,7 @@ jobs:
         image: [
           {dockerfile: Dockerfile, name: liquibase/liquibase, suffix: ""},
           {dockerfile: Dockerfile.alpine, name: liquibase/liquibase, suffix: "-alpine"},
-          {dockerfile: DockerfileSecure, name: liquibase/liquibase-secure, suffix: "-secure"},
+          {dockerfile: DockerfileSecure, name: liquibase/liquibase-secure, suffix: ""},
           ]
     name: Scout
     runs-on: "ubuntu-22.04"
@@ -183,12 +183,12 @@ jobs:
         uses: rsdmike/github-security-report-action@v3.0.4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          outputDir: ./reports/scout${{ matrix.image.suffix }}/
+          outputDir: ./reports/scout${{ matrix.image.dockerfile == 'DockerfileSecure' && '-secure' || matrix.image.suffix }}/
           sarifReportDir: .
 
       - name: Upload Security Report
         if: always()
         uses: actions/upload-artifact@v5
         with:
-          name: security-report-scout${{ matrix.image.suffix }}
-          path: ./reports/scout${{ matrix.image.suffix }}/summary.pdf
+          name: security-report-scout${{ matrix.image.dockerfile == 'DockerfileSecure' && '-secure' || matrix.image.suffix }}
+          path: ./reports/scout${{ matrix.image.dockerfile == 'DockerfileSecure' && '-secure' || matrix.image.suffix }}/summary.pdf
