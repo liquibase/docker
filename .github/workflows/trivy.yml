@@ -430,15 +430,6 @@ jobs:
                 fi
               fi
 
-              # Debug: Print first few lookups to help troubleshoot
-              if [ -z "$debug_count" ]; then
-                debug_count=0
-              fi
-              if [ $debug_count -lt 3 ]; then
-                echo "DEBUG: target=$target, pkgpath=$pkgpath, jar_path=$jar_path, jar_file=$jar_file, parent_jar=$parent_jar"
-                debug_count=$((debug_count + 1))
-              fi
-
               echo "| $parent_jar | $pkg | $vuln | $severity | $installed | $fixed |" >> "$temp_table"
             done
 
