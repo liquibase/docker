@@ -396,17 +396,25 @@ jobs:
               "\($target)|\(.PkgName)|\(.VulnerabilityID)|\(.Severity)|\(.InstalledVersion)|\(.FixedVersion // "N/A")"' \
               trivy-deep.json 2>/dev/null | head -30 | while IFS='|' read -r target pkg vuln severity installed fixed; do
 
-              # Extract JAR filename from target path
-              jar_file=$(basename "$target" 2>/dev/null || echo "$target")
+              # Extract JAR filename from target path (handle both file paths and directory paths)
+              if [[ "$target" == *.jar ]]; then
+                jar_file=$(basename "$target" 2>/dev/null || echo "$target")
+              else
+                # Target might be a directory containing a JAR, extract JAR name from path
+                jar_file=$(echo "$target" | grep -oE '[^/]+\.jar' | tail -1)
+                if [ -z "$jar_file" ]; then
+                  jar_file=$(basename "$target" 2>/dev/null || echo "$target")
+                fi
+              fi
 
               # Look up parent JAR from mapping file
-              if [ -f /tmp/extracted-deps/jar-mapping.txt ]; then
-                parent_jar=$(grep "$jar_file" /tmp/extracted-deps/jar-mapping.txt 2>/dev/null | cut -d'→' -f1 | tr -d ' ' | head -1)
-                if [ -z "$parent_jar" ]; then
-                  parent_jar="(internal)"
+              parent_jar="(internal)"
+              if [ -f /tmp/extracted-deps/jar-mapping.txt ] && [ -n "$jar_file" ]; then
+                # Try exact match first
+                parent_match=$(grep -F "$jar_file" /tmp/extracted-deps/jar-mapping.txt 2>/dev/null | cut -d'→' -f1 | tr -d ' ' | head -1)
+                if [ -n "$parent_match" ]; then
+                  parent_jar="$parent_match"
                 fi
-              else
-                parent_jar="(unknown)"
               fi
 
               echo "| $parent_jar | $pkg | $vuln | $severity | $installed | $fixed |" >> $GITHUB_STEP_SUMMARY
