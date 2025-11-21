@@ -115,7 +115,7 @@ jobs:
                         cp "$nested_jar" "$nested_jar_dir/" 2>/dev/null || true
 
                         # Record the parent → nested relationship
-                        echo "${jar_name}.jar → $nested_jar_name" >> "$mapping_file"
+                        echo "${jar_name}.jar|$nested_jar_name" >> "$mapping_file"
                       fi
                     done
                     echo "      → Preserved $nested_count nested JAR file(s)"
@@ -411,7 +411,7 @@ jobs:
               parent_jar="(internal)"
               if [ -f /tmp/extracted-deps/jar-mapping.txt ] && [ -n "$jar_file" ]; then
                 # Try exact match first
-                parent_match=$(grep -F "$jar_file" /tmp/extracted-deps/jar-mapping.txt 2>/dev/null | cut -d'→' -f1 | tr -d ' ' | head -1)
+                parent_match=$(grep -F "$jar_file" /tmp/extracted-deps/jar-mapping.txt 2>/dev/null | cut -d'|' -f1 | tr -d ' ' | head -1)
                 if [ -n "$parent_match" ]; then
                   parent_jar="$parent_match"
                 fi
@@ -532,7 +532,7 @@ jobs:
 
               # Find parent JAR from mapping file
               if [ -f /tmp/extracted-deps/jar-mapping.txt ]; then
-                parent_jar=$(grep "$jar_file" /tmp/extracted-deps/jar-mapping.txt | cut -d'→' -f1 | tr -d ' ' | head -1)
+                parent_jar=$(grep "$jar_file" /tmp/extracted-deps/jar-mapping.txt | cut -d'|' -f1 | tr -d ' ' | head -1)
                 if [ -z "$parent_jar" ]; then
                   parent_jar="(internal)"
                 fi
