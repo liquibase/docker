@@ -149,20 +149,21 @@ jobs:
                   mkdir -p "$jar_extract"
                   unzip -q "$jar_file" -d "$jar_extract" 2>/dev/null || true
 
-                  # Check for Spring Boot nested JARs
+                  # Check for Spring Boot nested JARs and copy them as-is (don't extract)
                   if [ -d "$jar_extract/BOOT-INF/lib" ]; then
-                    echo "    ✓ Spring Boot JAR: $jar_name - extracting nested dependencies"
+                    echo "    ✓ Spring Boot JAR: $jar_name - preserving nested JAR files"
                     nested_count=0
+                    nested_jar_dir="/tmp/extracted-deps/dist/${archive_name}/${jar_name}-nested-jars"
+                    mkdir -p "$nested_jar_dir"
+
                     for nested_jar in "$jar_extract/BOOT-INF/lib"/*.jar; do
                       if [ -f "$nested_jar" ]; then
                         nested_count=$((nested_count + 1))
-                        nested_name=$(basename "$nested_jar" .jar)
-                        nested_extract="/tmp/extracted-deps/dist/${archive_name}/${jar_name}-BOOT-INF/${nested_name}"
-                        mkdir -p "$nested_extract"
-                        unzip -q "$nested_jar" -d "$nested_extract" 2>/dev/null || true
+                        # Copy the JAR file as-is, don't extract it
+                        cp "$nested_jar" "$nested_jar_dir/" 2>/dev/null || true
                       fi
                     done
-                    echo "      → Extracted $nested_count nested JAR(s)"
+                    echo "      → Preserved $nested_count nested JAR file(s)"
                   fi
                 done
               fi
@@ -179,37 +180,26 @@ jobs:
             jar_count=$(find /tmp/liquibase-internal -name "*.jar" -type f | wc -l)
             echo "📊 Found $jar_count JAR files to scan"
 
-            # Extract all JAR files to enable nested dependency scanning
-            mkdir -p /tmp/extracted-deps/all-jars
+            # Copy all JAR files preserving them for Trivy to scan
+            mkdir -p /tmp/extracted-deps/internal-jars/lib
+            mkdir -p /tmp/extracted-deps/internal-jars/extensions
             jar_num=0
 
-            find /tmp/liquibase-internal -name "*.jar" -type f | while read jar_file; do
-              jar_num=$((jar_num + 1))
-              jar_name=$(basename "$jar_file" .jar)
-              jar_dir=$(dirname "$jar_file" | sed 's|/tmp/liquibase-internal/||')
+            # Copy lib JARs as-is
+            if [ -d /tmp/liquibase-internal/lib ]; then
+              cp /tmp/liquibase-internal/lib/*.jar /tmp/extracted-deps/internal-jars/lib/ 2>/dev/null || true
+              lib_jar_count=$(ls -1 /tmp/extracted-deps/internal-jars/lib/*.jar 2>/dev/null | wc -l)
+              echo "  ✓ Preserved $lib_jar_count lib JAR(s)"
+            fi
 
-              # Create subdirectory preserving structure (lib vs extensions)
-              extract_path="/tmp/extracted-deps/all-jars/${jar_dir}/${jar_name}"
-              mkdir -p "$extract_path"
+            # Copy extension JARs as-is
+            if [ -d /tmp/liquibase-internal/extensions ]; then
+              cp /tmp/liquibase-internal/extensions/*.jar /tmp/extracted-deps/internal-jars/extensions/ 2>/dev/null || true
+              ext_jar_count=$(ls -1 /tmp/extracted-deps/internal-jars/extensions/*.jar 2>/dev/null | wc -l)
+              echo "  ✓ Preserved $ext_jar_count extension JAR(s)"
+            fi
 
-              # Extract the JAR
-              unzip -q "$jar_file" -d "$extract_path" 2>/dev/null || true
-
-              # Check if this JAR contains nested JARs (Spring Boot structure)
-              if [ -d "$extract_path/BOOT-INF/lib" ]; then
-                echo "  ✓ Found Spring Boot JAR: $jar_name (extracting nested dependencies)"
-                for nested_jar in "$extract_path/BOOT-INF/lib"/*.jar; do
-                  if [ -f "$nested_jar" ]; then
-                    nested_name=$(basename "$nested_jar" .jar)
-                    nested_extract="/tmp/extracted-deps/all-jars/${jar_dir}/${jar_name}-nested/${nested_name}"
-                    mkdir -p "$nested_extract"
-                    unzip -q "$nested_jar" -d "$nested_extract" 2>/dev/null || true
-                  fi
-                done
-              fi
-            done
-
-            echo "✓ Extracted $jar_count JAR files for scanning"
+            echo "✓ Preserved $jar_count JAR files for scanning"
           else
             echo "⚠ Could not copy /liquibase/internal directory"
           fi
@@ -255,20 +245,21 @@ jobs:
           if [ -d /tmp/extracted-deps/dist ]; then
             dist_archives=$(find /tmp/liquibase-dist -name "*.tar.gz" -type f 2>/dev/null | wc -l)
             dist_jars=$(find /tmp/liquibase-dist -name "*.jar" -type f 2>/dev/null | wc -l)
-            dist_nested=$(find /tmp/extracted-deps/dist -type d -name "*-BOOT-INF" 2>/dev/null | wc -l)
+            nested_jars=$(find /tmp/extracted-deps/dist -type d -name "*-nested-jars" -exec sh -c 'ls -1 "{}"/*.jar 2>/dev/null | wc -l' \; 2>/dev/null | awk '{s+=$1} END {print s}')
             echo "Distribution archives: $dist_archives"
             echo "  - JARs in archives: $dist_jars"
-            if [ $dist_nested -gt 0 ]; then
-              nested_jar_count=$(find /tmp/extracted-deps/dist -type d -name "*-BOOT-INF" -exec sh -c 'ls -1 "{}" | wc -l' \; 2>/dev/null | awk '{s+=$1} END {print s}')
-              echo "  - Spring Boot nested JARs: $nested_jar_count"
+            if [ "$nested_jars" -gt 0 ]; then
+              echo "  - Spring Boot nested JARs: $nested_jars"
             fi
           fi
 
-          if [ -d /tmp/extracted-deps/all-jars ]; then
-            total_jars=$(find /tmp/liquibase-internal -name "*.jar" -type f 2>/dev/null | wc -l)
-            echo "Internal JARs processed: $total_jars"
-            echo "  - Lib JARs: $(find /tmp/liquibase-internal/lib -name "*.jar" -type f 2>/dev/null | wc -l)"
-            echo "  - Extension JARs: $(find /tmp/liquibase-internal/extensions -name "*.jar" -type f 2>/dev/null | wc -l)"
+          if [ -d /tmp/extracted-deps/internal-jars ]; then
+            lib_jars=$(ls -1 /tmp/extracted-deps/internal-jars/lib/*.jar 2>/dev/null | wc -l)
+            ext_jars=$(ls -1 /tmp/extracted-deps/internal-jars/extensions/*.jar 2>/dev/null | wc -l)
+            total_internal=$((lib_jars + ext_jars))
+            echo "Internal JARs preserved: $total_internal"
+            echo "  - Lib JARs: $lib_jars"
+            echo "  - Extension JARs: $ext_jars"
           fi
 
           if [ -d /tmp/extracted-deps/python-packages ]; then
