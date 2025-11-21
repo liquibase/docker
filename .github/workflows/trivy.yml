@@ -391,10 +391,14 @@ jobs:
             } >> $GITHUB_STEP_SUMMARY
 
             # Process each vulnerability and look up parent JAR from mapping file
+            # First, collect all rows into a temp file, then deduplicate
+            temp_table="/tmp/vuln-table-$$.txt"
+            > "$temp_table"  # Clear temp file
+
             jq -r '.Results[]? | .Target as $target | .Vulnerabilities[]? |
               select(.Severity == "HIGH" or .Severity == "CRITICAL") |
               "\($target)|\(.PkgPath // "")|\(.PkgName)|\(.VulnerabilityID)|\(.Severity)|\(.InstalledVersion)|\(.FixedVersion // "N/A")"' \
-              trivy-deep.json 2>/dev/null | head -30 | while IFS='|' read -r target pkgpath pkg vuln severity installed fixed; do
+              trivy-deep.json 2>/dev/null | while IFS='|' read -r target pkgpath pkg vuln severity installed fixed; do
 
               # Use PkgPath if available (contains JAR file path), otherwise use Target
               jar_path="${pkgpath:-$target}"
@@ -429,8 +433,12 @@ jobs:
                 debug_count=$((debug_count + 1))
               fi
 
-              echo "| $parent_jar | $pkg | $vuln | $severity | $installed | $fixed |" >> $GITHUB_STEP_SUMMARY
+              echo "| $parent_jar | $pkg | $vuln | $severity | $installed | $fixed |" >> "$temp_table"
             done
+
+            # Deduplicate and add to summary (limit to 30 entries)
+            sort -u "$temp_table" | head -30 >> $GITHUB_STEP_SUMMARY
+            rm -f "$temp_table"
 
             echo "" >> $GITHUB_STEP_SUMMARY
           fi
