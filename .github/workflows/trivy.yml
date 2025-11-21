@@ -159,33 +159,39 @@ jobs:
             echo "⚠ Could not copy /liquibase/internal directory"
           fi
 
-          # Extract liquibase-checks.jar (contains GraalVM Python embedded dependencies)
-          if docker cp $container_id:/liquibase/internal/extensions/liquibase-checks.jar /tmp/liquibase-checks.jar 2>/dev/null; then
-            echo "✓ Found liquibase-checks.jar"
-            mkdir -p /tmp/extracted-deps/checks
-            unzip -q /tmp/liquibase-checks.jar -d /tmp/extracted-deps/checks || true
+          # Extract all extension JARs and look for GraalVM Python embedded dependencies
+          echo "🔍 Scanning extension JARs for Python packages..."
+          mkdir -p /tmp/extracted-deps/python-packages
 
-            # Extract GraalVM Python packages to standard Python structure
-            if [ -d /tmp/extracted-deps/checks/org.graalvm.python.vfs ]; then
-              echo "✓ Extracting GraalVM Python packages..."
-              mkdir -p /tmp/extracted-deps/python-packages
+          # Scan all JARs in internal-jars/extensions directory
+          if [ -d /tmp/extracted-deps/internal-jars/extensions ]; then
+            for ext_jar in /tmp/extracted-deps/internal-jars/extensions/*.jar; do
+              if [ -f "$ext_jar" ]; then
+                jar_name=$(basename "$ext_jar")
+                jar_extract="/tmp/extracted-deps/extension-scan/${jar_name%.jar}"
+                mkdir -p "$jar_extract"
+                unzip -q "$ext_jar" -d "$jar_extract" 2>/dev/null || true
 
-              # Copy from both possible locations
-              if [ -d /tmp/extracted-deps/checks/org.graalvm.python.vfs/venv/lib/python3.11/site-packages ]; then
-                cp -r /tmp/extracted-deps/checks/org.graalvm.python.vfs/venv/lib/python3.11/site-packages/* /tmp/extracted-deps/python-packages/ 2>/dev/null || true
-              fi
-              if [ -d /tmp/extracted-deps/checks/org.graalvm.python.vfs/venv/Lib/site-packages ]; then
-                cp -r /tmp/extracted-deps/checks/org.graalvm.python.vfs/venv/Lib/site-packages/* /tmp/extracted-deps/python-packages/ 2>/dev/null || true
-              fi
+                # Check if this JAR contains GraalVM Python packages
+                if [ -d "$jar_extract/org.graalvm.python.vfs" ]; then
+                  echo "  ✓ Found Python packages in $jar_name"
 
-              # Also extract bundled wheels
-              if [ -d /tmp/extracted-deps/checks/META-INF/resources/libpython/ensurepip/_bundled ]; then
-                mkdir -p /tmp/extracted-deps/python-bundled
-                cp /tmp/extracted-deps/checks/META-INF/resources/libpython/ensurepip/_bundled/*.whl /tmp/extracted-deps/python-bundled/ 2>/dev/null || true
+                  # Copy from both possible locations
+                  if [ -d "$jar_extract/org.graalvm.python.vfs/venv/lib/python3.11/site-packages" ]; then
+                    cp -r "$jar_extract/org.graalvm.python.vfs/venv/lib/python3.11/site-packages"/* /tmp/extracted-deps/python-packages/ 2>/dev/null || true
+                  fi
+                  if [ -d "$jar_extract/org.graalvm.python.vfs/venv/Lib/site-packages" ]; then
+                    cp -r "$jar_extract/org.graalvm.python.vfs/venv/Lib/site-packages"/* /tmp/extracted-deps/python-packages/ 2>/dev/null || true
+                  fi
+
+                  # Also extract bundled wheels
+                  if [ -d "$jar_extract/META-INF/resources/libpython/ensurepip/_bundled" ]; then
+                    mkdir -p /tmp/extracted-deps/python-bundled
+                    cp "$jar_extract/META-INF/resources/libpython/ensurepip/_bundled"/*.whl /tmp/extracted-deps/python-bundled/ 2>/dev/null || true
+                  fi
+                fi
               fi
-            fi
-          else
-            echo "⚠ liquibase-checks.jar not found"
+            done
           fi
 
           # Cleanup container
@@ -574,7 +580,7 @@ jobs:
               {
                 echo "### Python Package Vulnerabilities"
                 echo ""
-                echo "These are found in \`liquibase-checks.jar\` (GraalVM Python VFS)"
+                echo "These are found in extension JARs (GraalVM Python VFS)"
                 echo ""
                 echo "| Package | Vulnerability | Severity | Installed | Fixed |"
                 echo "|---------|---------------|----------|-----------|-------|"
