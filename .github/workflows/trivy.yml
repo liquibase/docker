@@ -151,7 +151,7 @@ jobs:
           path: sbom.spdx.json
           retention-days: 30
 
-      - name: Run Trivy vulnerability scanner (Surface Scan)
+      - name: Run Trivy vulnerability scanner (Surface Scan - SARIF)
         uses: aquasecurity/trivy-action@0.33.1
         with:
           image-ref: '${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}'
@@ -162,7 +162,17 @@ jobs:
           exit-code: '0'
           limit-severities-for-sarif: true
 
-      - name: Run Trivy scanner on extracted nested JARs (Deep Scan)
+      - name: Run Trivy vulnerability scanner (Surface Scan - JSON)
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          image-ref: '${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}'
+          vuln-type: 'os,library'
+          format: 'json'
+          output: 'trivy-surface.json'
+          severity: 'HIGH,CRITICAL'
+          exit-code: '0'
+
+      - name: Run Trivy scanner on extracted nested JARs (Deep Scan - SARIF)
         if: always()
         uses: aquasecurity/trivy-action@0.33.1
         with:
@@ -174,6 +184,18 @@ jobs:
           severity: 'HIGH,CRITICAL'
           exit-code: '0'
           limit-severities-for-sarif: true
+
+      - name: Run Trivy scanner on extracted nested JARs (Deep Scan - JSON)
+        if: always()
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          scan-type: 'rootfs'
+          scan-ref: '/tmp/extracted-deps'
+          vuln-type: 'library'
+          format: 'json'
+          output: 'trivy-deep.json'
+          severity: 'HIGH,CRITICAL'
+          exit-code: '0'
 
       - name: Run Grype scanner on SBOM
         if: always()
@@ -214,23 +236,23 @@ jobs:
           ls -lh *.sarif *.json 2>/dev/null || echo "No scan result files found"
           echo ""
 
-          # Count vulnerabilities from each scanner
+          # Count vulnerabilities from each scanner (using JSON for accuracy)
           surface_vulns=0
           deep_vulns=0
           grype_vulns=0
 
-          if [ -f trivy-surface.sarif ]; then
-            surface_vulns=$(jq '[.runs[].results[]? | select(.level == "error" or .level == "warning")] | length' trivy-surface.sarif 2>/dev/null || echo 0)
+          if [ -f trivy-surface.json ]; then
+            surface_vulns=$(jq '[.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH" or .Severity == "CRITICAL")] | length' trivy-surface.json 2>/dev/null || echo 0)
             echo "✓ Trivy Surface Scan: $surface_vulns HIGH/CRITICAL vulnerabilities"
           else
-            echo "⚠ Trivy Surface Scan: SARIF file not found"
+            echo "⚠ Trivy Surface Scan: JSON file not found"
           fi
 
-          if [ -f trivy-deep.sarif ]; then
-            deep_vulns=$(jq '[.runs[].results[]? | select(.level == "error" or .level == "warning")] | length' trivy-deep.sarif 2>/dev/null || echo 0)
+          if [ -f trivy-deep.json ]; then
+            deep_vulns=$(jq '[.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH" or .Severity == "CRITICAL")] | length' trivy-deep.json 2>/dev/null || echo 0)
             echo "✓ Trivy Deep Scan: $deep_vulns HIGH/CRITICAL vulnerabilities"
           else
-            echo "⚠ Trivy Deep Scan: SARIF file not found"
+            echo "⚠ Trivy Deep Scan: JSON file not found"
           fi
 
           if [ -f grype-results.sarif ]; then
@@ -258,8 +280,8 @@ jobs:
             echo ""
           } >> $GITHUB_STEP_SUMMARY
 
-          # Add detailed vulnerability tables
-          if [ $surface_vulns -gt 0 ] && [ -f trivy-surface.sarif ]; then
+          # Add detailed vulnerability tables using JSON format (more reliable than SARIF)
+          if [ $surface_vulns -gt 0 ] && [ -f trivy-surface.json ]; then
             {
               echo "### 🔍 Trivy Surface Scan Details"
               echo ""
@@ -267,14 +289,14 @@ jobs:
               echo "|---------|---------------|----------|-----------|-------|"
             } >> $GITHUB_STEP_SUMMARY
 
-            jq -r '.runs[].results[] | select(.level == "error" or .level == "warning") |
-              "| \(.locations[0].physicalLocation.artifactLocation.uri // "N/A" | split("/")[-1]) | \(.ruleId) | \(.level | ascii_upcase) | \(.message.text | capture("(?<version>[0-9]+\\.[0-9]+[^ ]*)") | .version // "N/A") | \(.fixes[0].description.text // "N/A") |"' \
-              trivy-surface.sarif 2>/dev/null | head -20 >> $GITHUB_STEP_SUMMARY || echo "| Error parsing results | - | - | - | - |" >> $GITHUB_STEP_SUMMARY
+            jq -r '.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH" or .Severity == "CRITICAL") |
+              "| \(.PkgName) | \(.VulnerabilityID) | \(.Severity) | \(.InstalledVersion) | \(.FixedVersion // "N/A") |"' \
+              trivy-surface.json 2>/dev/null | head -20 >> $GITHUB_STEP_SUMMARY || echo "| Error parsing results | - | - | - | - |" >> $GITHUB_STEP_SUMMARY
 
             echo "" >> $GITHUB_STEP_SUMMARY
           fi
 
-          if [ $deep_vulns -gt 0 ] && [ -f trivy-deep.sarif ]; then
+          if [ $deep_vulns -gt 0 ] && [ -f trivy-deep.json ]; then
             {
               echo "### 🔎 Trivy Deep Scan Details (Nested JARs & Python)"
               echo ""
@@ -282,9 +304,9 @@ jobs:
               echo "|---------|---------------|----------|-----------|-------|"
             } >> $GITHUB_STEP_SUMMARY
 
-            jq -r '.runs[].results[] | select(.level == "error" or .level == "warning") |
-              "| \(.locations[0].physicalLocation.artifactLocation.uri // "N/A" | split("/")[-1]) | \(.ruleId) | \(.level | ascii_upcase) | \(.message.text | capture("(?<version>[0-9]+\\.[0-9]+[^ ]*)") | .version // "N/A") | \(.fixes[0].description.text // "N/A") |"' \
-              trivy-deep.sarif 2>/dev/null | head -30 >> $GITHUB_STEP_SUMMARY || echo "| Error parsing results | - | - | - | - |" >> $GITHUB_STEP_SUMMARY
+            jq -r '.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH" or .Severity == "CRITICAL") |
+              "| \(.PkgName) | \(.VulnerabilityID) | \(.Severity) | \(.InstalledVersion) | \(.FixedVersion // "N/A") |"' \
+              trivy-deep.json 2>/dev/null | head -30 >> $GITHUB_STEP_SUMMARY || echo "| Error parsing results | - | - | - | - |" >> $GITHUB_STEP_SUMMARY
 
             echo "" >> $GITHUB_STEP_SUMMARY
           fi
@@ -297,8 +319,14 @@ jobs:
               echo "|---------|---------------|----------|-----------|-------|"
             } >> $GITHUB_STEP_SUMMARY
 
-            jq -r '.runs[].results[] | select(.level == "error" or .level == "warning") |
-              "| \(.locations[0].physicalLocation.artifactLocation.uri // "N/A" | split("/")[-1]) | \(.ruleId) | \(.level | ascii_upcase) | \(.message.text | capture("(?<version>[0-9]+\\.[0-9]+[^ ]*)") | .version // "N/A") | \(.fixes[0].description.text // "N/A") |"' \
+            # Grype SARIF has different structure
+            jq -r '.runs[].results[] |
+              (.ruleId // "N/A") as $cve |
+              (try (.properties.packageName // .locations[0].logicalLocations[0].name) // "N/A") as $pkg |
+              (.level // "unknown") as $severity |
+              (try (.properties.installedVersion // "N/A") catch "N/A") as $installed |
+              (try (.properties.fixedVersion // "N/A") catch "N/A") as $fixed |
+              "| \($pkg) | \($cve) | \($severity | ascii_upcase) | \($installed) | \($fixed) |"' \
               grype-results.sarif 2>/dev/null | head -20 >> $GITHUB_STEP_SUMMARY || echo "| Error parsing results | - | - | - | - |" >> $GITHUB_STEP_SUMMARY
 
             echo "" >> $GITHUB_STEP_SUMMARY

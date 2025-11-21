@@ -406,43 +406,77 @@ jobs:
       - name: Append summary to GitHub Actions summary
         if: always()
         run: |
-          echo "### 🛡️ Multi-Scanner Vulnerability Summary for \`${{ matrix.image }}:${{ matrix.tag }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Total HIGH/CRITICAL Vulnerabilities: ${{ env.total_vulns }}**" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Scanner | Vulnerabilities Found |" >> $GITHUB_STEP_SUMMARY
-          echo "|---------|----------------------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Trivy Surface (OS + Top-level libs) | ${{ env.surface_vulns }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Trivy Deep (Nested JARs + Python) | ${{ env.deep_vulns }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Grype (SBOM-based) | ${{ env.grype_vulns }} |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          {
+            echo "## 🛡️ Vulnerability Scan Results for \`${{ matrix.image }}:${{ matrix.tag }}\`"
+            echo ""
+            echo "**Total HIGH/CRITICAL Vulnerabilities: ${{ env.total_vulns }}**"
+            echo ""
+            echo "| Scanner | Vulnerabilities | Status |"
+            echo "|---------|-----------------|--------|"
+            echo "| 🔍 Trivy Surface (OS + Top-level) | ${{ env.surface_vulns }} | $([ ${{ env.surface_vulns }} -eq 0 ] && echo '✅' || echo '⚠️') |"
+            echo "| 🔎 Trivy Deep (Nested JARs + Python) | ${{ env.deep_vulns }} | $([ ${{ env.deep_vulns }} -eq 0 ] && echo '✅' || echo '⚠️') |"
+            echo "| 📋 Grype (SBOM-based) | ${{ env.grype_vulns }} | $([ ${{ env.grype_vulns }} -eq 0 ] && echo '✅' || echo '⚠️') |"
+            echo ""
+          } >> $GITHUB_STEP_SUMMARY
 
-          # Add detailed vulnerability table
-          echo "#### Detailed Vulnerabilities" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Library | Vulnerability | Severity | Status | Installed | Fixed | Scanner |" >> $GITHUB_STEP_SUMMARY
-          echo "|---------|---------------|----------|--------|-----------|--------|---------|" >> $GITHUB_STEP_SUMMARY
+          # Add detailed vulnerability tables
+          if [ ${{ env.surface_vulns }} -gt 0 ] && [ -f trivy-surface.json ]; then
+            {
+              echo "### 🔍 Trivy Surface Scan Details"
+              echo ""
+              echo "| Package | Vulnerability | Severity | Status | Installed | Fixed |"
+              echo "|---------|---------------|----------|--------|-----------|-------|"
+            } >> $GITHUB_STEP_SUMMARY
 
-          # Extract surface scan vulnerabilities
-          if [ -f trivy-surface.json ]; then
             jq -r '.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH" or .Severity == "CRITICAL") |
-              "| \(.PkgName) | \(.VulnerabilityID) | \(.Severity) | \(.Status // "-") | \(.InstalledVersion) | \(.FixedVersion // "-") | Trivy Surface |"' \
-              trivy-surface.json >> $GITHUB_STEP_SUMMARY 2>/dev/null || true
+              "| \(.PkgName) | \(.VulnerabilityID) | \(.Severity) | \(.Status // "-") | \(.InstalledVersion) | \(.FixedVersion // "-") |"' \
+              trivy-surface.json 2>/dev/null | head -20 >> $GITHUB_STEP_SUMMARY || echo "| Error parsing results | - | - | - | - | - |" >> $GITHUB_STEP_SUMMARY
+
+            echo "" >> $GITHUB_STEP_SUMMARY
           fi
 
-          # Extract deep scan vulnerabilities
-          if [ -f trivy-deep.json ]; then
+          if [ ${{ env.deep_vulns }} -gt 0 ] && [ -f trivy-deep.json ]; then
+            {
+              echo "### 🔎 Trivy Deep Scan Details (Nested JARs & Python)"
+              echo ""
+              echo "| Package | Vulnerability | Severity | Status | Installed | Fixed |"
+              echo "|---------|---------------|----------|--------|-----------|-------|"
+            } >> $GITHUB_STEP_SUMMARY
+
             jq -r '.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH" or .Severity == "CRITICAL") |
-              "| \(.PkgName) | \(.VulnerabilityID) | \(.Severity) | \(.Status // "-") | \(.InstalledVersion) | \(.FixedVersion // "-") | Trivy Deep |"' \
-              trivy-deep.json >> $GITHUB_STEP_SUMMARY 2>/dev/null || true
+              "| \(.PkgName) | \(.VulnerabilityID) | \(.Severity) | \(.Status // "-") | \(.InstalledVersion) | \(.FixedVersion // "-") |"' \
+              trivy-deep.json 2>/dev/null | head -30 >> $GITHUB_STEP_SUMMARY || echo "| Error parsing results | - | - | - | - | - |" >> $GITHUB_STEP_SUMMARY
+
+            echo "" >> $GITHUB_STEP_SUMMARY
           fi
 
-          # Extract Grype vulnerabilities
-          if [ -f grype-results.json ]; then
+          if [ ${{ env.grype_vulns }} -gt 0 ] && [ -f grype-results.json ]; then
+            {
+              echo "### 📋 Grype SBOM Scan Details"
+              echo ""
+              echo "| Package | Vulnerability | Severity | Installed | Fixed |"
+              echo "|---------|---------------|----------|-----------|-------|"
+            } >> $GITHUB_STEP_SUMMARY
+
             jq -r '.matches[]? | select(.vulnerability.severity == "High" or .vulnerability.severity == "Critical") |
-              "| \(.artifact.name) | \(.vulnerability.id) | \(.vulnerability.severity) | - | \(.artifact.version) | \(.vulnerability.fix.versions[0] // "-") | Grype |"' \
-              grype-results.json >> $GITHUB_STEP_SUMMARY 2>/dev/null || true
+              "| \(.artifact.name) | \(.vulnerability.id) | \(.vulnerability.severity) | \(.artifact.version) | \(.vulnerability.fix.versions[0] // "-") |"' \
+              grype-results.json 2>/dev/null | head -20 >> $GITHUB_STEP_SUMMARY || echo "| Error parsing results | - | - | - | - |" >> $GITHUB_STEP_SUMMARY
+
+            echo "" >> $GITHUB_STEP_SUMMARY
           fi
+
+          # Add scanner information
+          {
+            echo "---"
+            echo ""
+            echo "### 📖 Scanner Information"
+            echo ""
+            echo "- **Trivy Surface**: Scans OS packages and top-level libraries"
+            echo "- **Trivy Deep**: Extracts and scans nested Spring Boot JARs (BOOT-INF/lib) and GraalVM Python packages"
+            echo "- **Grype**: SBOM-based validation for comprehensive dependency analysis"
+            echo ""
+            echo "💡 **Note**: Deep scan detects vulnerabilities in nested dependencies that standard scans miss."
+          } >> $GITHUB_STEP_SUMMARY
 
   notify-results:
     name: Notify Scan Results
