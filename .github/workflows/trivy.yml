@@ -177,13 +177,31 @@ jobs:
 
       - name: Run Grype scanner on SBOM
         if: always()
+        id: grype_scan
         uses: anchore/scan-action@v5
         with:
           sbom: 'sbom.spdx.json'
           fail-build: false
           severity-cutoff: high
           output-format: sarif
-          output-file: grype-results.sarif
+        continue-on-error: true
+
+      - name: Save Grype results to file
+        if: always()
+        run: |
+          # The anchore/scan-action outputs to stdout, capture it
+          # If the scan step succeeded, the SARIF should be in the default location
+          if [ -f "results.sarif" ]; then
+            mv results.sarif grype-results.sarif
+            echo "✓ Grype SARIF results saved to grype-results.sarif"
+          elif [ -f "anchore-scan-results.sarif" ]; then
+            mv anchore-scan-results.sarif grype-results.sarif
+            echo "✓ Grype SARIF results saved to grype-results.sarif"
+          else
+            echo "⚠ Grype SARIF output file not found in expected locations"
+            echo "Checking for any SARIF files created by Grype:"
+            find . -name "*.sarif" -type f -mmin -5
+          fi
 
       - name: Combine scan results and check for failures
         if: always()
@@ -191,6 +209,10 @@ jobs:
           set +e  # Don't fail immediately
 
           echo "🔍 Analyzing scan results..."
+          echo ""
+          echo "Available scan result files:"
+          ls -lh *.sarif *.json 2>/dev/null || echo "No scan result files found"
+          echo ""
 
           # Count vulnerabilities from each scanner
           surface_vulns=0
@@ -199,17 +221,23 @@ jobs:
 
           if [ -f trivy-surface.sarif ]; then
             surface_vulns=$(jq '[.runs[].results[]? | select(.level == "error" or .level == "warning")] | length' trivy-surface.sarif 2>/dev/null || echo 0)
-            echo "Trivy Surface Scan: $surface_vulns HIGH/CRITICAL vulnerabilities"
+            echo "✓ Trivy Surface Scan: $surface_vulns HIGH/CRITICAL vulnerabilities"
+          else
+            echo "⚠ Trivy Surface Scan: SARIF file not found"
           fi
 
           if [ -f trivy-deep.sarif ]; then
             deep_vulns=$(jq '[.runs[].results[]? | select(.level == "error" or .level == "warning")] | length' trivy-deep.sarif 2>/dev/null || echo 0)
-            echo "Trivy Deep Scan: $deep_vulns HIGH/CRITICAL vulnerabilities"
+            echo "✓ Trivy Deep Scan: $deep_vulns HIGH/CRITICAL vulnerabilities"
+          else
+            echo "⚠ Trivy Deep Scan: SARIF file not found"
           fi
 
           if [ -f grype-results.sarif ]; then
             grype_vulns=$(jq '[.runs[].results[]? | select(.level == "error" or .level == "warning")] | length' grype-results.sarif 2>/dev/null || echo 0)
-            echo "Grype SBOM Scan: $grype_vulns HIGH/CRITICAL vulnerabilities"
+            echo "✓ Grype SBOM Scan: $grype_vulns HIGH/CRITICAL vulnerabilities"
+          else
+            echo "⚠ Grype SBOM Scan: SARIF file not found (scan may have failed or SBOM was empty)"
           fi
 
           total_vulns=$((surface_vulns + deep_vulns + grype_vulns))
@@ -271,7 +299,7 @@ jobs:
           category: '${{ matrix.image.name }}${{ matrix.image.suffix }}-deep'
 
       - name: Upload Grype scan results to GitHub Security tab
-        if: always()
+        if: always() && hashFiles('grype-results.sarif') != ''
         uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: 'grype-results.sarif'

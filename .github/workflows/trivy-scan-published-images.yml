@@ -230,8 +230,24 @@ jobs:
           fail-build: false
           severity-cutoff: high
           output-format: json
-          output-file: grype-results.json
         continue-on-error: true
+
+      - name: Save Grype results to file
+        if: always()
+        run: |
+          # The anchore/scan-action outputs to stdout, capture it
+          # Check for Grype output files in various possible locations
+          if [ -f "results.json" ]; then
+            mv results.json grype-results.json
+            echo "✓ Grype JSON results saved to grype-results.json"
+          elif [ -f "anchore-scan-results.json" ]; then
+            mv anchore-scan-results.json grype-results.json
+            echo "✓ Grype JSON results saved to grype-results.json"
+          else
+            echo "⚠ Grype JSON output file not found in expected locations"
+            echo "Checking for any JSON files created by Grype:"
+            find . -name "*.json" -type f -mmin -5 | grep -v node_modules || true
+          fi
 
         # trivy convert steps assume trivy CLI is available, therefore install the CLI before using those commands across steps.
       - name: Install Trivy CLI
@@ -245,33 +261,40 @@ jobs:
           set +e  # Don't fail immediately
 
           echo "🔍 Converting scan results to SARIF format..."
+          echo ""
+          echo "Available scan result files:"
+          ls -lh *.sarif *.json 2>/dev/null || echo "No scan result files found"
+          echo ""
 
           # Convert Trivy surface scan results
           if [ -f trivy-surface.json ]; then
             trivy convert --format sarif --output trivy-surface.sarif trivy-surface.json
             surface_vulns=$(jq '[.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH" or .Severity == "CRITICAL")] | length' trivy-surface.json 2>/dev/null || echo 0)
-            echo "Trivy Surface Scan: $surface_vulns HIGH/CRITICAL vulnerabilities"
+            echo "✓ Trivy Surface Scan: $surface_vulns HIGH/CRITICAL vulnerabilities"
           else
             surface_vulns=0
+            echo "⚠ Trivy Surface Scan: JSON file not found"
           fi
 
           # Convert Trivy deep scan results
           if [ -f trivy-deep.json ]; then
             trivy convert --format sarif --output trivy-deep.sarif trivy-deep.json
             deep_vulns=$(jq '[.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH" or .Severity == "CRITICAL")] | length' trivy-deep.json 2>/dev/null || echo 0)
-            echo "Trivy Deep Scan: $deep_vulns HIGH/CRITICAL vulnerabilities"
+            echo "✓ Trivy Deep Scan: $deep_vulns HIGH/CRITICAL vulnerabilities"
           else
             deep_vulns=0
+            echo "⚠ Trivy Deep Scan: JSON file not found"
           fi
 
           # Process Grype results
           if [ -f grype-results.json ]; then
-            # Convert Grype JSON to SARIF (Grype format is different)
-            # For now, keep as JSON and count vulnerabilities
+            # Grype scan-action already outputs SARIF if specified
+            # Count vulnerabilities from JSON
             grype_vulns=$(jq '[.matches[]? | select(.vulnerability.severity == "High" or .vulnerability.severity == "Critical")] | length' grype-results.json 2>/dev/null || echo 0)
-            echo "Grype SBOM Scan: $grype_vulns HIGH/CRITICAL vulnerabilities"
+            echo "✓ Grype SBOM Scan: $grype_vulns HIGH/CRITICAL vulnerabilities"
           else
             grype_vulns=0
+            echo "⚠ Grype SBOM Scan: JSON file not found (scan may have failed or SBOM was empty)"
           fi
 
           total_vulns=$((surface_vulns + deep_vulns + grype_vulns))
@@ -308,11 +331,19 @@ jobs:
         continue-on-error: true
 
       - name: Upload Trivy Deep SARIF to GitHub Security tab
-        if: always()
+        if: always() && hashFiles('trivy-deep.sarif') != ''
         uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: 'trivy-deep.sarif'
           category: 'trivy-${{ matrix.image }}-${{ matrix.tag }}-deep'
+        continue-on-error: true
+
+      - name: Upload Grype SARIF to GitHub Security tab
+        if: always() && hashFiles('grype-results.sarif') != ''
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: 'grype-results.sarif'
+          category: 'trivy-${{ matrix.image }}-${{ matrix.tag }}-grype'
         continue-on-error: true
 
       - name: Set sanitized names for artifacts
