@@ -393,17 +393,20 @@ jobs:
             # Process each vulnerability and look up parent JAR from mapping file
             jq -r '.Results[]? | .Target as $target | .Vulnerabilities[]? |
               select(.Severity == "HIGH" or .Severity == "CRITICAL") |
-              "\($target)|\(.PkgName)|\(.VulnerabilityID)|\(.Severity)|\(.InstalledVersion)|\(.FixedVersion // "N/A")"' \
-              trivy-deep.json 2>/dev/null | head -30 | while IFS='|' read -r target pkg vuln severity installed fixed; do
+              "\($target)|\(.PkgPath // "")|\(.PkgName)|\(.VulnerabilityID)|\(.Severity)|\(.InstalledVersion)|\(.FixedVersion // "N/A")"' \
+              trivy-deep.json 2>/dev/null | head -30 | while IFS='|' read -r target pkgpath pkg vuln severity installed fixed; do
 
-              # Extract JAR filename from target path (handle both file paths and directory paths)
-              if [[ "$target" == *.jar ]]; then
-                jar_file=$(basename "$target" 2>/dev/null || echo "$target")
+              # Use PkgPath if available (contains JAR file path), otherwise use Target
+              jar_path="${pkgpath:-$target}"
+
+              # Extract JAR filename from path (handle both file paths and directory paths)
+              if [[ "$jar_path" == *.jar ]]; then
+                jar_file=$(basename "$jar_path" 2>/dev/null || echo "$jar_path")
               else
-                # Target might be a directory containing a JAR, extract JAR name from path
-                jar_file=$(echo "$target" | grep -oE '[^/]+\.jar' | tail -1)
+                # Path might be a directory containing a JAR, extract JAR name from path
+                jar_file=$(echo "$jar_path" | grep -oE '[^/]+\.jar' | tail -1)
                 if [ -z "$jar_file" ]; then
-                  jar_file=$(basename "$target" 2>/dev/null || echo "$target")
+                  jar_file=$(basename "$jar_path" 2>/dev/null || echo "$jar_path")
                 fi
               fi
 
@@ -422,7 +425,7 @@ jobs:
                 debug_count=0
               fi
               if [ $debug_count -lt 3 ]; then
-                echo "DEBUG: target=$target, jar_file=$jar_file, parent_jar=$parent_jar"
+                echo "DEBUG: target=$target, pkgpath=$pkgpath, jar_path=$jar_path, jar_file=$jar_file, parent_jar=$parent_jar"
                 debug_count=$((debug_count + 1))
               fi
 
