@@ -2,19 +2,18 @@
 # This workflow scans the published images on Docker Hub for vulnerabilities.
 # It generates a matrix of image/tag combinations and runs Trivy scans on them.
 
-
 name: Published Images Vulnerability Scanning
 
 on:
   workflow_dispatch:
     inputs:
       max_tags_to_scan:
-        description: 'Maximum number of published tags to scan'
+        description: "Maximum number of published tags to scan"
         required: false
-        default: '20'
+        default: "20"
   schedule:
-      # Run Monday-Friday at 10 AM UTC (published image monitoring)
-    - cron: '0 10 * * 1-5' # Run every weekday at 10am UTC
+    # Run Monday-Friday at 10 AM UTC (published image monitoring)
+    - cron: "0 10 * * 1-5" # Run every weekday at 10am UTC
 
 permissions:
   contents: read
@@ -30,64 +29,13 @@ jobs:
     env:
       MAX_TAGS: ${{ github.event.inputs.max_tags_to_scan || '10' }}
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
       - name: Generate matrix for all image/tag combinations
         id: set-matrix
         run: |
-          echo "Generating matrix for scanning with max $MAX_TAGS tags per image..."
-          MATRIX_INCLUDE="["
-          FIRST=true
-
-          for IMAGE in "liquibase/liquibase" "liquibase/liquibase-secure"; do
-            echo "Getting tags for $IMAGE..."
-            REPO=$(basename "$IMAGE")
-            TAGS=""
-            URL="https://hub.docker.com/v2/namespaces/liquibase/repositories/${REPO}/tags?page_size=100"
-            while [ -n "$URL" ]; do
-              RESPONSE=$(curl -s "$URL")
-              TAG_REGEX='^[0-9]+\.[0-9]+(\.[0-9]+)?(-alpine|-latest)?$'
-              NEW_TAGS=$(echo "$RESPONSE" | jq -r '.results[] | select(.tag_status == "active") | .name' | grep -E "$TAG_REGEX" || true)
-              TAGS=$(echo -e "$TAGS\n$NEW_TAGS" | sort -Vu)
-
-              TAGS=$(echo "$TAGS" | awk '
-                {
-                  tags[NR] = $0
-                  if (match($0, /^([0-9]+)\.([0-9]+)\.([0-9]+)(-alpine|-latest)?$/, m)) {
-                    full = m[1] "." m[2] "." m[3] (m[4] ? m[4] : "")
-                    has_full[full] = 1
-                  }
-                }
-                END {
-                  for (i = 1; i <= NR; i++) {
-                    tag = tags[i]
-                    if (match(tag, /^([0-9]+)\.([0-9]+)(-alpine|-latest)?$/, m)) {
-                      short = m[1] "." m[2] ".0" (m[3] ? m[3] : "")
-                      if (has_full[short]) continue
-                    }
-                    print tag
-                  }
-                }
-              ')
-              URL=$(echo "$RESPONSE" | jq -r '.next')
-              [ "$URL" = "null" ] && break
-            done
-
-            TAGS=$(echo "$TAGS" | tac | head -n "$MAX_TAGS")
-            while IFS= read -r tag; do
-              if [ -n "$tag" ]; then
-                if [ "$FIRST" = true ]; then
-                  MATRIX_INCLUDE="${MATRIX_INCLUDE}{\"image\":\"$IMAGE\",\"tag\":\"$tag\"}"
-                  FIRST=false
-                else
-                  MATRIX_INCLUDE="${MATRIX_INCLUDE},{\"image\":\"$IMAGE\",\"tag\":\"$tag\"}"
-                fi
-              fi
-            done <<< "$TAGS"
-          done
-
-          MATRIX_INCLUDE="${MATRIX_INCLUDE}]"
-          MATRIX="{\"include\":$MATRIX_INCLUDE}"
-          echo "Generated matrix: $MATRIX"
-          echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
+          scripts/generate-dockerhub-matrix.sh
 
   trivy-scan:
     name: Trivy Scan ${{ matrix.image }}:${{ matrix.tag }}
@@ -111,214 +59,46 @@ jobs:
 
       - name: Extract nested JARs and Python packages for deep scanning
         run: |
-          set -e
-
-          # Create extraction directory
-          mkdir -p /tmp/extracted-deps
-
-          # Create container from image to extract files
-          container_id=$(docker create ${{ matrix.image }}:${{ matrix.tag }})
-
-          echo "📦 Extracting all Liquibase JARs for deep scanning..."
-
-          # Extract all JAR files from /liquibase/internal directory
-          echo "🔍 Extracting all JAR files from container..."
-
-          # First, check for distribution archives in /liquibase/dist
-          echo "🔍 Checking /liquibase/dist for tar.gz archives..."
-          if docker cp $container_id:/liquibase/dist /tmp/liquibase-dist 2>/dev/null; then
-            echo "✓ Found /liquibase/dist directory"
-
-            # Extract all tar.gz archives
-            find /tmp/liquibase-dist -name "*.tar.gz" -type f | while read archive; do
-              archive_name=$(basename "$archive" .tar.gz)
-              echo "  📦 Extracting $archive_name..."
-              extract_dir="/tmp/liquibase-dist/${archive_name}-extracted"
-              mkdir -p "$extract_dir"
-              tar -xzf "$archive" -C "$extract_dir" 2>/dev/null || true
-
-              # Find JARs in extracted archive
-              jar_count=$(find "$extract_dir" -name "*.jar" -type f | wc -l)
-              if [ $jar_count -gt 0 ]; then
-                echo "  ✓ Found $jar_count JAR(s) in $archive_name"
-
-                # Extract each JAR from the archive
-                find "$extract_dir" -name "*.jar" -type f | while read jar_file; do
-                  jar_name=$(basename "$jar_file" .jar)
-                  jar_extract="/tmp/extracted-deps/dist/${archive_name}/${jar_name}"
-                  mkdir -p "$jar_extract"
-                  unzip -q "$jar_file" -d "$jar_extract" 2>/dev/null || true
-
-                  # Check for Spring Boot nested JARs and copy them as-is (don't extract)
-                  if [ -d "$jar_extract/BOOT-INF/lib" ]; then
-                    echo "    ✓ Spring Boot JAR: $jar_name - preserving nested JAR files"
-                    nested_count=0
-                    nested_jar_dir="/tmp/extracted-deps/dist/${archive_name}/${jar_name}-nested-jars"
-                    mkdir -p "$nested_jar_dir"
-
-                    # Create a mapping file to track parent JAR relationships
-                    mapping_file="/tmp/extracted-deps/jar-mapping.txt"
-
-                    for nested_jar in "$jar_extract/BOOT-INF/lib"/*.jar; do
-                      if [ -f "$nested_jar" ]; then
-                        nested_count=$((nested_count + 1))
-                        nested_jar_name=$(basename "$nested_jar")
-
-                        # Copy the JAR file as-is, don't extract it
-                        cp "$nested_jar" "$nested_jar_dir/" 2>/dev/null || true
-
-                        # Record the parent → nested relationship
-                        echo "${jar_name}.jar|$nested_jar_name" >> "$mapping_file"
-                      fi
-                    done
-                    echo "      → Preserved $nested_count nested JAR file(s)"
-                  fi
-                done
-              fi
-            done
-          else
-            echo "⚠ No /liquibase/dist directory found"
-          fi
-
-          # Copy entire internal directory for comprehensive scanning
-          if docker cp $container_id:/liquibase/internal /tmp/liquibase-internal 2>/dev/null; then
-            echo "✓ Copied /liquibase/internal directory"
-
-            # Count total JARs
-            jar_count=$(find /tmp/liquibase-internal -name "*.jar" -type f | wc -l)
-            echo "📊 Found $jar_count JAR files to scan"
-
-            # Copy all JAR files preserving them for Trivy to scan
-            mkdir -p /tmp/extracted-deps/internal-jars/lib
-            mkdir -p /tmp/extracted-deps/internal-jars/extensions
-            jar_num=0
-
-            # Copy lib JARs as-is
-            if [ -d /tmp/liquibase-internal/lib ]; then
-              cp /tmp/liquibase-internal/lib/*.jar /tmp/extracted-deps/internal-jars/lib/ 2>/dev/null || true
-              lib_jar_count=$(ls -1 /tmp/extracted-deps/internal-jars/lib/*.jar 2>/dev/null | wc -l)
-              echo "  ✓ Preserved $lib_jar_count lib JAR(s)"
-            fi
-
-            # Copy extension JARs as-is
-            if [ -d /tmp/liquibase-internal/extensions ]; then
-              cp /tmp/liquibase-internal/extensions/*.jar /tmp/extracted-deps/internal-jars/extensions/ 2>/dev/null || true
-              ext_jar_count=$(ls -1 /tmp/extracted-deps/internal-jars/extensions/*.jar 2>/dev/null | wc -l)
-              echo "  ✓ Preserved $ext_jar_count extension JAR(s)"
-            fi
-
-            echo "✓ Preserved $jar_count JAR files for scanning"
-          else
-            echo "⚠ Could not copy /liquibase/internal directory"
-          fi
-
-          # Extract all extension JARs and look for GraalVM Python embedded dependencies
-          echo "🔍 Scanning extension JARs for Python packages..."
-          mkdir -p /tmp/extracted-deps/python-packages
-
-          # Scan all JARs in internal-jars/extensions directory
-          if [ -d /tmp/extracted-deps/internal-jars/extensions ]; then
-            for ext_jar in /tmp/extracted-deps/internal-jars/extensions/*.jar; do
-              if [ -f "$ext_jar" ]; then
-                jar_name=$(basename "$ext_jar")
-                jar_extract="/tmp/extracted-deps/extension-scan/${jar_name%.jar}"
-                mkdir -p "$jar_extract"
-                unzip -q "$ext_jar" -d "$jar_extract" 2>/dev/null || true
-
-                # Check if this JAR contains GraalVM Python packages
-                if [ -d "$jar_extract/org.graalvm.python.vfs" ]; then
-                  echo "  ✓ Found Python packages in $jar_name"
-
-                  # Copy from both possible locations
-                  if [ -d "$jar_extract/org.graalvm.python.vfs/venv/lib/python3.11/site-packages" ]; then
-                    cp -r "$jar_extract/org.graalvm.python.vfs/venv/lib/python3.11/site-packages"/* /tmp/extracted-deps/python-packages/ 2>/dev/null || true
-                  fi
-                  if [ -d "$jar_extract/org.graalvm.python.vfs/venv/Lib/site-packages" ]; then
-                    cp -r "$jar_extract/org.graalvm.python.vfs/venv/Lib/site-packages"/* /tmp/extracted-deps/python-packages/ 2>/dev/null || true
-                  fi
-
-                  # Also extract bundled wheels
-                  if [ -d "$jar_extract/META-INF/resources/libpython/ensurepip/_bundled" ]; then
-                    mkdir -p /tmp/extracted-deps/python-bundled
-                    cp "$jar_extract/META-INF/resources/libpython/ensurepip/_bundled"/*.whl /tmp/extracted-deps/python-bundled/ 2>/dev/null || true
-                  fi
-                fi
-              fi
-            done
-          fi
-
-          # Cleanup container
-          docker rm $container_id
-
-          # Show what was extracted
-          echo ""
-          echo "📊 Extraction Summary:"
-          total_files=$(find /tmp/extracted-deps -type f 2>/dev/null | wc -l)
-          echo "Total files extracted: $total_files"
-
-          if [ -d /tmp/extracted-deps/dist ]; then
-            dist_archives=$(find /tmp/liquibase-dist -name "*.tar.gz" -type f 2>/dev/null | wc -l)
-            dist_jars=$(find /tmp/liquibase-dist -name "*.jar" -type f 2>/dev/null | wc -l)
-            nested_jars=$(find /tmp/extracted-deps/dist -type d -name "*-nested-jars" -exec sh -c 'ls -1 "{}"/*.jar 2>/dev/null | wc -l' \; 2>/dev/null | awk '{s+=$1} END {print s}')
-            echo "Distribution archives: $dist_archives"
-            echo "  - JARs in archives: $dist_jars"
-            if [ "$nested_jars" -gt 0 ]; then
-              echo "  - Spring Boot nested JARs: $nested_jars"
-            fi
-          fi
-
-          if [ -d /tmp/extracted-deps/internal-jars ]; then
-            lib_jars=$(ls -1 /tmp/extracted-deps/internal-jars/lib/*.jar 2>/dev/null | wc -l)
-            ext_jars=$(ls -1 /tmp/extracted-deps/internal-jars/extensions/*.jar 2>/dev/null | wc -l)
-            total_internal=$((lib_jars + ext_jars))
-            echo "Internal JARs preserved: $total_internal"
-            echo "  - Lib JARs: $lib_jars"
-            echo "  - Extension JARs: $ext_jars"
-          fi
-
-          if [ -d /tmp/extracted-deps/python-packages ]; then
-            python_pkgs=$(ls -1 /tmp/extracted-deps/python-packages 2>/dev/null | grep -E '\.(dist-info|egg-info)$' | wc -l)
-            echo "Python packages found: $python_pkgs"
-          fi
+          scripts/extract-nested-deps.sh ${{ matrix.image }}:${{ matrix.tag }}
 
       - name: Generate SBOM with Syft
         uses: anchore/sbom-action@v0
         with:
-          image: '${{ matrix.image }}:${{ matrix.tag }}'
-          format: 'spdx-json'
-          output-file: 'sbom.spdx.json'
+          image: "${{ matrix.image }}:${{ matrix.tag }}"
+          format: "spdx-json"
+          output-file: "sbom.spdx.json"
 
       - name: Run Trivy vulnerability scanner (Surface Scan)
         id: trivy_scan
         uses: aquasecurity/trivy-action@0.33.1
         with:
-          image-ref: '${{ matrix.image }}:${{ matrix.tag }}'
-          vuln-type: 'os,library'
-          scanners: 'vuln'
-          format: 'json'
-          output: 'trivy-surface.json'
-          severity: 'HIGH,CRITICAL'
-          exit-code: '0'
+          image-ref: "${{ matrix.image }}:${{ matrix.tag }}"
+          vuln-type: "os,library"
+          scanners: "vuln"
+          format: "json"
+          output: "trivy-surface.json"
+          severity: "HIGH,CRITICAL"
+          exit-code: "0"
         continue-on-error: true
 
       - name: Run Trivy scanner on extracted nested JARs (Deep Scan)
         id: trivy_deep
         uses: aquasecurity/trivy-action@0.33.1
         with:
-          scan-type: 'rootfs'
-          scan-ref: '/tmp/extracted-deps'
-          vuln-type: 'library'
-          format: 'json'
-          output: 'trivy-deep.json'
-          severity: 'HIGH,CRITICAL'
-          exit-code: '0'
+          scan-type: "rootfs"
+          scan-ref: "/tmp/extracted-deps"
+          vuln-type: "library"
+          format: "json"
+          output: "trivy-deep.json"
+          severity: "HIGH,CRITICAL"
+          exit-code: "0"
         continue-on-error: true
 
       - name: Run Grype scanner on SBOM
         id: grype_scan
         uses: anchore/scan-action@v5
         with:
-          sbom: 'sbom.spdx.json'
+          sbom: "sbom.spdx.json"
           fail-build: false
           severity-cutoff: high
           output-format: json
@@ -326,192 +106,26 @@ jobs:
 
       - name: Save Grype results to file
         if: always()
+        env:
+          GRYPE_OUTPUT_FORMAT: json
         run: |
-          # The anchore/scan-action outputs to stdout, capture it
-          # Check for Grype output files in various possible locations
-          if [ -f "results.json" ]; then
-            mv results.json grype-results.json
-            echo "✓ Grype JSON results saved to grype-results.json"
-          elif [ -f "anchore-scan-results.json" ]; then
-            mv anchore-scan-results.json grype-results.json
-            echo "✓ Grype JSON results saved to grype-results.json"
-          else
-            echo "⚠ Grype JSON output file not found in expected locations"
-            echo "Checking for any JSON files created by Grype:"
-            find . -name "*.json" -type f -mmin -5 | grep -v node_modules || true
-          fi
+          scripts/save-grype-results.sh
 
-        # trivy convert steps assume trivy CLI is available, therefore install the CLI before using those commands across steps.
+      # trivy convert steps assume trivy CLI is available, therefore install the CLI before using those commands across steps.
       - name: Install Trivy CLI
         run: |
-            curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
-            trivy --version
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+          trivy --version
 
       - name: Convert JSON to SARIF and analyze results
         if: always()
         run: |
-          set +e  # Don't fail immediately
-
-          echo "🔍 Converting scan results to SARIF format..."
-          echo ""
-          echo "Available scan result files:"
-          ls -lh *.sarif *.json 2>/dev/null || echo "No scan result files found"
-          echo ""
-
-          # Convert Trivy surface scan results
-          if [ -f trivy-surface.json ]; then
-            trivy convert --format sarif --output trivy-surface.sarif trivy-surface.json
-            surface_vulns=$(jq '[.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH" or .Severity == "CRITICAL")] | length' trivy-surface.json 2>/dev/null || echo 0)
-            echo "✓ Trivy Surface Scan: $surface_vulns HIGH/CRITICAL vulnerabilities"
-          else
-            surface_vulns=0
-            echo "⚠ Trivy Surface Scan: JSON file not found"
-          fi
-
-          # Convert Trivy deep scan results
-          if [ -f trivy-deep.json ]; then
-            trivy convert --format sarif --output trivy-deep.sarif trivy-deep.json
-            deep_vulns=$(jq '[.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH" or .Severity == "CRITICAL")] | length' trivy-deep.json 2>/dev/null || echo 0)
-            echo "✓ Trivy Deep Scan: $deep_vulns HIGH/CRITICAL vulnerabilities"
-          else
-            deep_vulns=0
-            echo "⚠ Trivy Deep Scan: JSON file not found"
-          fi
-
-          # Process Grype results
-          if [ -f grype-results.json ]; then
-            # Grype scan-action already outputs SARIF if specified
-            # Count vulnerabilities from JSON
-            grype_vulns=$(jq '[.matches[]? | select(.vulnerability.severity == "High" or .vulnerability.severity == "Critical")] | length' grype-results.json 2>/dev/null || echo 0)
-            echo "✓ Grype SBOM Scan: $grype_vulns HIGH/CRITICAL vulnerabilities"
-          else
-            grype_vulns=0
-            echo "⚠ Grype SBOM Scan: JSON file not found (scan may have failed or SBOM was empty)"
-          fi
-
-          total_vulns=$((surface_vulns + deep_vulns + grype_vulns))
-          echo ""
-          echo "📊 Total HIGH/CRITICAL vulnerabilities found: $total_vulns"
-
-          # Print detailed table if vulnerabilities found
-          if [ $total_vulns -gt 0 ]; then
-            echo ""
-            echo "==== Trivy Surface Scan Vulnerabilities ===="
-            if [ -f trivy-surface.json ] && [ $surface_vulns -gt 0 ]; then
-              trivy convert --format table trivy-surface.json
-            fi
-
-            echo ""
-            echo "==== Trivy Deep Scan Vulnerabilities (Nested JARs) ===="
-            if [ -f trivy-deep.json ] && [ $deep_vulns -gt 0 ]; then
-              trivy convert --format table trivy-deep.json
-            fi
-          fi
-
-          # Store counts for later use
-          echo "surface_vulns=$surface_vulns" >> $GITHUB_ENV
-          echo "deep_vulns=$deep_vulns" >> $GITHUB_ENV
-          echo "grype_vulns=$grype_vulns" >> $GITHUB_ENV
-          echo "total_vulns=$total_vulns" >> $GITHUB_ENV
+          scripts/convert-scan-results.sh
 
       - name: Create enhanced vulnerability report with parent JAR mapping
         if: always()
         run: |
-          report_file="vulnerability-report-enhanced.md"
-
-          {
-            echo "# Enhanced Vulnerability Report"
-            echo ""
-            echo "**Image**: \`${{ matrix.image }}:${{ matrix.tag }}\`"
-            echo "**Scan Date**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
-            echo ""
-            echo "## Summary"
-            echo ""
-            echo "| Scanner | HIGH/CRITICAL Vulnerabilities |"
-            echo "|---------|-------------------------------|"
-            echo "| Trivy Surface (OS + Top-level) | ${surface_vulns:-0} |"
-            echo "| Trivy Deep (Nested JARs + Python) | ${deep_vulns:-0} |"
-            echo "| Grype (SBOM-based) | ${grype_vulns:-0} |"
-            echo "| **Total** | **${total_vulns:-0}** |"
-            echo ""
-          } > "$report_file"
-
-          # Add parent JAR mapping section
-          if [ -f /tmp/extracted-deps/jar-mapping.txt ]; then
-            {
-              echo "## Parent JAR Relationships"
-              echo ""
-              echo "The following shows which Liquibase JARs contain vulnerable nested dependencies:"
-              echo ""
-              echo "\`\`\`"
-              cat /tmp/extracted-deps/jar-mapping.txt | sort | uniq
-              echo "\`\`\`"
-              echo ""
-            } >> "$report_file"
-          fi
-
-          # Add detailed vulnerability table with parent JAR context
-          if [ -f trivy-deep.json ]; then
-            {
-              echo "## Detailed Vulnerability Analysis"
-              echo ""
-              echo "### Nested JAR Vulnerabilities"
-              echo ""
-              echo "| Parent JAR | Nested JAR | Vulnerability | Severity | Installed | Fixed |"
-              echo "|------------|------------|---------------|----------|-----------|-------|"
-            } >> "$report_file"
-
-            # Process each vulnerability and match with parent JAR
-            jq -r '.Results[]? | .Target as $target | .Vulnerabilities[]? |
-              select(.Severity == "HIGH" or .Severity == "CRITICAL") |
-              "\($target)|\(.PkgName)|\(.VulnerabilityID)|\(.Severity)|\(.InstalledVersion)|\(.FixedVersion // "-")"' \
-              trivy-deep.json 2>/dev/null | while IFS='|' read -r target pkg vuln severity installed fixed; do
-
-              # Extract JAR name from target path
-              jar_file=$(basename "$target" 2>/dev/null || echo "$target")
-
-              # Find parent JAR from mapping file
-              if [ -f /tmp/extracted-deps/jar-mapping.txt ]; then
-                parent_jar=$(grep "$jar_file" /tmp/extracted-deps/jar-mapping.txt | cut -d'|' -f1 | tr -d ' ' | head -1)
-                if [ -z "$parent_jar" ]; then
-                  parent_jar="(internal)"
-                fi
-              else
-                parent_jar="(unknown)"
-              fi
-
-              echo "| $parent_jar | $jar_file | $vuln | $severity | $installed | $fixed |" >> "$report_file"
-            done
-
-            echo "" >> "$report_file"
-          fi
-
-          # Add Python vulnerabilities
-          if [ -f trivy-deep.json ]; then
-            python_vulns=$(jq '[.Results[]? | select(.Type == "python-pkg") | .Vulnerabilities[]? | select(.Severity == "HIGH" or .Severity == "CRITICAL")] | length' trivy-deep.json 2>/dev/null || echo 0)
-
-            if [ "$python_vulns" -gt 0 ]; then
-              {
-                echo "### Python Package Vulnerabilities"
-                echo ""
-                echo "These are found in extension JARs (GraalVM Python VFS)"
-                echo ""
-                echo "| Package | Vulnerability | Severity | Installed | Fixed |"
-                echo "|---------|---------------|----------|-----------|-------|"
-              } >> "$report_file"
-
-              jq -r '.Results[]? | select(.Type == "python-pkg") | .Vulnerabilities[]? |
-                select(.Severity == "HIGH" or .Severity == "CRITICAL") |
-                "\(.PkgName)|\(.VulnerabilityID)|\(.Severity)|\(.InstalledVersion)|\(.FixedVersion // "-")"' \
-                trivy-deep.json 2>/dev/null | while IFS='|' read -r pkg vuln severity installed fixed; do
-                echo "| $pkg | $vuln | $severity | $installed | $fixed |" >> "$report_file"
-              done
-
-              echo "" >> "$report_file"
-            fi
-          fi
-
-          echo "✓ Enhanced vulnerability report created: $report_file"
+          scripts/create-enhanced-report.sh ${{ matrix.image }} ${{ matrix.tag }}
 
       - name: Upload enhanced vulnerability report
         if: always()
@@ -525,44 +139,36 @@ jobs:
         if: always()
         uses: github/codeql-action/upload-sarif@v4
         with:
-          sarif_file: 'trivy-surface.sarif'
-          category: 'trivy-${{ matrix.image }}-${{ matrix.tag }}-surface'
+          sarif_file: "trivy-surface.sarif"
+          category: "trivy-${{ matrix.image }}-${{ matrix.tag }}-surface"
         continue-on-error: true
 
       - name: Check if Trivy Deep SARIF exists
         if: always()
         id: check_trivy_deep
         run: |
-          if [ -f "trivy-deep.sarif" ]; then
-            echo "exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
-          fi
+          scripts/check-file-exists.sh trivy-deep.sarif exists
 
       - name: Upload Trivy Deep SARIF to GitHub Security tab
         if: always() && steps.check_trivy_deep.outputs.exists == 'true'
         uses: github/codeql-action/upload-sarif@v4
         with:
-          sarif_file: 'trivy-deep.sarif'
-          category: 'trivy-${{ matrix.image }}-${{ matrix.tag }}-deep'
+          sarif_file: "trivy-deep.sarif"
+          category: "trivy-${{ matrix.image }}-${{ matrix.tag }}-deep"
         continue-on-error: true
 
       - name: Check if Grype SARIF exists
         if: always()
         id: check_grype
         run: |
-          if [ -f "grype-results.sarif" ]; then
-            echo "exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
-          fi
+          scripts/check-file-exists.sh grype-results.sarif exists
 
       - name: Upload Grype SARIF to GitHub Security tab
         if: always() && steps.check_grype.outputs.exists == 'true'
         uses: github/codeql-action/upload-sarif@v4
         with:
-          sarif_file: 'grype-results.sarif'
-          category: 'trivy-${{ matrix.image }}-${{ matrix.tag }}-grype'
+          sarif_file: "grype-results.sarif"
+          category: "trivy-${{ matrix.image }}-${{ matrix.tag }}-grype"
         continue-on-error: true
 
       - name: Set sanitized names for artifacts
@@ -601,118 +207,11 @@ jobs:
           else
             echo "✅ No HIGH/CRITICAL vulnerabilities found in ${{ matrix.image }}:${{ matrix.tag }}"
           fi
-      
+
       - name: Append summary to GitHub Actions summary
         if: always()
         run: |
-          {
-            echo "## 🛡️ Vulnerability Scan Results for \`${{ matrix.image }}:${{ matrix.tag }}\`"
-            echo ""
-            echo "**Total HIGH/CRITICAL Vulnerabilities: ${{ env.total_vulns }}**"
-            echo ""
-            echo "| Scanner | Vulnerabilities | Status |"
-            echo "|---------|-----------------|--------|"
-            echo "| 🔍 Trivy Surface (OS + Top-level) | ${{ env.surface_vulns }} | $([ ${{ env.surface_vulns }} -eq 0 ] && echo '✅' || echo '⚠️') |"
-            echo "| 🔎 Trivy Deep (Nested JARs + Python) | ${{ env.deep_vulns }} | $([ ${{ env.deep_vulns }} -eq 0 ] && echo '✅' || echo '⚠️') |"
-            echo "| 📋 Grype (SBOM-based) | ${{ env.grype_vulns }} | $([ ${{ env.grype_vulns }} -eq 0 ] && echo '✅' || echo '⚠️') |"
-            echo ""
-          } >> $GITHUB_STEP_SUMMARY
-
-          # Add detailed vulnerability tables
-          if [ ${{ env.surface_vulns }} -gt 0 ] && [ -f trivy-surface.json ]; then
-            {
-              echo "### 🔍 Trivy Surface Scan Details"
-              echo ""
-              echo "| Package | Vulnerability | Severity | Installed | Fixed |"
-              echo "|---------|---------------|----------|-----------|-------|"
-            } >> $GITHUB_STEP_SUMMARY
-
-            jq -r '.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH" or .Severity == "CRITICAL") |
-              "| \(.PkgName) | \(.VulnerabilityID) | \(.Severity) | \(.InstalledVersion) | \(.FixedVersion // "-") |"' \
-              trivy-surface.json 2>/dev/null | head -20 >> $GITHUB_STEP_SUMMARY || echo "| Error parsing results | - | - | - | - |" >> $GITHUB_STEP_SUMMARY
-
-            echo "" >> $GITHUB_STEP_SUMMARY
-          fi
-
-          if [ ${{ env.deep_vulns }} -gt 0 ] && [ -f trivy-deep.json ]; then
-            {
-              echo "### 🔎 Trivy Deep Scan Details (Nested JARs & Python)"
-              echo ""
-              echo "| Parent JAR | Package | Vulnerability | Severity | Installed | Fixed |"
-              echo "|------------|---------|---------------|----------|-----------|-------|"
-            } >> $GITHUB_STEP_SUMMARY
-
-            # Process each vulnerability and look up parent JAR from mapping file
-            # First, collect all rows into a temp file, then deduplicate
-            temp_table="/tmp/vuln-table-$$.txt"
-            > "$temp_table"  # Clear temp file
-
-            jq -r '.Results[]? | .Target as $target | .Vulnerabilities[]? |
-              select(.Severity == "HIGH" or .Severity == "CRITICAL") |
-              "\($target)|\(.PkgPath // "")|\(.PkgName)|\(.VulnerabilityID)|\(.Severity)|\(.InstalledVersion)|\(.FixedVersion // "-")"' \
-              trivy-deep.json 2>/dev/null | while IFS='|' read -r target pkgpath pkg vuln severity installed fixed; do
-
-              # Use PkgPath if available (contains JAR file path), otherwise use Target
-              jar_path="${pkgpath:-$target}"
-
-              # Extract JAR filename from path (handle both file paths and directory paths)
-              if [[ "$jar_path" == *.jar ]]; then
-                jar_file=$(basename "$jar_path" 2>/dev/null || echo "$jar_path")
-              else
-                # Path might be a directory containing a JAR, extract JAR name from path
-                jar_file=$(echo "$jar_path" | grep -oE '[^/]+\.jar' | tail -1)
-                if [ -z "$jar_file" ]; then
-                  jar_file=$(basename "$jar_path" 2>/dev/null || echo "$jar_path")
-                fi
-              fi
-
-              # Look up parent JAR from mapping file
-              parent_jar="(internal)"
-              if [ -f /tmp/extracted-deps/jar-mapping.txt ] && [ -n "$jar_file" ]; then
-                # Try exact match first
-                parent_match=$(grep -F "$jar_file" /tmp/extracted-deps/jar-mapping.txt 2>/dev/null | cut -d'|' -f1 | tr -d ' ' | head -1)
-                if [ -n "$parent_match" ]; then
-                  parent_jar="$parent_match"
-                fi
-              fi
-
-              echo "| $parent_jar | $pkg | $vuln | $severity | $installed | $fixed |" >> "$temp_table"
-            done
-
-            # Deduplicate and add to summary (limit to 40 entries)
-            sort -u "$temp_table" | head -40 >> $GITHUB_STEP_SUMMARY
-            rm -f "$temp_table"
-
-            echo "" >> $GITHUB_STEP_SUMMARY
-          fi
-
-          if [ ${{ env.grype_vulns }} -gt 0 ] && [ -f grype-results.json ]; then
-            {
-              echo "### 📋 Grype SBOM Scan Details"
-              echo ""
-              echo "| Package | Vulnerability | Severity | Installed | Fixed |"
-              echo "|---------|---------------|----------|-----------|-------|"
-            } >> $GITHUB_STEP_SUMMARY
-
-            jq -r '.matches[]? | select(.vulnerability.severity == "High" or .vulnerability.severity == "Critical") |
-              "| \(.artifact.name) | \(.vulnerability.id) | \(.vulnerability.severity) | \(.artifact.version) | \(.vulnerability.fix.versions[0] // "-") |"' \
-              grype-results.json 2>/dev/null | head -20 >> $GITHUB_STEP_SUMMARY || echo "| Error parsing results | - | - | - | - |" >> $GITHUB_STEP_SUMMARY
-
-            echo "" >> $GITHUB_STEP_SUMMARY
-          fi
-
-          # Add scanner information
-          {
-            echo "---"
-            echo ""
-            echo "### 📖 Scanner Information"
-            echo ""
-            echo "- **Trivy Surface**: Scans OS packages and top-level libraries"
-            echo "- **Trivy Deep**: Extracts and scans nested Spring Boot JARs (BOOT-INF/lib) and GraalVM Python packages"
-            echo "- **Grype**: SBOM-based validation for comprehensive dependency analysis"
-            echo ""
-            echo "💡 **Note**: Deep scan detects vulnerabilities in nested dependencies that standard scans miss."
-          } >> $GITHUB_STEP_SUMMARY
+          scripts/append-github-summary.sh ${{ matrix.image }} ${{ matrix.tag }}
 
   notify-results:
     name: Notify Scan Results
@@ -720,45 +219,45 @@ jobs:
     needs: [trivy-scan, generate-matrix]
     if: always()
     strategy:
-     matrix:
+      matrix:
         image: ["liquibase/liquibase", "liquibase/liquibase-secure"]
     steps:
       - name: "Check failures for ${{ matrix.image }}"
         id: check_failures
         uses: actions/github-script@v8
         with:
-            script: |
-                const image = '${{ matrix.image }}';
-                const jobs = await github.rest.actions.listJobsForWorkflowRun({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    run_id: context.runId
-                });
+          script: |
+            const image = '${{ matrix.image }}';
+            const jobs = await github.rest.actions.listJobsForWorkflowRun({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                run_id: context.runId
+            });
 
-                const scanJobs = jobs.data.jobs.filter(job =>
-                    job.name.includes(`Trivy Scan ${image}`)
-                );
+            const scanJobs = jobs.data.jobs.filter(job =>
+                job.name.includes(`Trivy Scan ${image}`)
+            );
 
-                const failed = scanJobs.filter(job => job.conclusion === 'failure');
-                const failedCount = failed.length;
-                const totalCount = scanJobs.length;
+            const failed = scanJobs.filter(job => job.conclusion === 'failure');
+            const failedCount = failed.length;
+            const totalCount = scanJobs.length;
 
-                core.setOutput('has_failures', failedCount > 0);
-                core.setOutput('failed_count', failedCount.toString());
-                core.setOutput('total_count', totalCount.toString());
+            core.setOutput('has_failures', failedCount > 0);
+            core.setOutput('failed_count', failedCount.toString());
+            core.setOutput('total_count', totalCount.toString());
 
 ## Since we only fix forward, this Slack notification is redundant.
 ## It reports vulnerabilities in outdated images even though they've already been fixed.
 
-      # - name: "Notify Slack for ${{ matrix.image }}"
-        # if: steps.check_failures.outputs.has_failures == 'true'
-        # uses: rtCamp/action-slack-notify@v2
-        # env:
-        #     SLACK_COLOR: 'danger'
-        #     SLACK_MESSAGE: "Security vulnerabilities found in ${{ steps.check_failures.outputs.failed_count }} out of ${{ steps.check_failures.outputs.total_count }} tags for *${{ matrix.image }}*.\n🔎 [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
-        #     SLACK_TITLE: "❌ Trivy scan found vulnerabilities in ${{ matrix.image }}"
-        #     SLACK_USERNAME: liquibot
-        #     SLACK_WEBHOOK: ${{ secrets.DOCKER_SLACK_WEBHOOK_URL }}
-        #     SLACK_ICON_EMOJI: ":warning:"
-        #     SLACK_FOOTER: "${{ github.repository }} - ${{ matrix.image }}"
-        #     SLACK_LINK_NAMES: true
+# - name: "Notify Slack for ${{ matrix.image }}"
+# if: steps.check_failures.outputs.has_failures == 'true'
+# uses: rtCamp/action-slack-notify@v2
+# env:
+#     SLACK_COLOR: 'danger'
+#     SLACK_MESSAGE: "Security vulnerabilities found in ${{ steps.check_failures.outputs.failed_count }} out of ${{ steps.check_failures.outputs.total_count }} tags for *${{ matrix.image }}*.\n🔎 [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+#     SLACK_TITLE: "❌ Trivy scan found vulnerabilities in ${{ matrix.image }}"
+#     SLACK_USERNAME: liquibot
+#     SLACK_WEBHOOK: ${{ secrets.DOCKER_SLACK_WEBHOOK_URL }}
+#     SLACK_ICON_EMOJI: ":warning:"
+#     SLACK_FOOTER: "${{ github.repository }} - ${{ matrix.image }}"
+#     SLACK_LINK_NAMES: true
