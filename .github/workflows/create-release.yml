@@ -137,7 +137,7 @@ jobs:
           owner: ${{ github.repository_owner }}
           permission-contents: write
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
           ref: ${{ github.ref }}
@@ -253,7 +253,7 @@ jobs:
             latest_tag: "latest"
             type: liquibase-secure-release
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
           ref: ${{ github.ref }}
@@ -501,7 +501,7 @@ jobs:
           permission-pull-requests: write
 
       - name: Check out liquibase/official-images
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: liquibase/official-images
           ref: master

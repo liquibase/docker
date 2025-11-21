@@ -127,7 +127,7 @@ jobs:
           permission-actions: write
 
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Install jq
         run: |
