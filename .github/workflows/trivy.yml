@@ -8,12 +8,12 @@ name: Vulnerability Scanning
 on:
   workflow_dispatch:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: [ "main" ]
+    branches: ["main"]
   schedule:
-    - cron: '0 7 * * 1-5' # Run every weekday at 7am UTC
+    - cron: "0 7 * * 1-5" # Run every weekday at 7am UTC
 
 permissions:
   contents: read
@@ -27,10 +27,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: [
-          {dockerfile: Dockerfile, name: liquibase/liquibase, suffix: ""},
-          {dockerfile: Dockerfile.alpine, name: liquibase/liquibase, suffix: "-alpine"},
-          {dockerfile: DockerfileSecure, name: liquibase/liquibase-secure, suffix: ""},
+        image:
+          [
+            { dockerfile: Dockerfile, name: liquibase/liquibase, suffix: "" },
+            {
+              dockerfile: Dockerfile.alpine,
+              name: liquibase/liquibase,
+              suffix: "-alpine",
+            },
+            {
+              dockerfile: DockerfileSecure,
+              name: liquibase/liquibase-secure,
+              suffix: "",
+            },
           ]
     name: Trivy
     runs-on: "ubuntu-22.04"
@@ -231,9 +240,9 @@ jobs:
       - name: Generate SBOM with Syft
         uses: anchore/sbom-action@v0
         with:
-          image: '${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}'
-          format: 'spdx-json'
-          output-file: 'sbom.spdx.json'
+          image: "${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}"
+          format: "spdx-json"
+          output-file: "sbom.spdx.json"
 
       - name: Upload SBOM as artifact
         if: always()
@@ -246,55 +255,55 @@ jobs:
       - name: Run Trivy vulnerability scanner (Surface Scan - SARIF)
         uses: aquasecurity/trivy-action@0.33.1
         with:
-          image-ref: '${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}'
-          vuln-type: 'os,library'
-          format: 'sarif'
-          output: 'trivy-surface.sarif'
-          severity: 'HIGH,CRITICAL'
-          exit-code: '0'
+          image-ref: "${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}"
+          vuln-type: "os,library"
+          format: "sarif"
+          output: "trivy-surface.sarif"
+          severity: "HIGH,CRITICAL"
+          exit-code: "0"
           limit-severities-for-sarif: true
 
       - name: Run Trivy vulnerability scanner (Surface Scan - JSON)
         uses: aquasecurity/trivy-action@0.33.1
         with:
-          image-ref: '${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}'
-          vuln-type: 'os,library'
-          format: 'json'
-          output: 'trivy-surface.json'
-          severity: 'HIGH,CRITICAL'
-          exit-code: '0'
+          image-ref: "${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}"
+          vuln-type: "os,library"
+          format: "json"
+          output: "trivy-surface.json"
+          severity: "HIGH,CRITICAL"
+          exit-code: "0"
 
       - name: Run Trivy scanner on extracted nested JARs (Deep Scan - SARIF)
         if: always()
         uses: aquasecurity/trivy-action@0.33.1
         with:
-          scan-type: 'rootfs'
-          scan-ref: '/tmp/extracted-deps'
-          vuln-type: 'library'
-          format: 'sarif'
-          output: 'trivy-deep.sarif'
-          severity: 'HIGH,CRITICAL'
-          exit-code: '0'
+          scan-type: "rootfs"
+          scan-ref: "/tmp/extracted-deps"
+          vuln-type: "library"
+          format: "sarif"
+          output: "trivy-deep.sarif"
+          severity: "HIGH,CRITICAL"
+          exit-code: "0"
           limit-severities-for-sarif: true
 
       - name: Run Trivy scanner on extracted nested JARs (Deep Scan - JSON)
         if: always()
         uses: aquasecurity/trivy-action@0.33.1
         with:
-          scan-type: 'rootfs'
-          scan-ref: '/tmp/extracted-deps'
-          vuln-type: 'library'
-          format: 'json'
-          output: 'trivy-deep.json'
-          severity: 'HIGH,CRITICAL'
-          exit-code: '0'
+          scan-type: "rootfs"
+          scan-ref: "/tmp/extracted-deps"
+          vuln-type: "library"
+          format: "json"
+          output: "trivy-deep.json"
+          severity: "HIGH,CRITICAL"
+          exit-code: "0"
 
       - name: Run Grype scanner on SBOM
         if: always()
         id: grype_scan
         uses: anchore/scan-action@v5
         with:
-          sbom: 'sbom.spdx.json'
+          sbom: "sbom.spdx.json"
           fail-build: false
           severity-cutoff: high
           output-format: sarif
@@ -433,8 +442,8 @@ jobs:
               echo "| $parent_jar | $pkg | $vuln | $severity | $installed | $fixed |" >> "$temp_table"
             done
 
-            # Deduplicate and add to summary (limit to 30 entries)
-            sort -u "$temp_table" | head -30 >> $GITHUB_STEP_SUMMARY
+            # Deduplicate and add to summary (limit to 40 entries)
+            sort -u "$temp_table" | head -40 >> $GITHUB_STEP_SUMMARY
             rm -f "$temp_table"
 
             echo "" >> $GITHUB_STEP_SUMMARY
@@ -607,32 +616,32 @@ jobs:
           path: vulnerability-report-enhanced.md
           retention-days: 90
 
-      # - name: Notify Slack on Build Failure
-      #   if: failure()
-      #   uses: rtCamp/action-slack-notify@v2
-      #   env:
-      #     SLACK_COLOR: 'failure'
-      #     SLACK_MESSAGE: "View details on GitHub Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Triggered by repository: ${{ github.repository }} and job: ${{ github.job }}"
-      #     SLACK_TITLE: "❌ ${{ github.repository }} ❌ Trivy failed on branch ${{ github.ref_name }} for commit ${{ github.sha }} in repository ${{ github.repository }}"
-      #     SLACK_USERNAME: liquibot
-      #     SLACK_WEBHOOK: ${{ env.DOCKER_SLACK_WEBHOOK_URL }}
-      #     SLACK_ICON_EMOJI: ":whale:"
-      #     SLACK_FOOTER: "${{ github.repository }} - ${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}"
-      #     SLACK_LINK_NAMES: true
+      - name: Notify Slack on Build Failure
+        if: failure()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_COLOR: "failure"
+          SLACK_MESSAGE: "View details on GitHub Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Triggered by repository: ${{ github.repository }} and job: ${{ github.job }}"
+          SLACK_TITLE: "❌ ${{ github.repository }} ❌ Trivy failed on branch ${{ github.ref_name }} for commit ${{ github.sha }} in repository ${{ github.repository }}"
+          SLACK_USERNAME: liquibot
+          SLACK_WEBHOOK: ${{ env.DOCKER_SLACK_WEBHOOK_URL }}
+          SLACK_ICON_EMOJI: ":whale:"
+          SLACK_FOOTER: "${{ github.repository }} - ${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}"
+          SLACK_LINK_NAMES: true
 
       - name: Upload Trivy Surface scan results to GitHub Security tab
         if: always()
         uses: github/codeql-action/upload-sarif@v4
         with:
-          sarif_file: 'trivy-surface.sarif'
-          category: '${{ matrix.image.name }}${{ matrix.image.suffix }}-surface'
+          sarif_file: "trivy-surface.sarif"
+          category: "${{ matrix.image.name }}${{ matrix.image.suffix }}-surface"
 
       - name: Upload Trivy Deep scan results to GitHub Security tab
         if: always()
         uses: github/codeql-action/upload-sarif@v4
         with:
-          sarif_file: 'trivy-deep.sarif'
-          category: '${{ matrix.image.name }}${{ matrix.image.suffix }}-deep'
+          sarif_file: "trivy-deep.sarif"
+          category: "${{ matrix.image.name }}${{ matrix.image.suffix }}-deep"
 
       - name: Check if Grype SARIF exists
         if: always()
@@ -648,8 +657,8 @@ jobs:
         if: always() && steps.check_grype.outputs.exists == 'true'
         uses: github/codeql-action/upload-sarif@v4
         with:
-          sarif_file: 'grype-results.sarif'
-          category: '${{ matrix.image.name }}${{ matrix.image.suffix }}-grype'
+          sarif_file: "grype-results.sarif"
+          category: "${{ matrix.image.name }}${{ matrix.image.suffix }}-grype"
 
       - name: Generate Security Report
         if: always()
@@ -674,15 +683,23 @@ jobs:
           path: scan-summary.txt
           retention-days: 30
 
-
   scout:
     strategy:
       fail-fast: false
       matrix:
-        image: [
-          {dockerfile: Dockerfile, name: liquibase/liquibase, suffix: ""},
-          {dockerfile: Dockerfile.alpine, name: liquibase/liquibase, suffix: "-alpine"},
-          {dockerfile: DockerfileSecure, name: liquibase/liquibase-secure, suffix: ""},
+        image:
+          [
+            { dockerfile: Dockerfile, name: liquibase/liquibase, suffix: "" },
+            {
+              dockerfile: Dockerfile.alpine,
+              name: liquibase/liquibase,
+              suffix: "-alpine",
+            },
+            {
+              dockerfile: DockerfileSecure,
+              name: liquibase/liquibase-secure,
+              suffix: "",
+            },
           ]
     name: Scout
     runs-on: "ubuntu-22.04"
@@ -722,33 +739,33 @@ jobs:
         uses: docker/scout-action@v1.18.2
         with:
           command: cves
-          image: '${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}'
+          image: "${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}"
           github-token: ${{ secrets.GITHUB_TOKEN }}
           write-comment: true
-          sarif-file: 'scout-results.sarif'
+          sarif-file: "scout-results.sarif"
           summary: true
           exit-code: true
           only-severities: "critical,high"
 
-      # - name: Notify Slack on Build Failure
-      #   if: failure()
-      #   uses: rtCamp/action-slack-notify@v2
-      #   env:
-      #     SLACK_COLOR: 'failure'
-      #     SLACK_MESSAGE: "View details on GitHub Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Triggered by repository: ${{ github.repository }} and job: ${{ github.job }}"
-      #     SLACK_TITLE: "❌ ${{ github.repository }} ❌ Docker Scout failed on branch ${{ github.ref_name }} for commit ${{ github.sha }} in repository ${{ github.repository }}"
-      #     SLACK_USERNAME: liquibot
-      #     SLACK_WEBHOOK: ${{ env.DOCKER_SLACK_WEBHOOK_URL }}
-      #     SLACK_ICON_EMOJI: ":whale:"
-      #     SLACK_FOOTER: "${{ github.repository }} - ${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}"
-      #     SLACK_LINK_NAMES: true
+      - name: Notify Slack on Build Failure
+        if: failure()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_COLOR: "failure"
+          SLACK_MESSAGE: "View details on GitHub Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Triggered by repository: ${{ github.repository }} and job: ${{ github.job }}"
+          SLACK_TITLE: "❌ ${{ github.repository }} ❌ Docker Scout failed on branch ${{ github.ref_name }} for commit ${{ github.sha }} in repository ${{ github.repository }}"
+          SLACK_USERNAME: liquibot
+          SLACK_WEBHOOK: ${{ env.DOCKER_SLACK_WEBHOOK_URL }}
+          SLACK_ICON_EMOJI: ":whale:"
+          SLACK_FOOTER: "${{ github.repository }} - ${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}"
+          SLACK_LINK_NAMES: true
 
       - name: Upload Scout scan results to GitHub Security tab
         if: always()
         uses: github/codeql-action/upload-sarif@v4
         with:
-          sarif_file: 'scout-results.sarif'
-          category: '${{ matrix.image.name }}${{ matrix.image.suffix }}'
+          sarif_file: "scout-results.sarif"
+          category: "${{ matrix.image.name }}${{ matrix.image.suffix }}"
 
       - name: Generate Security Report
         if: always()

@@ -679,8 +679,8 @@ jobs:
               echo "| $parent_jar | $pkg | $vuln | $severity | $installed | $fixed |" >> "$temp_table"
             done
 
-            # Deduplicate and add to summary (limit to 30 entries)
-            sort -u "$temp_table" | head -30 >> $GITHUB_STEP_SUMMARY
+            # Deduplicate and add to summary (limit to 40 entries)
+            sort -u "$temp_table" | head -40 >> $GITHUB_STEP_SUMMARY
             rm -f "$temp_table"
 
             echo "" >> $GITHUB_STEP_SUMMARY
