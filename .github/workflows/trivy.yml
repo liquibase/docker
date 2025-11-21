@@ -103,11 +103,19 @@ jobs:
                     nested_jar_dir="/tmp/extracted-deps/dist/${archive_name}/${jar_name}-nested-jars"
                     mkdir -p "$nested_jar_dir"
 
+                    # Create a mapping file to track parent JAR relationships
+                    mapping_file="/tmp/extracted-deps/jar-mapping.txt"
+
                     for nested_jar in "$jar_extract/BOOT-INF/lib"/*.jar; do
                       if [ -f "$nested_jar" ]; then
                         nested_count=$((nested_count + 1))
+                        nested_jar_name=$(basename "$nested_jar")
+
                         # Copy the JAR file as-is, don't extract it
                         cp "$nested_jar" "$nested_jar_dir/" 2>/dev/null || true
+
+                        # Record the parent → nested relationship
+                        echo "${jar_name}.jar → $nested_jar_name" >> "$mapping_file"
                       fi
                     done
                     echo "      → Preserved $nested_count nested JAR file(s)"
@@ -441,6 +449,104 @@ jobs:
 
           echo "Scan summary created"
 
+          # Create enhanced vulnerability report with parent JAR mapping
+          report_file="vulnerability-report-enhanced.md"
+
+          {
+            echo "# Enhanced Vulnerability Report"
+            echo ""
+            echo "**Image**: \`${{ matrix.image.name }}${{ matrix.image.suffix }}\`"
+            echo "**Build SHA**: \`${{ github.sha }}\`"
+            echo "**Scan Date**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+            echo ""
+            echo "## Summary"
+            echo ""
+            echo "| Scanner | HIGH/CRITICAL Vulnerabilities |"
+            echo "|---------|-------------------------------|"
+            echo "| Trivy Surface (OS + Top-level) | $surface_vulns |"
+            echo "| Trivy Deep (Nested JARs + Python) | $deep_vulns |"
+            echo "| Grype (SBOM-based) | $grype_vulns |"
+            echo "| **Total** | **$total_vulns** |"
+            echo ""
+          } > "$report_file"
+
+          # Add parent JAR mapping section
+          if [ -f /tmp/extracted-deps/jar-mapping.txt ]; then
+            {
+              echo "## Parent JAR Relationships"
+              echo ""
+              echo "The following shows which Liquibase JARs contain vulnerable nested dependencies:"
+              echo ""
+              echo "\`\`\`"
+              cat /tmp/extracted-deps/jar-mapping.txt | sort | uniq
+              echo "\`\`\`"
+              echo ""
+            } >> "$report_file"
+          fi
+
+          # Add detailed vulnerability table with parent JAR context
+          if [ -f trivy-deep.json ]; then
+            {
+              echo "## Detailed Vulnerability Analysis"
+              echo ""
+              echo "### Nested JAR Vulnerabilities"
+              echo ""
+              echo "| Parent JAR | Nested JAR | Vulnerability | Severity | Installed | Fixed |"
+              echo "|------------|------------|---------------|----------|-----------|-------|"
+            } >> "$report_file"
+
+            # Process each vulnerability and match with parent JAR
+            jq -r '.Results[]? | .Target as $target | .Vulnerabilities[]? |
+              select(.Severity == "HIGH" or .Severity == "CRITICAL") |
+              "\($target)|\(.PkgName)|\(.VulnerabilityID)|\(.Severity)|\(.InstalledVersion)|\(.FixedVersion // "-")"' \
+              trivy-deep.json 2>/dev/null | while IFS='|' read -r target pkg vuln severity installed fixed; do
+
+              # Extract JAR name from target path
+              jar_file=$(basename "$target" 2>/dev/null || echo "$target")
+
+              # Find parent JAR from mapping file
+              if [ -f /tmp/extracted-deps/jar-mapping.txt ]; then
+                parent_jar=$(grep "$jar_file" /tmp/extracted-deps/jar-mapping.txt | cut -d'→' -f1 | tr -d ' ' | head -1)
+                if [ -z "$parent_jar" ]; then
+                  parent_jar="(internal)"
+                fi
+              else
+                parent_jar="(unknown)"
+              fi
+
+              echo "| $parent_jar | $jar_file | $vuln | $severity | $installed | $fixed |" >> "$report_file"
+            done
+
+            echo "" >> "$report_file"
+          fi
+
+          # Add Python vulnerabilities
+          if [ -f trivy-deep.json ]; then
+            python_vulns=$(jq '[.Results[]? | select(.Type == "python-pkg") | .Vulnerabilities[]? | select(.Severity == "HIGH" or .Severity == "CRITICAL")] | length' trivy-deep.json 2>/dev/null || echo 0)
+
+            if [ "$python_vulns" -gt 0 ]; then
+              {
+                echo "### Python Package Vulnerabilities"
+                echo ""
+                echo "These are found in \`liquibase-checks.jar\` (GraalVM Python VFS)"
+                echo ""
+                echo "| Package | Vulnerability | Severity | Installed | Fixed |"
+                echo "|---------|---------------|----------|-----------|-------|"
+              } >> "$report_file"
+
+              jq -r '.Results[]? | select(.Type == "python-pkg") | .Vulnerabilities[]? |
+                select(.Severity == "HIGH" or .Severity == "CRITICAL") |
+                "\(.PkgName)|\(.VulnerabilityID)|\(.Severity)|\(.InstalledVersion)|\(.FixedVersion // "-")"' \
+                trivy-deep.json 2>/dev/null | while IFS='|' read -r pkg vuln severity installed fixed; do
+                echo "| $pkg | $vuln | $severity | $installed | $fixed |" >> "$report_file"
+              done
+
+              echo "" >> "$report_file"
+            fi
+          fi
+
+          echo "✓ Enhanced vulnerability report created: $report_file"
+
           # Exit with error if vulnerabilities found
           if [ $total_vulns -gt 0 ]; then
             echo "❌ Vulnerabilities detected - failing build"
@@ -449,6 +555,14 @@ jobs:
             echo "✅ No HIGH/CRITICAL vulnerabilities found"
             exit 0
           fi
+
+      - name: Upload enhanced vulnerability report
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: vulnerability-report-${{ matrix.image.dockerfile == 'DockerfileSecure' && 'secure' || matrix.image.suffix != '' && matrix.image.suffix || 'community' }}
+          path: vulnerability-report-enhanced.md
+          retention-days: 90
 
       # - name: Notify Slack on Build Failure
       #   if: failure()
