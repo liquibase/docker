@@ -298,8 +298,18 @@ jobs:
           sarif_file: 'trivy-deep.sarif'
           category: '${{ matrix.image.name }}${{ matrix.image.suffix }}-deep'
 
+      - name: Check if Grype SARIF exists
+        if: always()
+        id: check_grype
+        run: |
+          if [ -f "grype-results.sarif" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Upload Grype scan results to GitHub Security tab
-        if: always() && hashFiles('grype-results.sarif') != ''
+        if: always() && steps.check_grype.outputs.exists == 'true'
         uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: 'grype-results.sarif'
