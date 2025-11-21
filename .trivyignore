@@ -1,0 +1,34 @@
+# .trivyignore - Trivy vulnerability scanner suppressions
+# This file contains CVEs that are false positives or accepted risks
+
+# CVE-2025-59250 - Microsoft SQL Server JDBC Driver
+# Status: FALSE POSITIVE
+#
+# Description:
+# Trivy flags mssql-jdbc 12.10.2.jre8 as vulnerable to CVE-2025-59250, but this
+# version actually CONTAINS THE FIX for this vulnerability.
+#
+# Evidence:
+# - Liquibase Secure 5.0.2 upgraded mssql-jdbc from 12.10.1.jre8 to 12.10.2.jre8
+# - This upgrade explicitly addressed CVE-2025-59250 (see DAT-21214)
+# - Microsoft released mssql-jdbc 12.10.2.jre8 on October 13, 2024 as a security update
+# - The vulnerability affects versions <12.10.2.jre8
+# - Version 12.10.2.jre8 contains the fix
+#
+# Root Cause of False Positive:
+# Trivy's vulnerability database only lists JRE11 variants as fixed versions:
+# (10.2.4.jre11, 11.2.4.jre11, 12.2.1.jre11, 12.6.5.jre11, 12.8.2.jre11,
+#  12.10.2.jre11, 13.2.1.jre11)
+# The database doesn't recognize that the JRE8 variant (12.10.2.jre8) is also patched.
+#
+# References:
+# - Liquibase Secure 5.0.2 changelog
+# - Jira ticket: DAT-21214 "Bump mssql driver versions to address CVE-2025-59250"
+# - GitHub PR: https://github.com/liquibase/liquibase-pro/pull/2976
+# - Microsoft JDBC Driver release notes:
+#   https://learn.microsoft.com/en-us/sql/connect/jdbc/release-notes-for-the-jdbc-driver
+#
+# Date Added: 2025-11-20
+# Added By: DevOps Team
+# Review Date: 2026-02-20 (review when Trivy database is updated)
+CVE-2025-59250 exp:2026-02-20
