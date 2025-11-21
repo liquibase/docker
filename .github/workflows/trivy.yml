@@ -56,16 +56,192 @@ jobs:
         run: |
           docker build -f ${{ matrix.image.dockerfile }} -t ${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }} .
 
-      - name: Run Trivy vulnerability scanner
+      - name: Extract nested JARs and Python packages for deep scanning
+        run: |
+          set -e
+
+          # Create extraction directory
+          mkdir -p /tmp/extracted-deps
+
+          # Create container from image to extract files
+          container_id=$(docker create ${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }})
+
+          echo "📦 Extracting Liquibase JARs for deep scanning..."
+
+          # Extract liquibase-license-tracking.jar (contains Spring Boot fat JAR with nested dependencies)
+          if docker cp $container_id:/liquibase/internal/lib/liquibase-license-tracking.jar /tmp/liquibase-license-tracking.jar 2>/dev/null; then
+            echo "✓ Found liquibase-license-tracking.jar"
+            mkdir -p /tmp/extracted-deps/license-tracking
+            unzip -q /tmp/liquibase-license-tracking.jar -d /tmp/extracted-deps/license-tracking || true
+
+            # Extract nested JARs from BOOT-INF/lib (Spring Boot structure)
+            if [ -d /tmp/extracted-deps/license-tracking/BOOT-INF/lib ]; then
+              echo "✓ Extracting nested JARs from BOOT-INF/lib..."
+              mkdir -p /tmp/extracted-deps/nested-jars
+              for jar in /tmp/extracted-deps/license-tracking/BOOT-INF/lib/*.jar; do
+                if [ -f "$jar" ]; then
+                  jar_name=$(basename "$jar" .jar)
+                  echo "  - Extracting $jar_name"
+                  mkdir -p "/tmp/extracted-deps/nested-jars/$jar_name"
+                  unzip -q "$jar" -d "/tmp/extracted-deps/nested-jars/$jar_name" || true
+                fi
+              done
+            fi
+          else
+            echo "⚠ liquibase-license-tracking.jar not found (expected for Community edition)"
+          fi
+
+          # Extract liquibase-checks.jar (contains GraalVM Python embedded dependencies)
+          if docker cp $container_id:/liquibase/internal/extensions/liquibase-checks.jar /tmp/liquibase-checks.jar 2>/dev/null; then
+            echo "✓ Found liquibase-checks.jar"
+            mkdir -p /tmp/extracted-deps/checks
+            unzip -q /tmp/liquibase-checks.jar -d /tmp/extracted-deps/checks || true
+
+            # Extract GraalVM Python packages to standard Python structure
+            if [ -d /tmp/extracted-deps/checks/org.graalvm.python.vfs ]; then
+              echo "✓ Extracting GraalVM Python packages..."
+              mkdir -p /tmp/extracted-deps/python-packages
+
+              # Copy from both possible locations
+              if [ -d /tmp/extracted-deps/checks/org.graalvm.python.vfs/venv/lib/python3.11/site-packages ]; then
+                cp -r /tmp/extracted-deps/checks/org.graalvm.python.vfs/venv/lib/python3.11/site-packages/* /tmp/extracted-deps/python-packages/ 2>/dev/null || true
+              fi
+              if [ -d /tmp/extracted-deps/checks/org.graalvm.python.vfs/venv/Lib/site-packages ]; then
+                cp -r /tmp/extracted-deps/checks/org.graalvm.python.vfs/venv/Lib/site-packages/* /tmp/extracted-deps/python-packages/ 2>/dev/null || true
+              fi
+
+              # Also extract bundled wheels
+              if [ -d /tmp/extracted-deps/checks/META-INF/resources/libpython/ensurepip/_bundled ]; then
+                mkdir -p /tmp/extracted-deps/python-bundled
+                cp /tmp/extracted-deps/checks/META-INF/resources/libpython/ensurepip/_bundled/*.whl /tmp/extracted-deps/python-bundled/ 2>/dev/null || true
+              fi
+            fi
+          else
+            echo "⚠ liquibase-checks.jar not found"
+          fi
+
+          # Cleanup container
+          docker rm $container_id
+
+          # Show what was extracted
+          echo ""
+          echo "📊 Extraction Summary:"
+          find /tmp/extracted-deps -type f | wc -l | xargs echo "Total files extracted:"
+
+          if [ -d /tmp/extracted-deps/nested-jars ]; then
+            echo "Nested JARs extracted: $(ls -1 /tmp/extracted-deps/nested-jars | wc -l)"
+          fi
+
+          if [ -d /tmp/extracted-deps/python-packages ]; then
+            echo "Python packages found: $(ls -1 /tmp/extracted-deps/python-packages 2>/dev/null | grep -E '\.(dist-info|egg-info)$' | wc -l)"
+          fi
+
+      - name: Generate SBOM with Syft
+        uses: anchore/sbom-action@v0
+        with:
+          image: '${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}'
+          format: 'spdx-json'
+          output-file: 'sbom.spdx.json'
+
+      - name: Upload SBOM as artifact
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: sbom-${{ matrix.image.dockerfile == 'DockerfileSecure' && 'secure' || matrix.image.suffix != '' && matrix.image.suffix || 'community' }}
+          path: sbom.spdx.json
+          retention-days: 30
+
+      - name: Run Trivy vulnerability scanner (Surface Scan)
         uses: aquasecurity/trivy-action@0.33.1
         with:
           image-ref: '${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}'
           vuln-type: 'os,library'
           format: 'sarif'
-          output: 'trivy-results.sarif'
+          output: 'trivy-surface.sarif'
           severity: 'HIGH,CRITICAL'
-          exit-code: '1'
+          exit-code: '0'
           limit-severities-for-sarif: true
+
+      - name: Run Trivy scanner on extracted nested JARs (Deep Scan)
+        if: always()
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          scan-type: 'rootfs'
+          scan-ref: '/tmp/extracted-deps'
+          vuln-type: 'library'
+          format: 'sarif'
+          output: 'trivy-deep.sarif'
+          severity: 'HIGH,CRITICAL'
+          exit-code: '0'
+          limit-severities-for-sarif: true
+
+      - name: Run Grype scanner on SBOM
+        if: always()
+        uses: anchore/scan-action@v5
+        with:
+          sbom: 'sbom.spdx.json'
+          fail-build: false
+          severity-cutoff: high
+          output-format: sarif
+          output-file: grype-results.sarif
+
+      - name: Combine scan results and check for failures
+        if: always()
+        run: |
+          set +e  # Don't fail immediately
+
+          echo "🔍 Analyzing scan results..."
+
+          # Count vulnerabilities from each scanner
+          surface_vulns=0
+          deep_vulns=0
+          grype_vulns=0
+
+          if [ -f trivy-surface.sarif ]; then
+            surface_vulns=$(jq '[.runs[].results[]? | select(.level == "error" or .level == "warning")] | length' trivy-surface.sarif 2>/dev/null || echo 0)
+            echo "Trivy Surface Scan: $surface_vulns HIGH/CRITICAL vulnerabilities"
+          fi
+
+          if [ -f trivy-deep.sarif ]; then
+            deep_vulns=$(jq '[.runs[].results[]? | select(.level == "error" or .level == "warning")] | length' trivy-deep.sarif 2>/dev/null || echo 0)
+            echo "Trivy Deep Scan: $deep_vulns HIGH/CRITICAL vulnerabilities"
+          fi
+
+          if [ -f grype-results.sarif ]; then
+            grype_vulns=$(jq '[.runs[].results[]? | select(.level == "error" or .level == "warning")] | length' grype-results.sarif 2>/dev/null || echo 0)
+            echo "Grype SBOM Scan: $grype_vulns HIGH/CRITICAL vulnerabilities"
+          fi
+
+          total_vulns=$((surface_vulns + deep_vulns + grype_vulns))
+          echo ""
+          echo "📊 Total HIGH/CRITICAL vulnerabilities found: $total_vulns"
+
+          # Create combined summary
+          cat > scan-summary.txt <<EOF
+          # Vulnerability Scan Summary - ${{ matrix.image.name }}${{ matrix.image.suffix }}
+
+          ## Scan Results
+          - **Trivy Surface Scan**: $surface_vulns vulnerabilities
+          - **Trivy Deep Scan (Nested JARs)**: $deep_vulns vulnerabilities
+          - **Grype SBOM Scan**: $grype_vulns vulnerabilities
+          - **Total**: $total_vulns HIGH/CRITICAL vulnerabilities
+
+          ## Scanner Details
+          - Trivy Surface: OS packages and top-level libraries
+          - Trivy Deep: Extracted Spring Boot nested JARs and GraalVM Python packages
+          - Grype: SBOM-based comprehensive dependency analysis
+          EOF
+
+          echo "Scan summary created"
+
+          # Exit with error if vulnerabilities found
+          if [ $total_vulns -gt 0 ]; then
+            echo "❌ Vulnerabilities detected - failing build"
+            exit 1
+          else
+            echo "✅ No HIGH/CRITICAL vulnerabilities found"
+            exit 0
+          fi
 
       - name: Notify Slack on Build Failure
         if: failure()
@@ -80,12 +256,26 @@ jobs:
           SLACK_FOOTER: "${{ github.repository }} - ${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}"
           SLACK_LINK_NAMES: true
 
-      - name: Upload Trivy scan results to GitHub Security tab
+      - name: Upload Trivy Surface scan results to GitHub Security tab
         if: always()
         uses: github/codeql-action/upload-sarif@v4
         with:
-          sarif_file: 'trivy-results.sarif'
-          category: '${{ matrix.image.name }}${{ matrix.image.suffix }}'
+          sarif_file: 'trivy-surface.sarif'
+          category: '${{ matrix.image.name }}${{ matrix.image.suffix }}-surface'
+
+      - name: Upload Trivy Deep scan results to GitHub Security tab
+        if: always()
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: 'trivy-deep.sarif'
+          category: '${{ matrix.image.name }}${{ matrix.image.suffix }}-deep'
+
+      - name: Upload Grype scan results to GitHub Security tab
+        if: always()
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: 'grype-results.sarif'
+          category: '${{ matrix.image.name }}${{ matrix.image.suffix }}-grype'
 
       - name: Generate Security Report
         if: always()
@@ -101,6 +291,14 @@ jobs:
         with:
           name: security-report-trivy${{ matrix.image.dockerfile == 'DockerfileSecure' && '-secure' || matrix.image.suffix }}
           path: ./reports/trivy${{ matrix.image.dockerfile == 'DockerfileSecure' && '-secure' || matrix.image.suffix }}/summary.pdf
+
+      - name: Upload Scan Summary
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: scan-summary-${{ matrix.image.dockerfile == 'DockerfileSecure' && 'secure' || matrix.image.suffix != '' && matrix.image.suffix || 'community' }}
+          path: scan-summary.txt
+          retention-days: 30
 
 
   scout:
