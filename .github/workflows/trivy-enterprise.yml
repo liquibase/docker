@@ -1,0 +1,300 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: Liquibase Enterprise Vulnerability Scanning
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["main"]
+    paths:
+      - 'DockerfileEnterprise'
+      - 'docker-entrypoint-enterprise.sh'
+      - 'autoInstall.xml'
+      - '.github/workflows/trivy-enterprise.yml'
+  pull_request:
+    branches: ["main"]
+    paths:
+      - 'DockerfileEnterprise'
+      - 'docker-entrypoint-enterprise.sh'
+      - 'autoInstall.xml'
+      - '.github/workflows/trivy-enterprise.yml'
+  schedule:
+    - cron: "0 7 * * 1-5" # Run every weekday at 7am UTC
+
+permissions:
+  contents: read
+  id-token: write # Required for AWS OIDC authentication
+  security-events: write # Required for uploading SARIF results to GitHub Security tab
+  actions: read # Required for private repositories to get Action run status
+  pull-requests: write # Required for writing comments on pull requests
+
+jobs:
+  trivy:
+    name: Trivy Scan - Liquibase Enterprise
+    runs-on: "ubuntu-22.04"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Configure AWS credentials for vault access
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{ secrets.LIQUIBASE_VAULT_OIDC_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Get secrets from vault
+        id: vault-secrets
+        uses: aws-actions/aws-secretsmanager-get-secrets@v2
+        with:
+          secret-ids: |
+            ,/vault/liquibase
+          parse-json-secrets: true
+
+      - name: Build liquibase/liquibase-enterprise from DockerfileEnterprise
+        run: |
+          docker build -f DockerfileEnterprise -t liquibase/liquibase-enterprise:${{ github.sha }} .
+
+      - name: Extract nested JARs and Python packages for deep scanning
+        run: |
+          scripts/extract-nested-deps.sh liquibase/liquibase-enterprise:${{ github.sha }}
+
+      - name: Generate SBOM with Syft
+        uses: anchore/sbom-action@v0
+        with:
+          image: "liquibase/liquibase-enterprise:${{ github.sha }}"
+          format: "spdx-json"
+          output-file: "sbom.spdx.json"
+
+      - name: Upload SBOM as artifact
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: sbom-enterprise
+          path: sbom.spdx.json
+          retention-days: 30
+
+      - name: Run Trivy vulnerability scanner (Surface Scan - SARIF)
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          image-ref: "liquibase/liquibase-enterprise:${{ github.sha }}"
+          vuln-type: "os,library"
+          format: "sarif"
+          output: "trivy-surface.sarif"
+          severity: "HIGH,CRITICAL"
+          exit-code: "0"
+          limit-severities-for-sarif: true
+
+      - name: Run Trivy vulnerability scanner (Surface Scan - JSON)
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          image-ref: "liquibase/liquibase-enterprise:${{ github.sha }}"
+          vuln-type: "os,library"
+          format: "json"
+          output: "trivy-surface.json"
+          severity: "HIGH,CRITICAL"
+          exit-code: "0"
+
+      - name: Run Trivy scanner on extracted nested JARs (Deep Scan - SARIF)
+        if: always()
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          scan-type: "rootfs"
+          scan-ref: "/tmp/extracted-deps"
+          vuln-type: "library"
+          format: "sarif"
+          output: "trivy-deep.sarif"
+          severity: "HIGH,CRITICAL"
+          exit-code: "0"
+          limit-severities-for-sarif: true
+
+      - name: Run Trivy scanner on extracted nested JARs (Deep Scan - JSON)
+        if: always()
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          scan-type: "rootfs"
+          scan-ref: "/tmp/extracted-deps"
+          vuln-type: "library"
+          format: "json"
+          output: "trivy-deep.json"
+          severity: "HIGH,CRITICAL"
+          exit-code: "0"
+
+      - name: Run Grype scanner on SBOM
+        if: always()
+        id: grype_scan
+        uses: anchore/scan-action@v5
+        with:
+          sbom: "sbom.spdx.json"
+          fail-build: false
+          severity-cutoff: high
+          output-format: sarif
+        continue-on-error: true
+
+      - name: Save Grype results to file
+        if: always()
+        run: |
+          scripts/save-grype-results.sh
+
+      - name: Combine scan results and check for failures
+        if: always()
+        env:
+          IMAGE_NAME: liquibase/liquibase-enterprise
+          IMAGE_SUFFIX: ""
+        run: |
+          scripts/analyze-scan-results.sh
+
+      - name: Upload enhanced vulnerability report
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: vulnerability-report-enterprise
+          path: vulnerability-report-enhanced.md
+          retention-days: 90
+
+      - name: Notify Slack on Build Failure
+        if: failure()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_COLOR: "failure"
+          SLACK_MESSAGE: "View details on GitHub Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Triggered by repository: ${{ github.repository }} and job: ${{ github.job }}"
+          SLACK_TITLE: "❌ ${{ github.repository }} ❌ Trivy failed on branch ${{ github.ref_name }} for commit ${{ github.sha }} in repository ${{ github.repository }}"
+          SLACK_USERNAME: liquibot
+          SLACK_WEBHOOK: ${{ env.DOCKER_SLACK_WEBHOOK_URL }}
+          SLACK_ICON_EMOJI: ":whale:"
+          SLACK_FOOTER: "${{ github.repository }} - liquibase/liquibase-enterprise:${{ github.sha }}"
+          SLACK_LINK_NAMES: true
+
+      - name: Upload Trivy Surface scan results to GitHub Security tab
+        if: always()
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: "trivy-surface.sarif"
+          category: "liquibase/liquibase-enterprise-surface"
+
+      - name: Upload Trivy Deep scan results to GitHub Security tab
+        if: always()
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: "trivy-deep.sarif"
+          category: "liquibase/liquibase-enterprise-deep"
+
+      - name: Check if Grype SARIF exists
+        if: always()
+        id: check_grype
+        run: |
+          scripts/check-file-exists.sh grype-results.sarif exists
+
+      - name: Upload Grype scan results to GitHub Security tab
+        if: always() && steps.check_grype.outputs.exists == 'true'
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: "grype-results.sarif"
+          category: "liquibase/liquibase-enterprise-grype"
+
+      - name: Generate Security Report
+        if: always()
+        uses: rsdmike/github-security-report-action@v3.0.4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          outputDir: ./reports/trivy-enterprise/
+          sarifReportDir: .
+
+      - name: Upload Security Report
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: security-report-trivy-enterprise
+          path: ./reports/trivy-enterprise/summary.pdf
+
+      - name: Upload Scan Summary
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: scan-summary-enterprise
+          path: scan-summary.txt
+          retention-days: 30
+
+  scout:
+    name: Scout Scan - Liquibase Enterprise
+    runs-on: "ubuntu-22.04"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Build liquibase/liquibase-enterprise from DockerfileEnterprise
+        run: |
+          docker build -f DockerfileEnterprise -t liquibase/liquibase-enterprise:${{ github.sha }} .
+
+      - name: Configure AWS credentials for vault access
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{ secrets.LIQUIBASE_VAULT_OIDC_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Get secrets from vault
+        id: vault-secrets
+        uses: aws-actions/aws-secretsmanager-get-secrets@v2
+        with:
+          secret-ids: |
+            ,/vault/liquibase
+          parse-json-secrets: true
+
+      - name: Decode DOCKERHUB_USERNAME
+        run: |
+          decoded_username=$(echo "${{ env.DOCKERHUB_USERNAME }}" | base64 -d)
+          echo "DOCKERHUB_USERNAME_DECODED=$decoded_username" >> $GITHUB_ENV
+
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ env.DOCKERHUB_USERNAME_DECODED }}
+          password: ${{ env.DOCKERHUB_TOKEN }}
+
+      - name: Docker Scout
+        uses: docker/scout-action@v1.18.2
+        with:
+          command: cves
+          image: "liquibase/liquibase-enterprise:${{ github.sha }}"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          write-comment: true
+          sarif-file: "scout-results.sarif"
+          summary: true
+          exit-code: true
+          only-severities: "critical,high"
+
+      - name: Notify Slack on Build Failure
+        if: failure()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_COLOR: "failure"
+          SLACK_MESSAGE: "View details on GitHub Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Triggered by repository: ${{ github.repository }} and job: ${{ github.job }}"
+          SLACK_TITLE: "❌ ${{ github.repository }} ❌ Docker Scout failed on branch ${{ github.ref_name }} for commit ${{ github.sha }} in repository ${{ github.repository }}"
+          SLACK_USERNAME: liquibot
+          SLACK_WEBHOOK: ${{ env.DOCKER_SLACK_WEBHOOK_URL }}
+          SLACK_ICON_EMOJI: ":whale:"
+          SLACK_FOOTER: "${{ github.repository }} - liquibase/liquibase-enterprise:${{ github.sha }}"
+          SLACK_LINK_NAMES: true
+
+      - name: Upload Scout scan results to GitHub Security tab
+        if: always()
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: "scout-results.sarif"
+          category: "liquibase/liquibase-enterprise"
+
+      - name: Generate Security Report
+        if: always()
+        uses: rsdmike/github-security-report-action@v3.0.4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          outputDir: ./reports/scout-enterprise/
+          sarifReportDir: .
+
+      - name: Upload Security Report
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: security-report-scout-enterprise
+          path: ./reports/scout-enterprise/summary.pdf

@@ -1,0 +1,84 @@
+# Builder Stage - Install Liquibase Enterprise using IzPack installer
+FROM eclipse-temurin:21-jre-noble AS builder
+
+WORKDIR /tmp/installer
+
+# Install required tools for IzPack installer (needs Xvfb for headless GUI installation)
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends wget xvfb && \
+    rm -rf /var/lib/apt/lists/*
+
+ARG ENTERPRISE_VERSION=8.10.479
+ARG ENT_JAR_SHA256=165e519e95ca2cf27138e35feaa8a6f4d3e938754c95747e56748a78b4342442
+
+# Download Liquibase Enterprise installer from software.datical.com
+RUN wget -q -O DaticalDB-installer.jar \
+    "https://software.datical.com/Datical_DB_Software/Datical_DB_${ENTERPRISE_VERSION}/DaticalDB-linux.gtk.x86_64-${ENTERPRISE_VERSION}.jar" && \
+    echo "$ENT_JAR_SHA256 *DaticalDB-installer.jar" | sha256sum -c -
+
+# Copy IzPack installation configuration
+COPY autoInstall.xml /tmp/autoInstall.xml
+
+# Run headless installation using Xvfb (virtual framebuffer for GUI installer)
+# Java 21 requires --add-opens flags for Groovy reflection compatibility
+# Using --illegal-access=permit equivalent for Java 21
+RUN xvfb-run java \
+    --add-opens java.base/java.lang=ALL-UNNAMED \
+    --add-opens java.base/java.lang.invoke=ALL-UNNAMED \
+    --add-opens java.base/java.util=ALL-UNNAMED \
+    --add-opens java.base/java.util.concurrent=ALL-UNNAMED \
+    --add-opens java.base/java.io=ALL-UNNAMED \
+    --add-opens java.base/java.text=ALL-UNNAMED \
+    --add-opens java.base/java.net=ALL-UNNAMED \
+    --add-opens java.base/java.nio=ALL-UNNAMED \
+    --add-opens java.base/java.nio.file=ALL-UNNAMED \
+    --add-opens java.base/java.math=ALL-UNNAMED \
+    --add-opens java.base/sun.nio.ch=ALL-UNNAMED \
+    -jar DaticalDB-installer.jar /tmp/autoInstall.xml && \
+    rm -f DaticalDB-installer.jar /tmp/autoInstall.xml
+
+# Runtime Stage - Create production image with only installed files
+FROM eclipse-temurin:21-jre-noble
+
+# Create liquibase user with fixed UID/GID for consistency
+RUN groupadd --gid 1001 liquibase && \
+    useradd --uid 1001 --gid liquibase --create-home --home-dir /liquibase liquibase && \
+    chown liquibase:root /liquibase && \
+    chmod g+rx /liquibase
+
+WORKDIR /liquibase
+
+# Copy installed Liquibase Enterprise from builder stage
+COPY --from=builder --chown=liquibase:liquibase /liquibase/DaticalDB ./DaticalDB
+
+# Create symlink for hammer command in PATH
+RUN ln -s /liquibase/DaticalDB/repl/hammer /usr/local/bin/hammer
+
+ARG ENTERPRISE_VERSION=8.10.479
+
+# Add metadata labels following OCI standards
+LABEL org.opencontainers.image.description="Liquibase Enterprise Container Image"
+LABEL org.opencontainers.image.licenses="LicenseRef-Datical-EULA"
+LABEL org.opencontainers.image.licenses.url="https://www.datical.com/eula"
+LABEL org.opencontainers.image.vendor="Liquibase"
+LABEL org.opencontainers.image.version="${ENTERPRISE_VERSION}"
+LABEL org.opencontainers.image.documentation="https://docs.liquibase.com"
+
+# Set environment variables
+ENV LIQUIBASE_HOME=/liquibase
+# Marker which indicates this is a Liquibase docker container
+ENV DOCKER_LIQUIBASE=true
+# Add DaticalDB repl directory to PATH for hammer command
+ENV PATH="/liquibase/DaticalDB/repl:${PATH}"
+
+# Copy entrypoint script and set execute permissions before switching to liquibase user
+COPY --chmod=755 docker-entrypoint-enterprise.sh ./docker-entrypoint.sh
+
+# Set user and group
+USER liquibase:liquibase
+
+# Define volumes for project files and license
+VOLUME ["/liquibase/project", "/liquibase/license"]
+
+ENTRYPOINT ["/liquibase/docker-entrypoint.sh"]
+CMD ["hammer", "--help"]

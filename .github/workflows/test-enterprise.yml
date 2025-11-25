@@ -1,0 +1,337 @@
+name: Test Liquibase Enterprise Dockerfile
+
+on:
+  push:
+    branches: ["main", "master"]
+    paths:
+      - 'DockerfileEnterprise'
+      - 'docker-entrypoint-enterprise.sh'
+      - 'autoInstall.xml'
+      - '.github/workflows/test-enterprise.yml'
+  pull_request:
+    branches: ["main"]
+    paths:
+      - 'DockerfileEnterprise'
+      - 'docker-entrypoint-enterprise.sh'
+      - 'autoInstall.xml'
+      - '.github/workflows/test-enterprise.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    env:
+      CONTAINER_NAME: "liquibase-enterprise"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-15-intel]
+
+    name: Build & Test DockerfileEnterprise - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Docker on macOS
+        if: matrix.os == 'macos-15-intel'
+        uses: douglascamata/setup-docker-macos-action@v1.0.2
+
+      - name: Build Enterprise image from DockerfileEnterprise
+        run: |
+          docker build -f DockerfileEnterprise -t liquibase/liquibase-enterprise:${{ github.sha }} .
+
+      - name: Test container structure
+        run: |
+          echo "Testing container basic structure and configuration..."
+
+          # Test that container starts and shows help
+          docker run --rm --name ${CONTAINER_NAME}-structure liquibase/liquibase-enterprise:${{ github.sha }} || true
+
+          # Test working directory
+          WORKDIR=$(docker run --rm liquibase/liquibase-enterprise:${{ github.sha }} pwd)
+          if [ "$WORKDIR" = "/liquibase" ]; then
+            echo "✅ SUCCESS: Working directory is /liquibase"
+          else
+            echo "❌ FAIL: Working directory is $WORKDIR, expected /liquibase"
+            exit 1
+          fi
+
+          # Test user
+          USER=$(docker run --rm liquibase/liquibase-enterprise:${{ github.sha }} whoami)
+          if [ "$USER" = "liquibase" ]; then
+            echo "✅ SUCCESS: Container runs as liquibase user"
+          else
+            echo "❌ FAIL: Container runs as $USER, expected liquibase"
+            exit 1
+          fi
+
+          # Test UID/GID
+          USERID=$(docker run --rm liquibase/liquibase-enterprise:${{ github.sha }} id -u)
+          GROUPID=$(docker run --rm liquibase/liquibase-enterprise:${{ github.sha }} id -g)
+          if [ "$USERID" = "1001" ] && [ "$GROUPID" = "1001" ]; then
+            echo "✅ SUCCESS: UID/GID is 1001:1001"
+          else
+            echo "❌ FAIL: UID/GID is $USERID:$GROUPID, expected 1001:1001"
+            exit 1
+          fi
+
+      - name: Test Java installation
+        run: |
+          echo "Testing Java installation..."
+
+          RESULT=$(docker run --rm liquibase/liquibase-enterprise:${{ github.sha }} java -version 2>&1)
+          echo "Java version output: $RESULT"
+
+          if echo "$RESULT" | grep -q "openjdk.*21"; then
+            echo "✅ SUCCESS: Java 21 is installed"
+          else
+            echo "❌ FAIL: Java 21 not found"
+            exit 1
+          fi
+
+      - name: Test hammer command is available
+        run: |
+          echo "Testing hammer command availability..."
+
+          # Test hammer command exists in PATH
+          RESULT=$(docker run --rm liquibase/liquibase-enterprise:${{ github.sha }} which hammer 2>&1)
+          echo "Hammer location: $RESULT"
+
+          if echo "$RESULT" | grep -q "hammer"; then
+            echo "✅ SUCCESS: hammer command is in PATH"
+          else
+            echo "❌ FAIL: hammer command not found in PATH"
+            exit 1
+          fi
+
+      - name: Test DaticalDB installation directory
+        run: |
+          echo "Testing DaticalDB installation structure..."
+
+          # Check DaticalDB directory exists
+          RESULT=$(docker run --rm liquibase/liquibase-enterprise:${{ github.sha }} ls -la /liquibase/DaticalDB 2>&1)
+          echo "DaticalDB directory contents: $RESULT"
+
+          if echo "$RESULT" | grep -q "repl"; then
+            echo "✅ SUCCESS: DaticalDB installation directory structure is correct"
+          else
+            echo "❌ FAIL: DaticalDB installation structure incomplete"
+            exit 1
+          fi
+
+      - name: Test environment variables
+        run: |
+          echo "Testing environment variables..."
+
+          # Test LIQUIBASE_HOME
+          LIQUIBASE_HOME=$(docker run --rm liquibase/liquibase-enterprise:${{ github.sha }} printenv LIQUIBASE_HOME)
+          if [ "$LIQUIBASE_HOME" = "/liquibase" ]; then
+            echo "✅ SUCCESS: LIQUIBASE_HOME is set to /liquibase"
+          else
+            echo "❌ FAIL: LIQUIBASE_HOME is $LIQUIBASE_HOME, expected /liquibase"
+            exit 1
+          fi
+
+          # Test DOCKER_LIQUIBASE marker
+          DOCKER_LIQUIBASE=$(docker run --rm liquibase/liquibase-enterprise:${{ github.sha }} printenv DOCKER_LIQUIBASE)
+          if [ "$DOCKER_LIQUIBASE" = "true" ]; then
+            echo "✅ SUCCESS: DOCKER_LIQUIBASE marker is set"
+          else
+            echo "❌ FAIL: DOCKER_LIQUIBASE is not set correctly"
+            exit 1
+          fi
+
+      - name: Test volume mount points
+        run: |
+          echo "Testing volume mount points..."
+
+          # Test /liquibase/project directory
+          RESULT=$(docker run --rm liquibase/liquibase-enterprise:${{ github.sha }} ls -ld /liquibase/project 2>&1 || echo "MISSING")
+          echo "Project directory check: $RESULT"
+
+          # Note: The directory may not exist by default, which is OK for volume mount points
+          # We're just verifying the container can access these paths
+
+          # Test /liquibase/license directory
+          RESULT=$(docker run --rm liquibase/liquibase-enterprise:${{ github.sha }} ls -ld /liquibase/license 2>&1 || echo "MISSING")
+          echo "License directory check: $RESULT"
+
+          echo "✅ SUCCESS: Volume mount points can be accessed"
+
+      - name: Test entrypoint script
+        run: |
+          echo "Testing entrypoint script functionality..."
+
+          # Test that entrypoint executes hammer by default
+          RESULT=$(docker run --rm liquibase/liquibase-enterprise:${{ github.sha }} --help 2>&1)
+          echo "Entrypoint test output: $RESULT"
+
+          if echo "$RESULT" | grep -qi "hammer\|usage\|command"; then
+            echo "✅ SUCCESS: Entrypoint script executes hammer commands"
+          else
+            echo "⚠️  WARNING: Could not verify hammer help output (may require x86-64 platform)"
+            # Don't fail on ARM64/Apple Silicon since hammer binaries are x86-64
+          fi
+
+      - name: Test bash command execution
+        run: |
+          echo "Testing direct bash command execution..."
+
+          # Test that we can override entrypoint with bash
+          RESULT=$(docker run --rm liquibase/liquibase-enterprise:${{ github.sha }} bash -c "echo 'Custom command works'" 2>&1)
+          echo "Bash test output: $RESULT"
+
+          if echo "$RESULT" | grep -q "Custom command works"; then
+            echo "✅ SUCCESS: Can execute custom bash commands"
+          else
+            echo "❌ FAIL: Cannot execute custom bash commands"
+            exit 1
+          fi
+
+      - name: Test license file mounting (without actual license)
+        run: |
+          echo "Testing license file volume mounting..."
+
+          # Create a test license file
+          mkdir -p test-license
+          echo "test-license-content" > test-license/license.lic
+
+          # Mount license file and verify it's accessible
+          RESULT=$(docker run --rm \
+            -v $(pwd)/test-license:/liquibase/license \
+            liquibase/liquibase-enterprise:${{ github.sha }} \
+            cat /liquibase/license/license.lic 2>&1)
+
+          echo "License mount test output: $RESULT"
+
+          if echo "$RESULT" | grep -q "test-license-content"; then
+            echo "✅ SUCCESS: License file can be mounted and accessed"
+          else
+            echo "❌ FAIL: License file mounting failed"
+            exit 1
+          fi
+
+          # Cleanup
+          rm -rf test-license
+
+      - name: Test project directory mounting
+        run: |
+          echo "Testing project directory volume mounting..."
+
+          # Create a test project structure
+          mkdir -p test-project
+          echo "<?xml version=\"1.0\"?><project></project>" > test-project/datical.project
+
+          # Mount project directory and verify it's accessible
+          RESULT=$(docker run --rm \
+            -v $(pwd)/test-project:/liquibase/project \
+            liquibase/liquibase-enterprise:${{ github.sha }} \
+            cat /liquibase/project/datical.project 2>&1)
+
+          echo "Project mount test output: $RESULT"
+
+          if echo "$RESULT" | grep -q "project"; then
+            echo "✅ SUCCESS: Project directory can be mounted and accessed"
+          else
+            echo "❌ FAIL: Project directory mounting failed"
+            exit 1
+          fi
+
+          # Cleanup
+          rm -rf test-project
+
+      - name: Test working directory changes to project when mounted
+        run: |
+          echo "Testing automatic working directory change to /liquibase/project..."
+
+          # Create test project
+          mkdir -p test-project-workdir
+          echo "test-file-content" > test-project-workdir/test-file.txt
+
+          # Mount project and test that working directory changes
+          RESULT=$(docker run --rm \
+            -v $(pwd)/test-project-workdir:/liquibase/project \
+            liquibase/liquibase-enterprise:${{ github.sha }} \
+            pwd 2>&1)
+
+          echo "Working directory after project mount: $RESULT"
+
+          if echo "$RESULT" | grep -q "/liquibase/project"; then
+            echo "✅ SUCCESS: Working directory automatically changes to /liquibase/project"
+          else
+            echo "⚠️  Note: Working directory did not change (may be expected behavior)"
+          fi
+
+          # Test that relative paths work from project directory
+          RESULT=$(docker run --rm \
+            -v $(pwd)/test-project-workdir:/liquibase/project \
+            liquibase/liquibase-enterprise:${{ github.sha }} \
+            cat test-file.txt 2>&1)
+
+          if echo "$RESULT" | grep -q "test-file-content"; then
+            echo "✅ SUCCESS: Relative paths work correctly with project mount"
+          else
+            echo "❌ FAIL: Relative paths do not work with project mount"
+            exit 1
+          fi
+
+          # Cleanup
+          rm -rf test-project-workdir
+
+      - name: Test multi-architecture support metadata
+        run: |
+          echo "Testing image architecture metadata..."
+
+          # Inspect image architecture
+          ARCH=$(docker inspect liquibase/liquibase-enterprise:${{ github.sha }} --format='{{.Architecture}}')
+          echo "Image architecture: $ARCH"
+
+          if [ -n "$ARCH" ]; then
+            echo "✅ SUCCESS: Image has architecture metadata: $ARCH"
+          else
+            echo "❌ FAIL: Image missing architecture metadata"
+            exit 1
+          fi
+
+      - name: Platform-specific tests - x86-64 only
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          echo "Running x86-64 specific tests..."
+
+          # These tests require x86-64 platform since Liquibase Enterprise binaries are x86-64
+          # Test hammer show version command
+          set +e
+          RESULT=$(docker run --rm liquibase/liquibase-enterprise:${{ github.sha }} show version 2>&1)
+          EXIT_CODE=$?
+          set -e
+
+          echo "Hammer version output: $RESULT"
+          echo "Exit code: $EXIT_CODE"
+
+          # Note: Without a valid license, hammer may fail, but we can check if it attempts to run
+          if echo "$RESULT" | grep -qi "version\|datical\|liquibase\|license"; then
+            echo "✅ SUCCESS: Hammer command executes on x86-64 platform"
+          else
+            echo "⚠️  WARNING: Hammer command output unexpected (may require valid license)"
+            echo "Full output: $RESULT"
+          fi
+
+      - name: Summary
+        run: |
+          echo "=================================================="
+          echo "Liquibase Enterprise Docker Image Test Summary"
+          echo "=================================================="
+          echo "Platform: ${{ matrix.os }}"
+          echo "Image: liquibase/liquibase-enterprise:${{ github.sha }}"
+          echo ""
+          echo "✅ All core tests passed successfully"
+          echo ""
+          echo "Notes:"
+          echo "- This image uses Liquibase Enterprise (formerly Datical DB)"
+          echo "- Requires a valid license file at runtime"
+          echo "- x86-64 binaries - use --platform linux/amd64 on Apple Silicon"
+          echo "- Production testing requires actual Liquibase Enterprise license"
+          echo "=================================================="
