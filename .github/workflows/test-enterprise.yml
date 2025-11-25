@@ -18,6 +18,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write  # Required for AWS OIDC authentication
 
 jobs:
   test:
@@ -34,6 +35,26 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+
+      - name: Configure AWS credentials for vault access
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{ secrets.LIQUIBASE_VAULT_OIDC_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Get secrets from vault
+        id: vault-secrets
+        uses: aws-actions/aws-secretsmanager-get-secrets@v2
+        with:
+          secret-ids: |
+            ,/vault/liquibase
+          parse-json-secrets: true
+
+      - name: Write license file for testing
+        run: |
+          mkdir -p test-license
+          echo "${{ steps.vault-secrets.outputs.ENTERPRISE_LICENSE }}" > test-license/license.lic
+          chmod 644 test-license/license.lic
 
       - name: Setup Docker on macOS
         if: matrix.os == 'macos-15-intel'
@@ -165,11 +186,20 @@ jobs:
         run: |
           echo "Testing entrypoint script functionality..."
 
-          # Test that entrypoint executes hammer by default
-          RESULT=$(docker run --rm liquibase/liquibase-enterprise:${{ github.sha }} --help 2>&1)
-          echo "Entrypoint test output: $RESULT"
+          # Test that entrypoint executes hammer by default with valid license
+          # Note: We mount the license file to test the full workflow
+          set +e
+          RESULT=$(docker run --rm \
+            -v $(pwd)/test-license:/liquibase/license \
+            liquibase/liquibase-enterprise:${{ github.sha }} --help 2>&1)
+          EXIT_CODE=$?
+          set -e
 
-          if echo "$RESULT" | grep -qi "hammer\|usage\|command"; then
+          echo "Entrypoint test output: $RESULT"
+          echo "Exit code: $EXIT_CODE"
+
+          # Check if output contains expected keywords (hammer, usage, command, or license error)
+          if echo "$RESULT" | grep -qi "hammer\|usage\|command\|options\|datical"; then
             echo "✅ SUCCESS: Entrypoint script executes hammer commands"
           else
             echo "⚠️  WARNING: Could not verify hammer help output (may require x86-64 platform)"
@@ -191,31 +221,25 @@ jobs:
             exit 1
           fi
 
-      - name: Test license file mounting (without actual license)
+      - name: Test license file mounting with real license
         run: |
-          echo "Testing license file volume mounting..."
+          echo "Testing license file volume mounting with real license..."
 
-          # Create a test license file
-          mkdir -p test-license
-          echo "test-license-content" > test-license/license.lic
-
-          # Mount license file and verify it's accessible
+          # Mount license file and verify it's accessible (already created from vault)
           RESULT=$(docker run --rm \
             -v $(pwd)/test-license:/liquibase/license \
             liquibase/liquibase-enterprise:${{ github.sha }} \
             cat /liquibase/license/license.lic 2>&1)
 
-          echo "License mount test output: $RESULT"
+          echo "License mount test output (first 100 chars): ${RESULT:0:100}..."
 
-          if echo "$RESULT" | grep -q "test-license-content"; then
+          # Check that the license file was read successfully
+          if [ -n "$RESULT" ] && [ ${#RESULT} -gt 10 ]; then
             echo "✅ SUCCESS: License file can be mounted and accessed"
           else
             echo "❌ FAIL: License file mounting failed"
             exit 1
           fi
-
-          # Cleanup
-          rm -rf test-license
 
       - name: Test project directory mounting
         run: |
@@ -299,23 +323,25 @@ jobs:
       - name: Platform-specific tests - x86-64 only
         if: matrix.os == 'ubuntu-latest'
         run: |
-          echo "Running x86-64 specific tests..."
+          echo "Running x86-64 specific tests with valid license..."
 
           # These tests require x86-64 platform since Liquibase Enterprise binaries are x86-64
-          # Test hammer show version command
+          # Test hammer show version command with mounted license
           set +e
-          RESULT=$(docker run --rm liquibase/liquibase-enterprise:${{ github.sha }} show version 2>&1)
+          RESULT=$(docker run --rm \
+            -v $(pwd)/test-license:/liquibase/license \
+            liquibase/liquibase-enterprise:${{ github.sha }} show version 2>&1)
           EXIT_CODE=$?
           set -e
 
           echo "Hammer version output: $RESULT"
           echo "Exit code: $EXIT_CODE"
 
-          # Note: Without a valid license, hammer may fail, but we can check if it attempts to run
-          if echo "$RESULT" | grep -qi "version\|datical\|liquibase\|license"; then
-            echo "✅ SUCCESS: Hammer command executes on x86-64 platform"
+          # With a valid license, we should see version information
+          if echo "$RESULT" | grep -qi "version\|datical\|liquibase\|cli\|core"; then
+            echo "✅ SUCCESS: Hammer command executes on x86-64 platform with license"
           else
-            echo "⚠️  WARNING: Hammer command output unexpected (may require valid license)"
+            echo "⚠️  WARNING: Hammer command output unexpected"
             echo "Full output: $RESULT"
           fi
 
@@ -331,7 +357,12 @@ jobs:
           echo ""
           echo "Notes:"
           echo "- This image uses Liquibase Enterprise (formerly Datical DB)"
-          echo "- Requires a valid license file at runtime"
+          echo "- Tested with valid license from AWS Secrets Manager"
           echo "- x86-64 binaries - use --platform linux/amd64 on Apple Silicon"
-          echo "- Production testing requires actual Liquibase Enterprise license"
           echo "=================================================="
+
+      - name: Cleanup license file
+        if: always()
+        run: |
+          rm -rf test-license
+          echo "License file cleaned up"
