@@ -9,9 +9,21 @@ on:
   workflow_dispatch:
   push:
     branches: ["main"]
+    paths:
+      - 'Dockerfile'
+      - 'Dockerfile.alpine'
+      - 'DockerfileSecure'
+      - 'docker-entrypoint.sh'
+      - '.github/workflows/trivy.yml'
   pull_request:
     # The branches below must be a subset of the branches above
     branches: ["main"]
+    paths:
+      - 'Dockerfile'
+      - 'Dockerfile.alpine'
+      - 'DockerfileSecure'
+      - 'docker-entrypoint.sh'
+      - '.github/workflows/trivy.yml'
   schedule:
     - cron: "0 7 * * 1-5" # Run every weekday at 7am UTC
 
