@@ -51,11 +51,13 @@ jobs:
           parse-json-secrets: true
 
       - name: Write license file for testing
+        env:
+          LICENSE_HEX: ${{ env.ENTERPRISE_LICENSE }}
         run: |
           mkdir -p test-license
           # Convert hex dump to binary file
           # Remove spaces and newlines, then convert hex to binary
-          echo "${{ steps.vault-secrets.outputs.ENTERPRISE_LICENSE }}" | tr -d ' \n' | xxd -r -p > test-license/license.lic
+          echo "$LICENSE_HEX" | tr -d ' \n' | xxd -r -p > test-license/license.lic
           chmod 644 test-license/license.lic
           # Verify the file was created correctly
           ls -lh test-license/license.lic
