@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: liquibase_demo
+      POSTGRES_USER: liquibase
+      POSTGRES_PASSWORD: liquibase_password
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "liquibase"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  liquibase:
+    image: liquibase/liquibase-enterprise:latest
+    container_name: liquibase_enterprise_runner
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      # Mount your Liquibase Enterprise project directory
+      - ./project:/liquibase/project
+      # Mount your license file (REQUIRED)
+      - ./license.lic:/liquibase/license/license.lic
+      # Optional: Mount SQL source files for Packager
+      # - ./sql-source:/liquibase/src
+    # Example commands - uncomment and modify as needed:
+    # command: ["statusDetails", "DEV"]
+    # command: ["forecast", "DEV"]
+    # command: ["deploy", "DEV"]
+    # command: ["show", "version"]
+    command: ["bash", "-c", "echo 'Liquibase Enterprise container ready. Mount your project and run hammer commands.'"]
+
+volumes:
+  postgres_data:
