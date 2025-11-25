@@ -53,8 +53,13 @@ jobs:
       - name: Write license file for testing
         run: |
           mkdir -p test-license
-          echo "${{ steps.vault-secrets.outputs.ENTERPRISE_LICENSE }}" > test-license/license.lic
+          # Convert hex dump to binary file
+          # Remove spaces and newlines, then convert hex to binary
+          echo "${{ steps.vault-secrets.outputs.ENTERPRISE_LICENSE }}" | tr -d ' \n' | xxd -r -p > test-license/license.lic
           chmod 644 test-license/license.lic
+          # Verify the file was created correctly
+          ls -lh test-license/license.lic
+          echo "License file size: $(wc -c < test-license/license.lic) bytes"
 
       - name: Setup Docker on macOS
         if: matrix.os == 'macos-15-intel'
