@@ -1,0 +1,371 @@
+name: Release Liquibase Enterprise
+
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
+  packages: write
+
+on:
+  repository_dispatch:
+    types: [liquibase-enterprise-release]
+  workflow_dispatch:
+    inputs:
+      enterpriseVersion:
+        description: "Liquibase Enterprise Version"
+        required: true
+      extensionVersion:
+        description: "Container Version (Defaults to Enterprise Version)"
+        required: false
+      dryRun:
+        description: "Dry Run release"
+        required: true
+        type: boolean
+        default: false
+      distinct_id:
+        description: "Only needed for liquibase dispatch"
+        required: false
+        type: string
+        default: ""
+      pushDockerHub:
+        description: "Publish to Docker Hub"
+        type: boolean
+        default: true
+      pushGHCR:
+        description: "Publish to GitHub Container Registry"
+        type: boolean
+        default: true
+      pushECR:
+        description: "Publish to AWS Public ECR"
+        type: boolean
+        default: true
+
+jobs:
+  update-dockerfiles:
+    name: "Update DockerfileEnterprise"
+    runs-on: ubuntu-latest
+    outputs:
+      enterpriseVersion: ${{ steps.collect-data.outputs.enterpriseVersion }}
+      extensionVersion: ${{ steps.collect-data.outputs.extensionVersion }}
+      dryRun: ${{ steps.collect-data.outputs.dryRun }}
+      minorVersion: ${{ steps.collect-data.outputs.minorVersion }}
+      latestCommitSha: ${{ steps.get-latest-sha.outputs.latestCommitSha }}
+      pushDockerHub: ${{ steps.collect-data.outputs.pushDockerHub }}
+      pushGHCR: ${{ steps.collect-data.outputs.pushGHCR }}
+      pushECR: ${{ steps.collect-data.outputs.pushECR }}
+
+    steps:
+      - name: Collect Data
+        id: collect-data
+        uses: actions/github-script@v8
+        with:
+          script: |
+            function getMinorVersion(version) {
+              const arr = version.split(".");
+              return `${arr[0]}.${arr[1]}`;
+            }
+            let enterpriseVersion = null;
+            let extensionVersion = null;
+            let dryRun = false;
+            let minorVersion = null;
+            if (context.payload.client_payload) {
+              enterpriseVersion = context.payload.client_payload.enterpriseVersion;
+              dryRun = context.payload.client_payload.dryRun;
+              minorVersion = getMinorVersion(enterpriseVersion);
+              core.setOutput("enterpriseVersion", enterpriseVersion);
+              core.setOutput("extensionVersion", enterpriseVersion);
+              core.setOutput("minorVersion", minorVersion);
+              core.setOutput("dryRun", dryRun);
+              core.setOutput("pushDockerHub", context.payload.client_payload.pushDockerHub ?? true);
+              core.setOutput("pushGHCR", context.payload.client_payload.pushGHCR ?? true);
+              core.setOutput("pushECR", context.payload.client_payload.pushECR ?? true);
+            } else if (context.payload.inputs) {
+              enterpriseVersion = context.payload.inputs.enterpriseVersion;
+              dryRun = context.payload.inputs.dryRun;
+              minorVersion = getMinorVersion(enterpriseVersion);
+              core.setOutput("enterpriseVersion", enterpriseVersion);
+              core.setOutput("extensionVersion", context.payload.inputs.extensionVersion || enterpriseVersion);
+              core.setOutput("minorVersion", minorVersion);
+              core.setOutput("dryRun", dryRun);
+              core.setOutput("pushDockerHub", Boolean(context.payload.inputs?.pushDockerHub ?? true));
+              core.setOutput("pushGHCR", Boolean(context.payload.inputs?.pushGHCR ?? true));
+              core.setOutput("pushECR", Boolean(context.payload.inputs?.pushECR ?? true));
+            } else {
+              core.setFailed('Unknown event type');
+            }
+
+      - run: |
+          echo "Enterprise version: ${{ steps.collect-data.outputs.enterpriseVersion }}"
+          echo "Extension version: ${{ steps.collect-data.outputs.extensionVersion }}"
+          echo "Dry run: ${{ steps.collect-data.outputs.dryRun }}"
+
+      - name: Configure AWS credentials for vault access
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{ secrets.LIQUIBASE_VAULT_OIDC_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Get secrets from vault
+        id: vault-secrets
+        uses: aws-actions/aws-secretsmanager-get-secrets@v2
+        with:
+          secret-ids: |
+            ,/vault/liquibase
+          parse-json-secrets: true
+
+      - name: Get GitHub App token
+        id: get-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ env.LIQUIBASE_GITHUB_APP_ID }}
+          private-key: ${{ env.LIQUIBASE_GITHUB_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          permission-contents: write
+
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+          ref: ${{ github.ref }}
+          token: ${{ steps.get-token.outputs.token }}
+          fetch-depth: 0
+
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: "8"
+          distribution: "adopt"
+
+      - name: Configure git user
+        run: |
+          git config user.name "liquibase-workflows[bot]"
+          git config user.email "1241802+liquibase-workflows[bot]@users.noreply.github.com"
+
+      - name: Update DockerfileEnterprise and commit changes
+        id: update-dockerfiles
+        run: |
+          # First ensure we're up to date with remote
+          git fetch origin
+          git reset --hard origin/${{ github.ref_name }}
+
+          ENTERPRISE_SHA=$(curl -LsS https://software.datical.com/Datical_DB_Software/Datical_DB_${{ steps.collect-data.outputs.enterpriseVersion }}/DaticalDB-linux.gtk.x86_64-${{ steps.collect-data.outputs.enterpriseVersion }}.jar | sha256sum | awk '{ print $1 }')
+
+          sed -i 's/^ARG ENTERPRISE_VERSION=.*/ARG ENTERPRISE_VERSION='"${{ steps.collect-data.outputs.enterpriseVersion }}"'/' "${{ github.workspace }}/DockerfileEnterprise"
+          sed -i 's/^ARG ENT_JAR_SHA256=.*/ARG ENT_JAR_SHA256='"$ENTERPRISE_SHA"'/' "${{ github.workspace }}/DockerfileEnterprise"
+          git add DockerfileEnterprise
+
+          if git diff-index --cached --quiet HEAD --; then
+            echo "Nothing new to commit"
+            echo "changes_made=false" >> $GITHUB_OUTPUT
+          else
+            COMMIT_MSG="Liquibase Enterprise Version Bumped to ${{ steps.collect-data.outputs.enterpriseVersion }}"
+            git commit -m "${COMMIT_MSG}"
+            echo "changes_made=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create and Push Tag
+        id: create-tag
+        if: ${{ steps.update-dockerfiles.outputs.changes_made == 'true' && steps.collect-data.outputs.dryRun == 'false' }}
+        run: |
+          VERSION="${{ steps.collect-data.outputs.enterpriseVersion }}"
+          EXTENSION_VERSION="${{ steps.collect-data.outputs.extensionVersion }}"
+
+          TAG_NAME="v${EXTENSION_VERSION}-ENTERPRISE"
+          COMMIT_MSG="Liquibase Enterprise Version Bumped to ${VERSION}"
+          TAG_MSG="Version Bumped to ${EXTENSION_VERSION} Enterprise"
+
+          # Create and push new tag
+          git tag -a -m "${TAG_MSG}" "${TAG_NAME}"
+          # Push changes and tags using the token
+          git remote set-url origin "https://x-access-token:${{ steps.get-token.outputs.token }}@github.com/$GITHUB_REPOSITORY.git"
+          git push origin ${{ github.ref }} --tags
+        env:
+          GITHUB_TOKEN: ${{ steps.get-token.outputs.token }}
+
+      - name: Get latest commit SHA
+        id: get-latest-sha
+        run: echo "latestCommitSha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+  build-push-image:
+    name: "Build and Push Docker Images"
+    needs: update-dockerfiles
+    runs-on: ubuntu-latest
+    env:
+      PUSH_DOCKERHUB: ${{ needs.update-dockerfiles.outputs.pushDockerHub }}
+      PUSH_GHCR: ${{ needs.update-dockerfiles.outputs.pushGHCR }}
+      PUSH_ECR: ${{ needs.update-dockerfiles.outputs.pushECR }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+          ref: ${{ github.ref }}
+
+      - name: Configure AWS credentials for vault access
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{ secrets.LIQUIBASE_VAULT_OIDC_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Get secrets from vault
+        id: vault-secrets
+        uses: aws-actions/aws-secretsmanager-get-secrets@v2
+        with:
+          secret-ids: |
+            ,/vault/liquibase
+          parse-json-secrets: true
+
+      - name: Decode DOCKERHUB_USERNAME
+        run: |
+          decoded_username=$(echo "${{ env.DOCKERHUB_USERNAME }}" | base64 -d)
+          echo "DOCKERHUB_USERNAME_DECODED=$decoded_username" >> $GITHUB_ENV
+
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: "8"
+          distribution: "adopt"
+
+      - name: Determine Release Tag
+        id: release-tag
+        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' }}
+        run: |
+          TAG_NAME="v${{ needs.update-dockerfiles.outputs.extensionVersion }}-ENTERPRISE"
+          RELEASE_NAME="v${{ needs.update-dockerfiles.outputs.extensionVersion }} ENTERPRISE"
+          echo "tag_name=${TAG_NAME}" >> $GITHUB_OUTPUT
+          echo "release_name=${RELEASE_NAME}" >> $GITHUB_OUTPUT
+          echo "::notice::Creating GitHub release for Liquibase Enterprise on tag: ${TAG_NAME}"
+
+      - name: Create GitHub Release
+        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' }}
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ steps.release-tag.outputs.release_name }}
+          tag_name: ${{ steps.release-tag.outputs.tag_name }}
+          draft: true
+          body: |
+            Support for Liquibase Enterprise ${{ needs.update-dockerfiles.outputs.enterpriseVersion }}.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Set registry variables
+        id: set-registries
+        run: |
+          echo "DOCKERHUB_REPO=liquibase/liquibase-enterprise" >> $GITHUB_OUTPUT
+          echo "ECR_REPO=public.ecr.aws/liquibase/liquibase-enterprise" >> $GITHUB_OUTPUT
+          echo "GHCR_REPO=ghcr.io/liquibase/liquibase-enterprise" >> $GITHUB_OUTPUT
+
+      - name: Login to Docker Hub
+        if: ${{ env.PUSH_DOCKERHUB == 'true' && needs.update-dockerfiles.outputs.dryRun == 'false' }}
+        uses: docker/login-action@v3
+        with:
+          username: ${{ env.DOCKERHUB_USERNAME_DECODED }}
+          password: ${{ env.DOCKERHUB_TOKEN }}
+
+      - name: Login to GitHub Container Registry
+        if: ${{ env.PUSH_GHCR == 'true' && needs.update-dockerfiles.outputs.dryRun == 'false' }}
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure AWS credentials for PROD ECR
+        id: configure-aws-credentials-prod
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{ env.AWS_PROD_GITHUB_OIDC_ROLE_ARN_INFRASTRUCTURE }}
+          aws-region: us-east-1
+
+      - name: Login to ECR Registry
+        if: ${{ env.PUSH_ECR == 'true' && needs.update-dockerfiles.outputs.dryRun == 'false' }}
+        uses: docker/login-action@v3
+        env:
+          AWS_REGION: us-east-1
+        with:
+          registry: public.ecr.aws
+          username: ${{ steps.configure-aws-credentials-prod.outputs.aws_access_key_id }}
+          password: ${{ steps.configure-aws-credentials-prod.outputs.aws_secret_access_key }}
+
+      - name: Login to Private ECR Registry (dry-run)
+        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'true' }}
+        uses: docker/login-action@v3
+        env:
+          AWS_REGION: us-east-1
+        with:
+          registry: ${{ env.PRIVATE_ECR_DRY_RUN_REPO }}
+          username: ${{ steps.configure-aws-credentials-prod.outputs.aws_access_key_id }}
+          password: ${{ steps.configure-aws-credentials-prod.outputs.aws_secret_access_key }}
+
+      - name: Generate Docker Tags
+        id: generate-tags
+        run: |
+          VERSION="${{ needs.update-dockerfiles.outputs.extensionVersion }}"
+          MINOR_VERSION="${{ needs.update-dockerfiles.outputs.minorVersion }}"
+          TAGS=""
+          IS_DRY_RUN="${{ needs.update-dockerfiles.outputs.dryRun }}"
+
+          if [[ "${IS_DRY_RUN}" == "true" ]]; then
+            TAGS="${{ env.PRIVATE_ECR_DRY_RUN_REPO }}:latest"
+            TAGS="${TAGS},${{ env.PRIVATE_ECR_DRY_RUN_REPO }}:${VERSION}"
+            TAGS="${TAGS},${{ env.PRIVATE_ECR_DRY_RUN_REPO }}:${MINOR_VERSION}"
+          else
+            if [[ "${PUSH_DOCKERHUB}" == "true" ]]; then
+              TAGS="${{ steps.set-registries.outputs.DOCKERHUB_REPO }}:latest"
+              TAGS="${TAGS},${{ steps.set-registries.outputs.DOCKERHUB_REPO }}:${VERSION}"
+              TAGS="${TAGS},${{ steps.set-registries.outputs.DOCKERHUB_REPO }}:${MINOR_VERSION}"
+            fi
+
+            if [[ "${PUSH_ECR}" == "true" ]]; then
+              if [[ -n "${TAGS}" ]]; then TAGS="${TAGS},"; fi
+              TAGS="${TAGS}${{ steps.set-registries.outputs.ECR_REPO }}:latest"
+              TAGS="${TAGS},${{ steps.set-registries.outputs.ECR_REPO }}:${VERSION}"
+              TAGS="${TAGS},${{ steps.set-registries.outputs.ECR_REPO }}:${MINOR_VERSION}"
+            fi
+
+            if [[ "${PUSH_GHCR}" == "true" ]]; then
+              if [[ -n "${TAGS}" ]]; then TAGS="${TAGS},"; fi
+              TAGS="${TAGS}${{ steps.set-registries.outputs.GHCR_REPO }}:latest"
+              TAGS="${TAGS},${{ steps.set-registries.outputs.GHCR_REPO }}:${VERSION}"
+              TAGS="${TAGS},${{ steps.set-registries.outputs.GHCR_REPO }}:${MINOR_VERSION}"
+            fi
+
+            if [[ -z "${TAGS}" ]]; then
+              echo "::warning::No registries were selected. Running in dry-run mode."
+              TAGS="${{ env.PRIVATE_ECR_DRY_RUN_REPO }}:latest"
+            fi
+          fi
+
+          echo "tags=${TAGS}" >> $GITHUB_OUTPUT
+          if [[ "${IS_DRY_RUN}" == "true" ]]; then
+            echo "Generated tags (dry-run): ${TAGS}"
+          else
+            echo "Generated tags: ${TAGS}"
+          fi
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: DockerfileEnterprise
+          no-cache: true
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ steps.generate-tags.outputs.tags }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/liquibase/docker
+            org.opencontainers.image.description=Liquibase Enterprise Container Image
+            org.opencontainers.image.licenses=LicenseRef-Datical-EULA
+            org.opencontainers.image.licenses.url=https://www.datical.com/eula
+            org.opencontainers.image.vendor=Liquibase
+            org.opencontainers.image.version=${{ needs.update-dockerfiles.outputs.extensionVersion }}
+            org.opencontainers.image.documentation=https://docs.liquibase.com
+          annotations: |
+            org.opencontainers.image.source=https://github.com/liquibase/docker
+            org.opencontainers.image.description=Liquibase Enterprise Container Image
+            org.opencontainers.image.licenses=LicenseRef-Datical-EULA
+            org.opencontainers.image.licenses.url=https://www.datical.com/eula
+            org.opencontainers.image.vendor=Liquibase
+            org.opencontainers.image.version=${{ needs.update-dockerfiles.outputs.extensionVersion }}
+            org.opencontainers.image.documentation=https://docs.liquibase.com

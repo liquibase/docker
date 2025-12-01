@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<AutomatedInstallation langpack="eng">
+    <com.izforge.izpack.panels.HelloPanel id="UNKNOWN (com.izforge.izpack.panels.HelloPanel)"/>
+    <com.izforge.izpack.panels.LicencePanel id="UNKNOWN (com.izforge.izpack.panels.LicencePanel)"/>
+    <com.izforge.izpack.panels.TargetPanel id="UNKNOWN (com.izforge.izpack.panels.TargetPanel)">
+        <installpath>/liquibase/DaticalDB</installpath>
+    </com.izforge.izpack.panels.TargetPanel>
+    <com.izforge.izpack.panels.PacksPanel id="UNKNOWN (com.izforge.izpack.panels.PacksPanel)">
+        <pack index="0" name="Datical DB UI" selected="true"/>
+        <pack index="1" name="Datical DB CLI" selected="true"/>
+        <pack index="2" name="Datical DB license manager" selected="true"/>
+        <pack index="3" name="Java Runtime" selected="true"/>
+        <pack index="4" name="Oracle Instant Client" selected="true"/>
+    </com.izforge.izpack.panels.PacksPanel>
+    <com.izforge.izpack.panels.UserInputPanel id="SelectLicenseFilePanel">
+        <userInput>
+            <entry key="license.path" value="/liquibase/license/myLicense.lic"/>
+        </userInput>
+    </com.izforge.izpack.panels.UserInputPanel>
+    <com.izforge.izpack.panels.InstallPanel id="UNKNOWN (com.izforge.izpack.panels.InstallPanel)"/>
+    <com.izforge.izpack.panels.ShortcutPanel id="UNKNOWN (com.izforge.izpack.panels.ShortcutPanel)"/>
+    <com.izforge.izpack.panels.FinishPanel id="UNKNOWN (com.izforge.izpack.panels.FinishPanel)"/>
+</AutomatedInstallation>
