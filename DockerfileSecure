@@ -32,9 +32,9 @@ RUN wget -q -O liquibase-secure-${LIQUIBASE_SECURE_VERSION}.tar.gz "https://repo
     ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \
     liquibase --version
     
-ARG LPM_VERSION=0.2.16
-ARG LPM_SHA256=734536181f67b108bccf5483a6ecad8d64e3c916c6586224d367984016364a9c
-ARG LPM_SHA256_ARM=9bc545ea6c475cb4fd42557772b8c9be23b5db0e4f7016d50a68516a0ac59365
+ARG LPM_VERSION=0.2.17
+ARG LPM_SHA256=f58e69ec338f5ab6abb60af5a03d9151bf17ae569662e54001963b61a5ac02d7
+ARG LPM_SHA256_ARM=020a2ccd0d9a63b97de6109aee7558946f16fa55cdebb34218676c54c0cf7464
 
 # Download and Install lpm
 RUN apt-get update && \
