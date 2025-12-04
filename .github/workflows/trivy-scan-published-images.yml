@@ -1,6 +1,10 @@
 # Vulnerability scanning for published Docker images using Trivy
 # This workflow scans the published images on Docker Hub for vulnerabilities.
 # It generates a matrix of image/tag combinations and runs Trivy scans on them.
+#
+# NOTE: SARIF results are NOT uploaded to GitHub Security tab to avoid stale alerts.
+# Published image vulnerabilities are tracked via workflow artifacts and GitHub Actions summary.
+# Only the main branch workflow (trivy.yml) populates the Security tab.
 
 name: Published Images Vulnerability Scanning
 
@@ -17,7 +21,6 @@ on:
 
 permissions:
   contents: read
-  security-events: write # Required for uploading SARIF results to GitHub Security tab
   actions: read # Required for private repositories to get Action run status
 
 jobs:
@@ -43,7 +46,6 @@ jobs:
     needs: generate-matrix
     permissions:
       contents: read
-      security-events: write
       actions: read
     strategy:
       fail-fast: false
@@ -135,41 +137,9 @@ jobs:
           path: vulnerability-report-enhanced.md
           retention-days: 90
 
-      - name: Upload Trivy Surface SARIF to GitHub Security tab
-        if: always()
-        uses: github/codeql-action/upload-sarif@v4
-        with:
-          sarif_file: "trivy-surface.sarif"
-          category: "trivy-${{ matrix.image }}-${{ matrix.tag }}-surface"
-        continue-on-error: true
-
-      - name: Check if Trivy Deep SARIF exists
-        if: always()
-        id: check_trivy_deep
-        run: |
-          scripts/check-file-exists.sh trivy-deep.sarif exists
-
-      - name: Upload Trivy Deep SARIF to GitHub Security tab
-        if: always() && steps.check_trivy_deep.outputs.exists == 'true'
-        uses: github/codeql-action/upload-sarif@v4
-        with:
-          sarif_file: "trivy-deep.sarif"
-          category: "trivy-${{ matrix.image }}-${{ matrix.tag }}-deep"
-        continue-on-error: true
-
-      - name: Check if Grype SARIF exists
-        if: always()
-        id: check_grype
-        run: |
-          scripts/check-file-exists.sh grype-results.sarif exists
-
-      - name: Upload Grype SARIF to GitHub Security tab
-        if: always() && steps.check_grype.outputs.exists == 'true'
-        uses: github/codeql-action/upload-sarif@v4
-        with:
-          sarif_file: "grype-results.sarif"
-          category: "trivy-${{ matrix.image }}-${{ matrix.tag }}-grype"
-        continue-on-error: true
+      # NOTE: SARIF uploads to GitHub Security tab removed to prevent stale alerts.
+      # Published image vulnerabilities are tracked via artifacts below.
+      # Only main branch workflow (trivy.yml) populates Security tab.
 
       - name: Set sanitized names for artifacts
         if: always()
