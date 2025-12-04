@@ -32,3 +32,25 @@
 # Added By: DevOps Team
 # Review Date: 2026-02-20 (review when Trivy database is updated)
 CVE-2025-59250 exp:2026-02-20
+
+# GraalVM Python/setuptools - FALSE POSITIVES
+# Status: FALSE POSITIVE
+#
+# Description:
+# Trivy Deep Scan finds setuptools vulnerabilities in Python packages embedded
+# within GraalVM extensions (org.graalvm.python.vfs). These are false positives.
+#
+# Justification:
+# - Liquibase Docker images do not run pip or enable Python package installation
+# - The Python runtime is embedded in GraalVM for internal extension use only
+# - Users cannot execute Python code or install packages
+# - These CVEs require pip/package installation operations to exploit
+#
+# Source: Lead developer confirmation - "we don't run pip or enable the user to execute it"
+#
+# Date Added: 2025-12-04
+# Added By: DevOps Team
+# Review Date: 2026-06-04
+CVE-2022-40897 exp:2026-06-04
+CVE-2024-6345 exp:2026-06-04
+CVE-2025-47273 exp:2026-06-04

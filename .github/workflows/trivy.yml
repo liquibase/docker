@@ -141,6 +141,7 @@ jobs:
           sbom: "sbom.spdx.json"
           fail-build: false
           severity-cutoff: high
+          only-fixed: true
           output-format: sarif
         continue-on-error: true
 
