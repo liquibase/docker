@@ -40,14 +40,25 @@ CVE-2025-59250 exp:2026-02-20
 # Trivy Deep Scan finds setuptools vulnerabilities in Python packages embedded
 # within GraalVM extensions (org.graalvm.python.vfs). These are false positives.
 #
-# Justification:
-# - Liquibase Docker images do not run pip or enable Python package installation
-# - The Python runtime is embedded in GraalVM for internal extension use only
-# - Users cannot execute Python code or install packages
-# - These CVEs require pip/package installation operations to exploit
+# Technical Justification:
+# GraalVM Python is used in liquibase-checks for custom validation scripts.
+# While network access is enabled for the Python runtime, setuptools package
+# management functions are NEVER invoked at runtime:
 #
-# Source: Lead developer confirmation - "we don't run pip or enable the user to execute it"
+# - CVE-2022-40897 (ReDoS): Requires setuptools to parse HTML during package lookup.
+#   No package lookups occur - all packages are pre-installed at build time via Maven.
 #
+# - CVE-2024-6345 (Command injection): Requires setuptools to process URLs.
+#   setuptools download/install functions are never called at runtime.
+#
+# - CVE-2025-47273 (Path traversal): Requires setuptools to process package inputs.
+#   No package installation or processing occurs at runtime.
+#
+# setuptools is bundled as a transitive dependency (standard Python tooling) but
+# its package management functionality is never used. Package installation occurs
+# only during Maven build via graalpy-maven-plugin, not at runtime.
+#
+# Source: Code review of liquibase-checks PythonScriptExecutor.java
 # Date Added: 2025-12-04
 # Added By: DevOps Team
 # Review Date: 2026-06-04
