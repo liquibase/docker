@@ -96,7 +96,7 @@ jobs:
 
       - name: Run Grype scanner on SBOM
         id: grype_scan
-        uses: anchore/scan-action@v5
+        uses: anchore/scan-action@v7
         with:
           sbom: "sbom.spdx.json"
           fail-build: false
