@@ -64,12 +64,35 @@ echo "📝 Creating enhanced vulnerability report for ${IMAGE}:${TAG}..."
   echo ""
   echo "| Scanner | HIGH/CRITICAL Vulnerabilities |"
   echo "|---------|-------------------------------|"
-  echo "| Trivy Surface (OS + Top-level) | ${surface_vulns} |"
-  echo "| Trivy Deep (Nested JARs + Python) | ${deep_vulns} |"
+  echo "| OS & Application Libraries | ${surface_vulns} |"
+  echo "| Nested JAR Dependencies | ${deep_vulns} |"
   echo "| Grype (SBOM-based) | ${grype_vulns} |"
   echo "| **Total** | **${total_vulns}** |"
   echo ""
 } > "$report_file"
+
+# Add scan targets section
+{
+  echo "## Scan Targets"
+  echo ""
+  echo "### OS & Application Libraries"
+  if [ -f trivy-surface.json ]; then
+    jq -r '[.Results[].Target] | unique | .[]' trivy-surface.json 2>/dev/null | sed 's/^/- /' || echo "- (no targets found)"
+  else
+    echo "- (scan results not available)"
+  fi
+  echo ""
+  echo "### Nested JAR Dependencies"
+  if [ -f trivy-deep.json ]; then
+    target_count=$(jq -r '[.Results[].Target] | unique | length' trivy-deep.json 2>/dev/null || echo 0)
+    echo "*(${target_count} files scanned)*"
+    echo ""
+    jq -r '[.Results[].Target | split("/")[-1]] | unique | sort | .[]' trivy-deep.json 2>/dev/null | sed 's/^/- /' || echo "- (no targets found)"
+  else
+    echo "- (scan results not available)"
+  fi
+  echo ""
+} >> "$report_file"
 
 # Add parent JAR mapping section
 if [ -f "${EXTRACT_DIR}/jar-mapping.txt" ]; then
@@ -92,15 +115,15 @@ if [ -f trivy-deep.json ]; then
     echo ""
     echo "### Nested JAR Vulnerabilities"
     echo ""
-    echo "| Parent JAR | Nested JAR | Vulnerability | CVE Published | Severity | Installed | Fixed |"
-    echo "|------------|------------|---------------|---------------|----------|-----------|-------|"
+    echo "| Parent JAR | Nested JAR | NVD | GHSA | CVE Published | Trivy Severity | NVD Severity | Installed | Fixed |"
+    echo "|------------|------------|-----|------|---------------|----------------|--------------|-----------|-------|"
   } >> "$report_file"
 
   # Process each vulnerability and match with parent JAR
   jq -r '.Results[]? | .Target as $target | .Vulnerabilities[]? |
     select(.Severity == "HIGH" or .Severity == "CRITICAL") |
-    "\($target)|\(.PkgName)|\(.VulnerabilityID)|\((.PublishedDate // "-") | split("T")[0])|\(.Severity)|\(.InstalledVersion)|\(.FixedVersion // "-")"' \
-    trivy-deep.json 2>/dev/null | while IFS='|' read -r target pkg vuln cve_date severity installed fixed; do
+    "\($target)|\(.PkgName)|\(.VulnerabilityID)|\((.PublishedDate // "-") | split("T")[0])|\(.Severity)|\((.VendorSeverity.nvd // 0) | if . == 1 then "LOW" elif . == 2 then "MEDIUM" elif . == 3 then "HIGH" elif . == 4 then "CRITICAL" else "-" end)|\(.InstalledVersion)|\(.FixedVersion // "-")"' \
+    trivy-deep.json 2>/dev/null | while IFS='|' read -r target pkg vuln cve_date severity nvd_severity installed fixed; do
 
     # Extract JAR name from target path
     jar_file=$(basename "$target" 2>/dev/null || echo "$target")
@@ -115,7 +138,7 @@ if [ -f trivy-deep.json ]; then
       parent_jar="(unknown)"
     fi
 
-    echo "| $parent_jar | $jar_file | $vuln | $cve_date | $severity | $installed | $fixed |" >> "$report_file"
+    echo "| $parent_jar | $jar_file | [$vuln](https://nvd.nist.gov/vuln/detail/$vuln) | [GHSA](https://github.com/advisories?query=$vuln) | $cve_date | $severity | $nvd_severity | $installed | $fixed |" >> "$report_file"
   done
 
   echo "" >> "$report_file"
@@ -131,15 +154,15 @@ if [ -f trivy-deep.json ]; then
       echo ""
       echo "These are found in extension JARs (GraalVM Python VFS)"
       echo ""
-      echo "| Package | Vulnerability | CVE Published | Severity | Installed | Fixed |"
-      echo "|---------|---------------|---------------|----------|-----------|-------|"
+      echo "| Package | NVD | GHSA | CVE Published | Trivy Severity | NVD Severity | Installed | Fixed |"
+      echo "|---------|-----|------|---------------|----------------|--------------|-----------|-------|"
     } >> "$report_file"
 
     jq -r '.Results[]? | select(.Type == "python-pkg") | .Vulnerabilities[]? |
       select(.Severity == "HIGH" or .Severity == "CRITICAL") |
-      "\(.PkgName)|\(.VulnerabilityID)|\((.PublishedDate // "-") | split("T")[0])|\(.Severity)|\(.InstalledVersion)|\(.FixedVersion // "-")"' \
-      trivy-deep.json 2>/dev/null | while IFS='|' read -r pkg vuln cve_date severity installed fixed; do
-      echo "| $pkg | $vuln | $cve_date | $severity | $installed | $fixed |" >> "$report_file"
+      "\(.PkgName)|\(.VulnerabilityID)|\((.PublishedDate // "-") | split("T")[0])|\(.Severity)|\((.VendorSeverity.nvd // 0) | if . == 1 then "LOW" elif . == 2 then "MEDIUM" elif . == 3 then "HIGH" elif . == 4 then "CRITICAL" else "-" end)|\(.InstalledVersion)|\(.FixedVersion // "-")"' \
+      trivy-deep.json 2>/dev/null | while IFS='|' read -r pkg vuln cve_date severity nvd_severity installed fixed; do
+      echo "| $pkg | [$vuln](https://nvd.nist.gov/vuln/detail/$vuln) | [GHSA](https://github.com/advisories?query=$vuln) | $cve_date | $severity | $nvd_severity | $installed | $fixed |" >> "$report_file"
     done
 
     echo "" >> "$report_file"
