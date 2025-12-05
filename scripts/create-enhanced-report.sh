@@ -92,15 +92,15 @@ if [ -f trivy-deep.json ]; then
     echo ""
     echo "### Nested JAR Vulnerabilities"
     echo ""
-    echo "| Parent JAR | Nested JAR | Vulnerability | CVE Published | Severity | Installed | Fixed |"
-    echo "|------------|------------|---------------|---------------|----------|-----------|-------|"
+    echo "| Parent JAR | Nested JAR | NVD | GHSA | CVE Published | Trivy Severity | NVD Severity | Installed | Fixed |"
+    echo "|------------|------------|-----|------|---------------|----------------|--------------|-----------|-------|"
   } >> "$report_file"
 
   # Process each vulnerability and match with parent JAR
   jq -r '.Results[]? | .Target as $target | .Vulnerabilities[]? |
     select(.Severity == "HIGH" or .Severity == "CRITICAL") |
-    "\($target)|\(.PkgName)|\(.VulnerabilityID)|\((.PublishedDate // "-") | split("T")[0])|\(.Severity)|\(.InstalledVersion)|\(.FixedVersion // "-")"' \
-    trivy-deep.json 2>/dev/null | while IFS='|' read -r target pkg vuln cve_date severity installed fixed; do
+    "\($target)|\(.PkgName)|\(.VulnerabilityID)|\((.PublishedDate // "-") | split("T")[0])|\(.Severity)|\((.VendorSeverity.nvd // 0) | if . == 1 then "LOW" elif . == 2 then "MEDIUM" elif . == 3 then "HIGH" elif . == 4 then "CRITICAL" else "-" end)|\(.InstalledVersion)|\(.FixedVersion // "-")"' \
+    trivy-deep.json 2>/dev/null | while IFS='|' read -r target pkg vuln cve_date severity nvd_severity installed fixed; do
 
     # Extract JAR name from target path
     jar_file=$(basename "$target" 2>/dev/null || echo "$target")
@@ -115,7 +115,7 @@ if [ -f trivy-deep.json ]; then
       parent_jar="(unknown)"
     fi
 
-    echo "| $parent_jar | $jar_file | $vuln | $cve_date | $severity | $installed | $fixed |" >> "$report_file"
+    echo "| $parent_jar | $jar_file | [$vuln](https://nvd.nist.gov/vuln/detail/$vuln) | [GHSA](https://github.com/advisories?query=$vuln) | $cve_date | $severity | $nvd_severity | $installed | $fixed |" >> "$report_file"
   done
 
   echo "" >> "$report_file"
@@ -131,15 +131,15 @@ if [ -f trivy-deep.json ]; then
       echo ""
       echo "These are found in extension JARs (GraalVM Python VFS)"
       echo ""
-      echo "| Package | Vulnerability | CVE Published | Severity | Installed | Fixed |"
-      echo "|---------|---------------|---------------|----------|-----------|-------|"
+      echo "| Package | NVD | GHSA | CVE Published | Trivy Severity | NVD Severity | Installed | Fixed |"
+      echo "|---------|-----|------|---------------|----------------|--------------|-----------|-------|"
     } >> "$report_file"
 
     jq -r '.Results[]? | select(.Type == "python-pkg") | .Vulnerabilities[]? |
       select(.Severity == "HIGH" or .Severity == "CRITICAL") |
-      "\(.PkgName)|\(.VulnerabilityID)|\((.PublishedDate // "-") | split("T")[0])|\(.Severity)|\(.InstalledVersion)|\(.FixedVersion // "-")"' \
-      trivy-deep.json 2>/dev/null | while IFS='|' read -r pkg vuln cve_date severity installed fixed; do
-      echo "| $pkg | $vuln | $cve_date | $severity | $installed | $fixed |" >> "$report_file"
+      "\(.PkgName)|\(.VulnerabilityID)|\((.PublishedDate // "-") | split("T")[0])|\(.Severity)|\((.VendorSeverity.nvd // 0) | if . == 1 then "LOW" elif . == 2 then "MEDIUM" elif . == 3 then "HIGH" elif . == 4 then "CRITICAL" else "-" end)|\(.InstalledVersion)|\(.FixedVersion // "-")"' \
+      trivy-deep.json 2>/dev/null | while IFS='|' read -r pkg vuln cve_date severity nvd_severity installed fixed; do
+      echo "| $pkg | [$vuln](https://nvd.nist.gov/vuln/detail/$vuln) | [GHSA](https://github.com/advisories?query=$vuln) | $cve_date | $severity | $nvd_severity | $installed | $fixed |" >> "$report_file"
     done
 
     echo "" >> "$report_file"
