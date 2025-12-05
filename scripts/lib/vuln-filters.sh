@@ -90,12 +90,15 @@ jq_trivy_python_vulns() {
 
 # Format vendor severity for markdown display
 # Input: vendor_sev (e.g., "rh:H") and vendor_url
-# Output: "[rh:H](url)" if url exists, else "rh:H"
+# Output: "[rh:H](url)" if url exists, "-" if no vendor data, else "rh:H"
 # Usage: format_vendor_display "$vendor_sev" "$vendor_url"
 format_vendor_display() {
   local vendor_sev="$1"
   local vendor_url="$2"
-  if [ -n "$vendor_url" ]; then
+  # Handle no vendor data case (fallback returns "-:-")
+  if [ "$vendor_sev" = "-:-" ]; then
+    echo "-"
+  elif [ -n "$vendor_url" ]; then
     echo "[$vendor_sev]($vendor_url)"
   else
     echo "$vendor_sev"

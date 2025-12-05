@@ -37,9 +37,11 @@ def vendor_severity($cve):
   end;
 
 # Format vendor severity for markdown display
-# Returns "[prefix:letter](url)" if url exists, else "prefix:letter"
+# Returns "[prefix:letter](url)" if url exists, "prefix:letter" if no url, or "-" if no vendor data
 def format_vendor($vendor):
-  if $vendor[2] != "" then
+  if $vendor[0] == "-" then
+    "-"
+  elif $vendor[2] != "" then
     "[\($vendor[0]):\($vendor[1])](\($vendor[2]))"
   else
     "\($vendor[0]):\($vendor[1])"

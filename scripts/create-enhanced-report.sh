@@ -118,19 +118,9 @@ if [ "$surface_vulns" -gt 0 ] && [ -f trivy-surface.json ]; then
     echo "|---------|-----|-------------------|---------------|----------------|-----------------|-----------|-------|------|"
   } >> "$report_file"
 
-  jq -r '.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH" or .Severity == "CRITICAL") |
-    .VulnerabilityID as $cve |
-    '"${JQ_VENDOR_FILTER}"' |
-    "\(.PkgName)|\($cve)|\((.PublishedDate // "-") | split("T")[0])|\(.Severity)|\($vendor[0]):\($vendor[1])|\($vendor[2])|\(.InstalledVersion)|\(.FixedVersion // "-")|\(if (.FixedVersion // "") != "" then "Y" else "N" end)"' \
-    trivy-surface.json 2>/dev/null | while IFS='|' read -r pkg vuln cve_date severity vendor_sev vendor_url installed fixed has_fix; do
-    # Format vendor severity with link if URL available
-    if [ -n "$vendor_url" ]; then
-      vendor_display="[$vendor_sev]($vendor_url)"
-    else
-      vendor_display="$vendor_sev"
-    fi
-    # Format fix indicator
-    fix_indicator=$([ "$has_fix" = "Y" ] && echo "✅" || echo "❌")
+  jq_trivy_surface_vulns trivy-surface.json | while IFS='|' read -r pkg vuln cve_date severity vendor_sev vendor_url installed fixed has_fix; do
+    vendor_display=$(format_vendor_display "$vendor_sev" "$vendor_url")
+    fix_indicator=$(format_fix_indicator "$has_fix")
     echo "| $pkg | [$vuln](https://nvd.nist.gov/vuln/detail/$vuln) | [Search](https://github.com/advisories?query=$vuln) | $cve_date | $severity | $vendor_display | $installed | $fixed | $fix_indicator |" >> "$report_file"
   done
 
@@ -163,19 +153,20 @@ if [ -f trivy-deep.json ] && [ "$deep_vulns" -gt 0 ]; then
   } >> "$report_file"
 
   # Process each vulnerability and match with parent JAR
-  jq -r '.Results[]? | .Target as $target | .Vulnerabilities[]? |
-    select(.Severity == "HIGH" or .Severity == "CRITICAL") |
-    .VulnerabilityID as $cve |
-    '"${JQ_VENDOR_FILTER}"' |
-    "\($target)|\(.PkgName)|\($cve)|\((.PublishedDate // "-") | split("T")[0])|\(.Severity)|\($vendor[0]):\($vendor[1])|\($vendor[2])|\(.InstalledVersion)|\(.FixedVersion // "-")|\(if (.FixedVersion // "") != "" then "Y" else "N" end)"' \
-    trivy-deep.json 2>/dev/null | while IFS='|' read -r target pkg vuln cve_date severity vendor_sev vendor_url installed fixed has_fix; do
+  jq_trivy_deep_vulns trivy-deep.json | while IFS='|' read -r target pkgpath pkg vuln cve_date severity vendor_sev vendor_url installed fixed has_fix; do
+    # Use PkgPath if available (contains JAR file path), otherwise use Target
+    jar_path="${pkgpath:-$target}"
 
-    # Extract JAR name from target path
-    jar_file=$(basename "$target" 2>/dev/null || echo "$target")
+    # Extract JAR filename from path
+    if [[ "$jar_path" == *.jar ]]; then
+      jar_file=$(basename "$jar_path" 2>/dev/null || echo "$jar_path")
+    else
+      jar_file=$(basename "$target" 2>/dev/null || echo "$target")
+    fi
 
     # Find parent JAR from mapping file
     if [ -f "${EXTRACT_DIR}/jar-mapping.txt" ]; then
-      parent_jar=$(grep "$jar_file" "${EXTRACT_DIR}/jar-mapping.txt" | cut -d'|' -f1 | tr -d ' ' | head -1)
+      parent_jar=$(grep -F "$jar_file" "${EXTRACT_DIR}/jar-mapping.txt" | cut -d'|' -f1 | tr -d ' ' | head -1)
       if [ -z "$parent_jar" ]; then
         parent_jar="(internal)"
       fi
@@ -183,14 +174,8 @@ if [ -f trivy-deep.json ] && [ "$deep_vulns" -gt 0 ]; then
       parent_jar="(unknown)"
     fi
 
-    # Format vendor severity with link if URL available
-    if [ -n "$vendor_url" ]; then
-      vendor_display="[$vendor_sev]($vendor_url)"
-    else
-      vendor_display="$vendor_sev"
-    fi
-    # Format fix indicator
-    fix_indicator=$([ "$has_fix" = "Y" ] && echo "✅" || echo "❌")
+    vendor_display=$(format_vendor_display "$vendor_sev" "$vendor_url")
+    fix_indicator=$(format_fix_indicator "$has_fix")
     echo "| $parent_jar | $jar_file | [$vuln](https://nvd.nist.gov/vuln/detail/$vuln) | [Search](https://github.com/advisories?query=$vuln) | $cve_date | $severity | $vendor_display | $installed | $fixed | $fix_indicator |" >> "$report_file"
   done
 
@@ -211,20 +196,9 @@ if [ -f trivy-deep.json ]; then
       echo "|---------|-----|-------------------|---------------|----------------|-----------------|-----------|-------|------|"
     } >> "$report_file"
 
-    jq -r '.Results[]? | select(.Type == "python-pkg") | .Vulnerabilities[]? |
-      select(.Severity == "HIGH" or .Severity == "CRITICAL") |
-      .VulnerabilityID as $cve |
-      '"${JQ_VENDOR_FILTER}"' |
-      "\(.PkgName)|\($cve)|\((.PublishedDate // "-") | split("T")[0])|\(.Severity)|\($vendor[0]):\($vendor[1])|\($vendor[2])|\(.InstalledVersion)|\(.FixedVersion // "-")|\(if (.FixedVersion // "") != "" then "Y" else "N" end)"' \
-      trivy-deep.json 2>/dev/null | while IFS='|' read -r pkg vuln cve_date severity vendor_sev vendor_url installed fixed has_fix; do
-      # Format vendor severity with link if URL available
-      if [ -n "$vendor_url" ]; then
-        vendor_display="[$vendor_sev]($vendor_url)"
-      else
-        vendor_display="$vendor_sev"
-      fi
-      # Format fix indicator
-      fix_indicator=$([ "$has_fix" = "Y" ] && echo "✅" || echo "❌")
+    jq_trivy_python_vulns trivy-deep.json | while IFS='|' read -r pkg vuln cve_date severity vendor_sev vendor_url installed fixed has_fix; do
+      vendor_display=$(format_vendor_display "$vendor_sev" "$vendor_url")
+      fix_indicator=$(format_fix_indicator "$has_fix")
       echo "| $pkg | [$vuln](https://nvd.nist.gov/vuln/detail/$vuln) | [Search](https://github.com/advisories?query=$vuln) | $cve_date | $severity | $vendor_display | $installed | $fixed | $fix_indicator |" >> "$report_file"
     done
 
@@ -246,8 +220,7 @@ if [ "$grype_vulns" -gt 0 ] && [ -f grype-results.json ]; then
     (.matchDetails[0].fix.suggestedVersion // .vulnerability.fix.versions[0] // "-") as $fixVersion |
     "\(.artifact.name)|\(.vulnerability.id)|\(.vulnerability.severity)|\(.artifact.version)|\($fixVersion)|\(if $fixVersion != "-" then "Y" else "N" end)"' \
     grype-results.json 2>/dev/null | while IFS='|' read -r pkg vuln severity installed fixed has_fix; do
-    # Format fix indicator
-    fix_indicator=$([ "$has_fix" = "Y" ] && echo "✅" || echo "❌")
+    fix_indicator=$(format_fix_indicator "$has_fix")
     echo "| $pkg | [$vuln](https://nvd.nist.gov/vuln/detail/$vuln) | [Search](https://github.com/advisories?query=$vuln) | $severity | $installed | $fixed | $fix_indicator |" >> "$report_file"
   done
 

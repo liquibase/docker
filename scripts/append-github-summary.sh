@@ -150,13 +150,7 @@ if [ "$deep_vulns" -gt 0 ] && [ -f trivy-deep.json ]; then
   temp_table="/tmp/vuln-table-$$.txt"
   > "$temp_table"  # Clear temp file
 
-  jq -r '.Results[]? | .Target as $target | .Vulnerabilities[]? |
-    select(.Severity == "HIGH" or .Severity == "CRITICAL") |
-    .VulnerabilityID as $cve |
-    '"${JQ_VENDOR_FILTER}"' |
-    "\($target)|\(.PkgPath // "")|\(.PkgName)|\($cve)|\((.PublishedDate // "-") | split("T")[0])|\(.Severity)|\($vendor[0]):\($vendor[1])|\($vendor[2])|\(.InstalledVersion)|\(.FixedVersion // "-")|\(if (.FixedVersion // "") != "" then "Y" else "N" end)"' \
-    trivy-deep.json 2>/dev/null | while IFS='|' read -r target pkgpath pkg vuln cve_date severity vendor_sev vendor_url installed fixed has_fix; do
-
+  jq_trivy_deep_vulns trivy-deep.json | while IFS='|' read -r target pkgpath pkg vuln cve_date severity vendor_sev vendor_url installed fixed has_fix; do
     # Use PkgPath if available (contains JAR file path), otherwise use Target
     jar_path="${pkgpath:-$target}"
 
@@ -181,14 +175,8 @@ if [ "$deep_vulns" -gt 0 ] && [ -f trivy-deep.json ]; then
       fi
     fi
 
-    # Format vendor severity with link if URL available
-    if [ -n "$vendor_url" ]; then
-      vendor_display="[$vendor_sev]($vendor_url)"
-    else
-      vendor_display="$vendor_sev"
-    fi
-    # Format fix indicator
-    fix_indicator=$([ "$has_fix" = "Y" ] && echo "✅" || echo "❌")
+    vendor_display=$(format_vendor_display "$vendor_sev" "$vendor_url")
+    fix_indicator=$(format_fix_indicator "$has_fix")
     echo "| $parent_jar | $pkg | [$vuln](https://nvd.nist.gov/vuln/detail/$vuln) | [Search](https://github.com/advisories?query=$vuln) | $cve_date | $severity | $vendor_display | $installed | $fixed | $fix_indicator |" >> "$temp_table"
   done
 
