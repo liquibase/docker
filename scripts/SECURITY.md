@@ -8,7 +8,7 @@ The workflow performs three types of scans on each published Docker image:
 
 | Scan Type | What It Checks | Scanner |
 |-----------|----------------|---------|
-| **OS & Application Libraries** | Operating system packages (Alpine/Debian) and top-level Java libraries | Trivy |
+| **OS & Application Libraries** | Operating system packages (Debian/Ubuntu) and top-level Java libraries | Trivy |
 | **Nested JAR Dependencies** | Libraries bundled inside Liquibase JARs (Spring Boot fat JARs, extensions) | Trivy |
 | **SBOM-based Scan** | Software Bill of Materials - a complete inventory of all components | Grype |
 
