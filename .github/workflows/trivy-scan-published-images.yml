@@ -136,7 +136,7 @@ jobs:
         with:
           name: vulnerability-report-${{ matrix.image == 'liquibase/liquibase-secure' && 'secure' || 'community' }}-${{ matrix.tag }}
           path: vulnerability-report-enhanced.md
-          retention-days: 90
+          retention-days: 20
 
       - name: Append summary to GitHub Actions summary
         if: always()
