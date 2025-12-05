@@ -158,17 +158,4 @@ if [ "$grype_vulns" -gt 0 ] && [ -f grype-results.json ]; then
   echo "" >> "$GITHUB_STEP_SUMMARY"
 fi
 
-# Add scanner information
-{
-  echo "---"
-  echo ""
-  echo "### 📖 Scanner Information"
-  echo ""
-  echo "- **Trivy Surface**: Scans OS packages and top-level libraries"
-  echo "- **Trivy Deep**: Extracts and scans nested Spring Boot JARs (BOOT-INF/lib) and GraalVM Python packages"
-  echo "- **Grype**: SBOM-based validation for comprehensive dependency analysis"
-  echo ""
-  echo "💡 **Note**: Deep scan detects vulnerabilities in nested dependencies that standard scans miss."
-} >> "$GITHUB_STEP_SUMMARY"
-
 echo "✅ GitHub Actions summary updated"
