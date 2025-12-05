@@ -87,7 +87,15 @@ echo "📊 Appending vulnerability details to GitHub Actions summary..."
   fi
   echo ""
   echo "**Nested JAR Dependencies:**"
-  if [ -f trivy-deep.json ]; then
+  if [ -f "${EXTRACT_DIR}/scanned-jars.txt" ]; then
+    jar_count=$(wc -l < "${EXTRACT_DIR}/scanned-jars.txt" | tr -d ' ')
+    echo "*(${jar_count} JAR files scanned)*"
+    head -20 "${EXTRACT_DIR}/scanned-jars.txt" | sed 's/^/- /'
+    if [ "$jar_count" -gt 20 ]; then
+      echo "- ... and $((jar_count - 20)) more"
+    fi
+  elif [ -f trivy-deep.json ]; then
+    # Fallback to Trivy JSON if manifest not available
     target_count=$(jq -r '[.Results[].Target] | unique | length' trivy-deep.json 2>/dev/null || echo 0)
     echo "*(${target_count} files scanned)*"
     jq -r '[.Results[].Target | split("/")[-1]] | unique | sort | .[]' trivy-deep.json 2>/dev/null | head -20 | sed 's/^/- /' || echo "- (no targets found)"
@@ -107,13 +115,13 @@ if [ "$surface_vulns" -gt 0 ] && [ -f trivy-surface.json ]; then
   {
     echo "### 🔍 OS & Application Library Vulnerabilities"
     echo ""
-    echo "| Package | NVD | GHSA | CVE Published | Trivy Severity | NVD Severity | Installed | Fixed |"
-    echo "|---------|-----|------|---------------|----------------|--------------|-----------|-------|"
+    echo "| Package | NVD | GHSA | CVE Published | Trivy Severity | NVD Severity | GHSA Severity | Installed | Fixed |"
+    echo "|---------|-----|------|---------------|----------------|--------------|---------------|-----------|-------|"
   } >> "$GITHUB_STEP_SUMMARY"
 
   jq -r '.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH" or .Severity == "CRITICAL") |
-    "| \(.PkgName) | [\(.VulnerabilityID)](https://nvd.nist.gov/vuln/detail/\(.VulnerabilityID)) | [GHSA](https://github.com/advisories?query=\(.VulnerabilityID)) | \((.PublishedDate // "-") | split("T")[0]) | \(.Severity) | \((.VendorSeverity.nvd // 0) | if . == 1 then "LOW" elif . == 2 then "MEDIUM" elif . == 3 then "HIGH" elif . == 4 then "CRITICAL" else "-" end) | \(.InstalledVersion) | \(.FixedVersion // "-") |"' \
-    trivy-surface.json 2>/dev/null | head -20 >> "$GITHUB_STEP_SUMMARY" || echo "| Error parsing results | - | - | - | - | - | - | - |" >> "$GITHUB_STEP_SUMMARY"
+    "| \(.PkgName) | [\(.VulnerabilityID)](https://nvd.nist.gov/vuln/detail/\(.VulnerabilityID)) | [GHSA](https://github.com/advisories?query=\(.VulnerabilityID)) | \((.PublishedDate // "-") | split("T")[0]) | \(.Severity) | \((.VendorSeverity.nvd // 0) | if . == 1 then "LOW" elif . == 2 then "MEDIUM" elif . == 3 then "HIGH" elif . == 4 then "CRITICAL" else "-" end) | \((.VendorSeverity.ghsa // 0) | if . == 1 then "LOW" elif . == 2 then "MEDIUM" elif . == 3 then "HIGH" elif . == 4 then "CRITICAL" else "-" end) | \(.InstalledVersion) | \(.FixedVersion // "-") |"' \
+    trivy-surface.json 2>/dev/null | head -20 >> "$GITHUB_STEP_SUMMARY" || echo "| Error parsing results | - | - | - | - | - | - | - | - |" >> "$GITHUB_STEP_SUMMARY"
 
   echo "" >> "$GITHUB_STEP_SUMMARY"
 fi
@@ -122,8 +130,8 @@ if [ "$deep_vulns" -gt 0 ] && [ -f trivy-deep.json ]; then
   {
     echo "### 🔎 Nested JAR Dependency Vulnerabilities"
     echo ""
-    echo "| Parent JAR | Package | NVD | GHSA | CVE Published | Trivy Severity | NVD Severity | Installed | Fixed |"
-    echo "|------------|---------|-----|------|---------------|----------------|--------------|-----------|-------|"
+    echo "| Parent JAR | Package | NVD | GHSA | CVE Published | Trivy Severity | NVD Severity | GHSA Severity | Installed | Fixed |"
+    echo "|------------|---------|-----|------|---------------|----------------|--------------|---------------|-----------|-------|"
   } >> "$GITHUB_STEP_SUMMARY"
 
   # Process each vulnerability and look up parent JAR from mapping file
@@ -133,8 +141,8 @@ if [ "$deep_vulns" -gt 0 ] && [ -f trivy-deep.json ]; then
 
   jq -r '.Results[]? | .Target as $target | .Vulnerabilities[]? |
     select(.Severity == "HIGH" or .Severity == "CRITICAL") |
-    "\($target)|\(.PkgPath // "")|\(.PkgName)|\(.VulnerabilityID)|\((.PublishedDate // "-") | split("T")[0])|\(.Severity)|\((.VendorSeverity.nvd // 0) | if . == 1 then "LOW" elif . == 2 then "MEDIUM" elif . == 3 then "HIGH" elif . == 4 then "CRITICAL" else "-" end)|\(.InstalledVersion)|\(.FixedVersion // "-")"' \
-    trivy-deep.json 2>/dev/null | while IFS='|' read -r target pkgpath pkg vuln cve_date severity nvd_severity installed fixed; do
+    "\($target)|\(.PkgPath // "")|\(.PkgName)|\(.VulnerabilityID)|\((.PublishedDate // "-") | split("T")[0])|\(.Severity)|\((.VendorSeverity.nvd // 0) | if . == 1 then "LOW" elif . == 2 then "MEDIUM" elif . == 3 then "HIGH" elif . == 4 then "CRITICAL" else "-" end)|\((.VendorSeverity.ghsa // 0) | if . == 1 then "LOW" elif . == 2 then "MEDIUM" elif . == 3 then "HIGH" elif . == 4 then "CRITICAL" else "-" end)|\(.InstalledVersion)|\(.FixedVersion // "-")"' \
+    trivy-deep.json 2>/dev/null | while IFS='|' read -r target pkgpath pkg vuln cve_date severity nvd_severity ghsa_severity installed fixed; do
 
     # Use PkgPath if available (contains JAR file path), otherwise use Target
     jar_path="${pkgpath:-$target}"
@@ -160,7 +168,7 @@ if [ "$deep_vulns" -gt 0 ] && [ -f trivy-deep.json ]; then
       fi
     fi
 
-    echo "| $parent_jar | $pkg | [$vuln](https://nvd.nist.gov/vuln/detail/$vuln) | [GHSA](https://github.com/advisories?query=$vuln) | $cve_date | $severity | $nvd_severity | $installed | $fixed |" >> "$temp_table"
+    echo "| $parent_jar | $pkg | [$vuln](https://nvd.nist.gov/vuln/detail/$vuln) | [GHSA](https://github.com/advisories?query=$vuln) | $cve_date | $severity | $nvd_severity | $ghsa_severity | $installed | $fixed |" >> "$temp_table"
   done
 
   # Deduplicate and add to summary (limit to 40 entries)
