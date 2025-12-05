@@ -7,10 +7,23 @@ name: Test Dockerfiles
 
 on:
   push:
-    branches: ["main", "master"]
-  pull_request:
-    # The branches below must be a subset of the branches above
     branches: ["main"]
+    paths:
+      - 'Dockerfile*'
+      - 'docker-entrypoint.sh'
+      - '.github/workflows/test.yml'
+      - '.github/test/**'
+      - 'examples/**'
+      - 'pom.xml'
+  pull_request:
+    branches: ["main"]
+    paths:
+      - 'Dockerfile*'
+      - 'docker-entrypoint.sh'
+      - '.github/workflows/test.yml'
+      - '.github/test/**'
+      - 'examples/**'
+      - 'pom.xml'
 
 permissions:
   contents: read
