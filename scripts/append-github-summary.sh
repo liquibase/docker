@@ -31,6 +31,11 @@
 
 set -e
 
+# Source shared jq filters
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=lib/vuln-filters.sh
+source "${SCRIPT_DIR}/lib/vuln-filters.sh"
+
 # Arguments
 IMAGE="${1:?Error: Image name required}"
 TAG="${2:?Error: Tag required}"
@@ -125,7 +130,7 @@ if [ "$surface_vulns" -gt 0 ] && [ -f trivy-surface.json ]; then
 
   jq -r '.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH" or .Severity == "CRITICAL") |
     .VulnerabilityID as $cve |
-    (if .VendorSeverity.nvd then ["nvd", (.VendorSeverity.nvd | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end), "https://nvd.nist.gov/vuln/detail/\($cve)"] elif .VendorSeverity.ghsa then ["ghsa", (.VendorSeverity.ghsa | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end), "https://github.com/advisories?query=\($cve)"] elif .VendorSeverity.redhat then ["rh", (.VendorSeverity.redhat | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end), "https://access.redhat.com/security/cve/\($cve)"] elif .VendorSeverity.amazon then ["amz", (.VendorSeverity.amazon | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end), "https://alas.aws.amazon.com/cve/html/\($cve).html"] elif .VendorSeverity["oracle-oval"] then ["ora", (.VendorSeverity["oracle-oval"] | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end), "https://linux.oracle.com/cve/\($cve).html"] elif .VendorSeverity.bitnami then ["bit", (.VendorSeverity.bitnami | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end), ""] elif .VendorSeverity.alma then ["alma", (.VendorSeverity.alma | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end), "https://errata.almalinux.org/"] elif .VendorSeverity.rocky then ["rky", (.VendorSeverity.rocky | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end), "https://errata.rockylinux.org/"] else ["-", "-", ""] end) as $vendor |
+    '"${JQ_VENDOR_FILTER}"' |
     "| \(.PkgName) | [\($cve)](https://nvd.nist.gov/vuln/detail/\($cve)) | [Search](https://github.com/advisories?query=\($cve)) | \((.PublishedDate // "-") | split("T")[0]) | \(.Severity) | \(if $vendor[2] != "" then "[\($vendor[0]):\($vendor[1])](\($vendor[2]))" else "\($vendor[0]):\($vendor[1])" end) | \(.InstalledVersion) | \(.FixedVersion // "-") | \(if .FixedVersion then "✅" else "❌" end) |"' \
     trivy-surface.json 2>/dev/null | head -20 >> "$GITHUB_STEP_SUMMARY" || echo "| Error parsing results | - | - | - | - | - | - | - | - |" >> "$GITHUB_STEP_SUMMARY"
 
@@ -148,7 +153,7 @@ if [ "$deep_vulns" -gt 0 ] && [ -f trivy-deep.json ]; then
   jq -r '.Results[]? | .Target as $target | .Vulnerabilities[]? |
     select(.Severity == "HIGH" or .Severity == "CRITICAL") |
     .VulnerabilityID as $cve |
-    (if .VendorSeverity.nvd then ["nvd", (.VendorSeverity.nvd | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end), "https://nvd.nist.gov/vuln/detail/\($cve)"] elif .VendorSeverity.ghsa then ["ghsa", (.VendorSeverity.ghsa | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end), "https://github.com/advisories?query=\($cve)"] elif .VendorSeverity.redhat then ["rh", (.VendorSeverity.redhat | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end), "https://access.redhat.com/security/cve/\($cve)"] elif .VendorSeverity.amazon then ["amz", (.VendorSeverity.amazon | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end), "https://alas.aws.amazon.com/cve/html/\($cve).html"] elif .VendorSeverity["oracle-oval"] then ["ora", (.VendorSeverity["oracle-oval"] | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end), "https://linux.oracle.com/cve/\($cve).html"] elif .VendorSeverity.bitnami then ["bit", (.VendorSeverity.bitnami | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end), ""] elif .VendorSeverity.alma then ["alma", (.VendorSeverity.alma | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end), "https://errata.almalinux.org/"] elif .VendorSeverity.rocky then ["rky", (.VendorSeverity.rocky | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end), "https://errata.rockylinux.org/"] else ["-", "-", ""] end) as $vendor |
+    '"${JQ_VENDOR_FILTER}"' |
     "\($target)|\(.PkgPath // "")|\(.PkgName)|\($cve)|\((.PublishedDate // "-") | split("T")[0])|\(.Severity)|\($vendor[0]):\($vendor[1])|\($vendor[2])|\(.InstalledVersion)|\(.FixedVersion // "-")|\(if .FixedVersion then "Y" else "N" end)"' \
     trivy-deep.json 2>/dev/null | while IFS='|' read -r target pkgpath pkg vuln cve_date severity vendor_sev vendor_url installed fixed has_fix; do
 
