@@ -104,6 +104,34 @@ echo "📝 Creating enhanced vulnerability report for ${IMAGE}:${TAG}..."
   echo ""
 } >> "$report_file"
 
+# Add OS & Application Library vulnerabilities (only if found)
+if [ "$surface_vulns" -gt 0 ] && [ -f trivy-surface.json ]; then
+  {
+    echo "## OS & Application Library Vulnerabilities"
+    echo ""
+    echo "| Package | NVD | GitHub Advisories | CVE Published | Trivy Severity | Trivy Vendor Data | Installed | Fixed | Fix? |"
+    echo "|---------|-----|-------------------|---------------|----------------|-----------------|-----------|-------|------|"
+  } >> "$report_file"
+
+  jq -r '.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH" or .Severity == "CRITICAL") |
+    .VulnerabilityID as $cve |
+    (if .VendorSeverity.nvd then ["nvd", (.VendorSeverity.nvd | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end), "https://nvd.nist.gov/vuln/detail/\($cve)"] elif .VendorSeverity.ghsa then ["ghsa", (.VendorSeverity.ghsa | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end), "https://github.com/advisories?query=\($cve)"] elif .VendorSeverity.redhat then ["rh", (.VendorSeverity.redhat | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end), "https://access.redhat.com/security/cve/\($cve)"] elif .VendorSeverity.amazon then ["amz", (.VendorSeverity.amazon | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end), "https://alas.aws.amazon.com/cve/html/\($cve).html"] elif .VendorSeverity["oracle-oval"] then ["ora", (.VendorSeverity["oracle-oval"] | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end), "https://linux.oracle.com/cve/\($cve).html"] elif .VendorSeverity.bitnami then ["bit", (.VendorSeverity.bitnami | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end), ""] elif .VendorSeverity.alma then ["alma", (.VendorSeverity.alma | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end), "https://errata.almalinux.org/"] elif .VendorSeverity.rocky then ["rky", (.VendorSeverity.rocky | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end), "https://errata.rockylinux.org/"] else ["-", "-", ""] end) as $vendor |
+    "\(.PkgName)|\($cve)|\((.PublishedDate // "-") | split("T")[0])|\(.Severity)|\($vendor[0]):\($vendor[1])|\($vendor[2])|\(.InstalledVersion)|\(.FixedVersion // "-")|\(if .FixedVersion then "Y" else "N" end)"' \
+    trivy-surface.json 2>/dev/null | while IFS='|' read -r pkg vuln cve_date severity vendor_sev vendor_url installed fixed has_fix; do
+    # Format vendor severity with link if URL available
+    if [ -n "$vendor_url" ]; then
+      vendor_display="[$vendor_sev]($vendor_url)"
+    else
+      vendor_display="$vendor_sev"
+    fi
+    # Format fix indicator
+    fix_indicator=$([ "$has_fix" = "Y" ] && echo "✅" || echo "❌")
+    echo "| $pkg | [$vuln](https://nvd.nist.gov/vuln/detail/$vuln) | [Search](https://github.com/advisories?query=$vuln) | $cve_date | $severity | $vendor_display | $installed | $fixed | $fix_indicator |" >> "$report_file"
+  done
+
+  echo "" >> "$report_file"
+fi
+
 # Add parent JAR mapping section (only if vulnerabilities found)
 if [ -f "${EXTRACT_DIR}/jar-mapping.txt" ] && [ "$deep_vulns" -gt 0 ]; then
   {
@@ -197,6 +225,28 @@ if [ -f trivy-deep.json ]; then
 
     echo "" >> "$report_file"
   fi
+fi
+
+# Add Grype SBOM scan vulnerabilities (only if found)
+if [ "$grype_vulns" -gt 0 ] && [ -f grype-results.json ]; then
+  {
+    echo "## Grype SBOM Scan Details"
+    echo ""
+    echo "| Package | NVD | GitHub Advisories | Grype Severity | Installed | Fixed | Fix? |"
+    echo "|---------|-----|-------------------|----------------|-----------|-------|------|"
+  } >> "$report_file"
+
+  # Use suggestedVersion from matchDetails when available (filters to relevant version for installed package)
+  jq -r '.matches[]? | select(.vulnerability.severity == "High" or .vulnerability.severity == "Critical") |
+    (.matchDetails[0].fix.suggestedVersion // .vulnerability.fix.versions[0] // "-") as $fixVersion |
+    "\(.artifact.name)|\(.vulnerability.id)|\(.vulnerability.severity)|\(.artifact.version)|\($fixVersion)|\(if $fixVersion != "-" then "Y" else "N" end)"' \
+    grype-results.json 2>/dev/null | while IFS='|' read -r pkg vuln severity installed fixed has_fix; do
+    # Format fix indicator
+    fix_indicator=$([ "$has_fix" = "Y" ] && echo "✅" || echo "❌")
+    echo "| $pkg | [$vuln](https://nvd.nist.gov/vuln/detail/$vuln) | [Search](https://github.com/advisories?query=$vuln) | $severity | $installed | $fixed | $fix_indicator |" >> "$report_file"
+  done
+
+  echo "" >> "$report_file"
 fi
 
 echo "✓ Enhanced vulnerability report created: $report_file"
