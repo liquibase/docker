@@ -203,8 +203,10 @@ if [ "$grype_vulns" -gt 0 ] && [ -f grype-results.json ]; then
   } >> "$GITHUB_STEP_SUMMARY"
 
   # Note: Grype JSON doesn't include CVE publish dates or vendor severity in the standard output
+  # Use suggestedVersion from matchDetails when available (filters to relevant version for installed package)
   jq -r '.matches[]? | select(.vulnerability.severity == "High" or .vulnerability.severity == "Critical") |
-    "| \(.artifact.name) | [\(.vulnerability.id)](https://nvd.nist.gov/vuln/detail/\(.vulnerability.id)) | [Search](https://github.com/advisories?query=\(.vulnerability.id)) | \(.vulnerability.severity) | \(.artifact.version) | \(.vulnerability.fix.versions[0] // "-") | \(if .vulnerability.fix.versions[0] then "✅" else "❌" end) |"' \
+    (.matchDetails[0].fix.suggestedVersion // .vulnerability.fix.versions[0] // "-") as $fixVersion |
+    "| \(.artifact.name) | [\(.vulnerability.id)](https://nvd.nist.gov/vuln/detail/\(.vulnerability.id)) | [Search](https://github.com/advisories?query=\(.vulnerability.id)) | \(.vulnerability.severity) | \(.artifact.version) | \($fixVersion) | \(if $fixVersion != "-" then "✅" else "❌" end) |"' \
     grype-results.json 2>/dev/null | head -20 >> "$GITHUB_STEP_SUMMARY" || echo "| Error parsing results | - | - | - | - | - | - |" >> "$GITHUB_STEP_SUMMARY"
 
   echo "" >> "$GITHUB_STEP_SUMMARY"
