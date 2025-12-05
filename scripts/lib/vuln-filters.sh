@@ -58,7 +58,7 @@ jq_trivy_surface_vulns() {
   jq -r '.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH" or .Severity == "CRITICAL") |
     .VulnerabilityID as $cve |
     '"${JQ_VENDOR_FILTER}"' |
-    "\(.PkgName)|\($cve)|\((.PublishedDate // "-") | split("T")[0])|\(.Severity)|\($vendor[0]):\($vendor[1])|\($vendor[2])|\(.InstalledVersion)|\(.FixedVersion // "-")|\(if .FixedVersion then "Y" else "N" end)"' \
+    "\(.PkgName)|\($cve)|\((.PublishedDate // "-") | split("T")[0])|\(.Severity)|\($vendor[0]):\($vendor[1])|\($vendor[2])|\(.InstalledVersion)|\(.FixedVersion // "-")|\(if (.FixedVersion // "") != "" then "Y" else "N" end)"' \
     "$input_file" 2>/dev/null
 }
 
@@ -71,7 +71,7 @@ jq_trivy_deep_vulns() {
     select(.Severity == "HIGH" or .Severity == "CRITICAL") |
     .VulnerabilityID as $cve |
     '"${JQ_VENDOR_FILTER}"' |
-    "\($target)|\(.PkgPath // "")|\(.PkgName)|\($cve)|\((.PublishedDate // "-") | split("T")[0])|\(.Severity)|\($vendor[0]):\($vendor[1])|\($vendor[2])|\(.InstalledVersion)|\(.FixedVersion // "-")|\(if .FixedVersion then "Y" else "N" end)"' \
+    "\($target)|\(.PkgPath // "")|\(.PkgName)|\($cve)|\((.PublishedDate // "-") | split("T")[0])|\(.Severity)|\($vendor[0]):\($vendor[1])|\($vendor[2])|\(.InstalledVersion)|\(.FixedVersion // "-")|\(if (.FixedVersion // "") != "" then "Y" else "N" end)"' \
     "$input_file" 2>/dev/null
 }
 
@@ -84,7 +84,7 @@ jq_trivy_python_vulns() {
     select(.Severity == "HIGH" or .Severity == "CRITICAL") |
     .VulnerabilityID as $cve |
     '"${JQ_VENDOR_FILTER}"' |
-    "\(.PkgName)|\($cve)|\((.PublishedDate // "-") | split("T")[0])|\(.Severity)|\($vendor[0]):\($vendor[1])|\($vendor[2])|\(.InstalledVersion)|\(.FixedVersion // "-")|\(if .FixedVersion then "Y" else "N" end)"' \
+    "\(.PkgName)|\($cve)|\((.PublishedDate // "-") | split("T")[0])|\(.Severity)|\($vendor[0]):\($vendor[1])|\($vendor[2])|\(.InstalledVersion)|\(.FixedVersion // "-")|\(if (.FixedVersion // "") != "" then "Y" else "N" end)"' \
     "$input_file" 2>/dev/null
 }
 

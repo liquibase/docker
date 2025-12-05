@@ -131,7 +131,7 @@ if [ "$surface_vulns" -gt 0 ] && [ -f trivy-surface.json ]; then
   jq -r '.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH" or .Severity == "CRITICAL") |
     .VulnerabilityID as $cve |
     '"${JQ_VENDOR_FILTER}"' |
-    "| \(.PkgName) | [\($cve)](https://nvd.nist.gov/vuln/detail/\($cve)) | [Search](https://github.com/advisories?query=\($cve)) | \((.PublishedDate // "-") | split("T")[0]) | \(.Severity) | \(if $vendor[2] != "" then "[\($vendor[0]):\($vendor[1])](\($vendor[2]))" else "\($vendor[0]):\($vendor[1])" end) | \(.InstalledVersion) | \(.FixedVersion // "-") | \(if .FixedVersion then "✅" else "❌" end) |"' \
+    "| \(.PkgName) | [\($cve)](https://nvd.nist.gov/vuln/detail/\($cve)) | [Search](https://github.com/advisories?query=\($cve)) | \((.PublishedDate // "-") | split("T")[0]) | \(.Severity) | \(if $vendor[2] != "" then "[\($vendor[0]):\($vendor[1])](\($vendor[2]))" else "\($vendor[0]):\($vendor[1])" end) | \(.InstalledVersion) | \(.FixedVersion // "-") | \(if (.FixedVersion // "") != "" then "✅" else "❌" end) |"' \
     trivy-surface.json 2>/dev/null | head -20 >> "$GITHUB_STEP_SUMMARY" || echo "| Error parsing results | - | - | - | - | - | - | - | - |" >> "$GITHUB_STEP_SUMMARY"
 
   echo "" >> "$GITHUB_STEP_SUMMARY"
@@ -154,7 +154,7 @@ if [ "$deep_vulns" -gt 0 ] && [ -f trivy-deep.json ]; then
     select(.Severity == "HIGH" or .Severity == "CRITICAL") |
     .VulnerabilityID as $cve |
     '"${JQ_VENDOR_FILTER}"' |
-    "\($target)|\(.PkgPath // "")|\(.PkgName)|\($cve)|\((.PublishedDate // "-") | split("T")[0])|\(.Severity)|\($vendor[0]):\($vendor[1])|\($vendor[2])|\(.InstalledVersion)|\(.FixedVersion // "-")|\(if .FixedVersion then "Y" else "N" end)"' \
+    "\($target)|\(.PkgPath // "")|\(.PkgName)|\($cve)|\((.PublishedDate // "-") | split("T")[0])|\(.Severity)|\($vendor[0]):\($vendor[1])|\($vendor[2])|\(.InstalledVersion)|\(.FixedVersion // "-")|\(if (.FixedVersion // "") != "" then "Y" else "N" end)"' \
     trivy-deep.json 2>/dev/null | while IFS='|' read -r target pkgpath pkg vuln cve_date severity vendor_sev vendor_url installed fixed has_fix; do
 
     # Use PkgPath if available (contains JAR file path), otherwise use Target
