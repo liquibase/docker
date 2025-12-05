@@ -121,15 +121,17 @@ if [ -f trivy-deep.json ]; then
     echo ""
     echo "### Nested JAR Vulnerabilities"
     echo ""
-    echo "| Parent JAR | Nested JAR | NVD | Advisories | CVE Published | Trivy Severity | NVD Severity | GHSA Severity | Installed | Fixed |"
-    echo "|------------|------------|-----|------|---------------|----------------|--------------|---------------|-----------|-------|"
+    echo "| Parent JAR | Nested JAR | NVD | GitHub Advisories | CVE Published | Trivy Severity | Vendor Severity | Installed | Fixed | Fix? |"
+    echo "|------------|------------|-----|-------------------|---------------|----------------|-----------------|-----------|-------|------|"
   } >> "$report_file"
 
   # Process each vulnerability and match with parent JAR
   jq -r '.Results[]? | .Target as $target | .Vulnerabilities[]? |
     select(.Severity == "HIGH" or .Severity == "CRITICAL") |
-    "\($target)|\(.PkgName)|\(.VulnerabilityID)|\((.PublishedDate // "-") | split("T")[0])|\(.Severity)|\(if .VendorSeverity.nvd then (.VendorSeverity.nvd | if . == 1 then "LOW" elif . == 2 then "MEDIUM" elif . == 3 then "HIGH" elif . == 4 then "CRITICAL" else "-" end) elif .VendorSeverity.redhat then "rh:" + (.VendorSeverity.redhat | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) elif .VendorSeverity.amazon then "amz:" + (.VendorSeverity.amazon | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) elif .VendorSeverity["oracle-oval"] then "ora:" + (.VendorSeverity["oracle-oval"] | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) elif .VendorSeverity.bitnami then "bit:" + (.VendorSeverity.bitnami | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) elif .VendorSeverity.alma then "alma:" + (.VendorSeverity.alma | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) elif .VendorSeverity.rocky then "rky:" + (.VendorSeverity.rocky | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) else "-" end)|\(if .VendorSeverity.ghsa then (.VendorSeverity.ghsa | if . == 1 then "LOW" elif . == 2 then "MEDIUM" elif . == 3 then "HIGH" elif . == 4 then "CRITICAL" else "-" end) elif .VendorSeverity.redhat then "rh:" + (.VendorSeverity.redhat | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) elif .VendorSeverity.amazon then "amz:" + (.VendorSeverity.amazon | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) elif .VendorSeverity["oracle-oval"] then "ora:" + (.VendorSeverity["oracle-oval"] | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) elif .VendorSeverity.bitnami then "bit:" + (.VendorSeverity.bitnami | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) elif .VendorSeverity.alma then "alma:" + (.VendorSeverity.alma | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) elif .VendorSeverity.rocky then "rky:" + (.VendorSeverity.rocky | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) else "-" end)|\(.InstalledVersion)|\(.FixedVersion // "-")"' \
-    trivy-deep.json 2>/dev/null | while IFS='|' read -r target pkg vuln cve_date severity nvd_severity ghsa_severity installed fixed; do
+    .VulnerabilityID as $cve |
+    (if .VendorSeverity.nvd then ["nvd", (.VendorSeverity.nvd | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end), "https://nvd.nist.gov/vuln/detail/\($cve)"] elif .VendorSeverity.ghsa then ["ghsa", (.VendorSeverity.ghsa | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end), "https://github.com/advisories?query=\($cve)"] elif .VendorSeverity.redhat then ["rh", (.VendorSeverity.redhat | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end), "https://access.redhat.com/security/cve/\($cve)"] elif .VendorSeverity.amazon then ["amz", (.VendorSeverity.amazon | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end), "https://alas.aws.amazon.com/cve/html/\($cve).html"] elif .VendorSeverity["oracle-oval"] then ["ora", (.VendorSeverity["oracle-oval"] | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end), "https://linux.oracle.com/cve/\($cve).html"] elif .VendorSeverity.bitnami then ["bit", (.VendorSeverity.bitnami | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end), ""] elif .VendorSeverity.alma then ["alma", (.VendorSeverity.alma | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end), "https://errata.almalinux.org/"] elif .VendorSeverity.rocky then ["rky", (.VendorSeverity.rocky | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end), "https://errata.rockylinux.org/"] else ["-", "-", ""] end) as $vendor |
+    "\($target)|\(.PkgName)|\($cve)|\((.PublishedDate // "-") | split("T")[0])|\(.Severity)|\($vendor[0]):\($vendor[1])|\($vendor[2])|\(.InstalledVersion)|\(.FixedVersion // "-")|\(if .FixedVersion then "Y" else "N" end)"' \
+    trivy-deep.json 2>/dev/null | while IFS='|' read -r target pkg vuln cve_date severity vendor_sev vendor_url installed fixed has_fix; do
 
     # Extract JAR name from target path
     jar_file=$(basename "$target" 2>/dev/null || echo "$target")
@@ -144,7 +146,15 @@ if [ -f trivy-deep.json ]; then
       parent_jar="(unknown)"
     fi
 
-    echo "| $parent_jar | $jar_file | [$vuln](https://nvd.nist.gov/vuln/detail/$vuln) | [Advisories](https://github.com/advisories?query=$vuln) | $cve_date | $severity | $nvd_severity | $ghsa_severity | $installed | $fixed |" >> "$report_file"
+    # Format vendor severity with link if URL available
+    if [ -n "$vendor_url" ]; then
+      vendor_display="[$vendor_sev]($vendor_url)"
+    else
+      vendor_display="$vendor_sev"
+    fi
+    # Format fix indicator
+    fix_indicator=$([ "$has_fix" = "Y" ] && echo "✅" || echo "❌")
+    echo "| $parent_jar | $jar_file | [$vuln](https://nvd.nist.gov/vuln/detail/$vuln) | [Search](https://github.com/advisories?query=$vuln) | $cve_date | $severity | $vendor_display | $installed | $fixed | $fix_indicator |" >> "$report_file"
   done
 
   echo "" >> "$report_file"
@@ -160,15 +170,25 @@ if [ -f trivy-deep.json ]; then
       echo ""
       echo "These are found in extension JARs (GraalVM Python VFS)"
       echo ""
-      echo "| Package | NVD | Advisories | CVE Published | Trivy Severity | NVD Severity | GHSA Severity | Installed | Fixed |"
-      echo "|---------|-----|------|---------------|----------------|--------------|---------------|-----------|-------|"
+      echo "| Package | NVD | GitHub Advisories | CVE Published | Trivy Severity | Vendor Severity | Installed | Fixed | Fix? |"
+      echo "|---------|-----|-------------------|---------------|----------------|-----------------|-----------|-------|------|"
     } >> "$report_file"
 
     jq -r '.Results[]? | select(.Type == "python-pkg") | .Vulnerabilities[]? |
       select(.Severity == "HIGH" or .Severity == "CRITICAL") |
-      "\(.PkgName)|\(.VulnerabilityID)|\((.PublishedDate // "-") | split("T")[0])|\(.Severity)|\(if .VendorSeverity.nvd then (.VendorSeverity.nvd | if . == 1 then "LOW" elif . == 2 then "MEDIUM" elif . == 3 then "HIGH" elif . == 4 then "CRITICAL" else "-" end) elif .VendorSeverity.redhat then "rh:" + (.VendorSeverity.redhat | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) elif .VendorSeverity.amazon then "amz:" + (.VendorSeverity.amazon | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) elif .VendorSeverity["oracle-oval"] then "ora:" + (.VendorSeverity["oracle-oval"] | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) elif .VendorSeverity.bitnami then "bit:" + (.VendorSeverity.bitnami | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) elif .VendorSeverity.alma then "alma:" + (.VendorSeverity.alma | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) elif .VendorSeverity.rocky then "rky:" + (.VendorSeverity.rocky | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) else "-" end)|\(if .VendorSeverity.ghsa then (.VendorSeverity.ghsa | if . == 1 then "LOW" elif . == 2 then "MEDIUM" elif . == 3 then "HIGH" elif . == 4 then "CRITICAL" else "-" end) elif .VendorSeverity.redhat then "rh:" + (.VendorSeverity.redhat | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) elif .VendorSeverity.amazon then "amz:" + (.VendorSeverity.amazon | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) elif .VendorSeverity["oracle-oval"] then "ora:" + (.VendorSeverity["oracle-oval"] | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) elif .VendorSeverity.bitnami then "bit:" + (.VendorSeverity.bitnami | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) elif .VendorSeverity.alma then "alma:" + (.VendorSeverity.alma | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) elif .VendorSeverity.rocky then "rky:" + (.VendorSeverity.rocky | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) else "-" end)|\(.InstalledVersion)|\(.FixedVersion // "-")"' \
-      trivy-deep.json 2>/dev/null | while IFS='|' read -r pkg vuln cve_date severity nvd_severity ghsa_severity installed fixed; do
-      echo "| $pkg | [$vuln](https://nvd.nist.gov/vuln/detail/$vuln) | [Advisories](https://github.com/advisories?query=$vuln) | $cve_date | $severity | $nvd_severity | $ghsa_severity | $installed | $fixed |" >> "$report_file"
+      .VulnerabilityID as $cve |
+      (if .VendorSeverity.nvd then ["nvd", (.VendorSeverity.nvd | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end), "https://nvd.nist.gov/vuln/detail/\($cve)"] elif .VendorSeverity.ghsa then ["ghsa", (.VendorSeverity.ghsa | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end), "https://github.com/advisories?query=\($cve)"] elif .VendorSeverity.redhat then ["rh", (.VendorSeverity.redhat | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end), "https://access.redhat.com/security/cve/\($cve)"] elif .VendorSeverity.amazon then ["amz", (.VendorSeverity.amazon | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end), "https://alas.aws.amazon.com/cve/html/\($cve).html"] elif .VendorSeverity["oracle-oval"] then ["ora", (.VendorSeverity["oracle-oval"] | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end), "https://linux.oracle.com/cve/\($cve).html"] elif .VendorSeverity.bitnami then ["bit", (.VendorSeverity.bitnami | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end), ""] elif .VendorSeverity.alma then ["alma", (.VendorSeverity.alma | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end), "https://errata.almalinux.org/"] elif .VendorSeverity.rocky then ["rky", (.VendorSeverity.rocky | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end), "https://errata.rockylinux.org/"] else ["-", "-", ""] end) as $vendor |
+      "\(.PkgName)|\($cve)|\((.PublishedDate // "-") | split("T")[0])|\(.Severity)|\($vendor[0]):\($vendor[1])|\($vendor[2])|\(.InstalledVersion)|\(.FixedVersion // "-")|\(if .FixedVersion then "Y" else "N" end)"' \
+      trivy-deep.json 2>/dev/null | while IFS='|' read -r pkg vuln cve_date severity vendor_sev vendor_url installed fixed has_fix; do
+      # Format vendor severity with link if URL available
+      if [ -n "$vendor_url" ]; then
+        vendor_display="[$vendor_sev]($vendor_url)"
+      else
+        vendor_display="$vendor_sev"
+      fi
+      # Format fix indicator
+      fix_indicator=$([ "$has_fix" = "Y" ] && echo "✅" || echo "❌")
+      echo "| $pkg | [$vuln](https://nvd.nist.gov/vuln/detail/$vuln) | [Search](https://github.com/advisories?query=$vuln) | $cve_date | $severity | $vendor_display | $installed | $fixed | $fix_indicator |" >> "$report_file"
     done
 
     echo "" >> "$report_file"
