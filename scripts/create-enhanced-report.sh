@@ -64,12 +64,35 @@ echo "📝 Creating enhanced vulnerability report for ${IMAGE}:${TAG}..."
   echo ""
   echo "| Scanner | HIGH/CRITICAL Vulnerabilities |"
   echo "|---------|-------------------------------|"
-  echo "| Trivy Surface (OS + Top-level) | ${surface_vulns} |"
-  echo "| Trivy Deep (Nested JARs + Python) | ${deep_vulns} |"
+  echo "| OS & Application Libraries | ${surface_vulns} |"
+  echo "| Nested JAR Dependencies | ${deep_vulns} |"
   echo "| Grype (SBOM-based) | ${grype_vulns} |"
   echo "| **Total** | **${total_vulns}** |"
   echo ""
 } > "$report_file"
+
+# Add scan targets section
+{
+  echo "## Scan Targets"
+  echo ""
+  echo "### OS & Application Libraries"
+  if [ -f trivy-surface.json ]; then
+    jq -r '[.Results[].Target] | unique | .[]' trivy-surface.json 2>/dev/null | sed 's/^/- /' || echo "- (no targets found)"
+  else
+    echo "- (scan results not available)"
+  fi
+  echo ""
+  echo "### Nested JAR Dependencies"
+  if [ -f trivy-deep.json ]; then
+    target_count=$(jq -r '[.Results[].Target] | unique | length' trivy-deep.json 2>/dev/null || echo 0)
+    echo "*(${target_count} files scanned)*"
+    echo ""
+    jq -r '[.Results[].Target | split("/")[-1]] | unique | sort | .[]' trivy-deep.json 2>/dev/null | sed 's/^/- /' || echo "- (no targets found)"
+  else
+    echo "- (scan results not available)"
+  fi
+  echo ""
+} >> "$report_file"
 
 # Add parent JAR mapping section
 if [ -f "${EXTRACT_DIR}/jar-mapping.txt" ]; then

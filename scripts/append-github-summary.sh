@@ -68,16 +68,44 @@ echo "📊 Appending vulnerability details to GitHub Actions summary..."
   echo ""
   echo "| Scanner | Vulnerabilities | Status |"
   echo "|---------|-----------------|--------|"
-  echo "| 🔍 Trivy Surface (OS + Top-level) | ${surface_vulns} | $([ "$surface_vulns" -eq 0 ] && echo '✅' || echo '⚠️') |"
-  echo "| 🔎 Trivy Deep (Nested JARs + Python) | ${deep_vulns} | $([ "$deep_vulns" -eq 0 ] && echo '✅' || echo '⚠️') |"
+  echo "| 🔍 OS & Application Libraries | ${surface_vulns} | $([ "$surface_vulns" -eq 0 ] && echo '✅' || echo '⚠️') |"
+  echo "| 🔎 Nested JAR Dependencies | ${deep_vulns} | $([ "$deep_vulns" -eq 0 ] && echo '✅' || echo '⚠️') |"
   echo "| 📋 Grype (SBOM-based) | ${grype_vulns} | $([ "$grype_vulns" -eq 0 ] && echo '✅' || echo '⚠️') |"
+  echo ""
+} >> "$GITHUB_STEP_SUMMARY"
+
+# Add scan targets section (collapsible)
+{
+  echo "<details>"
+  echo "<summary>📁 Scan Targets (click to expand)</summary>"
+  echo ""
+  echo "**OS & Application Libraries:**"
+  if [ -f trivy-surface.json ]; then
+    jq -r '[.Results[].Target] | unique | .[]' trivy-surface.json 2>/dev/null | sed 's/^/- /' || echo "- (no targets found)"
+  else
+    echo "- (scan results not available)"
+  fi
+  echo ""
+  echo "**Nested JAR Dependencies:**"
+  if [ -f trivy-deep.json ]; then
+    target_count=$(jq -r '[.Results[].Target] | unique | length' trivy-deep.json 2>/dev/null || echo 0)
+    echo "*(${target_count} files scanned)*"
+    jq -r '[.Results[].Target | split("/")[-1]] | unique | sort | .[]' trivy-deep.json 2>/dev/null | head -20 | sed 's/^/- /' || echo "- (no targets found)"
+    if [ "$target_count" -gt 20 ]; then
+      echo "- ... and $((target_count - 20)) more"
+    fi
+  else
+    echo "- (scan results not available)"
+  fi
+  echo ""
+  echo "</details>"
   echo ""
 } >> "$GITHUB_STEP_SUMMARY"
 
 # Add detailed vulnerability tables
 if [ "$surface_vulns" -gt 0 ] && [ -f trivy-surface.json ]; then
   {
-    echo "### 🔍 Trivy Surface Scan Details"
+    echo "### 🔍 OS & Application Library Vulnerabilities"
     echo ""
     echo "| Package | NVD | GHSA | CVE Published | Trivy Severity | NVD Severity | Installed | Fixed |"
     echo "|---------|-----|------|---------------|----------------|--------------|-----------|-------|"
@@ -92,7 +120,7 @@ fi
 
 if [ "$deep_vulns" -gt 0 ] && [ -f trivy-deep.json ]; then
   {
-    echo "### 🔎 Trivy Deep Scan Details (Nested JARs & Python)"
+    echo "### 🔎 Nested JAR Dependency Vulnerabilities"
     echo ""
     echo "| Parent JAR | Package | NVD | GHSA | CVE Published | Trivy Severity | NVD Severity | Installed | Fixed |"
     echo "|------------|---------|-----|------|---------------|----------------|--------------|-----------|-------|"
