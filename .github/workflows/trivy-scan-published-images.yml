@@ -104,6 +104,7 @@ jobs:
           fail-build: false
           severity-cutoff: high
           output-format: json
+          output-file: "grype-results.json"
         continue-on-error: true
 
       - name: Save Grype results to file
