@@ -2,6 +2,8 @@
 
 This directory contains shell scripts extracted from GitHub Actions workflows for vulnerability scanning. These scripts are versioned, testable, and reusable across multiple workflows.
 
+> **For Support & Sales:** See [SECURITY.md](SECURITY.md) for a guide on understanding vulnerability reports, terminology definitions, and how to interpret scan results.
+
 ## Overview
 
 The scripts handle various aspects of Docker image vulnerability scanning:

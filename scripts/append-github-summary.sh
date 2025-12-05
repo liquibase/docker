@@ -31,6 +31,11 @@
 
 set -e
 
+# Source shared jq filters
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=lib/vuln-filters.sh
+source "${SCRIPT_DIR}/lib/vuln-filters.sh"
+
 # Arguments
 IMAGE="${1:?Error: Image name required}"
 TAG="${2:?Error: Tag required}"
@@ -93,6 +98,8 @@ echo "📊 Appending vulnerability details to GitHub Actions summary..."
     head -20 "${EXTRACT_DIR}/scanned-jars.txt" | sed 's/^/- /'
     if [ "$jar_count" -gt 20 ]; then
       echo "- ... and $((jar_count - 20)) more"
+      echo ""
+      echo "📎 *Full report available in workflow artifacts*"
     fi
   elif [ -f trivy-deep.json ]; then
     # Fallback to Trivy JSON if manifest not available
@@ -101,6 +108,8 @@ echo "📊 Appending vulnerability details to GitHub Actions summary..."
     jq -r '[.Results[].Target | split("/")[-1]] | unique | sort | .[]' trivy-deep.json 2>/dev/null | head -20 | sed 's/^/- /' || echo "- (no targets found)"
     if [ "$target_count" -gt 20 ]; then
       echo "- ... and $((target_count - 20)) more"
+      echo ""
+      echo "📎 *Full report available in workflow artifacts*"
     fi
   else
     echo "- (scan results not available)"
@@ -115,12 +124,14 @@ if [ "$surface_vulns" -gt 0 ] && [ -f trivy-surface.json ]; then
   {
     echo "### 🔍 OS & Application Library Vulnerabilities"
     echo ""
-    echo "| Package | NVD | Advisories | CVE Published | Trivy Severity | NVD Severity | GHSA Severity | Installed | Fixed |"
-    echo "|---------|-----|------|---------------|----------------|--------------|---------------|-----------|-------|"
+    echo "| Package | NVD | GitHub Advisories | CVE Published | Trivy Severity | Trivy Vendor Data | Installed | Fixed | Fix? |"
+    echo "|---------|-----|-------------------|---------------|----------------|-----------------|-----------|-------|------|"
   } >> "$GITHUB_STEP_SUMMARY"
 
   jq -r '.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH" or .Severity == "CRITICAL") |
-    "| \(.PkgName) | [\(.VulnerabilityID)](https://nvd.nist.gov/vuln/detail/\(.VulnerabilityID)) | [Advisories](https://github.com/advisories?query=\(.VulnerabilityID)) | \((.PublishedDate // "-") | split("T")[0]) | \(.Severity) | \(if .VendorSeverity.nvd then (.VendorSeverity.nvd | if . == 1 then "LOW" elif . == 2 then "MEDIUM" elif . == 3 then "HIGH" elif . == 4 then "CRITICAL" else "-" end) elif .VendorSeverity.redhat then "rh:" + (.VendorSeverity.redhat | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) elif .VendorSeverity.amazon then "amz:" + (.VendorSeverity.amazon | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) elif .VendorSeverity["oracle-oval"] then "ora:" + (.VendorSeverity["oracle-oval"] | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) elif .VendorSeverity.bitnami then "bit:" + (.VendorSeverity.bitnami | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) elif .VendorSeverity.alma then "alma:" + (.VendorSeverity.alma | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) elif .VendorSeverity.rocky then "rky:" + (.VendorSeverity.rocky | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) else "-" end) | \(if .VendorSeverity.ghsa then (.VendorSeverity.ghsa | if . == 1 then "LOW" elif . == 2 then "MEDIUM" elif . == 3 then "HIGH" elif . == 4 then "CRITICAL" else "-" end) elif .VendorSeverity.redhat then "rh:" + (.VendorSeverity.redhat | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) elif .VendorSeverity.amazon then "amz:" + (.VendorSeverity.amazon | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) elif .VendorSeverity["oracle-oval"] then "ora:" + (.VendorSeverity["oracle-oval"] | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) elif .VendorSeverity.bitnami then "bit:" + (.VendorSeverity.bitnami | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) elif .VendorSeverity.alma then "alma:" + (.VendorSeverity.alma | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) elif .VendorSeverity.rocky then "rky:" + (.VendorSeverity.rocky | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) else "-" end) | \(.InstalledVersion) | \(.FixedVersion // "-") |"' \
+    .VulnerabilityID as $cve |
+    '"${JQ_VENDOR_FILTER}"' |
+    "| \(.PkgName) | [\($cve)](https://nvd.nist.gov/vuln/detail/\($cve)) | [Search](https://github.com/advisories?query=\($cve)) | \((.PublishedDate // "-") | split("T")[0]) | \(.Severity) | \(if $vendor[2] != "" then "[\($vendor[0]):\($vendor[1])](\($vendor[2]))" else "\($vendor[0]):\($vendor[1])" end) | \(.InstalledVersion) | \(.FixedVersion // "-") | \(if (.FixedVersion // "") != "" then "✅" else "❌" end) |"' \
     trivy-surface.json 2>/dev/null | head -20 >> "$GITHUB_STEP_SUMMARY" || echo "| Error parsing results | - | - | - | - | - | - | - | - |" >> "$GITHUB_STEP_SUMMARY"
 
   echo "" >> "$GITHUB_STEP_SUMMARY"
@@ -130,8 +141,8 @@ if [ "$deep_vulns" -gt 0 ] && [ -f trivy-deep.json ]; then
   {
     echo "### 🔎 Nested JAR Dependency Vulnerabilities"
     echo ""
-    echo "| Parent JAR | Package | NVD | Advisories | CVE Published | Trivy Severity | NVD Severity | GHSA Severity | Installed | Fixed |"
-    echo "|------------|---------|-----|------|---------------|----------------|--------------|---------------|-----------|-------|"
+    echo "| Parent JAR | Package | NVD | GitHub Advisories | CVE Published | Trivy Severity | Trivy Vendor Data | Installed | Fixed | Fix? |"
+    echo "|------------|---------|-----|-------------------|---------------|----------------|-----------------|-----------|-------|------|"
   } >> "$GITHUB_STEP_SUMMARY"
 
   # Process each vulnerability and look up parent JAR from mapping file
@@ -139,11 +150,7 @@ if [ "$deep_vulns" -gt 0 ] && [ -f trivy-deep.json ]; then
   temp_table="/tmp/vuln-table-$$.txt"
   > "$temp_table"  # Clear temp file
 
-  jq -r '.Results[]? | .Target as $target | .Vulnerabilities[]? |
-    select(.Severity == "HIGH" or .Severity == "CRITICAL") |
-    "\($target)|\(.PkgPath // "")|\(.PkgName)|\(.VulnerabilityID)|\((.PublishedDate // "-") | split("T")[0])|\(.Severity)|\(if .VendorSeverity.nvd then (.VendorSeverity.nvd | if . == 1 then "LOW" elif . == 2 then "MEDIUM" elif . == 3 then "HIGH" elif . == 4 then "CRITICAL" else "-" end) elif .VendorSeverity.redhat then "rh:" + (.VendorSeverity.redhat | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) elif .VendorSeverity.amazon then "amz:" + (.VendorSeverity.amazon | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) elif .VendorSeverity["oracle-oval"] then "ora:" + (.VendorSeverity["oracle-oval"] | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) elif .VendorSeverity.bitnami then "bit:" + (.VendorSeverity.bitnami | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) elif .VendorSeverity.alma then "alma:" + (.VendorSeverity.alma | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) elif .VendorSeverity.rocky then "rky:" + (.VendorSeverity.rocky | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) else "-" end)|\(if .VendorSeverity.ghsa then (.VendorSeverity.ghsa | if . == 1 then "LOW" elif . == 2 then "MEDIUM" elif . == 3 then "HIGH" elif . == 4 then "CRITICAL" else "-" end) elif .VendorSeverity.redhat then "rh:" + (.VendorSeverity.redhat | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) elif .VendorSeverity.amazon then "amz:" + (.VendorSeverity.amazon | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) elif .VendorSeverity["oracle-oval"] then "ora:" + (.VendorSeverity["oracle-oval"] | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) elif .VendorSeverity.bitnami then "bit:" + (.VendorSeverity.bitnami | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) elif .VendorSeverity.alma then "alma:" + (.VendorSeverity.alma | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) elif .VendorSeverity.rocky then "rky:" + (.VendorSeverity.rocky | if . == 1 then "L" elif . == 2 then "M" elif . == 3 then "H" elif . == 4 then "C" else "-" end) else "-" end)|\(.InstalledVersion)|\(.FixedVersion // "-")"' \
-    trivy-deep.json 2>/dev/null | while IFS='|' read -r target pkgpath pkg vuln cve_date severity nvd_severity ghsa_severity installed fixed; do
-
+  jq_trivy_deep_vulns trivy-deep.json | while IFS='|' read -r target pkgpath pkg vuln cve_date severity vendor_sev vendor_url installed fixed has_fix; do
     # Use PkgPath if available (contains JAR file path), otherwise use Target
     jar_path="${pkgpath:-$target}"
 
@@ -168,7 +175,9 @@ if [ "$deep_vulns" -gt 0 ] && [ -f trivy-deep.json ]; then
       fi
     fi
 
-    echo "| $parent_jar | $pkg | [$vuln](https://nvd.nist.gov/vuln/detail/$vuln) | [Advisories](https://github.com/advisories?query=$vuln) | $cve_date | $severity | $nvd_severity | $ghsa_severity | $installed | $fixed |" >> "$temp_table"
+    vendor_display=$(format_vendor_display "$vendor_sev" "$vendor_url")
+    fix_indicator=$(format_fix_indicator "$has_fix")
+    echo "| $parent_jar | $pkg | [$vuln](https://nvd.nist.gov/vuln/detail/$vuln) | [Search](https://github.com/advisories?query=$vuln) | $cve_date | $severity | $vendor_display | $installed | $fixed | $fix_indicator |" >> "$temp_table"
   done
 
   # Deduplicate and add to summary (limit to 40 entries)
@@ -182,14 +191,16 @@ if [ "$grype_vulns" -gt 0 ] && [ -f grype-results.json ]; then
   {
     echo "### 📋 Grype SBOM Scan Details"
     echo ""
-    echo "| Package | NVD | Advisories | Severity | Installed | Fixed |"
-    echo "|---------|-----|------|----------|-----------|-------|"
+    echo "| Package | NVD | GitHub Advisories | Grype Severity | Installed | Fixed | Fix? |"
+    echo "|---------|-----|-------------------|----------------|-----------|-------|------|"
   } >> "$GITHUB_STEP_SUMMARY"
 
   # Note: Grype JSON doesn't include CVE publish dates or vendor severity in the standard output
+  # Use suggestedVersion from matchDetails when available (filters to relevant version for installed package)
   jq -r '.matches[]? | select(.vulnerability.severity == "High" or .vulnerability.severity == "Critical") |
-    "| \(.artifact.name) | [\(.vulnerability.id)](https://nvd.nist.gov/vuln/detail/\(.vulnerability.id)) | [Advisories](https://github.com/advisories?query=\(.vulnerability.id)) | \(.vulnerability.severity) | \(.artifact.version) | \(.vulnerability.fix.versions[0] // "-") |"' \
-    grype-results.json 2>/dev/null | head -20 >> "$GITHUB_STEP_SUMMARY" || echo "| Error parsing results | - | - | - | - | - |" >> "$GITHUB_STEP_SUMMARY"
+    (.matchDetails[0].fix.suggestedVersion // .vulnerability.fix.versions[0] // "-") as $fixVersion |
+    "| \(.artifact.name) | [\(.vulnerability.id)](https://nvd.nist.gov/vuln/detail/\(.vulnerability.id)) | [Search](https://github.com/advisories?query=\(.vulnerability.id)) | \(.vulnerability.severity) | \(.artifact.version) | \($fixVersion) | \(if $fixVersion != "-" then "✅" else "❌" end) |"' \
+    grype-results.json 2>/dev/null | head -20 >> "$GITHUB_STEP_SUMMARY" || echo "| Error parsing results | - | - | - | - | - | - |" >> "$GITHUB_STEP_SUMMARY"
 
   echo "" >> "$GITHUB_STEP_SUMMARY"
 fi
