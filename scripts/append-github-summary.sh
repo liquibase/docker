@@ -198,8 +198,8 @@ if [ "$grype_vulns" -gt 0 ] && [ -f grype-results.json ]; then
   {
     echo "### 📋 Grype SBOM Scan Details"
     echo ""
-    echo "| Package | NVD | GitHub Advisories | Severity | Installed | Fixed | Fix? |"
-    echo "|---------|-----|-------------------|----------|-----------|-------|------|"
+    echo "| Package | NVD | GitHub Advisories | Grype Severity | Installed | Fixed | Fix? |"
+    echo "|---------|-----|-------------------|----------------|-----------|-------|------|"
   } >> "$GITHUB_STEP_SUMMARY"
 
   # Note: Grype JSON doesn't include CVE publish dates or vendor severity in the standard output
