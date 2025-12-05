@@ -119,7 +119,7 @@ if [ "$surface_vulns" -gt 0 ] && [ -f trivy-surface.json ]; then
   {
     echo "### 🔍 OS & Application Library Vulnerabilities"
     echo ""
-    echo "| Package | NVD | GitHub Advisories | CVE Published | Trivy Severity | Vendor Severity | Installed | Fixed | Fix? |"
+    echo "| Package | NVD | GitHub Advisories | CVE Published | Trivy Severity | Trivy Vendor Data | Installed | Fixed | Fix? |"
     echo "|---------|-----|-------------------|---------------|----------------|-----------------|-----------|-------|------|"
   } >> "$GITHUB_STEP_SUMMARY"
 
@@ -136,7 +136,7 @@ if [ "$deep_vulns" -gt 0 ] && [ -f trivy-deep.json ]; then
   {
     echo "### 🔎 Nested JAR Dependency Vulnerabilities"
     echo ""
-    echo "| Parent JAR | Package | NVD | GitHub Advisories | CVE Published | Trivy Severity | Vendor Severity | Installed | Fixed | Fix? |"
+    echo "| Parent JAR | Package | NVD | GitHub Advisories | CVE Published | Trivy Severity | Trivy Vendor Data | Installed | Fixed | Fix? |"
     echo "|------------|---------|-----|-------------------|---------------|----------------|-----------------|-----------|-------|------|"
   } >> "$GITHUB_STEP_SUMMARY"
 

@@ -121,7 +121,7 @@ if [ -f trivy-deep.json ]; then
     echo ""
     echo "### Nested JAR Vulnerabilities"
     echo ""
-    echo "| Parent JAR | Nested JAR | NVD | GitHub Advisories | CVE Published | Trivy Severity | Vendor Severity | Installed | Fixed | Fix? |"
+    echo "| Parent JAR | Nested JAR | NVD | GitHub Advisories | CVE Published | Trivy Severity | Trivy Vendor Data | Installed | Fixed | Fix? |"
     echo "|------------|------------|-----|-------------------|---------------|----------------|-----------------|-----------|-------|------|"
   } >> "$report_file"
 
@@ -170,7 +170,7 @@ if [ -f trivy-deep.json ]; then
       echo ""
       echo "These are found in extension JARs (GraalVM Python VFS)"
       echo ""
-      echo "| Package | NVD | GitHub Advisories | CVE Published | Trivy Severity | Vendor Severity | Installed | Fixed | Fix? |"
+      echo "| Package | NVD | GitHub Advisories | CVE Published | Trivy Severity | Trivy Vendor Data | Installed | Fixed | Fix? |"
       echo "|---------|-----|-------------------|---------------|----------------|-----------------|-----------|-------|------|"
     } >> "$report_file"
 
