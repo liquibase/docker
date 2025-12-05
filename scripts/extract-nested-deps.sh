@@ -159,6 +159,26 @@ if [ -d "${EXTRACT_DIR}/internal-jars/extensions" ]; then
   done
 fi
 
+# Save manifest of JAR files for reporting
+echo "📝 Creating JAR manifest..."
+MANIFEST="${EXTRACT_DIR}/scanned-jars.txt"
+{
+  # List lib JARs
+  if [ -d "${EXTRACT_DIR}/internal-jars/lib" ]; then
+    ls -1 "${EXTRACT_DIR}/internal-jars/lib/"*.jar 2>/dev/null | xargs -n1 basename 2>/dev/null || true
+  fi
+  # List extension JARs
+  if [ -d "${EXTRACT_DIR}/internal-jars/extensions" ]; then
+    ls -1 "${EXTRACT_DIR}/internal-jars/extensions/"*.jar 2>/dev/null | xargs -n1 basename 2>/dev/null || true
+  fi
+  # List nested JARs from dist archives
+  if [ -d "${EXTRACT_DIR}/dist" ]; then
+    find "${EXTRACT_DIR}/dist" -type d -name "*-nested-jars" -exec ls -1 {} \; 2>/dev/null | xargs -n1 basename 2>/dev/null || true
+  fi
+} | sort -u > "$MANIFEST"
+manifest_count=$(wc -l < "$MANIFEST" | tr -d ' ')
+echo "✓ Created manifest with ${manifest_count} JAR files"
+
 # Show what was extracted
 echo ""
 echo "📊 Extraction Summary:"
