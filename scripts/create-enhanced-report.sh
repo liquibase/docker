@@ -69,6 +69,10 @@ echo "📝 Creating enhanced vulnerability report for ${IMAGE}:${TAG}..."
   echo "| Grype (SBOM-based) | ${grype_vulns} |"
   echo "| **Total** | **${total_vulns}** |"
   echo ""
+  if [ "$total_vulns" -eq 0 ]; then
+    echo "**No HIGH/CRITICAL vulnerabilities found.**"
+    echo ""
+  fi
 } > "$report_file"
 
 # Add scan targets section
@@ -100,8 +104,8 @@ echo "📝 Creating enhanced vulnerability report for ${IMAGE}:${TAG}..."
   echo ""
 } >> "$report_file"
 
-# Add parent JAR mapping section
-if [ -f "${EXTRACT_DIR}/jar-mapping.txt" ]; then
+# Add parent JAR mapping section (only if vulnerabilities found)
+if [ -f "${EXTRACT_DIR}/jar-mapping.txt" ] && [ "$deep_vulns" -gt 0 ]; then
   {
     echo "## Parent JAR Relationships"
     echo ""
@@ -114,8 +118,8 @@ if [ -f "${EXTRACT_DIR}/jar-mapping.txt" ]; then
   } >> "$report_file"
 fi
 
-# Add detailed vulnerability table with parent JAR context
-if [ -f trivy-deep.json ]; then
+# Add detailed vulnerability table with parent JAR context (only if vulnerabilities found)
+if [ -f trivy-deep.json ] && [ "$deep_vulns" -gt 0 ]; then
   {
     echo "## Detailed Vulnerability Analysis"
     echo ""
