@@ -141,7 +141,9 @@ jobs:
           sbom: "sbom.spdx.json"
           fail-build: false
           severity-cutoff: high
+          only-fixed: true
           output-format: sarif
+          output-file: results.sarif
         continue-on-error: true
 
       - name: Save Grype results to file
