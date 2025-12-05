@@ -94,14 +94,14 @@ jobs:
       matrix: ${{ fromJSON(needs.set-matrix.outputs.matrix) }}
     steps:
       - name: Configure AWS credentials for vault access
-        uses: aws-actions/configure-aws-credentials@v5
+        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5
         with:
           role-to-assume: ${{ secrets.LIQUIBASE_VAULT_OIDC_ROLE_ARN }}
           aws-region: us-east-1
 
       - name: Get secrets from vault
         id: vault-secrets-liquibase
-        uses: aws-actions/aws-secretsmanager-get-secrets@v2
+        uses: aws-actions/aws-secretsmanager-get-secrets@a9a7eb4e2f2871d30dc5b892576fde60a2ecc802 # v2
         with:
           secret-ids: |
             ,/vault/liquibase
@@ -109,7 +109,7 @@ jobs:
 
       - name: Configure AWS credentials for Liquibase-Secure builds
         if: ${{ matrix.build_type == 'secure' }}
-        uses: aws-actions/configure-aws-credentials@v5
+        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5
         with:
           role-to-assume: ${{ env.AWS_PROD_GITHUB_OIDC_ROLE_ARN_LIQUIBASE_PRO }}
           aws-region: us-east-1
@@ -307,7 +307,7 @@ jobs:
         if: ${{ matrix.build_type == 'secure' && steps.download-artifact.outputs.trigger_liquibase_secure_workflow == 'true' && steps.download-artifact.outputs.use_fallback != 'true' }}
         id: trigger-liquibase-secure-release
         continue-on-error: true
-        uses: the-actions-org/workflow-dispatch@v4
+        uses: the-actions-org/workflow-dispatch@3133c5d135c7dbe4be4f9793872b6ef331b53bc7 # v4
         with:
           workflow: secure-release-to-s3.yml
           token: ${{ steps.get-token.outputs.token }}
@@ -510,15 +510,15 @@ jobs:
 
       - name: Set up Docker Buildx
         if: ${{ steps.validate-build.outcome == 'success' }}
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3
 
       - name: Set up QEMU
         if: ${{ steps.validate-build.outcome == 'success' }}
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3
 
       - name: Log in to internal Nexus Docker Registry
         if: ${{ steps.validate-build.outcome == 'success' }}
-        uses: docker/login-action@v3
+        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3
         with:
           registry: ${{ env.REPO_URL }}
           username: ${{ env.REPO_USER }}
@@ -526,7 +526,7 @@ jobs:
 
       - name: Build and push Docker image
         if: ${{ steps.validate-build.outcome == 'success' }}
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6
         with:
           context: .
           file: ${{ matrix.dockerfile }}
