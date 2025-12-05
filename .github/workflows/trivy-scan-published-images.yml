@@ -127,7 +127,7 @@ jobs:
       - name: Create enhanced vulnerability report with parent JAR mapping
         if: always()
         run: |
-          scripts/create-enhanced-report.sh ${{ matrix.image }} ${{ matrix.tag }}
+          scripts/create-enhanced-report.sh ${{ matrix.image }} ${{ matrix.tag }} "${{ matrix.published }}"
 
       - name: Upload enhanced vulnerability report
         if: always()
@@ -181,7 +181,7 @@ jobs:
       - name: Append summary to GitHub Actions summary
         if: always()
         run: |
-          scripts/append-github-summary.sh ${{ matrix.image }} ${{ matrix.tag }}
+          scripts/append-github-summary.sh ${{ matrix.image }} ${{ matrix.tag }} "${{ matrix.published }}"
 
   notify-results:
     name: Notify Scan Results

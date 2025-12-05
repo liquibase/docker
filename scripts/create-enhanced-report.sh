@@ -6,11 +6,12 @@
 # This script is specifically designed for published images scanning workflow.
 #
 # Usage:
-#   create-enhanced-report.sh <image> <tag>
+#   create-enhanced-report.sh <image> <tag> [published]
 #
 # Arguments:
 #   image: Docker image name (e.g., liquibase/liquibase)
 #   tag: Image tag (e.g., 4.28.0)
+#   published: ISO 8601 timestamp of when the image tag was last updated (optional)
 #
 # Environment Variables:
 #   EXTRACT_DIR: Directory containing jar-mapping.txt (default: /tmp/extracted-deps)
@@ -31,6 +32,14 @@ set -e
 # Arguments
 IMAGE="${1:?Error: Image name required}"
 TAG="${2:?Error: Tag required}"
+PUBLISHED="${3:-}"
+
+# Format the published date for display (extract just the date part YYYY-MM-DD)
+if [ -n "$PUBLISHED" ] && [ "$PUBLISHED" != "unknown" ]; then
+  PUBLISHED_DATE="${PUBLISHED%%T*}"
+else
+  PUBLISHED_DATE="unknown"
+fi
 
 # Environment variables
 EXTRACT_DIR="${EXTRACT_DIR:-/tmp/extracted-deps}"
@@ -48,6 +57,7 @@ echo "📝 Creating enhanced vulnerability report for ${IMAGE}:${TAG}..."
   echo "# Enhanced Vulnerability Report"
   echo ""
   echo "**Image**: \`${IMAGE}:${TAG}\`"
+  echo "**Image Last Updated**: ${PUBLISHED_DATE}"
   echo "**Scan Date**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
   echo ""
   echo "## Summary"
@@ -82,15 +92,15 @@ if [ -f trivy-deep.json ]; then
     echo ""
     echo "### Nested JAR Vulnerabilities"
     echo ""
-    echo "| Parent JAR | Nested JAR | Vulnerability | Severity | Installed | Fixed |"
-    echo "|------------|------------|---------------|----------|-----------|-------|"
+    echo "| Parent JAR | Nested JAR | Vulnerability | CVE Published | Severity | Installed | Fixed |"
+    echo "|------------|------------|---------------|---------------|----------|-----------|-------|"
   } >> "$report_file"
 
   # Process each vulnerability and match with parent JAR
   jq -r '.Results[]? | .Target as $target | .Vulnerabilities[]? |
     select(.Severity == "HIGH" or .Severity == "CRITICAL") |
-    "\($target)|\(.PkgName)|\(.VulnerabilityID)|\(.Severity)|\(.InstalledVersion)|\(.FixedVersion // "-")"' \
-    trivy-deep.json 2>/dev/null | while IFS='|' read -r target pkg vuln severity installed fixed; do
+    "\($target)|\(.PkgName)|\(.VulnerabilityID)|\((.PublishedDate // "-") | split("T")[0])|\(.Severity)|\(.InstalledVersion)|\(.FixedVersion // "-")"' \
+    trivy-deep.json 2>/dev/null | while IFS='|' read -r target pkg vuln cve_date severity installed fixed; do
 
     # Extract JAR name from target path
     jar_file=$(basename "$target" 2>/dev/null || echo "$target")
@@ -105,7 +115,7 @@ if [ -f trivy-deep.json ]; then
       parent_jar="(unknown)"
     fi
 
-    echo "| $parent_jar | $jar_file | $vuln | $severity | $installed | $fixed |" >> "$report_file"
+    echo "| $parent_jar | $jar_file | $vuln | $cve_date | $severity | $installed | $fixed |" >> "$report_file"
   done
 
   echo "" >> "$report_file"
@@ -121,15 +131,15 @@ if [ -f trivy-deep.json ]; then
       echo ""
       echo "These are found in extension JARs (GraalVM Python VFS)"
       echo ""
-      echo "| Package | Vulnerability | Severity | Installed | Fixed |"
-      echo "|---------|---------------|----------|-----------|-------|"
+      echo "| Package | Vulnerability | CVE Published | Severity | Installed | Fixed |"
+      echo "|---------|---------------|---------------|----------|-----------|-------|"
     } >> "$report_file"
 
     jq -r '.Results[]? | select(.Type == "python-pkg") | .Vulnerabilities[]? |
       select(.Severity == "HIGH" or .Severity == "CRITICAL") |
-      "\(.PkgName)|\(.VulnerabilityID)|\(.Severity)|\(.InstalledVersion)|\(.FixedVersion // "-")"' \
-      trivy-deep.json 2>/dev/null | while IFS='|' read -r pkg vuln severity installed fixed; do
-      echo "| $pkg | $vuln | $severity | $installed | $fixed |" >> "$report_file"
+      "\(.PkgName)|\(.VulnerabilityID)|\((.PublishedDate // "-") | split("T")[0])|\(.Severity)|\(.InstalledVersion)|\(.FixedVersion // "-")"' \
+      trivy-deep.json 2>/dev/null | while IFS='|' read -r pkg vuln cve_date severity installed fixed; do
+      echo "| $pkg | $vuln | $cve_date | $severity | $installed | $fixed |" >> "$report_file"
     done
 
     echo "" >> "$report_file"
