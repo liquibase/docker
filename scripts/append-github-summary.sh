@@ -6,11 +6,12 @@
 # This script generates formatted markdown tables for GitHub Actions UI.
 #
 # Usage:
-#   append-github-summary.sh <image> <tag>
+#   append-github-summary.sh <image> <tag> [published]
 #
 # Arguments:
 #   image: Docker image name (e.g., liquibase/liquibase)
 #   tag: Image tag (e.g., 4.28.0)
+#   published: ISO 8601 timestamp of when the image tag was last updated (optional)
 #
 # Environment Variables:
 #   EXTRACT_DIR: Directory containing jar-mapping.txt (default: /tmp/extracted-deps)
@@ -33,6 +34,14 @@ set -e
 # Arguments
 IMAGE="${1:?Error: Image name required}"
 TAG="${2:?Error: Tag required}"
+PUBLISHED="${3:-}"
+
+# Format the published date for display (extract just the date part YYYY-MM-DD)
+if [ -n "$PUBLISHED" ] && [ "$PUBLISHED" != "unknown" ]; then
+  PUBLISHED_DATE="${PUBLISHED%%T*}"
+else
+  PUBLISHED_DATE="unknown"
+fi
 
 # Environment variables
 EXTRACT_DIR="${EXTRACT_DIR:-/tmp/extracted-deps}"
@@ -53,6 +62,8 @@ echo "📊 Appending vulnerability details to GitHub Actions summary..."
 {
   echo "## 🛡️ Vulnerability Scan Results for \`${IMAGE}:${TAG}\`"
   echo ""
+  echo "**Image Last Updated**: ${PUBLISHED_DATE}"
+  echo ""
   echo "**Total HIGH/CRITICAL Vulnerabilities: ${total_vulns}**"
   echo ""
   echo "| Scanner | Vulnerabilities | Status |"
@@ -68,13 +79,13 @@ if [ "$surface_vulns" -gt 0 ] && [ -f trivy-surface.json ]; then
   {
     echo "### 🔍 Trivy Surface Scan Details"
     echo ""
-    echo "| Package | Vulnerability | Severity | Installed | Fixed |"
-    echo "|---------|---------------|----------|-----------|-------|"
+    echo "| Package | Vulnerability | CVE Published | Severity | Installed | Fixed |"
+    echo "|---------|---------------|---------------|----------|-----------|-------|"
   } >> "$GITHUB_STEP_SUMMARY"
 
   jq -r '.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH" or .Severity == "CRITICAL") |
-    "| \(.PkgName) | \(.VulnerabilityID) | \(.Severity) | \(.InstalledVersion) | \(.FixedVersion // "-") |"' \
-    trivy-surface.json 2>/dev/null | head -20 >> "$GITHUB_STEP_SUMMARY" || echo "| Error parsing results | - | - | - | - |" >> "$GITHUB_STEP_SUMMARY"
+    "| \(.PkgName) | \(.VulnerabilityID) | \((.PublishedDate // "-") | split("T")[0]) | \(.Severity) | \(.InstalledVersion) | \(.FixedVersion // "-") |"' \
+    trivy-surface.json 2>/dev/null | head -20 >> "$GITHUB_STEP_SUMMARY" || echo "| Error parsing results | - | - | - | - | - |" >> "$GITHUB_STEP_SUMMARY"
 
   echo "" >> "$GITHUB_STEP_SUMMARY"
 fi
@@ -83,8 +94,8 @@ if [ "$deep_vulns" -gt 0 ] && [ -f trivy-deep.json ]; then
   {
     echo "### 🔎 Trivy Deep Scan Details (Nested JARs & Python)"
     echo ""
-    echo "| Parent JAR | Package | Vulnerability | Severity | Installed | Fixed |"
-    echo "|------------|---------|---------------|----------|-----------|-------|"
+    echo "| Parent JAR | Package | Vulnerability | CVE Published | Severity | Installed | Fixed |"
+    echo "|------------|---------|---------------|---------------|----------|-----------|-------|"
   } >> "$GITHUB_STEP_SUMMARY"
 
   # Process each vulnerability and look up parent JAR from mapping file
@@ -94,8 +105,8 @@ if [ "$deep_vulns" -gt 0 ] && [ -f trivy-deep.json ]; then
 
   jq -r '.Results[]? | .Target as $target | .Vulnerabilities[]? |
     select(.Severity == "HIGH" or .Severity == "CRITICAL") |
-    "\($target)|\(.PkgPath // "")|\(.PkgName)|\(.VulnerabilityID)|\(.Severity)|\(.InstalledVersion)|\(.FixedVersion // "-")"' \
-    trivy-deep.json 2>/dev/null | while IFS='|' read -r target pkgpath pkg vuln severity installed fixed; do
+    "\($target)|\(.PkgPath // "")|\(.PkgName)|\(.VulnerabilityID)|\((.PublishedDate // "-") | split("T")[0])|\(.Severity)|\(.InstalledVersion)|\(.FixedVersion // "-")"' \
+    trivy-deep.json 2>/dev/null | while IFS='|' read -r target pkgpath pkg vuln cve_date severity installed fixed; do
 
     # Use PkgPath if available (contains JAR file path), otherwise use Target
     jar_path="${pkgpath:-$target}"
@@ -121,7 +132,7 @@ if [ "$deep_vulns" -gt 0 ] && [ -f trivy-deep.json ]; then
       fi
     fi
 
-    echo "| $parent_jar | $pkg | $vuln | $severity | $installed | $fixed |" >> "$temp_table"
+    echo "| $parent_jar | $pkg | $vuln | $cve_date | $severity | $installed | $fixed |" >> "$temp_table"
   done
 
   # Deduplicate and add to summary (limit to 40 entries)
@@ -139,6 +150,7 @@ if [ "$grype_vulns" -gt 0 ] && [ -f grype-results.json ]; then
     echo "|---------|---------------|----------|-----------|-------|"
   } >> "$GITHUB_STEP_SUMMARY"
 
+  # Note: Grype JSON doesn't include CVE publish dates in the standard output
   jq -r '.matches[]? | select(.vulnerability.severity == "High" or .vulnerability.severity == "Critical") |
     "| \(.artifact.name) | \(.vulnerability.id) | \(.vulnerability.severity) | \(.artifact.version) | \(.vulnerability.fix.versions[0] // "-") |"' \
     grype-results.json 2>/dev/null | head -20 >> "$GITHUB_STEP_SUMMARY" || echo "| Error parsing results | - | - | - | - |" >> "$GITHUB_STEP_SUMMARY"

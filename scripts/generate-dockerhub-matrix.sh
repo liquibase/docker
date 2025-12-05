@@ -16,7 +16,8 @@
 #
 # Outputs:
 #   - JSON matrix written to stdout and $GITHUB_OUTPUT if available
-#   - Format: {"include":[{"image":"...","tag":"..."},...]}"
+#   - Format: {"include":[{"image":"...","tag":"...","published":"..."},...]}
+#   - published: ISO 8601 timestamp of when the tag was last updated
 
 set -e
 
@@ -38,28 +39,34 @@ for IMAGE in "liquibase/liquibase" "liquibase/liquibase-secure"; do
     RESPONSE=$(curl -s "$URL")
 
     # Only include semantic version tags (with optional -alpine or -latest suffix)
-    TAG_REGEX='^[0-9]+\.[0-9]+(\.[0-9]+)?(-alpine|-latest)?$'
-    NEW_TAGS=$(echo "$RESPONSE" | jq -r '.results[] | select(.tag_status == "active") | .name' | grep -E "$TAG_REGEX" || true)
-    TAGS=$(echo -e "$TAGS\n$NEW_TAGS" | sort -Vu)
+    # Format: tag|last_updated (pipe-separated to preserve dates through filtering)
+    TAG_REGEX='^[0-9]+\.[0-9]+(\.[0-9]+)?(-alpine|-latest)?'
+    NEW_TAGS=$(echo "$RESPONSE" | jq -r '.results[] | select(.tag_status == "active") | "\(.name)|\(.last_updated)"' | grep -E "$TAG_REGEX" || true)
+    TAGS=$(echo -e "$TAGS\n$NEW_TAGS" | sort -t'|' -k1 -Vu)
 
     # Filter out minor version tags if we have the full version
     # e.g., if we have 4.28.0, skip 4.28
-    TAGS=$(echo "$TAGS" | awk '
+    # Preserves the |last_updated suffix through filtering
+    # Note: Uses GNU awk match() with capture groups (Ubuntu default, not BSD awk)
+    TAGS=$(echo "$TAGS" | awk -F'|' '
       {
+        tag = $1
+        date = $2
         tags[NR] = $0
-        if (match($0, /^([0-9]+)\.([0-9]+)\.([0-9]+)(-alpine|-latest)?$/, m)) {
+        tag_only[NR] = tag
+        if (match(tag, /^([0-9]+)\.([0-9]+)\.([0-9]+)(-alpine|-latest)?$/, m)) {
           full = m[1] "." m[2] "." m[3] (m[4] ? m[4] : "")
           has_full[full] = 1
         }
       }
       END {
         for (i = 1; i <= NR; i++) {
-          tag = tags[i]
+          tag = tag_only[i]
           if (match(tag, /^([0-9]+)\.([0-9]+)(-alpine|-latest)?$/, m)) {
             short = m[1] "." m[2] ".0" (m[3] ? m[3] : "")
             if (has_full[short]) continue
           }
-          print tag
+          print tags[i]
         }
       }
     ')
@@ -73,13 +80,16 @@ for IMAGE in "liquibase/liquibase" "liquibase/liquibase-secure"; do
   TAGS=$(echo "$TAGS" | tac | head -n "$MAX_TAGS")
 
   # Build matrix JSON
-  while IFS= read -r tag; do
+  # Each line is in format: tag|last_updated
+  while IFS='|' read -r tag published; do
     if [ -n "$tag" ]; then
+      # Escape any special characters in the date string for JSON
+      published="${published:-unknown}"
       if [ "$FIRST" = true ]; then
-        MATRIX_INCLUDE="${MATRIX_INCLUDE}{\"image\":\"$IMAGE\",\"tag\":\"$tag\"}"
+        MATRIX_INCLUDE="${MATRIX_INCLUDE}{\"image\":\"$IMAGE\",\"tag\":\"$tag\",\"published\":\"$published\"}"
         FIRST=false
       else
-        MATRIX_INCLUDE="${MATRIX_INCLUDE},{\"image\":\"$IMAGE\",\"tag\":\"$tag\"}"
+        MATRIX_INCLUDE="${MATRIX_INCLUDE},{\"image\":\"$IMAGE\",\"tag\":\"$tag\",\"published\":\"$published\"}"
       fi
     fi
   done <<< "$TAGS"
