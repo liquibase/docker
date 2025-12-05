@@ -138,33 +138,6 @@ jobs:
           path: vulnerability-report-enhanced.md
           retention-days: 90
 
-      # NOTE: SARIF uploads to GitHub Security tab removed to prevent stale alerts.
-      # Published image vulnerabilities are tracked via artifacts below.
-      # Only main branch workflow (trivy.yml) populates Security tab.
-
-      - name: Set sanitized names for artifacts
-        if: always()
-        id: sanitize
-        run: |
-          SANITIZED_IMAGE=$(echo "${{ matrix.image }}" | tr '/' '-')
-          SANITIZED_TAG=$(echo "${{ matrix.tag }}" | tr '/' '-' | tr ':' '-' | tr '.' '-')
-          echo "image=$SANITIZED_IMAGE" >> $GITHUB_OUTPUT
-          echo "tag=$SANITIZED_TAG" >> $GITHUB_OUTPUT
-
-      - name: Upload Scan Results as Artifacts
-        if: always()
-        uses: actions/upload-artifact@v5
-        with:
-          name: security-report-${{ steps.sanitize.outputs.image }}-${{ steps.sanitize.outputs.tag }}
-          path: |
-            trivy-surface.json
-            trivy-surface.sarif
-            trivy-deep.json
-            trivy-deep.sarif
-            grype-results.json
-            sbom.spdx.json
-          if-no-files-found: ignore
-
       - name: Append summary to GitHub Actions summary
         if: always()
         run: |
