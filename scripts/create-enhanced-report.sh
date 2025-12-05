@@ -114,14 +114,14 @@ if [ "$surface_vulns" -gt 0 ] && [ -f trivy-surface.json ]; then
   {
     echo "## OS & Application Library Vulnerabilities"
     echo ""
-    echo "| Package | NVD | GitHub Advisories | CVE Published | Trivy Severity | Trivy Vendor Data | Installed | Fixed | Fix? |"
-    echo "|---------|-----|-------------------|---------------|----------------|-----------------|-----------|-------|------|"
+    echo "| Package | NVD | GitHub Advisories | CVE Published | Trivy Severity | CVSS | Trivy Vendor Data | Installed | Fixed | Fix? |"
+    echo "|---------|-----|-------------------|---------------|----------------|------|-----------------|-----------|-------|------|"
   } >> "$report_file"
 
-  jq_trivy_surface_vulns trivy-surface.json | while IFS='|' read -r pkg vuln cve_date severity vendor_sev vendor_url installed fixed has_fix; do
+  jq_trivy_surface_vulns trivy-surface.json | while IFS='|' read -r pkg vuln cve_date severity vendor_sev vendor_url installed fixed has_fix cvss; do
     vendor_display=$(format_vendor_display "$vendor_sev" "$vendor_url")
     fix_indicator=$(format_fix_indicator "$has_fix")
-    echo "| $pkg | [$vuln](https://nvd.nist.gov/vuln/detail/$vuln) | [Search](https://github.com/advisories?query=$vuln) | $cve_date | $severity | $vendor_display | $installed | $fixed | $fix_indicator |" >> "$report_file"
+    echo "| $pkg | [$vuln](https://nvd.nist.gov/vuln/detail/$vuln) | [Search](https://github.com/advisories?query=$vuln) | $cve_date | $severity | $cvss | $vendor_display | $installed | $fixed | $fix_indicator |" >> "$report_file"
   done
 
   echo "" >> "$report_file"
@@ -148,12 +148,12 @@ if [ -f trivy-deep.json ] && [ "$deep_vulns" -gt 0 ]; then
     echo ""
     echo "### Nested JAR Vulnerabilities"
     echo ""
-    echo "| Parent JAR | Nested JAR | NVD | GitHub Advisories | CVE Published | Trivy Severity | Trivy Vendor Data | Installed | Fixed | Fix? |"
-    echo "|------------|------------|-----|-------------------|---------------|----------------|-----------------|-----------|-------|------|"
+    echo "| Parent JAR | Nested JAR | NVD | GitHub Advisories | CVE Published | Trivy Severity | CVSS | Trivy Vendor Data | Installed | Fixed | Fix? |"
+    echo "|------------|------------|-----|-------------------|---------------|----------------|------|-----------------|-----------|-------|------|"
   } >> "$report_file"
 
   # Process each vulnerability and match with parent JAR
-  jq_trivy_deep_vulns trivy-deep.json | while IFS='|' read -r target pkgpath pkg vuln cve_date severity vendor_sev vendor_url installed fixed has_fix; do
+  jq_trivy_deep_vulns trivy-deep.json | while IFS='|' read -r target pkgpath pkg vuln cve_date severity vendor_sev vendor_url installed fixed has_fix cvss; do
     # Use PkgPath if available (contains JAR file path), otherwise use Target
     jar_path="${pkgpath:-$target}"
 
@@ -176,7 +176,7 @@ if [ -f trivy-deep.json ] && [ "$deep_vulns" -gt 0 ]; then
 
     vendor_display=$(format_vendor_display "$vendor_sev" "$vendor_url")
     fix_indicator=$(format_fix_indicator "$has_fix")
-    echo "| $parent_jar | $jar_file | [$vuln](https://nvd.nist.gov/vuln/detail/$vuln) | [Search](https://github.com/advisories?query=$vuln) | $cve_date | $severity | $vendor_display | $installed | $fixed | $fix_indicator |" >> "$report_file"
+    echo "| $parent_jar | $jar_file | [$vuln](https://nvd.nist.gov/vuln/detail/$vuln) | [Search](https://github.com/advisories?query=$vuln) | $cve_date | $severity | $cvss | $vendor_display | $installed | $fixed | $fix_indicator |" >> "$report_file"
   done
 
   echo "" >> "$report_file"
@@ -192,14 +192,14 @@ if [ -f trivy-deep.json ]; then
       echo ""
       echo "These are found in extension JARs (GraalVM Python VFS)"
       echo ""
-      echo "| Package | NVD | GitHub Advisories | CVE Published | Trivy Severity | Trivy Vendor Data | Installed | Fixed | Fix? |"
-      echo "|---------|-----|-------------------|---------------|----------------|-----------------|-----------|-------|------|"
+      echo "| Package | NVD | GitHub Advisories | CVE Published | Trivy Severity | CVSS | Trivy Vendor Data | Installed | Fixed | Fix? |"
+      echo "|---------|-----|-------------------|---------------|----------------|------|-----------------|-----------|-------|------|"
     } >> "$report_file"
 
-    jq_trivy_python_vulns trivy-deep.json | while IFS='|' read -r pkg vuln cve_date severity vendor_sev vendor_url installed fixed has_fix; do
+    jq_trivy_python_vulns trivy-deep.json | while IFS='|' read -r pkg vuln cve_date severity vendor_sev vendor_url installed fixed has_fix cvss; do
       vendor_display=$(format_vendor_display "$vendor_sev" "$vendor_url")
       fix_indicator=$(format_fix_indicator "$has_fix")
-      echo "| $pkg | [$vuln](https://nvd.nist.gov/vuln/detail/$vuln) | [Search](https://github.com/advisories?query=$vuln) | $cve_date | $severity | $vendor_display | $installed | $fixed | $fix_indicator |" >> "$report_file"
+      echo "| $pkg | [$vuln](https://nvd.nist.gov/vuln/detail/$vuln) | [Search](https://github.com/advisories?query=$vuln) | $cve_date | $severity | $cvss | $vendor_display | $installed | $fixed | $fix_indicator |" >> "$report_file"
     done
 
     echo "" >> "$report_file"
@@ -211,17 +211,19 @@ if [ "$grype_vulns" -gt 0 ] && [ -f grype-results.json ]; then
   {
     echo "## Grype SBOM Scan Details"
     echo ""
-    echo "| Package | NVD | GitHub Advisories | Grype Severity | Installed | Fixed | Fix? |"
-    echo "|---------|-----|-------------------|----------------|-----------|-------|------|"
+    echo "| Package | NVD | GitHub Advisories | Grype Severity | CVSS | Installed | Fixed | Fix? |"
+    echo "|---------|-----|-------------------|----------------|------|-----------|-------|------|"
   } >> "$report_file"
 
   # Use suggestedVersion from matchDetails when available (filters to relevant version for installed package)
+  # Extract CVSS from vulnerability.ratings[] - prefer NVD source
   jq -r '.matches[]? | select(.vulnerability.severity == "High" or .vulnerability.severity == "Critical") |
     (.matchDetails[0].fix.suggestedVersion // .vulnerability.fix.versions[0] // "-") as $fixVersion |
-    "\(.artifact.name)|\(.vulnerability.id)|\(.vulnerability.severity)|\(.artifact.version)|\($fixVersion)|\(if $fixVersion != "-" then "Y" else "N" end)"' \
-    grype-results.json 2>/dev/null | while IFS='|' read -r pkg vuln severity installed fixed has_fix; do
+    ((.vulnerability.ratings[]? | select(.source == "NVD" or .source == "nvd") | .score) // (.vulnerability.ratings[0]?.score) // "-") as $cvss |
+    "\(.artifact.name)|\(.vulnerability.id)|\(.vulnerability.severity)|\($cvss)|\(.artifact.version)|\($fixVersion)|\(if $fixVersion != "-" then "Y" else "N" end)"' \
+    grype-results.json 2>/dev/null | while IFS='|' read -r pkg vuln severity cvss installed fixed has_fix; do
     fix_indicator=$(format_fix_indicator "$has_fix")
-    echo "| $pkg | [$vuln](https://nvd.nist.gov/vuln/detail/$vuln) | [Search](https://github.com/advisories?query=$vuln) | $severity | $installed | $fixed | $fix_indicator |" >> "$report_file"
+    echo "| $pkg | [$vuln](https://nvd.nist.gov/vuln/detail/$vuln) | [Search](https://github.com/advisories?query=$vuln) | $severity | $cvss | $installed | $fixed | $fix_indicator |" >> "$report_file"
   done
 
   echo "" >> "$report_file"
