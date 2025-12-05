@@ -69,6 +69,7 @@ jobs:
           image: "${{ matrix.image }}:${{ matrix.tag }}"
           format: "spdx-json"
           output-file: "sbom.spdx.json"
+          upload-artifact: false
 
       - name: Run Trivy vulnerability scanner (Surface Scan)
         id: trivy_scan
