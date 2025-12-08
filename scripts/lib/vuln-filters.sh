@@ -51,40 +51,43 @@ else
 end) as $vendor'
 
 # Process Trivy surface scan results and output pipe-delimited rows
-# Output format: pkg|cve|cve_date|severity|vendor_prefix:letter|vendor_url|installed|fixed|has_fix
+# Output format: pkg|cve|cve_date|severity|vendor_prefix:letter|vendor_url|installed|fixed|has_fix|cvss
 # Usage: jq_trivy_surface_vulns trivy-surface.json
 jq_trivy_surface_vulns() {
   local input_file="$1"
   jq -r '.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH" or .Severity == "CRITICAL") |
     .VulnerabilityID as $cve |
+    (.CVSS.nvd.V3Score // .CVSS.redhat.V3Score // .CVSS.ghsa.V3Score // "-") as $cvss |
     '"${JQ_VENDOR_FILTER}"' |
-    "\(.PkgName)|\($cve)|\((.PublishedDate // "-") | split("T")[0])|\(.Severity)|\($vendor[0]):\($vendor[1])|\($vendor[2])|\(.InstalledVersion)|\(.FixedVersion // "-")|\(if (.FixedVersion // "") != "" then "Y" else "N" end)"' \
+    "\(.PkgName)|\($cve)|\((.PublishedDate // "-") | split("T")[0])|\(.Severity)|\($vendor[0]):\($vendor[1])|\($vendor[2])|\(.InstalledVersion)|\(.FixedVersion // "-")|\(if (.FixedVersion // "") != "" then "Y" else "N" end)|\($cvss)"' \
     "$input_file" 2>/dev/null
 }
 
 # Process Trivy deep scan results and output pipe-delimited rows with target
-# Output format: target|pkg|cve|cve_date|severity|vendor_prefix:letter|vendor_url|installed|fixed|has_fix
+# Output format: target|pkgpath|pkg|cve|cve_date|severity|vendor_prefix:letter|vendor_url|installed|fixed|has_fix|cvss
 # Usage: jq_trivy_deep_vulns trivy-deep.json
 jq_trivy_deep_vulns() {
   local input_file="$1"
   jq -r '.Results[]? | .Target as $target | .Vulnerabilities[]? |
     select(.Severity == "HIGH" or .Severity == "CRITICAL") |
     .VulnerabilityID as $cve |
+    (.CVSS.nvd.V3Score // .CVSS.redhat.V3Score // .CVSS.ghsa.V3Score // "-") as $cvss |
     '"${JQ_VENDOR_FILTER}"' |
-    "\($target)|\(.PkgPath // "")|\(.PkgName)|\($cve)|\((.PublishedDate // "-") | split("T")[0])|\(.Severity)|\($vendor[0]):\($vendor[1])|\($vendor[2])|\(.InstalledVersion)|\(.FixedVersion // "-")|\(if (.FixedVersion // "") != "" then "Y" else "N" end)"' \
+    "\($target)|\(.PkgPath // "")|\(.PkgName)|\($cve)|\((.PublishedDate // "-") | split("T")[0])|\(.Severity)|\($vendor[0]):\($vendor[1])|\($vendor[2])|\(.InstalledVersion)|\(.FixedVersion // "-")|\(if (.FixedVersion // "") != "" then "Y" else "N" end)|\($cvss)"' \
     "$input_file" 2>/dev/null
 }
 
 # Process Trivy Python package vulnerabilities
-# Output format: pkg|cve|cve_date|severity|vendor_prefix:letter|vendor_url|installed|fixed|has_fix
+# Output format: pkg|cve|cve_date|severity|vendor_prefix:letter|vendor_url|installed|fixed|has_fix|cvss
 # Usage: jq_trivy_python_vulns trivy-deep.json
 jq_trivy_python_vulns() {
   local input_file="$1"
   jq -r '.Results[]? | select(.Type == "python-pkg") | .Vulnerabilities[]? |
     select(.Severity == "HIGH" or .Severity == "CRITICAL") |
     .VulnerabilityID as $cve |
+    (.CVSS.nvd.V3Score // .CVSS.redhat.V3Score // .CVSS.ghsa.V3Score // "-") as $cvss |
     '"${JQ_VENDOR_FILTER}"' |
-    "\(.PkgName)|\($cve)|\((.PublishedDate // "-") | split("T")[0])|\(.Severity)|\($vendor[0]):\($vendor[1])|\($vendor[2])|\(.InstalledVersion)|\(.FixedVersion // "-")|\(if (.FixedVersion // "") != "" then "Y" else "N" end)"' \
+    "\(.PkgName)|\($cve)|\((.PublishedDate // "-") | split("T")[0])|\(.Severity)|\($vendor[0]):\($vendor[1])|\($vendor[2])|\(.InstalledVersion)|\(.FixedVersion // "-")|\(if (.FixedVersion // "") != "" then "Y" else "N" end)|\($cvss)"' \
     "$input_file" 2>/dev/null
 }
 

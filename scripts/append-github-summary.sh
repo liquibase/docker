@@ -124,15 +124,16 @@ if [ "$surface_vulns" -gt 0 ] && [ -f trivy-surface.json ]; then
   {
     echo "### 🔍 OS & Application Library Vulnerabilities"
     echo ""
-    echo "| Package | NVD | GitHub Advisories | CVE Published | Trivy Severity | Trivy Vendor Data | Installed | Fixed | Fix? |"
-    echo "|---------|-----|-------------------|---------------|----------------|-----------------|-----------|-------|------|"
+    echo "| Package | NVD | GitHub Advisories | CVE Published | Trivy Severity | CVSS | Trivy Vendor Data | Installed | Fixed | Fix? |"
+    echo "|---------|-----|-------------------|---------------|----------------|------|-----------------|-----------|-------|------|"
   } >> "$GITHUB_STEP_SUMMARY"
 
   jq -r '.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH" or .Severity == "CRITICAL") |
     .VulnerabilityID as $cve |
+    (.CVSS.nvd.V3Score // .CVSS.redhat.V3Score // .CVSS.ghsa.V3Score // "-") as $cvss |
     '"${JQ_VENDOR_FILTER}"' |
-    "| \(.PkgName) | [\($cve)](https://nvd.nist.gov/vuln/detail/\($cve)) | [Search](https://github.com/advisories?query=\($cve)) | \((.PublishedDate // "-") | split("T")[0]) | \(.Severity) | \(if $vendor[2] != "" then "[\($vendor[0]):\($vendor[1])](\($vendor[2]))" else "\($vendor[0]):\($vendor[1])" end) | \(.InstalledVersion) | \(.FixedVersion // "-") | \(if (.FixedVersion // "") != "" then "✅" else "❌" end) |"' \
-    trivy-surface.json 2>/dev/null | head -20 >> "$GITHUB_STEP_SUMMARY" || echo "| Error parsing results | - | - | - | - | - | - | - | - |" >> "$GITHUB_STEP_SUMMARY"
+    "| \(.PkgName) | [\($cve)](https://nvd.nist.gov/vuln/detail/\($cve)) | [Search](https://github.com/advisories?query=\($cve)) | \((.PublishedDate // "-") | split("T")[0]) | \(.Severity) | \($cvss) | \(if $vendor[2] != "" then "[\($vendor[0]):\($vendor[1])](\($vendor[2]))" else "\($vendor[0]):\($vendor[1])" end) | \(.InstalledVersion) | \(.FixedVersion // "-") | \(if (.FixedVersion // "") != "" then "✅" else "❌" end) |"' \
+    trivy-surface.json 2>/dev/null | head -20 >> "$GITHUB_STEP_SUMMARY" || echo "| Error parsing results | - | - | - | - | - | - | - | - | - |" >> "$GITHUB_STEP_SUMMARY"
 
   echo "" >> "$GITHUB_STEP_SUMMARY"
 fi
@@ -141,8 +142,8 @@ if [ "$deep_vulns" -gt 0 ] && [ -f trivy-deep.json ]; then
   {
     echo "### 🔎 Nested JAR Dependency Vulnerabilities"
     echo ""
-    echo "| Parent JAR | Package | NVD | GitHub Advisories | CVE Published | Trivy Severity | Trivy Vendor Data | Installed | Fixed | Fix? |"
-    echo "|------------|---------|-----|-------------------|---------------|----------------|-----------------|-----------|-------|------|"
+    echo "| Parent JAR | Package | NVD | GitHub Advisories | CVE Published | Trivy Severity | CVSS | Trivy Vendor Data | Installed | Fixed | Fix? |"
+    echo "|------------|---------|-----|-------------------|---------------|----------------|------|-----------------|-----------|-------|------|"
   } >> "$GITHUB_STEP_SUMMARY"
 
   # Process each vulnerability and look up parent JAR from mapping file
@@ -150,7 +151,7 @@ if [ "$deep_vulns" -gt 0 ] && [ -f trivy-deep.json ]; then
   temp_table="/tmp/vuln-table-$$.txt"
   > "$temp_table"  # Clear temp file
 
-  jq_trivy_deep_vulns trivy-deep.json | while IFS='|' read -r target pkgpath pkg vuln cve_date severity vendor_sev vendor_url installed fixed has_fix; do
+  jq_trivy_deep_vulns trivy-deep.json | while IFS='|' read -r target pkgpath pkg vuln cve_date severity vendor_sev vendor_url installed fixed has_fix cvss; do
     # Use PkgPath if available (contains JAR file path), otherwise use Target
     jar_path="${pkgpath:-$target}"
 
@@ -177,7 +178,7 @@ if [ "$deep_vulns" -gt 0 ] && [ -f trivy-deep.json ]; then
 
     vendor_display=$(format_vendor_display "$vendor_sev" "$vendor_url")
     fix_indicator=$(format_fix_indicator "$has_fix")
-    echo "| $parent_jar | $pkg | [$vuln](https://nvd.nist.gov/vuln/detail/$vuln) | [Search](https://github.com/advisories?query=$vuln) | $cve_date | $severity | $vendor_display | $installed | $fixed | $fix_indicator |" >> "$temp_table"
+    echo "| $parent_jar | $pkg | [$vuln](https://nvd.nist.gov/vuln/detail/$vuln) | [Search](https://github.com/advisories?query=$vuln) | $cve_date | $severity | $cvss | $vendor_display | $installed | $fixed | $fix_indicator |" >> "$temp_table"
   done
 
   # Deduplicate and add to summary (limit to 40 entries)
@@ -191,16 +192,18 @@ if [ "$grype_vulns" -gt 0 ] && [ -f grype-results.json ]; then
   {
     echo "### 📋 Grype SBOM Scan Details"
     echo ""
-    echo "| Package | NVD | GitHub Advisories | Grype Severity | Installed | Fixed | Fix? |"
-    echo "|---------|-----|-------------------|----------------|-----------|-------|------|"
+    echo "| Package | NVD | GitHub Advisories | Grype Severity | CVSS | Installed | Fixed | Fix? |"
+    echo "|---------|-----|-------------------|----------------|------|-----------|-------|------|"
   } >> "$GITHUB_STEP_SUMMARY"
 
   # Note: Grype JSON doesn't include CVE publish dates or vendor severity in the standard output
   # Use suggestedVersion from matchDetails when available (filters to relevant version for installed package)
+  # Extract CVSS from vulnerability.ratings[] - prefer NVD source
   jq -r '.matches[]? | select(.vulnerability.severity == "High" or .vulnerability.severity == "Critical") |
     (.matchDetails[0].fix.suggestedVersion // .vulnerability.fix.versions[0] // "-") as $fixVersion |
-    "| \(.artifact.name) | [\(.vulnerability.id)](https://nvd.nist.gov/vuln/detail/\(.vulnerability.id)) | [Search](https://github.com/advisories?query=\(.vulnerability.id)) | \(.vulnerability.severity) | \(.artifact.version) | \($fixVersion) | \(if $fixVersion != "-" then "✅" else "❌" end) |"' \
-    grype-results.json 2>/dev/null | head -20 >> "$GITHUB_STEP_SUMMARY" || echo "| Error parsing results | - | - | - | - | - | - |" >> "$GITHUB_STEP_SUMMARY"
+    ((.vulnerability.ratings[]? | select(.source == "NVD" or .source == "nvd") | .score) // (.vulnerability.ratings[0]?.score) // "-") as $cvss |
+    "| \(.artifact.name) | [\(.vulnerability.id)](https://nvd.nist.gov/vuln/detail/\(.vulnerability.id)) | [Search](https://github.com/advisories?query=\(.vulnerability.id)) | \(.vulnerability.severity) | \($cvss) | \(.artifact.version) | \($fixVersion) | \(if $fixVersion != "-" then "✅" else "❌" end) |"' \
+    grype-results.json 2>/dev/null | head -20 >> "$GITHUB_STEP_SUMMARY" || echo "| Error parsing results | - | - | - | - | - | - | - |" >> "$GITHUB_STEP_SUMMARY"
 
   echo "" >> "$GITHUB_STEP_SUMMARY"
 fi

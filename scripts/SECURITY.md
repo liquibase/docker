@@ -8,7 +8,7 @@ The workflow performs three types of scans on each published Docker image:
 
 | Scan Type | What It Checks | Scanner |
 |-----------|----------------|---------|
-| **OS & Application Libraries** | Operating system packages (Alpine/Debian) and top-level Java libraries | Trivy |
+| **OS & Application Libraries** | Operating system packages (Debian/Ubuntu) and top-level Java libraries | Trivy |
 | **Nested JAR Dependencies** | Libraries bundled inside Liquibase JARs (Spring Boot fat JARs, extensions) | Trivy |
 | **SBOM-based Scan** | Software Bill of Materials - a complete inventory of all components | Grype |
 
@@ -17,6 +17,7 @@ The workflow performs three types of scans on each published Docker image:
 | Term | Definition |
 |------|------------|
 | **CVE** | Common Vulnerabilities and Exposures - a unique identifier for a security vulnerability (e.g., CVE-2025-12345) |
+| **CVSS** | Common Vulnerability Scoring System - a numeric score (0.0-10.0) that measures vulnerability severity. Scores: 0.0 = None, 0.1-3.9 = Low, 4.0-6.9 = Medium, 7.0-8.9 = High, 9.0-10.0 = Critical |
 | **NVD** | National Vulnerability Database - the U.S. government's repository of vulnerability data, managed by NIST |
 | **GHSA** | GitHub Security Advisory - GitHub's database of security vulnerabilities |
 | **Trivy** | An open-source vulnerability scanner by Aqua Security |
@@ -38,6 +39,7 @@ The workflow performs three types of scans on each published Docker image:
 | **GitHub Advisories** | Link to search for related security advisories on GitHub |
 | **CVE Published** | Date the vulnerability was publicly disclosed |
 | **Trivy Severity** | Trivy's assessment of the vulnerability severity (HIGH or CRITICAL) |
+| **CVSS** | The CVSS v3 numeric score (0.0-10.0) from NVD or vendor database. Higher scores indicate more severe vulnerabilities |
 | **Trivy Vendor Data** | Severity rating from the software vendor's security team (may differ from Trivy's assessment) |
 | **Grype Severity** | Grype scanner's assessment of vulnerability severity |
 | **Installed** | The version currently installed in the image |

@@ -85,13 +85,14 @@ if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
     {
       echo "### 🔍 Trivy Surface Scan Details"
       echo ""
-      echo "| Package | Vulnerability | Severity | Installed | Fixed |"
-      echo "|---------|---------------|----------|-----------|-------|"
+      echo "| Package | Vulnerability | Severity | CVSS | Installed | Fixed |"
+      echo "|---------|---------------|----------|------|-----------|-------|"
     } >> "$GITHUB_STEP_SUMMARY"
 
     jq -r '.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH" or .Severity == "CRITICAL") |
-      "| \(.PkgName) | \(.VulnerabilityID) | \(.Severity) | \(.InstalledVersion) | \(.FixedVersion // "N/A") |"' \
-      trivy-surface.json 2>/dev/null | head -20 >> "$GITHUB_STEP_SUMMARY" || echo "| Error parsing results | - | - | - | - |" >> "$GITHUB_STEP_SUMMARY"
+      (.CVSS.nvd.V3Score // .CVSS.redhat.V3Score // .CVSS.ghsa.V3Score // "-") as $cvss |
+      "| \(.PkgName) | \(.VulnerabilityID) | \(.Severity) | \($cvss) | \(.InstalledVersion) | \(.FixedVersion // "N/A") |"' \
+      trivy-surface.json 2>/dev/null | head -20 >> "$GITHUB_STEP_SUMMARY" || echo "| Error parsing results | - | - | - | - | - |" >> "$GITHUB_STEP_SUMMARY"
 
     echo "" >> "$GITHUB_STEP_SUMMARY"
   fi
@@ -100,8 +101,8 @@ if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
     {
       echo "### 🔎 Trivy Deep Scan Details (Nested JARs & Python)"
       echo ""
-      echo "| Parent JAR | Package | Vulnerability | Severity | Installed | Fixed |"
-      echo "|------------|---------|---------------|----------|-----------|-------|"
+      echo "| Parent JAR | Package | Vulnerability | Severity | CVSS | Installed | Fixed |"
+      echo "|------------|---------|---------------|----------|------|-----------|-------|"
     } >> "$GITHUB_STEP_SUMMARY"
 
     # Process each vulnerability and look up parent JAR from mapping file
@@ -111,8 +112,9 @@ if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
 
     jq -r '.Results[]? | .Target as $target | .Vulnerabilities[]? |
       select(.Severity == "HIGH" or .Severity == "CRITICAL") |
-      "\($target)|\(.PkgPath // "")|\(.PkgName)|\(.VulnerabilityID)|\(.Severity)|\(.InstalledVersion)|\(.FixedVersion // "N/A")"' \
-      trivy-deep.json 2>/dev/null | while IFS='|' read -r target pkgpath pkg vuln severity installed fixed; do
+      (.CVSS.nvd.V3Score // .CVSS.redhat.V3Score // .CVSS.ghsa.V3Score // "-") as $cvss |
+      "\($target)|\(.PkgPath // "")|\(.PkgName)|\(.VulnerabilityID)|\(.Severity)|\($cvss)|\(.InstalledVersion)|\(.FixedVersion // "N/A")"' \
+      trivy-deep.json 2>/dev/null | while IFS='|' read -r target pkgpath pkg vuln severity cvss installed fixed; do
 
       # Use PkgPath if available (contains JAR file path), otherwise use Target
       jar_path="${pkgpath:-$target}"
@@ -138,7 +140,7 @@ if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
         fi
       fi
 
-      echo "| $parent_jar | $pkg | $vuln | $severity | $installed | $fixed |" >> "$temp_table"
+      echo "| $parent_jar | $pkg | $vuln | $severity | $cvss | $installed | $fixed |" >> "$temp_table"
     done
 
     # Deduplicate and add to summary (limit to 40 entries)
@@ -152,19 +154,19 @@ if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
     {
       echo "### 📋 Grype SBOM Scan Details"
       echo ""
-      echo "| Package | Vulnerability | Severity | Installed | Fixed |"
-      echo "|---------|---------------|----------|-----------|-------|"
+      echo "| Package | Vulnerability | Severity | CVSS | Installed | Fixed |"
+      echo "|---------|---------------|----------|------|-----------|-------|"
     } >> "$GITHUB_STEP_SUMMARY"
 
-    # Grype SARIF has different structure
+    # Grype SARIF has different structure - CVSS not directly available in SARIF, show "-"
     jq -r '.runs[].results[] |
       (.ruleId // "N/A") as $cve |
       (try (.properties.packageName // .locations[0].logicalLocations[0].name) // "N/A") as $pkg |
       (.level // "unknown") as $severity |
       (try (.properties.installedVersion // "N/A") catch "N/A") as $installed |
       (try (.properties.fixedVersion // "N/A") catch "N/A") as $fixed |
-      "| \($pkg) | \($cve) | \($severity | ascii_upcase) | \($installed) | \($fixed) |"' \
-      grype-results.sarif 2>/dev/null | head -20 >> "$GITHUB_STEP_SUMMARY" || echo "| Error parsing results | - | - | - | - |" >> "$GITHUB_STEP_SUMMARY"
+      "| \($pkg) | \($cve) | \($severity | ascii_upcase) | - | \($installed) | \($fixed) |"' \
+      grype-results.sarif 2>/dev/null | head -20 >> "$GITHUB_STEP_SUMMARY" || echo "| Error parsing results | - | - | - | - | - |" >> "$GITHUB_STEP_SUMMARY"
 
     echo "" >> "$GITHUB_STEP_SUMMARY"
   fi
@@ -243,15 +245,16 @@ if [ -f trivy-deep.json ]; then
     echo ""
     echo "### Nested JAR Vulnerabilities"
     echo ""
-    echo "| Parent JAR | Nested JAR | Vulnerability | Severity | Installed | Fixed |"
-    echo "|------------|------------|---------------|----------|-----------|-------|"
+    echo "| Parent JAR | Nested JAR | Vulnerability | Severity | CVSS | Installed | Fixed |"
+    echo "|------------|------------|---------------|----------|------|-----------|-------|"
   } >> "$report_file"
 
   # Process each vulnerability and match with parent JAR
   jq -r '.Results[]? | .Target as $target | .Vulnerabilities[]? |
     select(.Severity == "HIGH" or .Severity == "CRITICAL") |
-    "\($target)|\(.PkgName)|\(.VulnerabilityID)|\(.Severity)|\(.InstalledVersion)|\(.FixedVersion // "-")"' \
-    trivy-deep.json 2>/dev/null | while IFS='|' read -r target pkg vuln severity installed fixed; do
+    (.CVSS.nvd.V3Score // .CVSS.redhat.V3Score // .CVSS.ghsa.V3Score // "-") as $cvss |
+    "\($target)|\(.PkgName)|\(.VulnerabilityID)|\(.Severity)|\($cvss)|\(.InstalledVersion)|\(.FixedVersion // "-")"' \
+    trivy-deep.json 2>/dev/null | while IFS='|' read -r target pkg vuln severity cvss installed fixed; do
 
     # Extract JAR name from target path
     jar_file=$(basename "$target" 2>/dev/null || echo "$target")
@@ -266,7 +269,7 @@ if [ -f trivy-deep.json ]; then
       parent_jar="(unknown)"
     fi
 
-    echo "| $parent_jar | $jar_file | $vuln | $severity | $installed | $fixed |" >> "$report_file"
+    echo "| $parent_jar | $jar_file | $vuln | $severity | $cvss | $installed | $fixed |" >> "$report_file"
   done
 
   echo "" >> "$report_file"
@@ -282,15 +285,16 @@ if [ -f trivy-deep.json ]; then
       echo ""
       echo "These are found in extension JARs (GraalVM Python VFS)"
       echo ""
-      echo "| Package | Vulnerability | Severity | Installed | Fixed |"
-      echo "|---------|---------------|----------|-----------|-------|"
+      echo "| Package | Vulnerability | Severity | CVSS | Installed | Fixed |"
+      echo "|---------|---------------|----------|------|-----------|-------|"
     } >> "$report_file"
 
     jq -r '.Results[]? | select(.Type == "python-pkg") | .Vulnerabilities[]? |
       select(.Severity == "HIGH" or .Severity == "CRITICAL") |
-      "\(.PkgName)|\(.VulnerabilityID)|\(.Severity)|\(.InstalledVersion)|\(.FixedVersion // "-")"' \
-      trivy-deep.json 2>/dev/null | while IFS='|' read -r pkg vuln severity installed fixed; do
-      echo "| $pkg | $vuln | $severity | $installed | $fixed |" >> "$report_file"
+      (.CVSS.nvd.V3Score // .CVSS.redhat.V3Score // .CVSS.ghsa.V3Score // "-") as $cvss |
+      "\(.PkgName)|\(.VulnerabilityID)|\(.Severity)|\($cvss)|\(.InstalledVersion)|\(.FixedVersion // "-")"' \
+      trivy-deep.json 2>/dev/null | while IFS='|' read -r pkg vuln severity cvss installed fixed; do
+      echo "| $pkg | $vuln | $severity | $cvss | $installed | $fixed |" >> "$report_file"
     done
 
     echo "" >> "$report_file"

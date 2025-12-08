@@ -41,7 +41,7 @@ jobs:
           scripts/generate-dockerhub-matrix.sh
 
   trivy-scan:
-    name: Trivy Scan ${{ matrix.image }}:${{ matrix.tag }}
+    name: ${{ matrix.image }}:${{ matrix.tag }}
     runs-on: ubuntu-22.04
     needs: generate-matrix
     permissions:
