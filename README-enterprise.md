@@ -66,6 +66,19 @@ Liquibase Enterprise includes all Community features plus:
 - **Hammer CLI**: Powerful command-line interface for all Enterprise operations
 - **Change Monitoring**: Track and audit all database changes across your pipeline
 
+### 🗄️ Included Database Drivers
+
+The Docker image includes JDBC drivers for the following databases:
+
+| Database | Driver Package |
+|----------|----------------|
+| **PostgreSQL** | `com.datical.db.drivers.postgres` |
+| **SQL Server** | `com.datical.db.drivers.mssql` |
+| **Oracle** | `com.datical.db.drivers.oracle` |
+| **DB2** | `com.datical.db.drivers.db2` |
+
+These drivers are pre-installed and ready to use. No additional driver installation is required.
+
 ### 🔧 Hammer Command
 
 The primary interface for Liquibase Enterprise is the `hammer` command, which provides:

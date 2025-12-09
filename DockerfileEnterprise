@@ -4,8 +4,9 @@ FROM eclipse-temurin:21-jre-noble AS builder
 WORKDIR /tmp/installer
 
 # Install required tools for IzPack installer (needs Xvfb for headless GUI installation)
+# and unzip for extracting drivers from CompositeRepo
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends wget xvfb && \
+    apt-get install -y --no-install-recommends wget xvfb unzip && \
     rm -rf /var/lib/apt/lists/*
 
 ARG ENTERPRISE_VERSION=8.10.479
@@ -15,6 +16,10 @@ ARG ENT_JAR_SHA256=165e519e95ca2cf27138e35feaa8a6f4d3e938754c95747e56748a78b4342
 RUN wget -q -O DaticalDB-installer.jar \
     "https://software.datical.com/Datical_DB_Software/Datical_DB_${ENTERPRISE_VERSION}/DaticalDB-linux.gtk.x86_64-${ENTERPRISE_VERSION}.jar" && \
     echo "$ENT_JAR_SHA256 *DaticalDB-installer.jar" | sha256sum -c -
+
+# Download CompositeRepo containing database drivers
+RUN wget -q -O DaticalDBCompositeRepo.zip \
+    "https://software.datical.com/Datical_DB_Software/Datical_DB_${ENTERPRISE_VERSION}/DaticalDBCompositeRepo-${ENTERPRISE_VERSION}.zip"
 
 # Copy IzPack installation configuration
 COPY autoInstall.xml /tmp/autoInstall.xml
@@ -36,6 +41,14 @@ RUN xvfb-run java \
     --add-opens java.base/sun.nio.ch=ALL-UNNAMED \
     -jar DaticalDB-installer.jar /tmp/autoInstall.xml && \
     rm -f DaticalDB-installer.jar /tmp/autoInstall.xml
+
+# Install database drivers using hammer installdrivers command
+# Requires license file passed via Docker build secret
+RUN --mount=type=secret,id=license,target=/tmp/license.lic \
+    DATDB_LICENSE=/tmp/license.lic \
+    /liquibase/DaticalDB/repl/hammer installDrivers \
+    "jar:file:/tmp/installer/DaticalDBCompositeRepo.zip!/" && \
+    rm -f DaticalDBCompositeRepo.zip
 
 # Runtime Stage - Create production image with only installed files
 FROM eclipse-temurin:21-jre-noble
