@@ -20,14 +20,14 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Configure AWS credentials for vault access
-        uses: aws-actions/configure-aws-credentials@v5
+        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5
         with:
           role-to-assume: ${{ secrets.LIQUIBASE_VAULT_OIDC_ROLE_ARN }}
           aws-region: us-east-1
 
       - name: Get secrets from vault
         id: vault-secrets
-        uses: aws-actions/aws-secretsmanager-get-secrets@v2
+        uses: aws-actions/aws-secretsmanager-get-secrets@a9a7eb4e2f2871d30dc5b892576fde60a2ecc802 # v2
         with:
           secret-ids: |
             ,/vault/liquibase
