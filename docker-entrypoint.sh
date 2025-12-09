@@ -32,8 +32,9 @@ else
         for arg in "$@"; do
           # Convert argument to lowercase for case-insensitive matching
           lower_arg=$(echo "$arg" | tr '[:upper:]' '[:lower:]')
+          # Match any --*file= argument (e.g., --changelog-file, --flow-file, --output-file, etc.)
           case "$lower_arg" in
-            --changelogfile=*|--changelog-file=*|--defaultsfile=*|--defaults-file=*|--outputfile=*|--output-file=*)
+            --*file=*)
               value="${arg#*=}"  # Use original arg to preserve case in the value
               # If the value doesn't start with / and doesn't contain :/ (for URLs), it's likely a relative path
               if [[ "$value" != /* && "$value" != *://* && "$value" != "" ]]; then
@@ -43,6 +44,22 @@ else
               ;;
           esac
         done
+
+        # Also check environment variables ending in _FILE (e.g., LIQUIBASE_COMMAND_CHANGELOG_FILE)
+        if [ "$SHOULD_CHANGE_DIR" = false ]; then
+          while IFS='=' read -r name value; do
+            # Match any *_FILE environment variable
+            case "$name" in
+              *_FILE)
+                # If the value doesn't start with / and doesn't contain :/ (for URLs), it's likely a relative path
+                if [[ "$value" != /* && "$value" != *://* && "$value" != "" ]]; then
+                  SHOULD_CHANGE_DIR=true
+                  break
+                fi
+                ;;
+            esac
+          done < <(env)
+        fi
       fi
     fi
   fi
