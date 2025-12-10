@@ -1,0 +1,16 @@
+# Label PRs based on files changed
+# Used by actions/labeler@v5
+
+"secure-only":
+  - changed-files:
+      - any-glob-to-any-file: "DockerfileSecure"
+
+"type: ci":
+  - changed-files:
+      - any-glob-to-any-file: ".github/**"
+
+"type: docs":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "*.md"
+          - "docs/**"
