@@ -241,6 +241,41 @@ For more information and licensing inquiries, visit [liquibase.com/get-liquibase
 
 ---
 
+## 🔒 Verifying Secure Images
+
+Liquibase Secure images include supply chain security features for compliance with SLSA Level 3 requirements. These features help verify image authenticity and provide transparency into image contents.
+
+### Verify Image Signature
+
+Liquibase Secure images are signed using [Cosign](https://docs.sigstore.dev/cosign/overview/) with keyless signing via GitHub OIDC. To verify a signature:
+
+```bash
+# Install cosign: https://docs.sigstore.dev/cosign/installation/
+cosign verify liquibase/liquibase-secure:latest \
+  --certificate-oidc-issuer=https://token.actions.githubusercontent.com \
+  --certificate-identity-regexp="https://github.com/liquibase/docker/.*"
+```
+
+### View SBOM (Software Bill of Materials)
+
+Each Liquibase Secure image includes an SBOM attestation listing all components:
+
+```bash
+docker buildx imagetools inspect liquibase/liquibase-secure:latest --format '{{ json .SBOM }}'
+```
+
+### View Build Provenance
+
+Build provenance attestations provide details about how the image was built:
+
+```bash
+docker buildx imagetools inspect liquibase/liquibase-secure:latest --format '{{ json .Provenance }}'
+```
+
+> **Note:** These supply chain security features are only available for Liquibase Secure images, not the Community edition.
+
+---
+
 ## Dockerfile
 
 ```dockerfile

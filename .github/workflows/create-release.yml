@@ -354,6 +354,11 @@ jobs:
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
 
+      # Install Cosign for keyless image signing (Secure images only)
+      - name: Install Cosign
+        if: ${{ matrix.type == 'liquibase-secure-release' }}
+        uses: sigstore/cosign-installer@v3
+
       # Define registry configurations based on image type
       - name: Set registry variables
         id: set-registries
@@ -471,6 +476,7 @@ jobs:
 
       #Unified build and push step using generated tags
       - name: Build and Push Docker Image
+        id: build-and-push
         if: ${{ needs.update-dockerfiles.outputs.releaseType == matrix.type }}
         uses: docker/build-push-action@v6
         with:
@@ -480,6 +486,9 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           tags: ${{ steps.generate-tags.outputs.tags }}
+          # Supply chain security - SBOM and Provenance for Secure images only (SLSA Level 3)
+          sbom: ${{ matrix.type == 'liquibase-secure-release' }}
+          provenance: ${{ matrix.type == 'liquibase-secure-release' && 'mode=max' || 'false' }}
           # Labels applied to each architecture-specific image
           labels: |
             org.opencontainers.image.source=https://github.com/liquibase/docker
@@ -498,6 +507,29 @@ jobs:
             org.opencontainers.image.vendor=Liquibase
             org.opencontainers.image.version=${{ needs.update-dockerfiles.outputs.extensionVersion }}
             org.opencontainers.image.documentation=https://docs.liquibase.com
+
+      # Cosign keyless signing for Liquibase Secure images (SLSA Level 3 compliance)
+      # Uses GitHub OIDC for identity - no private keys stored in repository
+      - name: Sign Docker Hub Image with Cosign
+        if: ${{ matrix.type == 'liquibase-secure-release' && needs.update-dockerfiles.outputs.dryRun == 'false' && env.PUSH_DOCKERHUB == 'true' }}
+        run: |
+          echo "Signing Docker Hub image with Cosign keyless signing..."
+          cosign sign --yes ${{ steps.set-registries.outputs.DOCKERHUB_REPO }}@${{ steps.build-and-push.outputs.digest }}
+          echo "Docker Hub image signed successfully"
+
+      - name: Sign GHCR Image with Cosign
+        if: ${{ matrix.type == 'liquibase-secure-release' && needs.update-dockerfiles.outputs.dryRun == 'false' && env.PUSH_GHCR == 'true' }}
+        run: |
+          echo "Signing GHCR image with Cosign keyless signing..."
+          cosign sign --yes ${{ steps.set-registries.outputs.GHCR_REPO }}@${{ steps.build-and-push.outputs.digest }}
+          echo "GHCR image signed successfully"
+
+      - name: Sign ECR Image with Cosign
+        if: ${{ matrix.type == 'liquibase-secure-release' && needs.update-dockerfiles.outputs.dryRun == 'false' && env.PUSH_ECR == 'true' }}
+        run: |
+          echo "Signing ECR image with Cosign keyless signing..."
+          cosign sign --yes ${{ steps.set-registries.outputs.ECR_REPO }}@${{ steps.build-and-push.outputs.digest }}
+          echo "ECR image signed successfully"
 
   update-official-repo:
     name: "Update Official Docker Repo"
