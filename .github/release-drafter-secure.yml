@@ -1,0 +1,66 @@
+# Release Drafter configuration for SECURE releases
+# Includes ALL PRs including secure-only
+# https://github.com/release-drafter/release-drafter
+
+name-template: 'v$RESOLVED_VERSION-SECURE'
+tag-template: 'v$RESOLVED_VERSION-SECURE'
+
+# Only exclude skip-changelog, include secure-only PRs
+exclude-labels:
+  - 'skip-changelog'
+
+# Auto-link Jira tickets
+replacers:
+  - search: '/DAT-(\d+)/g'
+    replace: '[DAT-$1](https://datical.atlassian.net/browse/DAT-$1)'
+
+template: |
+  ## What's Changed in Liquibase Secure Docker $RESOLVED_VERSION
+
+  $CHANGES
+
+  **Full Changelog**: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...v$RESOLVED_VERSION-SECURE
+
+categories:
+  - title: '🚀 Features'
+    labels:
+      - 'type: feature'
+      - 'enhancement'
+  - title: '🐛 Bug Fixes'
+    labels:
+      - 'type: bug'
+      - 'bug'
+  - title: '🔧 CI/CD & Infrastructure'
+    labels:
+      - 'type: ci'
+      - 'type: chore'
+  - title: '📦 Dependencies'
+    labels:
+      - 'dependencies'
+  - title: '📚 Documentation'
+    labels:
+      - 'type: docs'
+  - title: '🔒 Secure Edition'
+    labels:
+      - 'secure-only'
+  - title: '🔄 Other Changes'
+    labels:
+      - '*'
+
+change-template: '- $TITLE (#$NUMBER) @$AUTHOR'
+change-title-escapes: '\<*_&'
+no-changes-template: 'No changes since last release.'
+
+version-resolver:
+  major:
+    labels:
+      - 'breaking'
+  minor:
+    labels:
+      - 'type: feature'
+  patch:
+    labels:
+      - 'type: bug'
+      - 'type: chore'
+      - 'type: ci'
+  default: patch

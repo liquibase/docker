@@ -1,0 +1,88 @@
+# Release Drafter configuration for Community releases
+# Excludes secure-only PRs from Community release notes
+# https://github.com/release-drafter/release-drafter
+
+name-template: 'v$RESOLVED_VERSION'
+tag-template: 'v$RESOLVED_VERSION'
+
+# IMPORTANT: Exclude secure-only PRs from Community releases
+exclude-labels:
+  - 'secure-only'
+  - 'skip-changelog'
+
+# Auto-link Jira tickets
+replacers:
+  - search: '/DAT-(\d+)/g'
+    replace: '[DAT-$1](https://datical.atlassian.net/browse/DAT-$1)'
+
+template: |
+  ## What's Changed in Liquibase Docker $RESOLVED_VERSION
+
+  $CHANGES
+
+  **Full Changelog**: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...v$RESOLVED_VERSION
+
+categories:
+  - title: '🚀 Features'
+    labels:
+      - 'type: feature'
+      - 'enhancement'
+  - title: '🐛 Bug Fixes'
+    labels:
+      - 'type: bug'
+      - 'bug'
+  - title: '🔧 CI/CD & Infrastructure'
+    labels:
+      - 'type: ci'
+      - 'type: chore'
+  - title: '📦 Dependencies'
+    labels:
+      - 'dependencies'
+  - title: '📚 Documentation'
+    labels:
+      - 'type: docs'
+  - title: '🔄 Other Changes'
+    labels:
+      - '*'
+
+change-template: '- $TITLE (#$NUMBER) @$AUTHOR'
+change-title-escapes: '\<*_&'
+no-changes-template: 'No changes since last release.'
+
+# Auto-label PRs based on conventional commit title patterns
+autolabeler:
+  - label: 'type: feature'
+    title:
+      - '/^feat(\(.+\))?:/i'
+  - label: 'type: bug'
+    title:
+      - '/^fix(\(.+\))?:/i'
+  - label: 'type: chore'
+    title:
+      - '/^chore(\(.+\))?:/i'
+  - label: 'type: ci'
+    title:
+      - '/^ci(\(.+\))?:/i'
+  - label: 'type: docs'
+    title:
+      - '/^docs(\(.+\))?:/i'
+  - label: 'type: refactor'
+    title:
+      - '/^refactor(\(.+\))?:/i'
+  - label: 'dependencies'
+    title:
+      - '/^chore\(deps\):/i'
+
+version-resolver:
+  major:
+    labels:
+      - 'breaking'
+  minor:
+    labels:
+      - 'type: feature'
+  patch:
+    labels:
+      - 'type: bug'
+      - 'type: chore'
+      - 'type: ci'
+  default: patch
