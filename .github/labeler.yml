@@ -5,11 +5,11 @@
   - changed-files:
       - any-glob-to-any-file: "DockerfileSecure"
 
-"type: ci":
+"TypeCI":
   - changed-files:
       - any-glob-to-any-file: ".github/**"
 
-"type: docs":
+"TypeDocs":
   - changed-files:
       - any-glob-to-any-file:
           - "*.md"

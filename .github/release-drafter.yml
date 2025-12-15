@@ -8,7 +8,7 @@ tag-template: 'v$RESOLVED_VERSION'
 # IMPORTANT: Exclude secure-only PRs from Community releases
 exclude-labels:
   - 'secure-only'
-  - 'skip-changelog'
+  - 'skipReleaseNotes'
 
 # Auto-link Jira tickets
 replacers:
@@ -25,22 +25,20 @@ template: |
 categories:
   - title: '🚀 Features'
     labels:
-      - 'type: feature'
-      - 'enhancement'
+      - 'TypeEnhancement'
   - title: '🐛 Bug Fixes'
     labels:
-      - 'type: bug'
-      - 'bug'
+      - 'TypeBug'
   - title: '🔧 CI/CD & Infrastructure'
     labels:
-      - 'type: ci'
-      - 'type: chore'
+      - 'TypeCI'
+      - 'TypeChore'
   - title: '📦 Dependencies'
     labels:
       - 'dependencies'
   - title: '📚 Documentation'
     labels:
-      - 'type: docs'
+      - 'TypeDocs'
   - title: '🔄 Other Changes'
     labels:
       - '*'
@@ -51,22 +49,22 @@ no-changes-template: 'No changes since last release.'
 
 # Auto-label PRs based on conventional commit title patterns
 autolabeler:
-  - label: 'type: feature'
+  - label: 'TypeEnhancement'
     title:
       - '/^feat(\(.+\))?:/i'
-  - label: 'type: bug'
+  - label: 'TypeBug'
     title:
       - '/^fix(\(.+\))?:/i'
-  - label: 'type: chore'
+  - label: 'TypeChore'
     title:
       - '/^chore(\(.+\))?:/i'
-  - label: 'type: ci'
+  - label: 'TypeCI'
     title:
       - '/^ci(\(.+\))?:/i'
-  - label: 'type: docs'
+  - label: 'TypeDocs'
     title:
       - '/^docs(\(.+\))?:/i'
-  - label: 'type: refactor'
+  - label: 'TypeRefactor'
     title:
       - '/^refactor(\(.+\))?:/i'
   - label: 'dependencies'
@@ -76,13 +74,13 @@ autolabeler:
 version-resolver:
   major:
     labels:
-      - 'breaking'
+      - 'breakingChanges'
   minor:
     labels:
-      - 'type: feature'
+      - 'TypeEnhancement'
   patch:
     labels:
-      - 'type: bug'
-      - 'type: chore'
-      - 'type: ci'
+      - 'TypeBug'
+      - 'TypeChore'
+      - 'TypeCI'
   default: patch

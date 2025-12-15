@@ -5,9 +5,9 @@
 name-template: 'v$RESOLVED_VERSION-SECURE'
 tag-template: 'v$RESOLVED_VERSION-SECURE'
 
-# Only exclude skip-changelog, include secure-only PRs
+# Only exclude skipReleaseNotes, include secure-only PRs
 exclude-labels:
-  - 'skip-changelog'
+  - 'skipReleaseNotes'
 
 # Auto-link Jira tickets
 replacers:
@@ -24,22 +24,20 @@ template: |
 categories:
   - title: '🚀 Features'
     labels:
-      - 'type: feature'
-      - 'enhancement'
+      - 'TypeEnhancement'
   - title: '🐛 Bug Fixes'
     labels:
-      - 'type: bug'
-      - 'bug'
+      - 'TypeBug'
   - title: '🔧 CI/CD & Infrastructure'
     labels:
-      - 'type: ci'
-      - 'type: chore'
+      - 'TypeCI'
+      - 'TypeChore'
   - title: '📦 Dependencies'
     labels:
       - 'dependencies'
   - title: '📚 Documentation'
     labels:
-      - 'type: docs'
+      - 'TypeDocs'
   - title: '🔒 Secure Edition'
     labels:
       - 'secure-only'
@@ -54,13 +52,13 @@ no-changes-template: 'No changes since last release.'
 version-resolver:
   major:
     labels:
-      - 'breaking'
+      - 'breakingChanges'
   minor:
     labels:
-      - 'type: feature'
+      - 'TypeEnhancement'
   patch:
     labels:
-      - 'type: bug'
-      - 'type: chore'
-      - 'type: ci'
+      - 'TypeBug'
+      - 'TypeChore'
+      - 'TypeCI'
   default: patch
