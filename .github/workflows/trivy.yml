@@ -44,22 +44,22 @@ jobs:
       matrix:
         image:
           [
-            { dockerfile: Dockerfile, name: liquibase/liquibase, suffix: "" },
+            { dockerfile: Dockerfile, name: liquibase/liquibase, suffix: "", ghcr_name: community },
             {
               dockerfile: Dockerfile.alpine,
               name: liquibase/liquibase,
               suffix: "-alpine",
+              ghcr_name: alpine,
             },
             {
               dockerfile: DockerfileSecure,
               name: liquibase/liquibase-secure,
               suffix: "",
+              ghcr_name: secure,
             },
           ]
     name: Build ${{ matrix.image.name }}${{ matrix.image.suffix }}
     runs-on: "ubuntu-22.04"
-    outputs:
-      image_ref: ghcr.io/${{ github.repository }}/${{ matrix.image.dockerfile }}:${{ github.sha }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -80,7 +80,7 @@ jobs:
           context: .
           file: ${{ matrix.image.dockerfile }}
           push: true
-          tags: ghcr.io/${{ github.repository }}/${{ matrix.image.dockerfile }}:${{ github.sha }}
+          tags: ghcr.io/${{ github.repository }}/liquibase-${{ matrix.image.ghcr_name }}:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -94,23 +94,25 @@ jobs:
       matrix:
         image:
           [
-            { dockerfile: Dockerfile, name: liquibase/liquibase, suffix: "" },
+            { dockerfile: Dockerfile, name: liquibase/liquibase, suffix: "", ghcr_name: community },
             {
               dockerfile: Dockerfile.alpine,
               name: liquibase/liquibase,
               suffix: "-alpine",
+              ghcr_name: alpine,
             },
             {
               dockerfile: DockerfileSecure,
               name: liquibase/liquibase-secure,
               suffix: "",
+              ghcr_name: secure,
             },
           ]
     name: Scan ${{ matrix.image.name }}${{ matrix.image.suffix }}
     uses: liquibase/build-logic/.github/workflows/reusable-vulnerability-scan.yml@DAT-21381
     with:
       mode: docker
-      source: ghcr.io/${{ github.repository }}/${{ matrix.image.dockerfile }}:${{ github.sha }}
+      source: ghcr.io/${{ github.repository }}/liquibase-${{ matrix.image.ghcr_name }}:${{ github.sha }}
       image_name: ${{ matrix.image.name }}
       image_tag: ${{ matrix.image.suffix != '' && matrix.image.suffix || 'latest' }}
       fail_on_vulnerabilities: true
