@@ -58,6 +58,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
+      - name: Checkout build-logic
+        uses: actions/checkout@v6
+        with:
+          repository: liquibase/build-logic
+          ref: DAT-21381
+          path: build-logic
+
+      - name: Setup Trivy ignore file
+        run: cp build-logic/.trivyignore .trivyignore
+
       - name: Configure AWS credentials for vault access
         uses: aws-actions/configure-aws-credentials@v5
         with:
@@ -81,7 +91,13 @@ jobs:
 
       - name: Extract nested JARs and Python packages for deep scanning
         run: |
-          scripts/extract-nested-deps.sh ${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}
+          chmod +x build-logic/scripts/vulnerability-scanning/extract-nested-deps.sh
+          build-logic/scripts/vulnerability-scanning/extract-nested-deps.sh \
+            --mode=docker \
+            --source="${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}" \
+            --scope=full
+        env:
+          EXTRACT_DIR: /tmp/extracted-deps
 
       - name: Generate SBOM with Syft
         uses: anchore/sbom-action@v0
@@ -108,6 +124,7 @@ jobs:
           severity: "HIGH,CRITICAL"
           exit-code: "0"
           limit-severities-for-sarif: true
+          trivyignores: .trivyignore
 
       - name: Run Trivy vulnerability scanner (Surface Scan - JSON)
         uses: aquasecurity/trivy-action@0.33.1
@@ -118,6 +135,7 @@ jobs:
           output: "trivy-surface.json"
           severity: "HIGH,CRITICAL"
           exit-code: "0"
+          trivyignores: .trivyignore
 
       - name: Run Trivy scanner on extracted nested JARs (Deep Scan - SARIF)
         if: always()
@@ -131,6 +149,7 @@ jobs:
           severity: "HIGH,CRITICAL"
           exit-code: "0"
           limit-severities-for-sarif: true
+          trivyignores: .trivyignore
 
       - name: Run Trivy scanner on extracted nested JARs (Deep Scan - JSON)
         if: always()
@@ -143,6 +162,7 @@ jobs:
           output: "trivy-deep.json"
           severity: "HIGH,CRITICAL"
           exit-code: "0"
+          trivyignores: .trivyignore
 
       - name: Run Grype scanner on SBOM
         if: always()
@@ -160,15 +180,18 @@ jobs:
       - name: Save Grype results to file
         if: always()
         run: |
-          scripts/save-grype-results.sh
+          chmod +x build-logic/scripts/vulnerability-scanning/save-grype-results.sh
+          build-logic/scripts/vulnerability-scanning/save-grype-results.sh
 
       - name: Combine scan results and check for failures
         if: always()
         env:
           IMAGE_NAME: ${{ matrix.image.name }}
           IMAGE_SUFFIX: ${{ matrix.image.suffix }}
+          EXTRACT_DIR: /tmp/extracted-deps
         run: |
-          scripts/analyze-scan-results.sh
+          chmod +x build-logic/scripts/vulnerability-scanning/analyze-scan-results.sh
+          build-logic/scripts/vulnerability-scanning/analyze-scan-results.sh
 
       - name: Upload enhanced vulnerability report
         if: always()
@@ -209,7 +232,11 @@ jobs:
         if: always()
         id: check_grype
         run: |
-          scripts/check-file-exists.sh grype-results.sarif exists
+          if [ -f "grype-results.sarif" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Upload Grype scan results to GitHub Security tab
         if: always() && steps.check_grype.outputs.exists == 'true'

@@ -1,6 +1,6 @@
-# Vulnerability scanning for published Docker images using Trivy
-# This workflow scans the published images on Docker Hub for vulnerabilities.
-# It generates a matrix of image/tag combinations and runs Trivy scans on them.
+# Vulnerability scanning for published Docker images
+# This workflow scans published images on Docker Hub for vulnerabilities
+# using the reusable vulnerability scanning workflow from build-logic.
 #
 # NOTE: SARIF results are NOT uploaded to GitHub Security tab to avoid stale alerts.
 # Published image vulnerabilities are tracked via workflow artifacts and GitHub Actions summary.
@@ -17,11 +17,11 @@ on:
         default: "20"
   schedule:
     # Run Monday-Friday at 10 AM UTC (published image monitoring)
-    - cron: "0 10 * * 1-5" # Run every weekday at 10am UTC
+    - cron: "0 10 * * 1-5"
 
 permissions:
   contents: read
-  actions: read # Required for private repositories to get Action run status
+  actions: read
 
 jobs:
   generate-matrix:
@@ -40,106 +40,19 @@ jobs:
         run: |
           scripts/generate-dockerhub-matrix.sh
 
-  trivy-scan:
-    name: ${{ matrix.image }}:${{ matrix.tag }}
-    runs-on: ubuntu-22.04
+  vulnerability-scan:
+    name: Scan ${{ matrix.image }}:${{ matrix.tag }}
     needs: generate-matrix
-    permissions:
-      contents: read
-      actions: read
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
-      - name: Pull published image
-        run: |
-          echo "Pulling ${{ matrix.image }}:${{ matrix.tag }}..."
-          docker pull ${{ matrix.image }}:${{ matrix.tag }}
-
-      - name: Extract nested JARs and Python packages for deep scanning
-        run: |
-          scripts/extract-nested-deps.sh ${{ matrix.image }}:${{ matrix.tag }}
-
-      - name: Generate SBOM with Syft
-        uses: anchore/sbom-action@v0
-        with:
-          image: "${{ matrix.image }}:${{ matrix.tag }}"
-          format: "spdx-json"
-          output-file: "sbom.spdx.json"
-          upload-artifact: false
-
-      - name: Run Trivy vulnerability scanner (Surface Scan)
-        id: trivy_scan
-        uses: aquasecurity/trivy-action@0.33.1
-        with:
-          image-ref: "${{ matrix.image }}:${{ matrix.tag }}"
-          vuln-type: "os,library"
-          scanners: "vuln"
-          format: "json"
-          output: "trivy-surface.json"
-          severity: "HIGH,CRITICAL"
-          exit-code: "0"
-        continue-on-error: true
-
-      - name: Run Trivy scanner on extracted nested JARs (Deep Scan)
-        id: trivy_deep
-        uses: aquasecurity/trivy-action@0.33.1
-        with:
-          scan-type: "rootfs"
-          scan-ref: "/tmp/extracted-deps"
-          vuln-type: "library"
-          format: "json"
-          output: "trivy-deep.json"
-          severity: "HIGH,CRITICAL"
-          exit-code: "0"
-        continue-on-error: true
-
-      - name: Run Grype scanner on SBOM
-        id: grype_scan
-        uses: anchore/scan-action@v7
-        with:
-          sbom: "sbom.spdx.json"
-          fail-build: false
-          severity-cutoff: high
-          output-format: json
-          output-file: "grype-results.json"
-        continue-on-error: true
-
-      - name: Save Grype results to file
-        if: always()
-        env:
-          GRYPE_OUTPUT_FORMAT: json
-        run: |
-          scripts/save-grype-results.sh
-
-      # trivy convert steps assume trivy CLI is available, therefore install the CLI before using those commands across steps.
-      - name: Install Trivy CLI
-        run: |
-          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
-          trivy --version
-
-      - name: Convert JSON to SARIF and analyze results
-        if: always()
-        run: |
-          scripts/convert-scan-results.sh
-
-      - name: Create enhanced vulnerability report with parent JAR mapping
-        if: always()
-        run: |
-          scripts/create-enhanced-report.sh ${{ matrix.image }} ${{ matrix.tag }} "${{ matrix.published }}"
-
-      - name: Upload enhanced vulnerability report
-        if: always()
-        uses: actions/upload-artifact@v5
-        with:
-          name: vulnerability-report-${{ matrix.image == 'liquibase/liquibase-secure' && 'secure' || 'community' }}-${{ matrix.tag }}
-          path: vulnerability-report-enhanced.md
-          retention-days: 20
-
-      - name: Append summary to GitHub Actions summary
-        if: always()
-        run: |
-          scripts/append-github-summary.sh ${{ matrix.image }} ${{ matrix.tag }} "${{ matrix.published }}"
+    uses: liquibase/build-logic/.github/workflows/reusable-vulnerability-scan.yml@DAT-21381
+    with:
+      mode: docker
+      source: "${{ matrix.image }}:${{ matrix.tag }}"
+      image_name: ${{ matrix.image }}
+      image_tag: ${{ matrix.tag }}
+      fail_on_vulnerabilities: false
+      upload_sarif: false
+      generate_sbom: true
+      build_logic_ref: DAT-21381
