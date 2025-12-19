@@ -10,54 +10,135 @@ on:
   push:
     branches: ["main"]
     paths:
-      - 'Dockerfile*'
-      - 'docker-entrypoint.sh'
-      - '.github/workflows/trivy.yml'
-      - 'examples/**'
-      - 'pom.xml'
+      - "Dockerfile*"
+      - "docker-entrypoint.sh"
+      - ".github/workflows/trivy.yml"
+      - "examples/**"
+      - "pom.xml"
   pull_request:
     branches: ["main"]
     paths:
-      - 'Dockerfile*'
-      - 'docker-entrypoint.sh'
-      - '.github/workflows/trivy.yml'
-      - 'examples/**'
-      - 'pom.xml'
+      - "Dockerfile*"
+      - "docker-entrypoint.sh"
+      - ".github/workflows/trivy.yml"
+      - "examples/**"
+      - "pom.xml"
   schedule:
     - cron: "0 7 * * 1-5" # Run every weekday at 7am UTC
 
 permissions:
   contents: read
   id-token: write # Required for AWS OIDC authentication
+  packages: write # Required for pushing to GHCR
   security-events: write # Required for uploading SARIF results to GitHub Security tab
   actions: read # Required for private repositories to get Action run status
   pull-requests: write # Required for writing comments on pull requests
 
 jobs:
-  trivy:
+  # ============================================
+  # BUILD AND PUSH TO GHCR
+  # ============================================
+  build:
     strategy:
       fail-fast: false
       matrix:
         image:
           [
-            { dockerfile: Dockerfile, name: liquibase/liquibase, suffix: "" },
+            {
+              dockerfile: Dockerfile,
+              name: liquibase/liquibase,
+              suffix: "",
+              ghcr_name: community,
+            },
             {
               dockerfile: Dockerfile.alpine,
               name: liquibase/liquibase,
               suffix: "-alpine",
+              ghcr_name: alpine,
             },
             {
               dockerfile: DockerfileSecure,
               name: liquibase/liquibase-secure,
               suffix: "",
+              ghcr_name: secure,
             },
           ]
-    name: Trivy
+    name: Build ${{ matrix.image.name }}${{ matrix.image.suffix }}
     runs-on: "ubuntu-22.04"
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push to GHCR
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ matrix.image.dockerfile }}
+          push: true
+          tags: ghcr.io/${{ github.repository }}/liquibase-${{ matrix.image.ghcr_name }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ============================================
+  # VULNERABILITY SCAN (REUSABLE WORKFLOW)
+  # ============================================
+  vulnerability-scan:
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        image:
+          [
+            {
+              dockerfile: Dockerfile,
+              name: liquibase/liquibase,
+              suffix: "",
+              ghcr_name: community,
+            },
+            {
+              dockerfile: Dockerfile.alpine,
+              name: liquibase/liquibase,
+              suffix: "-alpine",
+              ghcr_name: alpine,
+            },
+            {
+              dockerfile: DockerfileSecure,
+              name: liquibase/liquibase-secure,
+              suffix: "",
+              ghcr_name: secure,
+            },
+          ]
+    name: Scan ${{ matrix.image.name }}${{ matrix.image.suffix }}
+    uses: liquibase/build-logic/.github/workflows/reusable-vulnerability-scan.yml@main
+    with:
+      mode: docker
+      source: ghcr.io/${{ github.repository }}/liquibase-${{ matrix.image.ghcr_name }}:${{ github.sha }}
+      image_name: ${{ matrix.image.name }}
+      image_tag: ${{ matrix.image.suffix != '' && matrix.image.suffix || 'latest' }}
+      fail_on_vulnerabilities: true
+      upload_sarif: true
+      sarif_category: ${{ matrix.image.name }}${{ matrix.image.suffix }}
+      generate_sbom: true
+      build_logic_ref: main
+
+  # ============================================
+  # SLACK NOTIFICATION ON FAILURE
+  # ============================================
+  notify-failure:
+    needs: [build, vulnerability-scan]
+    if: failure()
+    runs-on: "ubuntu-22.04"
+    steps:
       - name: Configure AWS credentials for vault access
         uses: aws-actions/configure-aws-credentials@v5
         with:
@@ -65,181 +146,23 @@ jobs:
           aws-region: us-east-1
 
       - name: Get secrets from vault
-        id: vault-secrets
         uses: aws-actions/aws-secretsmanager-get-secrets@v2
         with:
           secret-ids: |
             ,/vault/liquibase
           parse-json-secrets: true
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build ${{ matrix.image.name }}${{ matrix.image.suffix }} from Dockerfile
-        run: |
-          docker build -f ${{ matrix.image.dockerfile }} -t ${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }} .
-
-      - name: Extract nested JARs and Python packages for deep scanning
-        run: |
-          scripts/extract-nested-deps.sh ${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}
-
-      - name: Generate SBOM with Syft
-        uses: anchore/sbom-action@v0
-        with:
-          image: "${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}"
-          format: "spdx-json"
-          output-file: "sbom.spdx.json"
-
-      - name: Upload SBOM as artifact
-        if: always()
-        uses: actions/upload-artifact@v5
-        with:
-          name: sbom-${{ matrix.image.dockerfile == 'DockerfileSecure' && 'secure' || matrix.image.suffix != '' && matrix.image.suffix || 'community' }}
-          path: sbom.spdx.json
-          retention-days: 30
-
-      - name: Run Trivy vulnerability scanner (Surface Scan - SARIF)
-        uses: aquasecurity/trivy-action@0.33.1
-        with:
-          image-ref: "${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}"
-          vuln-type: "os,library"
-          format: "sarif"
-          output: "trivy-surface.sarif"
-          severity: "HIGH,CRITICAL"
-          exit-code: "0"
-          limit-severities-for-sarif: true
-
-      - name: Run Trivy vulnerability scanner (Surface Scan - JSON)
-        uses: aquasecurity/trivy-action@0.33.1
-        with:
-          image-ref: "${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}"
-          vuln-type: "os,library"
-          format: "json"
-          output: "trivy-surface.json"
-          severity: "HIGH,CRITICAL"
-          exit-code: "0"
-
-      - name: Run Trivy scanner on extracted nested JARs (Deep Scan - SARIF)
-        if: always()
-        uses: aquasecurity/trivy-action@0.33.1
-        with:
-          scan-type: "rootfs"
-          scan-ref: "/tmp/extracted-deps"
-          vuln-type: "library"
-          format: "sarif"
-          output: "trivy-deep.sarif"
-          severity: "HIGH,CRITICAL"
-          exit-code: "0"
-          limit-severities-for-sarif: true
-
-      - name: Run Trivy scanner on extracted nested JARs (Deep Scan - JSON)
-        if: always()
-        uses: aquasecurity/trivy-action@0.33.1
-        with:
-          scan-type: "rootfs"
-          scan-ref: "/tmp/extracted-deps"
-          vuln-type: "library"
-          format: "json"
-          output: "trivy-deep.json"
-          severity: "HIGH,CRITICAL"
-          exit-code: "0"
-
-      - name: Run Grype scanner on SBOM
-        if: always()
-        id: grype_scan
-        uses: anchore/scan-action@v7
-        with:
-          sbom: "sbom.spdx.json"
-          fail-build: false
-          severity-cutoff: high
-          only-fixed: true
-          output-format: sarif
-          output-file: results.sarif
-        continue-on-error: true
-
-      - name: Save Grype results to file
-        if: always()
-        run: |
-          scripts/save-grype-results.sh
-
-      - name: Combine scan results and check for failures
-        if: always()
-        env:
-          IMAGE_NAME: ${{ matrix.image.name }}
-          IMAGE_SUFFIX: ${{ matrix.image.suffix }}
-        run: |
-          scripts/analyze-scan-results.sh
-
-      - name: Upload enhanced vulnerability report
-        if: always()
-        uses: actions/upload-artifact@v5
-        with:
-          name: vulnerability-report-${{ matrix.image.dockerfile == 'DockerfileSecure' && 'secure' || matrix.image.suffix != '' && matrix.image.suffix || 'community' }}
-          path: vulnerability-report-enhanced.md
-          retention-days: 90
-
       - name: Notify Slack on Build Failure
-        if: failure()
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_COLOR: "failure"
-          SLACK_MESSAGE: "View details on GitHub Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Triggered by repository: ${{ github.repository }} and job: ${{ github.job }}"
+          SLACK_MESSAGE: "View details on GitHub Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Triggered by repository: ${{ github.repository }}"
           SLACK_TITLE: "❌ ${{ github.repository }} ❌ Trivy failed on branch ${{ github.ref_name }} for commit ${{ github.sha }} in repository ${{ github.repository }}"
           SLACK_USERNAME: liquibot
           SLACK_WEBHOOK: ${{ env.DOCKER_SLACK_WEBHOOK_URL }}
           SLACK_ICON_EMOJI: ":whale:"
-          SLACK_FOOTER: "${{ github.repository }} - ${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}"
+          SLACK_FOOTER: "${{ github.repository }}"
           SLACK_LINK_NAMES: true
-
-      - name: Upload Trivy Surface scan results to GitHub Security tab
-        if: always()
-        uses: github/codeql-action/upload-sarif@v4
-        with:
-          sarif_file: "trivy-surface.sarif"
-          category: "${{ matrix.image.name }}${{ matrix.image.suffix }}-surface"
-
-      - name: Upload Trivy Deep scan results to GitHub Security tab
-        if: always()
-        uses: github/codeql-action/upload-sarif@v4
-        with:
-          sarif_file: "trivy-deep.sarif"
-          category: "${{ matrix.image.name }}${{ matrix.image.suffix }}-deep"
-
-      - name: Check if Grype SARIF exists
-        if: always()
-        id: check_grype
-        run: |
-          scripts/check-file-exists.sh grype-results.sarif exists
-
-      - name: Upload Grype scan results to GitHub Security tab
-        if: always() && steps.check_grype.outputs.exists == 'true'
-        uses: github/codeql-action/upload-sarif@v4
-        with:
-          sarif_file: "grype-results.sarif"
-          category: "${{ matrix.image.name }}${{ matrix.image.suffix }}-grype"
-
-      - name: Generate Security Report
-        if: always()
-        uses: rsdmike/github-security-report-action@v3.0.4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          outputDir: ./reports/trivy${{ matrix.image.dockerfile == 'DockerfileSecure' && '-secure' || matrix.image.suffix }}/
-          sarifReportDir: .
-
-      - name: Upload Security Report
-        if: always()
-        uses: actions/upload-artifact@v5
-        with:
-          name: security-report-trivy${{ matrix.image.dockerfile == 'DockerfileSecure' && '-secure' || matrix.image.suffix }}
-          path: ./reports/trivy${{ matrix.image.dockerfile == 'DockerfileSecure' && '-secure' || matrix.image.suffix }}/summary.pdf
-
-      - name: Upload Scan Summary
-        if: always()
-        uses: actions/upload-artifact@v5
-        with:
-          name: scan-summary-${{ matrix.image.dockerfile == 'DockerfileSecure' && 'secure' || matrix.image.suffix != '' && matrix.image.suffix || 'community' }}
-          path: scan-summary.txt
-          retention-days: 30
 
   scout:
     strategy:
