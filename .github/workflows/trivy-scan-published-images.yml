@@ -55,4 +55,4 @@ jobs:
       fail_on_vulnerabilities: false
       upload_sarif: false
       generate_sbom: true
-      build_logic_ref: DAT-21381
+      build_logic_ref: main
