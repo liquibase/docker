@@ -301,15 +301,53 @@ jobs:
           echo "release_name=${RELEASE_NAME}" >> $GITHUB_OUTPUT
           echo "::notice::Creating GitHub release for ${{ needs.update-dockerfiles.outputs.releaseType }} on tag: ${TAG_NAME}"
 
+      # Fetch release notes from Release Drafter draft
+      - name: Get Release Notes from Draft
+        id: get-release-notes
+        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' && matrix.suffix == '' && ((needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' && matrix.type == 'liquibase-release') || (needs.update-dockerfiles.outputs.releaseType == 'liquibase-secure-release' && matrix.type == 'liquibase-secure-release')) }}
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const isSecure = '${{ needs.update-dockerfiles.outputs.releaseType }}' === 'liquibase-secure-release';
+
+            const releases = await github.rest.repos.listReleases({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+
+            // Find the matching draft from Release Drafter
+            const draft = releases.data.find(r => {
+              if (!r.draft) return false;
+              return isSecure ? r.tag_name.includes('SECURE') : !r.tag_name.includes('SECURE');
+            });
+
+            if (draft && draft.body) {
+              core.setOutput('body', draft.body);
+              core.setOutput('found', 'true');
+
+              // Delete the draft - we'll create the real release
+              await github.rest.repos.deleteRelease({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                release_id: draft.id
+              });
+              core.info(`Deleted Release Drafter draft: ${draft.name}`);
+            } else {
+              core.setOutput('found', 'false');
+              core.info('No Release Drafter draft found, using default release notes');
+            }
+
       - name: Create GitHub Release
         if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' && matrix.suffix == '' && ((needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' && matrix.type == 'liquibase-release') || (needs.update-dockerfiles.outputs.releaseType == 'liquibase-secure-release' && matrix.type == 'liquibase-secure-release')) }}
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2
         with:
           name: ${{ steps.release-tag.outputs.release_name }}
           tag_name: ${{ steps.release-tag.outputs.tag_name }}
           draft: true
           body: |
             ${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-secure-release' && format('Support for Liquibase Secure {0}.', needs.update-dockerfiles.outputs.liquibaseVersion) || format('Support for Liquibase {0}.', needs.update-dockerfiles.outputs.liquibaseVersion) }}
+
+            ${{ steps.get-release-notes.outputs.found == 'true' && steps.get-release-notes.outputs.body || '' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
