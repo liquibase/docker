@@ -10,19 +10,19 @@ on:
   push:
     branches: ["main"]
     paths:
-      - 'Dockerfile*'
-      - 'docker-entrypoint.sh'
-      - '.github/workflows/trivy.yml'
-      - 'examples/**'
-      - 'pom.xml'
+      - "Dockerfile*"
+      - "docker-entrypoint.sh"
+      - ".github/workflows/trivy.yml"
+      - "examples/**"
+      - "pom.xml"
   pull_request:
     branches: ["main"]
     paths:
-      - 'Dockerfile*'
-      - 'docker-entrypoint.sh'
-      - '.github/workflows/trivy.yml'
-      - 'examples/**'
-      - 'pom.xml'
+      - "Dockerfile*"
+      - "docker-entrypoint.sh"
+      - ".github/workflows/trivy.yml"
+      - "examples/**"
+      - "pom.xml"
   schedule:
     - cron: "0 7 * * 1-5" # Run every weekday at 7am UTC
 
@@ -44,7 +44,12 @@ jobs:
       matrix:
         image:
           [
-            { dockerfile: Dockerfile, name: liquibase/liquibase, suffix: "", ghcr_name: community },
+            {
+              dockerfile: Dockerfile,
+              name: liquibase/liquibase,
+              suffix: "",
+              ghcr_name: community,
+            },
             {
               dockerfile: Dockerfile.alpine,
               name: liquibase/liquibase,
@@ -94,7 +99,12 @@ jobs:
       matrix:
         image:
           [
-            { dockerfile: Dockerfile, name: liquibase/liquibase, suffix: "", ghcr_name: community },
+            {
+              dockerfile: Dockerfile,
+              name: liquibase/liquibase,
+              suffix: "",
+              ghcr_name: community,
+            },
             {
               dockerfile: Dockerfile.alpine,
               name: liquibase/liquibase,
@@ -109,7 +119,7 @@ jobs:
             },
           ]
     name: Scan ${{ matrix.image.name }}${{ matrix.image.suffix }}
-    uses: liquibase/build-logic/.github/workflows/reusable-vulnerability-scan.yml@DAT-21381
+    uses: liquibase/build-logic/.github/workflows/reusable-vulnerability-scan.yml@main
     with:
       mode: docker
       source: ghcr.io/${{ github.repository }}/liquibase-${{ matrix.image.ghcr_name }}:${{ github.sha }}
@@ -119,7 +129,7 @@ jobs:
       upload_sarif: true
       sarif_category: ${{ matrix.image.name }}${{ matrix.image.suffix }}
       generate_sbom: true
-      build_logic_ref: DAT-21381
+      build_logic_ref: main
 
   # ============================================
   # SLACK NOTIFICATION ON FAILURE

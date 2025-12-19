@@ -46,7 +46,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
-    uses: liquibase/build-logic/.github/workflows/reusable-vulnerability-scan.yml@DAT-21381
+    uses: liquibase/build-logic/.github/workflows/reusable-vulnerability-scan.yml@main
     with:
       mode: docker
       source: "${{ matrix.image }}:${{ matrix.tag }}"
