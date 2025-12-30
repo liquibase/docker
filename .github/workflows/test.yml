@@ -48,7 +48,7 @@ jobs:
 
       - name: Setup Docker on macOS
         if: matrix.os == 'macos-15-intel'
-        uses: douglascamata/setup-docker-macos-action@v1.0.2
+        uses: douglascamata/setup-docker-macos-action@v1.1.0
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
