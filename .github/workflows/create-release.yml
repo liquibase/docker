@@ -399,7 +399,7 @@ jobs:
         with:
           registry: public.ecr.aws
           username: ${{ steps.configure-aws-credentials-prod.outputs.aws_access_key_id }}
-          password: ${{ steps.configure-aws-credentials-prodoutputs.aws_secret_access_key }}
+          password: ${{ steps.configure-aws-credentials-prod.outputs.aws_secret_access_key }}
 
       # Add login for dry-run mode to private ECR
       - name: Login to Private ECR Registry (dry-run)
@@ -410,7 +410,7 @@ jobs:
         with:
           registry: ${{ env.PRIVATE_ECR_DRY_RUN_REPO }}
           username: ${{ steps.configure-aws-credentials-prod.outputs.aws_access_key_id }}
-          password: ${{ steps.configure-aws-credentials-prodoutputs.aws_secret_access_key }}
+          password: ${{ steps.configure-aws-credentials-prod.outputs.aws_secret_access_key }}
 
       # Generate tags dynamically using a separate step
       - name: Generate Docker Tags
