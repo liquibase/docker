@@ -357,7 +357,7 @@ jobs:
       # Install Cosign for keyless image signing (Secure images only)
       - name: Install Cosign
         if: ${{ matrix.type == 'liquibase-secure-release' }}
-        uses: sigstore/cosign-installer@v3
+        uses: sigstore/cosign-installer@faadad0cce49287aee09b3a48701e75088a2c6ad # v4.0.0
 
       # Define registry configurations based on image type
       - name: Set registry variables
