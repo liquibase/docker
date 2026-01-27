@@ -531,6 +531,13 @@ jobs:
           cosign sign --yes ${{ steps.set-registries.outputs.ECR_REPO }}@${{ steps.build-and-push.outputs.digest }}
           echo "ECR image signed successfully"
 
+      - name: Sign Dry-Run ECR Image with Cosign
+        if: ${{ needs.update-dockerfiles.outputs.releaseType == matrix.type && matrix.type == 'liquibase-secure-release' && needs.update-dockerfiles.outputs.dryRun == 'true' }}
+        run: |
+          echo "Signing dry-run ECR image with Cosign keyless signing..."
+          cosign sign --yes ${{ env.PRIVATE_ECR_DRY_RUN_REPO }}@${{ steps.build-and-push.outputs.digest }}
+          echo "Dry-run ECR image signed successfully"
+
   update-official-repo:
     name: "Update Official Docker Repo"
     needs: update-dockerfiles
