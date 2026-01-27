@@ -511,21 +511,21 @@ jobs:
       # Cosign keyless signing for Liquibase Secure images (SLSA Level 3 compliance)
       # Uses GitHub OIDC for identity - no private keys stored in repository
       - name: Sign Docker Hub Image with Cosign
-        if: ${{ matrix.type == 'liquibase-secure-release' && needs.update-dockerfiles.outputs.dryRun == 'false' && env.PUSH_DOCKERHUB == 'true' }}
+        if: ${{ needs.update-dockerfiles.outputs.releaseType == matrix.type && matrix.type == 'liquibase-secure-release' && needs.update-dockerfiles.outputs.dryRun == 'false' && env.PUSH_DOCKERHUB == 'true' }}
         run: |
           echo "Signing Docker Hub image with Cosign keyless signing..."
           cosign sign --yes ${{ steps.set-registries.outputs.DOCKERHUB_REPO }}@${{ steps.build-and-push.outputs.digest }}
           echo "Docker Hub image signed successfully"
 
       - name: Sign GHCR Image with Cosign
-        if: ${{ matrix.type == 'liquibase-secure-release' && needs.update-dockerfiles.outputs.dryRun == 'false' && env.PUSH_GHCR == 'true' }}
+        if: ${{ needs.update-dockerfiles.outputs.releaseType == matrix.type && matrix.type == 'liquibase-secure-release' && needs.update-dockerfiles.outputs.dryRun == 'false' && env.PUSH_GHCR == 'true' }}
         run: |
           echo "Signing GHCR image with Cosign keyless signing..."
           cosign sign --yes ${{ steps.set-registries.outputs.GHCR_REPO }}@${{ steps.build-and-push.outputs.digest }}
           echo "GHCR image signed successfully"
 
       - name: Sign ECR Image with Cosign
-        if: ${{ matrix.type == 'liquibase-secure-release' && needs.update-dockerfiles.outputs.dryRun == 'false' && env.PUSH_ECR == 'true' }}
+        if: ${{ needs.update-dockerfiles.outputs.releaseType == matrix.type && matrix.type == 'liquibase-secure-release' && needs.update-dockerfiles.outputs.dryRun == 'false' && env.PUSH_ECR == 'true' }}
         run: |
           echo "Signing ECR image with Cosign keyless signing..."
           cosign sign --yes ${{ steps.set-registries.outputs.ECR_REPO }}@${{ steps.build-and-push.outputs.digest }}
