@@ -179,7 +179,7 @@ jobs:
     runs-on: "ubuntu-22.04"
     steps:
       - name: Configure AWS credentials for vault access
-        uses: aws-actions/configure-aws-credentials@v5
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ secrets.LIQUIBASE_VAULT_OIDC_ROLE_ARN }}
           aws-region: us-east-1
@@ -235,7 +235,7 @@ jobs:
           docker build -f ${{ matrix.image.dockerfile }} -t ${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }} .
 
       - name: Configure AWS credentials for vault access
-        uses: aws-actions/configure-aws-credentials@v5
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ secrets.LIQUIBASE_VAULT_OIDC_ROLE_ARN }}
           aws-region: us-east-1
