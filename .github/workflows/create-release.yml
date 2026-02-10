@@ -168,7 +168,7 @@ jobs:
             for file in "${file_list[@]}"; do
               sed -i 's/^ARG LIQUIBASE_SECURE_VERSION=.*/ARG LIQUIBASE_SECURE_VERSION='"${{ steps.collect-data.outputs.liquibaseVersion }}"'/' "${{ github.workspace }}/${file}"
               sed -i 's/^ARG LB_SECURE_SHA256=.*/ARG LB_SECURE_SHA256='"$LIQUIBASE_SECURE_SHA"'/' "${{ github.workspace }}/${file}"
-              git add "${file}"
+              #git add "${file}"
             done
             if git diff-index --cached --quiet HEAD --; then
               echo "Nothing new to commit"
@@ -184,14 +184,14 @@ jobs:
             for file in "${file_list[@]}"; do
               sed -i 's/^ARG LIQUIBASE_VERSION=.*/ARG LIQUIBASE_VERSION='"${{ steps.collect-data.outputs.liquibaseVersion }}"'/' "${{ github.workspace }}/${file}"
               sed -i 's/^ARG LB_SHA256=.*/ARG LB_SHA256='"$LIQUIBASE_SHA"'/' "${{ github.workspace }}/${file}"
-              git add "${file}"
+              #git add "${file}"
             done
             if git diff-index --cached --quiet HEAD --; then
               echo "Nothing new to commit"
               echo "changes_made=false" >> $GITHUB_OUTPUT
             else
               COMMIT_MSG="Liquibase Version Bumped to ${{ steps.collect-data.outputs.extensionVersion }}"
-              git commit -m "${COMMIT_MSG}"
+              #git commit -m "${COMMIT_MSG}"
               echo "changes_made=true" >> $GITHUB_OUTPUT
             fi
           fi
@@ -215,10 +215,10 @@ jobs:
           fi
 
           # Create and push new tag
-          git tag -a -m "${TAG_MSG}" "${TAG_NAME}"
+          #git tag -a -m "${TAG_MSG}" "${TAG_NAME}"
           # Push changes and tags using the token
-          git remote set-url origin "https://x-access-token:${{ steps.get-token.outputs.token }}@github.com/$GITHUB_REPOSITORY.git"
-          git push origin ${{ github.ref }} --tags
+          #git remote set-url origin "https://x-access-token:${{ steps.get-token.outputs.token }}@github.com/$GITHUB_REPOSITORY.git"
+          #git push origin ${{ github.ref }} --tags
         env:
           GITHUB_TOKEN: ${{ steps.get-token.outputs.token }}
 
@@ -483,7 +483,7 @@ jobs:
           context: .
           file: ${{ matrix.dockerfile }}
           no-cache: true
-          push: true
+          push: false
           platforms: linux/amd64,linux/arm64
           tags: ${{ steps.generate-tags.outputs.tags }}
           # Supply chain security - SBOM and Provenance for Secure images only (SLSA Level 3)
@@ -538,19 +538,19 @@ jobs:
           cosign sign --yes ${{ env.PRIVATE_ECR_DRY_RUN_REPO }}@${{ steps.build-and-push.outputs.digest }}
           echo "Dry-run ECR image signed successfully"
 
-  update-official-repo:
-    name: "Update Official Docker Repo"
-    needs: update-dockerfiles
-    if: ${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' && needs.update-dockerfiles.outputs.dryRun == 'false' }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Extract major.minor version
-        id: extract_version
-        run: |
-          VERSION="${{ needs.update-dockerfiles.outputs.liquibaseVersion }}"
-          echo "MAJOR_MINOR=${VERSION%.*}" >> $GITHUB_ENV
-          echo "VERSION: $VERSION"
-          echo "MAJOR_MINOR: ${VERSION%.*}"
+      # update-official-repo:
+      #   name: "Update Official Docker Repo"
+      #   needs: update-dockerfiles
+      #   if: ${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' && needs.update-dockerfiles.outputs.dryRun == 'false' }}
+      #   runs-on: ubuntu-latest
+      #   steps:
+      #     - name: Extract major.minor version
+      #       id: extract_version
+      #       run: |
+      #         VERSION="${{ needs.update-dockerfiles.outputs.liquibaseVersion }}"
+      #         echo "MAJOR_MINOR=${VERSION%.*}" >> $GITHUB_ENV
+      #         echo "VERSION: $VERSION"
+      #         echo "MAJOR_MINOR: ${VERSION%.*}"
 
       - name: Configure AWS credentials for vault access
         uses: aws-actions/configure-aws-credentials@v5
@@ -584,48 +584,48 @@ jobs:
           ref: master
           token: ${{ steps.get-token.outputs.token }}
 
-      - name: Update library/liquibase in liquibase/official-images
-        run: |
-          echo "Maintainers: Jake Newton <docker@liquibase.com> (@jnewton03)" > library/liquibase
-          echo "Architectures: arm64v8, amd64" >> library/liquibase
-          echo "GitRepo: https://github.com/liquibase/docker.git" >> library/liquibase
-          echo "" >> library/liquibase
-          echo "Tags: ${{ env.MAJOR_MINOR }}, ${{ needs.update-dockerfiles.outputs.liquibaseVersion }}, latest" >> library/liquibase
-          echo "GitFetch: refs/heads/main" >> library/liquibase
-          echo "GitCommit: ${{ needs.update-dockerfiles.outputs.latestCommitSha }}" >> library/liquibase
-          echo "File: Dockerfile" >> library/liquibase
-          echo "" >> library/liquibase
-          echo "Tags: ${{ env.MAJOR_MINOR }}-alpine, ${{ needs.update-dockerfiles.outputs.liquibaseVersion }}-alpine, alpine" >> library/liquibase
-          echo "GitFetch: refs/heads/main" >> library/liquibase
-          echo "GitCommit: ${{ needs.update-dockerfiles.outputs.latestCommitSha }}" >> library/liquibase
-          echo "File: Dockerfile.alpine" >> library/liquibase
-          git add library/liquibase
-          if git diff-index --cached --quiet HEAD --
-            then
-              echo "Nothing new to commit"
-            else
-              git config user.name "liquibase-workflows[bot]"
-              git config user.email "1241802+liquibase-workflows[bot]@users.noreply.github.com"
-              git commit -m "Update library/liquibase to ${{ needs.update-dockerfiles.outputs.liquibaseVersion }}"
-              git push
-          fi
+      # - name: Update library/liquibase in liquibase/official-images
+      #   run: |
+      #     echo "Maintainers: Jake Newton <docker@liquibase.com> (@jnewton03)" > library/liquibase
+      #     echo "Architectures: arm64v8, amd64" >> library/liquibase
+      #     echo "GitRepo: https://github.com/liquibase/docker.git" >> library/liquibase
+      #     echo "" >> library/liquibase
+      #     echo "Tags: ${{ env.MAJOR_MINOR }}, ${{ needs.update-dockerfiles.outputs.liquibaseVersion }}, latest" >> library/liquibase
+      #     echo "GitFetch: refs/heads/main" >> library/liquibase
+      #     echo "GitCommit: ${{ needs.update-dockerfiles.outputs.latestCommitSha }}" >> library/liquibase
+      #     echo "File: Dockerfile" >> library/liquibase
+      #     echo "" >> library/liquibase
+      #     echo "Tags: ${{ env.MAJOR_MINOR }}-alpine, ${{ needs.update-dockerfiles.outputs.liquibaseVersion }}-alpine, alpine" >> library/liquibase
+      #     echo "GitFetch: refs/heads/main" >> library/liquibase
+      #     echo "GitCommit: ${{ needs.update-dockerfiles.outputs.latestCommitSha }}" >> library/liquibase
+      #     echo "File: Dockerfile.alpine" >> library/liquibase
+      #     git add library/liquibase
+      #     if git diff-index --cached --quiet HEAD --
+      #       then
+      #         echo "Nothing new to commit"
+      #       else
+      #         git config user.name "liquibase-workflows[bot]"
+      #         git config user.email "1241802+liquibase-workflows[bot]@users.noreply.github.com"
+      #         git commit -m "Update library/liquibase to ${{ needs.update-dockerfiles.outputs.liquibaseVersion }}"
+      #         git push
+      #     fi
 
-      - name: Create Official Docker Pull Request
-        id: create_pr
-        run: |
-          response=$(curl \
-            -X POST \
-            -H "Authorization: token ${{ env.LIQUIBOT_PAT_GPM_ACCESS }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/docker-library/official-images/pulls \
-            -d '{
-              "title": "Update library/liquibase to ${{ needs.update-dockerfiles.outputs.liquibaseVersion }}",
-              "body": "Update library/liquibase with latest commit and version",
-              "head": "liquibase:master",
-              "base": "master"
-            }')
-          pr_url=$(echo $response | jq -r '.html_url')
-          echo "PR_URL=$pr_url" >> $GITHUB_ENV
+      # - name: Create Official Docker Pull Request
+      #   id: create_pr
+      #   run: |
+      #     response=$(curl \
+      #       -X POST \
+      #       -H "Authorization: token ${{ env.LIQUIBOT_PAT_GPM_ACCESS }}" \
+      #       -H "Accept: application/vnd.github.v3+json" \
+      #       https://api.github.com/repos/docker-library/official-images/pulls \
+      #       -d '{
+      #         "title": "Update library/liquibase to ${{ needs.update-dockerfiles.outputs.liquibaseVersion }}",
+      #         "body": "Update library/liquibase with latest commit and version",
+      #         "head": "liquibase:master",
+      #         "base": "master"
+      #       }')
+      #     pr_url=$(echo $response | jq -r '.html_url')
+      #     echo "PR_URL=$pr_url" >> $GITHUB_ENV
 
-      - name: Adding Official Docker PR to job summary
-        run: echo '### 🚀 Official Docker PR -> ${{ env.PR_URL }}' >> $GITHUB_STEP_SUMMARY
+      # - name: Adding Official Docker PR to job summary
+      #   run: echo '### 🚀 Official Docker PR -> ${{ env.PR_URL }}' >> $GITHUB_STEP_SUMMARY
