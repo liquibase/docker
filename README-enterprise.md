@@ -296,7 +296,21 @@ docker run --rm \
 
 Packager with `scm=true` requires git and SSH access. The image includes git, openssh-client, and a default git identity (`Liquibase Docker <docker@liquibase.com>`).
 
-**Linux / standard Docker:**
+**With SSH keys (all platforms including WSL/Windows):**
+
+Mount your SSH keys to `/liquibase/.ssh-mount:ro` -- the entrypoint automatically copies them with correct permissions (600 for private keys):
+
+```bash
+docker run --rm \
+    -v /path/to/license.lic:/liquibase/license/license.lic \
+    -v "$(pwd)/project":/liquibase/project \
+    -v "$(pwd)/sql-source":/liquibase/src \
+    -v ~/.ssh:/liquibase/.ssh-mount:ro \
+    liquibase/liquibase-enterprise \
+    hammer groovy deployPackager.groovy pipeline=myPipeline scm=true
+```
+
+**With SSH agent forwarding (Linux):**
 
 ```bash
 docker run --rm \
@@ -305,10 +319,10 @@ docker run --rm \
     -v "$(pwd)/sql-source":/liquibase/src \
     -v $SSH_AUTH_SOCK:/ssh-agent -e SSH_AUTH_SOCK=/ssh-agent \
     liquibase/liquibase-enterprise \
-    groovy deployPackager.groovy pipeline=myPipeline scm=true
+    hammer groovy deployPackager.groovy pipeline=myPipeline scm=true
 ```
 
-**macOS Docker Desktop:**
+**With SSH agent forwarding (macOS Docker Desktop):**
 
 ```bash
 docker run --rm \
@@ -317,7 +331,7 @@ docker run --rm \
     -v "$(pwd)/sql-source":/liquibase/src \
     -v /run/host-services/ssh-auth.sock:/ssh-agent -e SSH_AUTH_SOCK=/ssh-agent \
     liquibase/liquibase-enterprise \
-    groovy deployPackager.groovy pipeline=myPipeline scm=true
+    hammer groovy deployPackager.groovy pipeline=myPipeline scm=true
 ```
 
 **Override git identity:**
