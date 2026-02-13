@@ -59,10 +59,24 @@ RUN groupadd --gid 1001 liquibase && \
     chown liquibase:root /liquibase && \
     chmod g+rx /liquibase
 
+# Install git and SSH for Packager workflows (scm=true requires git + SSH access)
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends git openssh-client && \
+    rm -rf /var/lib/apt/lists/*
+
+# Configure git for mounted volumes (standard Docker pattern)
+RUN git config --system --add safe.directory '*' && \
+    mkdir -p /liquibase/.ssh && \
+    chown liquibase:liquibase /liquibase/.ssh && \
+    chmod 700 /liquibase/.ssh
+
 WORKDIR /liquibase
 
 # Copy installed Liquibase Enterprise from builder stage
 COPY --from=builder --chown=liquibase:liquibase /liquibase/DaticalDB ./DaticalDB
+
+# Copy MSSQL driver properties
+COPY --chown=liquibase:liquibase mssql_driver.properties ./DaticalDB/repl/mssql_driver.properties
 
 # Create symlink for hammer command in PATH
 RUN ln -s /liquibase/DaticalDB/repl/hammer /usr/local/bin/hammer
@@ -90,8 +104,14 @@ COPY --chmod=755 docker-entrypoint-enterprise.sh ./docker-entrypoint.sh
 # Set user and group
 USER liquibase:liquibase
 
+# Set default git identity (override via GIT_AUTHOR_NAME/GIT_COMMITTER_NAME env vars)
+RUN git config --global user.email "docker@liquibase.com" && \
+    git config --global user.name "Liquibase Docker"
+
 # Define volumes for project files and license
 VOLUME ["/liquibase/project", "/liquibase/license"]
+
+WORKDIR /liquibase/project
 
 ENTRYPOINT ["/liquibase/docker-entrypoint.sh"]
 CMD ["hammer", "--help"]

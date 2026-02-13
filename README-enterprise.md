@@ -292,7 +292,50 @@ docker run --rm \
     deploy PRODUCTION
 ```
 
-### Run Packager (with source code)
+### Run Packager with Git (SCM mode)
+
+Packager with `scm=true` requires git and SSH access. The image includes git, openssh-client, and a default git identity (`Liquibase Docker <docker@liquibase.com>`).
+
+**Linux / standard Docker:**
+
+```bash
+docker run --rm \
+    -v /path/to/license.lic:/liquibase/license/license.lic \
+    -v "$(pwd)/project":/liquibase/project \
+    -v "$(pwd)/sql-source":/liquibase/src \
+    -v $SSH_AUTH_SOCK:/ssh-agent -e SSH_AUTH_SOCK=/ssh-agent \
+    liquibase/liquibase-enterprise \
+    groovy deployPackager.groovy pipeline=myPipeline scm=true
+```
+
+**macOS Docker Desktop:**
+
+```bash
+docker run --rm \
+    -v /path/to/license.lic:/liquibase/license/license.lic \
+    -v "$(pwd)/project":/liquibase/project \
+    -v "$(pwd)/sql-source":/liquibase/src \
+    -v /run/host-services/ssh-auth.sock:/ssh-agent -e SSH_AUTH_SOCK=/ssh-agent \
+    liquibase/liquibase-enterprise \
+    groovy deployPackager.groovy pipeline=myPipeline scm=true
+```
+
+**Override git identity:**
+
+```bash
+docker run --rm \
+    -e GIT_AUTHOR_NAME="Your Name" -e GIT_COMMITTER_NAME="Your Name" \
+    -e GIT_AUTHOR_EMAIL="you@example.com" -e GIT_COMMITTER_EMAIL="you@example.com" \
+    ...
+```
+
+Or mount your own `.gitconfig`:
+
+```bash
+-v ~/.gitconfig:/liquibase/.gitconfig:ro
+```
+
+### Run Packager without Git
 
 ```bash
 docker run --rm \
@@ -300,7 +343,7 @@ docker run --rm \
     -v "$(pwd)/project":/liquibase/project \
     -v "$(pwd)/sql-source":/liquibase/src \
     liquibase/liquibase-enterprise \
-    groovy deployPackager.groovy pipeline=myPipeline scm=true
+    groovy deployPackager.groovy pipeline=myPipeline
 ```
 
 ### Show Version
@@ -463,6 +506,23 @@ deploy-database:
       -v ${{ github.workspace }}/license.lic:/liquibase/license/license.lic \
       liquibase/liquibase-enterprise:latest \
       deploy PRODUCTION
+```
+
+## SQL Server (MSSQL) Configuration
+
+The image includes a default `mssql_driver.properties` at `/liquibase/DaticalDB/repl/mssql_driver.properties` with these defaults:
+
+```properties
+encrypt=true
+trustServerCertificate=true
+```
+
+Override by mounting your own file:
+
+```bash
+docker run --rm \
+    -v /path/to/mssql_driver.properties:/liquibase/DaticalDB/repl/mssql_driver.properties \
+    ...
 ```
 
 ## Troubleshooting

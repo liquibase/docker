@@ -7,6 +7,7 @@ on:
       - 'DockerfileEnterprise'
       - 'docker-entrypoint-enterprise.sh'
       - 'autoInstall.xml'
+      - 'mssql_driver.properties'
       - '.github/workflows/test-enterprise.yml'
   pull_request:
     branches: ["main"]
@@ -14,6 +15,7 @@ on:
       - 'DockerfileEnterprise'
       - 'docker-entrypoint-enterprise.sh'
       - 'autoInstall.xml'
+      - 'mssql_driver.properties'
       - '.github/workflows/test-enterprise.yml'
 
 permissions:
@@ -80,10 +82,10 @@ jobs:
 
           # Test working directory
           WORKDIR=$(docker run --rm liquibase/liquibase-enterprise:${{ github.sha }} pwd)
-          if [ "$WORKDIR" = "/liquibase" ]; then
-            echo "✅ SUCCESS: Working directory is /liquibase"
+          if [ "$WORKDIR" = "/liquibase/project" ]; then
+            echo "SUCCESS: Working directory is /liquibase/project"
           else
-            echo "❌ FAIL: Working directory is $WORKDIR, expected /liquibase"
+            echo "FAIL: Working directory is $WORKDIR, expected /liquibase/project"
             exit 1
           fi
 
@@ -103,6 +105,16 @@ jobs:
             echo "✅ SUCCESS: UID/GID is 1001:1001"
           else
             echo "❌ FAIL: UID/GID is $USERID:$GROUPID, expected 1001:1001"
+            exit 1
+          fi
+
+      - name: Test git installation
+        run: |
+          RESULT=$(docker run --rm liquibase/liquibase-enterprise:${{ github.sha }} git --version 2>&1)
+          if echo "$RESULT" | grep -q "git version"; then
+            echo "SUCCESS: git is installed"
+          else
+            echo "FAIL: git not found"
             exit 1
           fi
 
@@ -291,18 +303,17 @@ jobs:
           echo "Working directory after project mount: $RESULT"
 
           if echo "$RESULT" | grep -q "/liquibase/project"; then
-            echo "✅ SUCCESS: Working directory automatically changes to /liquibase/project"
+            echo "SUCCESS: Working directory is /liquibase/project"
           else
-            echo "⚠️  Note: Working directory did not change (may be expected behavior)"
+            echo "FAIL: Working directory is $RESULT, expected /liquibase/project"
+            exit 1
           fi
 
-          # Test that project files can be accessed
-          # Note: Using absolute path since working directory stays at /liquibase
-          # to avoid permission issues with log files
+          # Test that project files can be accessed from WORKDIR
           RESULT=$(docker run --rm \
             -v $(pwd)/test-project-workdir:/liquibase/project \
             liquibase/liquibase-enterprise:${{ github.sha }} \
-            cat /liquibase/project/test-file.txt 2>&1)
+            cat test-file.txt 2>&1)
 
           if echo "$RESULT" | grep -q "test-file-content"; then
             echo "✅ SUCCESS: Project files can be accessed via absolute paths"
