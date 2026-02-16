@@ -1,7 +1,10 @@
-# Vulnerability scanning for published Docker images using Trivy
-# This workflow scans the published images on Docker Hub for vulnerabilities.
-# It generates a matrix of image/tag combinations and runs Trivy scans on them.
-
+# Vulnerability scanning for published Docker images
+# This workflow scans published images on Docker Hub for vulnerabilities
+# using the reusable vulnerability scanning workflow from build-logic.
+#
+# NOTE: SARIF results are NOT uploaded to GitHub Security tab to avoid stale alerts.
+# Published image vulnerabilities are tracked via workflow artifacts and GitHub Actions summary.
+# Only the main branch workflow (trivy.yml) populates the Security tab.
 
 name: Published Images Vulnerability Scanning
 
@@ -9,17 +12,16 @@ on:
   workflow_dispatch:
     inputs:
       max_tags_to_scan:
-        description: 'Maximum number of published tags to scan'
+        description: "Maximum number of published tags to scan"
         required: false
-        default: '20'
+        default: "20"
   schedule:
-      # Run Monday-Friday at 10 AM UTC (published image monitoring)
-    - cron: '0 10 * * 1-5' # Run every weekday at 10am UTC
+    # Run Monday-Friday at 10 AM UTC (published image monitoring)
+    - cron: "0 10 * * 1-5"
 
 permissions:
   contents: read
-  security-events: write # Required for uploading SARIF results to GitHub Security tab
-  actions: read # Required for private repositories to get Action run status
+  actions: read
 
 jobs:
   generate-matrix:
@@ -30,208 +32,27 @@ jobs:
     env:
       MAX_TAGS: ${{ github.event.inputs.max_tags_to_scan || '10' }}
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
       - name: Generate matrix for all image/tag combinations
         id: set-matrix
         run: |
-          echo "Generating matrix for scanning with max $MAX_TAGS tags per image..."
-          MATRIX_INCLUDE="["
-          FIRST=true
+          scripts/generate-dockerhub-matrix.sh
 
-          for IMAGE in "liquibase/liquibase" "liquibase/liquibase-secure"; do
-            echo "Getting tags for $IMAGE..."
-            REPO=$(basename "$IMAGE")
-            TAGS=""
-            URL="https://hub.docker.com/v2/namespaces/liquibase/repositories/${REPO}/tags?page_size=100"
-            while [ -n "$URL" ]; do
-              RESPONSE=$(curl -s "$URL")
-              TAG_REGEX='^[0-9]+\.[0-9]+(\.[0-9]+)?(-alpine|-latest)?$'
-              NEW_TAGS=$(echo "$RESPONSE" | jq -r '.results[] | select(.tag_status == "active") | .name' | grep -E "$TAG_REGEX" || true)
-              TAGS=$(echo -e "$TAGS\n$NEW_TAGS" | sort -Vu)
-
-              TAGS=$(echo "$TAGS" | awk '
-                {
-                  tags[NR] = $0
-                  if (match($0, /^([0-9]+)\.([0-9]+)\.([0-9]+)(-alpine|-latest)?$/, m)) {
-                    full = m[1] "." m[2] "." m[3] (m[4] ? m[4] : "")
-                    has_full[full] = 1
-                  }
-                }
-                END {
-                  for (i = 1; i <= NR; i++) {
-                    tag = tags[i]
-                    if (match(tag, /^([0-9]+)\.([0-9]+)(-alpine|-latest)?$/, m)) {
-                      short = m[1] "." m[2] ".0" (m[3] ? m[3] : "")
-                      if (has_full[short]) continue
-                    }
-                    print tag
-                  }
-                }
-              ')
-              URL=$(echo "$RESPONSE" | jq -r '.next')
-              [ "$URL" = "null" ] && break
-            done
-
-            TAGS=$(echo "$TAGS" | tac | head -n "$MAX_TAGS")
-            while IFS= read -r tag; do
-              if [ -n "$tag" ]; then
-                if [ "$FIRST" = true ]; then
-                  MATRIX_INCLUDE="${MATRIX_INCLUDE}{\"image\":\"$IMAGE\",\"tag\":\"$tag\"}"
-                  FIRST=false
-                else
-                  MATRIX_INCLUDE="${MATRIX_INCLUDE},{\"image\":\"$IMAGE\",\"tag\":\"$tag\"}"
-                fi
-              fi
-            done <<< "$TAGS"
-          done
-
-          MATRIX_INCLUDE="${MATRIX_INCLUDE}]"
-          MATRIX="{\"include\":$MATRIX_INCLUDE}"
-          echo "Generated matrix: $MATRIX"
-          echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
-
-  trivy-scan:
-    name: Trivy Scan ${{ matrix.image }}:${{ matrix.tag }}
-    runs-on: ubuntu-22.04
+  vulnerability-scan:
+    name: Scan ${{ matrix.image }}:${{ matrix.tag }}
     needs: generate-matrix
-    permissions:
-      contents: read
-      security-events: write
-      actions: read
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-
-      - name: Run Trivy vulnerability scanner
-        id: trivy_scan
-        uses: aquasecurity/trivy-action@0.33.1
-        with:
-          image-ref: '${{ matrix.image }}:${{ matrix.tag }}'
-          vuln-type: 'os,library'
-          scanners: 'vuln'
-          format: 'json'
-          output: 'trivy-results.json'
-          severity: 'HIGH,CRITICAL'
-          exit-code: '1'
-        continue-on-error: true
-
-        # trivy convert steps assume trivy CLI is available, therefore install the CLI before using those commands across steps.
-      - name: Install Trivy CLI
-        run: |
-            curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
-            trivy --version
-
-      - name: Convert JSON to SARIF and print table format
-        if: always()
-        run: |
-          # Convert JSON to SARIF for Security tab upload
-          if [ -f trivy-results.json ]; then
-            trivy convert --format sarif --output trivy-results.sarif trivy-results.json
-            
-            # Print table format only if vulnerabilities were found
-            if [ "${{ steps.trivy_scan.outcome }}" = "failure" ]; then
-              echo ""
-              echo "==== Trivy Vulnerabilities (table format) ===="
-              trivy convert --format table trivy-results.json
-            fi
-          fi
-
-      - name: Upload SARIF results to GitHub Security tab
-        if: always()
-        uses: github/codeql-action/upload-sarif@v4
-        with:
-          sarif_file: 'trivy-results.sarif'
-          category: 'trivy-${{ matrix.image }}-${{ matrix.tag }}'
-        continue-on-error: true
-
-      - name: Set sanitized names for artifacts
-        if: always()
-        id: sanitize
-        run: |
-          SANITIZED_IMAGE=$(echo "${{ matrix.image }}" | tr '/' '-')
-          SANITIZED_TAG=$(echo "${{ matrix.tag }}" | tr '/' '-' | tr ':' '-' | tr '.' '-')
-          echo "image=$SANITIZED_IMAGE" >> $GITHUB_OUTPUT
-          echo "tag=$SANITIZED_TAG" >> $GITHUB_OUTPUT
-
-      - name: Upload Trivy Published Security Report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: security-report-trivy-${{ steps.sanitize.outputs.image }}-${{ steps.sanitize.outputs.tag }}
-          path: |
-            trivy-results.json
-            trivy-results.sarif
-          if-no-files-found: ignore
-
-      - name: Fail job if vulnerabilities found
-        if: steps.trivy_scan.outcome == 'failure'
-        run: |
-          echo "❌ Vulnerabilities were found in ${{ matrix.image }}:${{ matrix.tag }}"
-          echo "Check the logs above for detailed vulnerability information"
-          exit 1
-      
-      - name: Append summary to GitHub Actions summary
-        if: always()
-        run: |
-          echo "### 🛡️ Trivy Summary for \`${{ matrix.image }}:${{ matrix.tag }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Library | Vulnerability | Severity | Status | Installed | Fixed |" >> $GITHUB_STEP_SUMMARY
-          echo "|---------|---------------|----------|--------|-----------|--------|" >> $GITHUB_STEP_SUMMARY
-
-          # Extract and format top-level vulnerabilities (HIGH or CRITICAL only)
-          if [ -f trivy-results.json ]; then
-            jq -r '.Results[]?.Vulnerabilities[]? |
-              "| \(.PkgName) | \(.VulnerabilityID) | \(.Severity) | \(.Status // "-") | \(.InstalledVersion) | \(.FixedVersion // "-") |"' \
-              trivy-results.json >> $GITHUB_STEP_SUMMARY || true
-          fi
-
-  notify-results:
-    name: Notify Scan Results
-    runs-on: ubuntu-22.04
-    needs: [trivy-scan, generate-matrix]
-    if: always()
-    strategy:
-     matrix:
-        image: ["liquibase/liquibase", "liquibase/liquibase-secure"]
-    steps:
-      - name: "Check failures for ${{ matrix.image }}"
-        id: check_failures
-        uses: actions/github-script@v8
-        with:
-            script: |
-                const image = '${{ matrix.image }}';
-                const jobs = await github.rest.actions.listJobsForWorkflowRun({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    run_id: context.runId
-                });
-
-                const scanJobs = jobs.data.jobs.filter(job =>
-                    job.name.includes(`Trivy Scan ${image}`)
-                );
-
-                const failed = scanJobs.filter(job => job.conclusion === 'failure');
-                const failedCount = failed.length;
-                const totalCount = scanJobs.length;
-
-                core.setOutput('has_failures', failedCount > 0);
-                core.setOutput('failed_count', failedCount.toString());
-                core.setOutput('total_count', totalCount.toString());
-
-## Since we only fix forward, this Slack notification is redundant.
-## It reports vulnerabilities in outdated images even though they've already been fixed.
-
-      # - name: "Notify Slack for ${{ matrix.image }}"
-        # if: steps.check_failures.outputs.has_failures == 'true'
-        # uses: rtCamp/action-slack-notify@v2
-        # env:
-        #     SLACK_COLOR: 'danger'
-        #     SLACK_MESSAGE: "Security vulnerabilities found in ${{ steps.check_failures.outputs.failed_count }} out of ${{ steps.check_failures.outputs.total_count }} tags for *${{ matrix.image }}*.\n🔎 [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
-        #     SLACK_TITLE: "❌ Trivy scan found vulnerabilities in ${{ matrix.image }}"
-        #     SLACK_USERNAME: liquibot
-        #     SLACK_WEBHOOK: ${{ secrets.DOCKER_SLACK_WEBHOOK_URL }}
-        #     SLACK_ICON_EMOJI: ":warning:"
-        #     SLACK_FOOTER: "${{ github.repository }} - ${{ matrix.image }}"
-        #     SLACK_LINK_NAMES: true
+    uses: liquibase/build-logic/.github/workflows/reusable-vulnerability-scan.yml@main
+    with:
+      mode: docker
+      source: "${{ matrix.image }}:${{ matrix.tag }}"
+      image_name: ${{ matrix.image }}
+      image_tag: ${{ matrix.tag }}
+      fail_on_vulnerabilities: false
+      upload_sarif: false
+      generate_sbom: true
+      build_logic_ref: main

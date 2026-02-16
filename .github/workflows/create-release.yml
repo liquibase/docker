@@ -50,8 +50,6 @@ on:
 
 jobs:
   update-dockerfiles:
-    env:
-      LPM_VERSION: "0.2.14"
     name: "Update Dockerfiles"
     runs-on: ubuntu-latest
     outputs:
@@ -139,7 +137,7 @@ jobs:
           owner: ${{ github.repository_owner }}
           permission-contents: write
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
           ref: ${{ github.ref }}
@@ -167,13 +165,9 @@ jobs:
           if [[ "${{ steps.collect-data.outputs.releaseType }}" == "liquibase-secure-release" ]]; then
             file_list=("DockerfileSecure")
             LIQUIBASE_SECURE_SHA=$(curl -LsS https://repo.liquibase.com/releases/secure/${{ steps.collect-data.outputs.liquibaseVersion }}/liquibase-secure-${{ steps.collect-data.outputs.liquibaseVersion }}.tar.gz | sha256sum | awk '{ print $1 }')
-            LPM_SHA=$(curl -LsS https://github.com/liquibase/liquibase-package-manager/releases/download/v${{ env.LPM_VERSION }}/lpm-${{ env.LPM_VERSION }}-linux.zip | sha256sum | awk '{ print $1 }')
-            LPM_SHA_ARM=$(curl -LsS https://github.com/liquibase/liquibase-package-manager/releases/download/v${{ env.LPM_VERSION }}/lpm-${{ env.LPM_VERSION }}-linux-arm64.zip | sha256sum | awk '{ print $1 }')
             for file in "${file_list[@]}"; do
               sed -i 's/^ARG LIQUIBASE_SECURE_VERSION=.*/ARG LIQUIBASE_SECURE_VERSION='"${{ steps.collect-data.outputs.liquibaseVersion }}"'/' "${{ github.workspace }}/${file}"
               sed -i 's/^ARG LB_SECURE_SHA256=.*/ARG LB_SECURE_SHA256='"$LIQUIBASE_SECURE_SHA"'/' "${{ github.workspace }}/${file}"
-              sed -i 's/^ARG LPM_SHA256=.*/ARG LPM_SHA256='"$LPM_SHA"'/' "${{ github.workspace }}/${file}"
-              sed -i 's/^ARG LPM_SHA256_ARM=.*/ARG LPM_SHA256_ARM='"$LPM_SHA_ARM"'/' "${{ github.workspace }}/${file}"
               git add "${file}"
             done
             if git diff-index --cached --quiet HEAD --; then
@@ -187,13 +181,9 @@ jobs:
           else
             file_list=("Dockerfile" "Dockerfile.alpine")
             LIQUIBASE_SHA=$(curl -LsS https://github.com/liquibase/liquibase/releases/download/v${{ steps.collect-data.outputs.liquibaseVersion }}/liquibase-${{ steps.collect-data.outputs.liquibaseVersion }}.tar.gz | sha256sum | awk '{ print $1 }')
-            LPM_SHA=$(curl -LsS https://github.com/liquibase/liquibase-package-manager/releases/download/v${{ env.LPM_VERSION }}/lpm-${{ env.LPM_VERSION }}-linux.zip | sha256sum | awk '{ print $1 }')
-            LPM_SHA_ARM=$(curl -LsS https://github.com/liquibase/liquibase-package-manager/releases/download/v${{ env.LPM_VERSION }}/lpm-${{ env.LPM_VERSION }}-linux-arm64.zip | sha256sum | awk '{ print $1 }')
             for file in "${file_list[@]}"; do
               sed -i 's/^ARG LIQUIBASE_VERSION=.*/ARG LIQUIBASE_VERSION='"${{ steps.collect-data.outputs.liquibaseVersion }}"'/' "${{ github.workspace }}/${file}"
               sed -i 's/^ARG LB_SHA256=.*/ARG LB_SHA256='"$LIQUIBASE_SHA"'/' "${{ github.workspace }}/${file}"
-              sed -i 's/^ARG LPM_SHA256=.*/ARG LPM_SHA256='"$LPM_SHA"'/' "${{ github.workspace }}/${file}"
-              sed -i 's/^ARG LPM_SHA256_ARM=.*/ARG LPM_SHA256_ARM='"$LPM_SHA_ARM"'/' "${{ github.workspace }}/${file}"
               git add "${file}"
             done
             if git diff-index --cached --quiet HEAD --; then
@@ -263,7 +253,7 @@ jobs:
             latest_tag: "latest"
             type: liquibase-secure-release
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
           ref: ${{ github.ref }}
@@ -311,20 +301,63 @@ jobs:
           echo "release_name=${RELEASE_NAME}" >> $GITHUB_OUTPUT
           echo "::notice::Creating GitHub release for ${{ needs.update-dockerfiles.outputs.releaseType }} on tag: ${TAG_NAME}"
 
+      # Fetch release notes from Release Drafter draft
+      - name: Get Release Notes from Draft
+        id: get-release-notes
+        if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' && matrix.suffix == '' && ((needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' && matrix.type == 'liquibase-release') || (needs.update-dockerfiles.outputs.releaseType == 'liquibase-secure-release' && matrix.type == 'liquibase-secure-release')) }}
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const isSecure = '${{ needs.update-dockerfiles.outputs.releaseType }}' === 'liquibase-secure-release';
+
+            const releases = await github.rest.repos.listReleases({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+
+            // Find the matching draft from Release Drafter
+            const draft = releases.data.find(r => {
+              if (!r.draft) return false;
+              return isSecure ? r.tag_name.includes('SECURE') : !r.tag_name.includes('SECURE');
+            });
+
+            if (draft && draft.body) {
+              core.setOutput('body', draft.body);
+              core.setOutput('found', 'true');
+
+              // Delete the draft - we'll create the real release
+              await github.rest.repos.deleteRelease({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                release_id: draft.id
+              });
+              core.info(`Deleted Release Drafter draft: ${draft.name}`);
+            } else {
+              core.setOutput('found', 'false');
+              core.info('No Release Drafter draft found, using default release notes');
+            }
+
       - name: Create GitHub Release
         if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' && matrix.suffix == '' && ((needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' && matrix.type == 'liquibase-release') || (needs.update-dockerfiles.outputs.releaseType == 'liquibase-secure-release' && matrix.type == 'liquibase-secure-release')) }}
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2
         with:
           name: ${{ steps.release-tag.outputs.release_name }}
           tag_name: ${{ steps.release-tag.outputs.tag_name }}
           draft: true
           body: |
             ${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-secure-release' && format('Support for Liquibase Secure {0}.', needs.update-dockerfiles.outputs.liquibaseVersion) || format('Support for Liquibase {0}.', needs.update-dockerfiles.outputs.liquibaseVersion) }}
+
+            ${{ steps.get-release-notes.outputs.found == 'true' && steps.get-release-notes.outputs.body || '' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
+
+      # Install Cosign for keyless image signing (Secure images only)
+      - name: Install Cosign
+        if: ${{ matrix.type == 'liquibase-secure-release' }}
+        uses: sigstore/cosign-installer@faadad0cce49287aee09b3a48701e75088a2c6ad # v4.0.0
 
       # Define registry configurations based on image type
       - name: Set registry variables
@@ -371,7 +404,7 @@ jobs:
         with:
           registry: public.ecr.aws
           username: ${{ steps.configure-aws-credentials-prod.outputs.aws_access_key_id }}
-          password: ${{ steps.configure-aws-credentials-prodoutputs.aws_secret_access_key }}
+          password: ${{ steps.configure-aws-credentials-prod.outputs.aws_secret_access_key }}
 
       # Add login for dry-run mode to private ECR
       - name: Login to Private ECR Registry (dry-run)
@@ -382,7 +415,7 @@ jobs:
         with:
           registry: ${{ env.PRIVATE_ECR_DRY_RUN_REPO }}
           username: ${{ steps.configure-aws-credentials-prod.outputs.aws_access_key_id }}
-          password: ${{ steps.configure-aws-credentials-prodoutputs.aws_secret_access_key }}
+          password: ${{ steps.configure-aws-credentials-prod.outputs.aws_secret_access_key }}
 
       # Generate tags dynamically using a separate step
       - name: Generate Docker Tags
@@ -443,6 +476,7 @@ jobs:
 
       #Unified build and push step using generated tags
       - name: Build and Push Docker Image
+        id: build-and-push
         if: ${{ needs.update-dockerfiles.outputs.releaseType == matrix.type }}
         uses: docker/build-push-action@v6
         with:
@@ -452,6 +486,9 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           tags: ${{ steps.generate-tags.outputs.tags }}
+          # Supply chain security - SBOM and Provenance for Secure images only (SLSA Level 3)
+          sbom: ${{ matrix.type == 'liquibase-secure-release' }}
+          provenance: ${{ matrix.type == 'liquibase-secure-release' && 'mode=max' || 'false' }}
           # Labels applied to each architecture-specific image
           labels: |
             org.opencontainers.image.source=https://github.com/liquibase/docker
@@ -470,6 +507,36 @@ jobs:
             org.opencontainers.image.vendor=Liquibase
             org.opencontainers.image.version=${{ needs.update-dockerfiles.outputs.extensionVersion }}
             org.opencontainers.image.documentation=https://docs.liquibase.com
+
+      # Cosign keyless signing for Liquibase Secure images (SLSA Level 3 compliance)
+      # Uses GitHub OIDC for identity - no private keys stored in repository
+      - name: Sign Docker Hub Image with Cosign
+        if: ${{ needs.update-dockerfiles.outputs.releaseType == matrix.type && matrix.type == 'liquibase-secure-release' && needs.update-dockerfiles.outputs.dryRun == 'false' && env.PUSH_DOCKERHUB == 'true' }}
+        run: |
+          echo "Signing Docker Hub image with Cosign keyless signing..."
+          cosign sign --yes ${{ steps.set-registries.outputs.DOCKERHUB_REPO }}@${{ steps.build-and-push.outputs.digest }}
+          echo "Docker Hub image signed successfully"
+
+      - name: Sign GHCR Image with Cosign
+        if: ${{ needs.update-dockerfiles.outputs.releaseType == matrix.type && matrix.type == 'liquibase-secure-release' && needs.update-dockerfiles.outputs.dryRun == 'false' && env.PUSH_GHCR == 'true' }}
+        run: |
+          echo "Signing GHCR image with Cosign keyless signing..."
+          cosign sign --yes ${{ steps.set-registries.outputs.GHCR_REPO }}@${{ steps.build-and-push.outputs.digest }}
+          echo "GHCR image signed successfully"
+
+      - name: Sign ECR Image with Cosign
+        if: ${{ needs.update-dockerfiles.outputs.releaseType == matrix.type && matrix.type == 'liquibase-secure-release' && needs.update-dockerfiles.outputs.dryRun == 'false' && env.PUSH_ECR == 'true' }}
+        run: |
+          echo "Signing ECR image with Cosign keyless signing..."
+          cosign sign --yes ${{ steps.set-registries.outputs.ECR_REPO }}@${{ steps.build-and-push.outputs.digest }}
+          echo "ECR image signed successfully"
+
+      - name: Sign Dry-Run ECR Image with Cosign
+        if: ${{ needs.update-dockerfiles.outputs.releaseType == matrix.type && matrix.type == 'liquibase-secure-release' && needs.update-dockerfiles.outputs.dryRun == 'true' }}
+        run: |
+          echo "Signing dry-run ECR image with Cosign keyless signing..."
+          cosign sign --yes ${{ env.PRIVATE_ECR_DRY_RUN_REPO }}@${{ steps.build-and-push.outputs.digest }}
+          echo "Dry-run ECR image signed successfully"
 
   update-official-repo:
     name: "Update Official Docker Repo"
@@ -511,7 +578,7 @@ jobs:
           permission-pull-requests: write
 
       - name: Check out liquibase/official-images
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: liquibase/official-images
           ref: master

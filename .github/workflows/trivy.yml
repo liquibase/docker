@@ -8,51 +8,137 @@ name: Vulnerability Scanning
 on:
   workflow_dispatch:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
+    paths:
+      - "Dockerfile*"
+      - "docker-entrypoint.sh"
+      - ".github/workflows/trivy.yml"
+      - "examples/**"
+      - "pom.xml"
   pull_request:
-    # The branches below must be a subset of the branches above
-    branches: [ "main" ]
+    branches: ["main"]
+    paths:
+      - "Dockerfile*"
+      - "docker-entrypoint.sh"
+      - ".github/workflows/trivy.yml"
+      - "examples/**"
+      - "pom.xml"
   schedule:
-    - cron: '0 7 * * 1-5' # Run every weekday at 7am UTC
+    - cron: "0 7 * * 1-5" # Run every weekday at 7am UTC
 
 permissions:
   contents: read
   id-token: write # Required for AWS OIDC authentication
+  packages: write # Required for pushing to GHCR
   security-events: write # Required for uploading SARIF results to GitHub Security tab
   actions: read # Required for private repositories to get Action run status
   pull-requests: write # Required for writing comments on pull requests
 
 jobs:
-  trivy:
+  # ============================================
+  # BUILD AND PUSH TO GHCR
+  # ============================================
+  build:
     strategy:
       fail-fast: false
       matrix:
-        image: [ 
-          {dockerfile: Dockerfile, name: liquibase/liquibase, suffix: ""},
-          {dockerfile: Dockerfile.alpine, name: liquibase/liquibase, suffix: "-alpine"},
-          {dockerfile: DockerfileSecure, name: liquibase/liquibase-secure, suffix: ""},
+        image:
+          [
+            {
+              dockerfile: Dockerfile,
+              name: liquibase/liquibase,
+              suffix: "",
+              ghcr_name: community,
+            },
+            {
+              dockerfile: Dockerfile.alpine,
+              name: liquibase/liquibase,
+              suffix: "-alpine",
+              ghcr_name: alpine,
+            },
+            {
+              dockerfile: DockerfileSecure,
+              name: liquibase/liquibase-secure,
+              suffix: "",
+              ghcr_name: secure,
+            },
           ]
-    name: Trivy
+    name: Build ${{ matrix.image.name }}${{ matrix.image.suffix }}
     runs-on: "ubuntu-22.04"
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
-      - name: Build ${{ matrix.image.name }}${{ matrix.image.suffix }} from Dockerfile
-        run: |
-          docker build -f ${{ matrix.image.dockerfile }} -t ${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }} .
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.33.1
+      - name: Login to GHCR
+        uses: docker/login-action@v3
         with:
-          image-ref: '${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}'
-          vuln-type: 'os,library'
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-          severity: 'HIGH,CRITICAL'
-          exit-code: '1'
-          limit-severities-for-sarif: true
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Build and push to GHCR
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ matrix.image.dockerfile }}
+          push: true
+          tags: ghcr.io/${{ github.repository }}/liquibase-${{ matrix.image.ghcr_name }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ============================================
+  # VULNERABILITY SCAN (REUSABLE WORKFLOW)
+  # ============================================
+  vulnerability-scan:
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        image:
+          [
+            {
+              dockerfile: Dockerfile,
+              name: liquibase/liquibase,
+              suffix: "",
+              ghcr_name: community,
+            },
+            {
+              dockerfile: Dockerfile.alpine,
+              name: liquibase/liquibase,
+              suffix: "-alpine",
+              ghcr_name: alpine,
+            },
+            {
+              dockerfile: DockerfileSecure,
+              name: liquibase/liquibase-secure,
+              suffix: "",
+              ghcr_name: secure,
+            },
+          ]
+    name: Scan ${{ matrix.image.name }}${{ matrix.image.suffix }}
+    uses: liquibase/build-logic/.github/workflows/reusable-vulnerability-scan.yml@main
+    with:
+      mode: docker
+      source: ghcr.io/${{ github.repository }}/liquibase-${{ matrix.image.ghcr_name }}:${{ github.sha }}
+      image_name: ${{ matrix.image.name }}
+      image_tag: ${{ matrix.image.suffix != '' && matrix.image.suffix || 'latest' }}
+      fail_on_vulnerabilities: true
+      upload_sarif: true
+      sarif_category: ${{ matrix.image.name }}${{ matrix.image.suffix }}
+      generate_sbom: true
+      build_logic_ref: main
+
+  # ============================================
+  # SLACK NOTIFICATION ON FAILURE
+  # ============================================
+  notify-failure:
+    needs: [build, vulnerability-scan]
+    if: failure()
+    runs-on: "ubuntu-22.04"
+    steps:
       - name: Configure AWS credentials for vault access
         uses: aws-actions/configure-aws-credentials@v5
         with:
@@ -60,67 +146,50 @@ jobs:
           aws-region: us-east-1
 
       - name: Get secrets from vault
-        id: vault-secrets
         uses: aws-actions/aws-secretsmanager-get-secrets@v2
         with:
           secret-ids: |
             ,/vault/liquibase
           parse-json-secrets: true
 
-      - name: Export vault secrets to environment
-        run: |
-          echo "DOCKER_SLACK_WEBHOOK_URL=${{ env.vault_liquibase_DOCKER_SLACK_WEBHOOK_URL }}" >> $GITHUB_ENV
-
       - name: Notify Slack on Build Failure
-        if: failure()
         uses: rtCamp/action-slack-notify@v2
         env:
-          SLACK_COLOR: 'failure'
-          SLACK_MESSAGE: "View details on GitHub Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Triggered by repository: ${{ github.repository }} and job: ${{ github.job }}"
+          SLACK_COLOR: "failure"
+          SLACK_MESSAGE: "View details on GitHub Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Triggered by repository: ${{ github.repository }}"
           SLACK_TITLE: "❌ ${{ github.repository }} ❌ Trivy failed on branch ${{ github.ref_name }} for commit ${{ github.sha }} in repository ${{ github.repository }}"
           SLACK_USERNAME: liquibot
           SLACK_WEBHOOK: ${{ env.DOCKER_SLACK_WEBHOOK_URL }}
           SLACK_ICON_EMOJI: ":whale:"
-          SLACK_FOOTER: "${{ github.repository }} - ${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}"
+          SLACK_FOOTER: "${{ github.repository }}"
           SLACK_LINK_NAMES: true
-
-      - name: Upload Trivy scan results to GitHub Security tab
-        if: always()
-        uses: github/codeql-action/upload-sarif@v4
-        with:
-          sarif_file: 'trivy-results.sarif'
-          category: '${{ matrix.image.name }}${{ matrix.image.suffix }}'
-
-      - name: Generate Security Report
-        if: always()
-        uses: rsdmike/github-security-report-action@v3.0.4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          outputDir: ./reports/trivy${{ matrix.image.suffix }}/
-          sarifReportDir: .
-
-      - name: Upload Security Report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: security-report-trivy${{ matrix.image.suffix }}
-          path: ./reports/trivy${{ matrix.image.suffix }}/summary.pdf
-
 
   scout:
     strategy:
       fail-fast: false
       matrix:
-        image: [ 
-          {dockerfile: Dockerfile, name: liquibase/liquibase, suffix: ""},
-          {dockerfile: Dockerfile.alpine, name: liquibase/liquibase, suffix: "-alpine"},
-          {dockerfile: DockerfileSecure, name: liquibase/liquibase-secure, suffix: ""},
+        image:
+          [
+            { dockerfile: Dockerfile, name: liquibase/liquibase, suffix: "" },
+            {
+              dockerfile: Dockerfile.alpine,
+              name: liquibase/liquibase,
+              suffix: "-alpine",
+            },
+            {
+              dockerfile: DockerfileSecure,
+              name: liquibase/liquibase-secure,
+              suffix: "",
+            },
           ]
     name: Scout
     runs-on: "ubuntu-22.04"
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Build ${{ matrix.image.name }}${{ matrix.image.suffix }} from Dockerfile
         run: |
@@ -154,10 +223,10 @@ jobs:
         uses: docker/scout-action@v1.18.2
         with:
           command: cves
-          image: '${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}'
+          image: "${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}"
           github-token: ${{ secrets.GITHUB_TOKEN }}
           write-comment: true
-          sarif-file: 'scout-results.sarif'
+          sarif-file: "scout-results.sarif"
           summary: true
           exit-code: true
           only-severities: "critical,high"
@@ -166,7 +235,7 @@ jobs:
         if: failure()
         uses: rtCamp/action-slack-notify@v2
         env:
-          SLACK_COLOR: 'failure'
+          SLACK_COLOR: "failure"
           SLACK_MESSAGE: "View details on GitHub Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Triggered by repository: ${{ github.repository }} and job: ${{ github.job }}"
           SLACK_TITLE: "❌ ${{ github.repository }} ❌ Docker Scout failed on branch ${{ github.ref_name }} for commit ${{ github.sha }} in repository ${{ github.repository }}"
           SLACK_USERNAME: liquibot
@@ -179,20 +248,20 @@ jobs:
         if: always()
         uses: github/codeql-action/upload-sarif@v4
         with:
-          sarif_file: 'scout-results.sarif'
-          category: '${{ matrix.image.name }}${{ matrix.image.suffix }}'
+          sarif_file: "scout-results.sarif"
+          category: "${{ matrix.image.name }}${{ matrix.image.suffix }}"
 
       - name: Generate Security Report
         if: always()
         uses: rsdmike/github-security-report-action@v3.0.4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          outputDir: ./reports/scout${{ matrix.image.suffix }}/
+          outputDir: ./reports/scout${{ matrix.image.dockerfile == 'DockerfileSecure' && '-secure' || matrix.image.suffix }}/
           sarifReportDir: .
 
       - name: Upload Security Report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
-          name: security-report-scout${{ matrix.image.suffix }}
-          path: ./reports/scout${{ matrix.image.suffix }}/summary.pdf
+          name: security-report-scout${{ matrix.image.dockerfile == 'DockerfileSecure' && '-secure' || matrix.image.suffix }}
+          path: ./reports/scout${{ matrix.image.dockerfile == 'DockerfileSecure' && '-secure' || matrix.image.suffix }}/summary.pdf

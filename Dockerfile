@@ -1,10 +1,11 @@
 # Builder Stage
-FROM eclipse-temurin:21-jre-jammy
+FROM eclipse-temurin:21-jre-noble
 
 # Create liquibase user
 RUN groupadd --gid 1001 liquibase && \
     useradd --uid 1001 --gid liquibase --create-home --home-dir /liquibase liquibase && \
-    chown liquibase /liquibase
+    chown liquibase:root /liquibase && \
+    chmod g+rx /liquibase
 
 # Download and install Liquibase
 WORKDIR /liquibase
@@ -20,9 +21,9 @@ RUN wget -q -O liquibase-${LIQUIBASE_VERSION}.tar.gz "https://package.liquibase.
     ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \
     liquibase --version
     
-ARG LPM_VERSION=0.2.16
-ARG LPM_SHA256=734536181f67b108bccf5483a6ecad8d64e3c916c6586224d367984016364a9c
-ARG LPM_SHA256_ARM=9bc545ea6c475cb4fd42557772b8c9be23b5db0e4f7016d50a68516a0ac59365
+ARG LPM_VERSION=0.3.1
+ARG LPM_SHA256=c21d5df31a5af30e355186d1f0cebc203f6e4f60522a37505b0702db6927b5ca
+ARG LPM_SHA256_ARM=207177f3f701944326883156549f81a7826d1928addcc1880aee73df2a4703b9
     
 # Add metadata labels
 LABEL org.opencontainers.image.description="Liquibase Container Image"

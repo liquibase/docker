@@ -7,10 +7,23 @@ name: Test Dockerfiles
 
 on:
   push:
-    branches: ["main", "master"]
-  pull_request:
-    # The branches below must be a subset of the branches above
     branches: ["main"]
+    paths:
+      - 'Dockerfile*'
+      - 'docker-entrypoint.sh'
+      - '.github/workflows/test.yml'
+      - '.github/test/**'
+      - 'examples/**'
+      - 'pom.xml'
+  pull_request:
+    branches: ["main"]
+    paths:
+      - 'Dockerfile*'
+      - 'docker-entrypoint.sh'
+      - '.github/workflows/test.yml'
+      - '.github/test/**'
+      - 'examples/**'
+      - 'pom.xml'
 
 permissions:
   contents: read
@@ -25,18 +38,21 @@ jobs:
       fail-fast: false
       matrix:
         dockerfile: [Dockerfile, Dockerfile.alpine, DockerfileSecure]
-        os: [ubuntu-latest, macos-13]
+        os: [ubuntu-latest, macos-15-intel]
 
     name: Build & Test ${{ matrix.dockerfile }} - ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup Docker on macOS
-        if: matrix.os == 'macos-13'
-        uses: douglascamata/setup-docker-macos-action@v1.0.1
-            
+        if: matrix.os == 'macos-15-intel'
+        uses: douglascamata/setup-docker-macos-action@v1.1.0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Build an image from ${{ matrix.dockerfile }}
         run: |
           docker build -f ${{ matrix.dockerfile }} -t liquibase/liquibase:${{ github.sha }} .

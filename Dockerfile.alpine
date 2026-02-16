@@ -1,10 +1,11 @@
 # Use multi-stage build
-FROM alpine:3.22
+FROM alpine:3.23
 
 # Create liquibase user
 RUN addgroup --gid 1001 liquibase && \
     adduser --disabled-password --uid 1001 --ingroup liquibase --home /liquibase liquibase && \
-    chown liquibase /liquibase
+    chown liquibase:root /liquibase && \
+    chmod g+rx /liquibase
 
 # Install smaller JRE, if available and acceptable
 RUN apk add --no-cache openjdk21-jre-headless bash
@@ -26,9 +27,9 @@ RUN set -x && \
     ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh && \
     liquibase --version
     
-ARG LPM_VERSION=0.2.16
-ARG LPM_SHA256=734536181f67b108bccf5483a6ecad8d64e3c916c6586224d367984016364a9c
-ARG LPM_SHA256_ARM=9bc545ea6c475cb4fd42557772b8c9be23b5db0e4f7016d50a68516a0ac59365
+ARG LPM_VERSION=0.3.1
+ARG LPM_SHA256=c21d5df31a5af30e355186d1f0cebc203f6e4f60522a37505b0702db6927b5ca
+ARG LPM_SHA256_ARM=207177f3f701944326883156549f81a7826d1928addcc1880aee73df2a4703b9
 
 # Add metadata labels
 LABEL org.opencontainers.image.description="Liquibase Container Image (Alpine)"
