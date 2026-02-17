@@ -231,18 +231,18 @@ jobs:
           exit-code: true
           only-severities: "critical,high"
 
-      - name: Notify Slack on Build Failure
-        if: failure()
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_COLOR: "failure"
-          SLACK_MESSAGE: "View details on GitHub Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Triggered by repository: ${{ github.repository }} and job: ${{ github.job }}"
-          SLACK_TITLE: "❌ ${{ github.repository }} ❌ Docker Scout failed on branch ${{ github.ref_name }} for commit ${{ github.sha }} in repository ${{ github.repository }}"
-          SLACK_USERNAME: liquibot
-          SLACK_WEBHOOK: ${{ env.DOCKER_SLACK_WEBHOOK_URL }}
-          SLACK_ICON_EMOJI: ":whale:"
-          SLACK_FOOTER: "${{ github.repository }} - ${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}"
-          SLACK_LINK_NAMES: true
+      # - name: Notify Slack on Build Failure
+      #   if: failure()
+      #   uses: rtCamp/action-slack-notify@v2
+      #   env:
+      #     SLACK_COLOR: "failure"
+      #     SLACK_MESSAGE: "View details on GitHub Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Triggered by repository: ${{ github.repository }} and job: ${{ github.job }}"
+      #     SLACK_TITLE: "❌ ${{ github.repository }} ❌ Docker Scout failed on branch ${{ github.ref_name }} for commit ${{ github.sha }} in repository ${{ github.repository }}"
+      #     SLACK_USERNAME: liquibot
+      #     SLACK_WEBHOOK: ${{ env.DOCKER_SLACK_WEBHOOK_URL }}
+      #     SLACK_ICON_EMOJI: ":whale:"
+      #     SLACK_FOOTER: "${{ github.repository }} - ${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}"
+      #     SLACK_LINK_NAMES: true
 
       - name: Upload Scout scan results to GitHub Security tab
         if: always()
