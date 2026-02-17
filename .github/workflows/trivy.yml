@@ -129,7 +129,7 @@ jobs:
       upload_sarif: true
       sarif_category: ${{ matrix.image.name }}${{ matrix.image.suffix }}
       generate_sbom: true
-      build_logic_ref: main
+      build_logic_ref: fix/vul-scans-trivy
 
   # ============================================
   # SLACK NOTIFICATION ON FAILURE
