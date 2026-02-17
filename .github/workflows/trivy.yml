@@ -119,7 +119,7 @@ jobs:
             },
           ]
     name: Scan ${{ matrix.image.name }}${{ matrix.image.suffix }}
-    uses: liquibase/build-logic/.github/workflows/reusable-vulnerability-scan.yml@main
+    uses: liquibase/build-logic/.github/workflows/reusable-vulnerability-scan.yml@fix/vul-scans-trivy
     with:
       mode: docker
       source: ghcr.io/${{ github.repository }}/liquibase-${{ matrix.image.ghcr_name }}:${{ github.sha }}
