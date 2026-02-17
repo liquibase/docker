@@ -86,6 +86,7 @@ jobs:
           file: ${{ matrix.image.dockerfile }}
           push: true
           provenance: false
+          sbom: false
           tags: ghcr.io/${{ github.repository }}/liquibase-${{ matrix.image.ghcr_name }}:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
