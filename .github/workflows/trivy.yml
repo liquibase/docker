@@ -134,35 +134,35 @@ jobs:
   # ============================================
   # SLACK NOTIFICATION ON FAILURE
   # ============================================
-  notify-failure:
-    needs: [build, vulnerability-scan]
-    if: failure()
-    runs-on: "ubuntu-22.04"
-    steps:
-      - name: Configure AWS credentials for vault access
-        uses: aws-actions/configure-aws-credentials@v5
-        with:
-          role-to-assume: ${{ secrets.LIQUIBASE_VAULT_OIDC_ROLE_ARN }}
-          aws-region: us-east-1
+  # notify-failure:
+  #   needs: [build, vulnerability-scan]
+  #   if: failure()
+  #   runs-on: "ubuntu-22.04"
+  #   steps:
+  #     - name: Configure AWS credentials for vault access
+  #       uses: aws-actions/configure-aws-credentials@v5
+  #       with:
+  #         role-to-assume: ${{ secrets.LIQUIBASE_VAULT_OIDC_ROLE_ARN }}
+  #         aws-region: us-east-1
 
-      - name: Get secrets from vault
-        uses: aws-actions/aws-secretsmanager-get-secrets@v2
-        with:
-          secret-ids: |
-            ,/vault/liquibase
-          parse-json-secrets: true
+  #     - name: Get secrets from vault
+  #       uses: aws-actions/aws-secretsmanager-get-secrets@v2
+  #       with:
+  #         secret-ids: |
+  #           ,/vault/liquibase
+  #         parse-json-secrets: true
 
-      - name: Notify Slack on Build Failure
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_COLOR: "failure"
-          SLACK_MESSAGE: "View details on GitHub Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Triggered by repository: ${{ github.repository }}"
-          SLACK_TITLE: "❌ ${{ github.repository }} ❌ Trivy failed on branch ${{ github.ref_name }} for commit ${{ github.sha }} in repository ${{ github.repository }}"
-          SLACK_USERNAME: liquibot
-          SLACK_WEBHOOK: ${{ env.DOCKER_SLACK_WEBHOOK_URL }}
-          SLACK_ICON_EMOJI: ":whale:"
-          SLACK_FOOTER: "${{ github.repository }}"
-          SLACK_LINK_NAMES: true
+  #     - name: Notify Slack on Build Failure
+  #       uses: rtCamp/action-slack-notify@v2
+  #       env:
+  #         SLACK_COLOR: "failure"
+  #         SLACK_MESSAGE: "View details on GitHub Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Triggered by repository: ${{ github.repository }}"
+  #         SLACK_TITLE: "❌ ${{ github.repository }} ❌ Trivy failed on branch ${{ github.ref_name }} for commit ${{ github.sha }} in repository ${{ github.repository }}"
+  #         SLACK_USERNAME: liquibot
+  #         SLACK_WEBHOOK: ${{ env.DOCKER_SLACK_WEBHOOK_URL }}
+  #         SLACK_ICON_EMOJI: ":whale:"
+  #         SLACK_FOOTER: "${{ github.repository }}"
+  #         SLACK_LINK_NAMES: true
 
   scout:
     strategy:
