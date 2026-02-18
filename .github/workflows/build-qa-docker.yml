@@ -176,7 +176,7 @@ jobs:
               else
                 # Regular production version
                 LIQUIBASE_SECURE_ZIP="liquibase-secure-${VERSION}.zip"
-                S3_URL="s3://repo.liquibase.com/non-releases/secure/${VERSION}/${LIQUIBASE_SECURE_ZIP}"
+                S3_URL="s3://repo.liquibase.com/releases/secure/${VERSION}/${LIQUIBASE_SECURE_ZIP}"
                 echo "Using production S3 path: $S3_URL"
               fi
             else
