@@ -62,6 +62,7 @@ jobs:
       pushDockerHub: ${{ steps.collect-data.outputs.pushDockerHub }}
       pushGHCR: ${{ steps.collect-data.outputs.pushGHCR }}
       pushECR: ${{ steps.collect-data.outputs.pushECR }}
+      changes_made: ${{ steps.update-dockerfiles.outputs.changes_made }}
 
     steps:
       - name: Collect Data
@@ -541,7 +542,7 @@ jobs:
   publish-release:
     name: "Publish GitHub Release"
     needs: [update-dockerfiles, setup-update-draft-build]
-    if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' }}
+    if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' && needs.update-dockerfiles.outputs.changes_made == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Determine Release Tag
@@ -557,9 +558,15 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release edit "${{ steps.release-tag.outputs.tag_name }}" \
+          TAG="${{ steps.release-tag.outputs.tag_name }}"
+          if ! gh release view "${TAG}" --repo "${{ github.repository }}" &>/dev/null; then
+            echo "::warning::Release '${TAG}' not found — skipping publish."
+            exit 0
+          fi
+          gh release edit "${TAG}" \
             --repo "${{ github.repository }}" \
-            --draft=false
+            --draft=false \
+            --latest=true
 
   update-official-repo:
     name: "Update Official Docker Repo"
