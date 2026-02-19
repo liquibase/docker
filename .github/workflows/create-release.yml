@@ -538,6 +538,29 @@ jobs:
           cosign sign --yes ${{ env.PRIVATE_ECR_DRY_RUN_REPO }}@${{ steps.build-and-push.outputs.digest }}
           echo "Dry-run ECR image signed successfully"
 
+  publish-release:
+    name: "Publish GitHub Release"
+    needs: [update-dockerfiles, setup-update-draft-build]
+    if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Determine Release Tag
+        id: release-tag
+        run: |
+          if [[ "${{ needs.update-dockerfiles.outputs.releaseType }}" == "liquibase-secure-release" ]]; then
+            echo "tag_name=v${{ needs.update-dockerfiles.outputs.extensionVersion }}-SECURE" >> $GITHUB_OUTPUT
+          else
+            echo "tag_name=v${{ needs.update-dockerfiles.outputs.extensionVersion }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Publish Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release edit "${{ steps.release-tag.outputs.tag_name }}" \
+            --repo "${{ github.repository }}" \
+            --draft=false
+
   update-official-repo:
     name: "Update Official Docker Repo"
     needs: update-dockerfiles
