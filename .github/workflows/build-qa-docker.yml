@@ -4,6 +4,7 @@ permissions:
   contents: read
   id-token: write
   actions: read
+  packages: write
 
 on:
   workflow_dispatch:
@@ -50,30 +51,30 @@ jobs:
 
           case "${{ inputs.buildTargets }}" in
             "All (Community + Alpine + Secure)")
-              matrix_items+=('{"dockerfile": "Dockerfile", "image_name": "liquibase-qa", "suffix": "", "build_type": "Community", "is_rc": false}')
-              matrix_items+=('{"dockerfile": "Dockerfile.alpine", "image_name": "liquibase-qa-alpine", "suffix": "-alpine", "build_type": "Community", "is_rc": false}')
+              matrix_items+=('{"dockerfile": "Dockerfile", "image_name": "liquibase-qa", "suffix": "", "build_type": "Community", "is_rc": false, "ghcr_name": "community"}')
+              matrix_items+=('{"dockerfile": "Dockerfile.alpine", "image_name": "liquibase-qa-alpine", "suffix": "-alpine", "build_type": "Community", "is_rc": false, "ghcr_name": "alpine"}')
               if [[ "$IS_RC_BUILD" == "true" ]]; then
-                matrix_items+=('{"dockerfile": "DockerfileSecure", "image_name": "liquibase-secure-rc", "suffix": "-secure", "build_type": "secure", "is_rc": true}')
+                matrix_items+=('{"dockerfile": "DockerfileSecure", "image_name": "liquibase-secure-rc", "suffix": "-secure", "build_type": "secure", "is_rc": true, "ghcr_name": "secure"}')
               else
-                matrix_items+=('{"dockerfile": "DockerfileSecure", "image_name": "liquibase-secure-qa", "suffix": "-secure", "build_type": "secure", "is_rc": false}')
+                matrix_items+=('{"dockerfile": "DockerfileSecure", "image_name": "liquibase-secure-qa", "suffix": "-secure", "build_type": "secure", "is_rc": false, "ghcr_name": "secure"}')
               fi
               ;;
             "Community Only (Standard + Alpine)")
-              matrix_items+=('{"dockerfile": "Dockerfile", "image_name": "liquibase-qa", "suffix": "", "build_type": "Community", "is_rc": false}')
-              matrix_items+=('{"dockerfile": "Dockerfile.alpine", "image_name": "liquibase-qa-alpine", "suffix": "-alpine", "build_type": "Community", "is_rc": false}')
+              matrix_items+=('{"dockerfile": "Dockerfile", "image_name": "liquibase-qa", "suffix": "", "build_type": "Community", "is_rc": false, "ghcr_name": "community"}')
+              matrix_items+=('{"dockerfile": "Dockerfile.alpine", "image_name": "liquibase-qa-alpine", "suffix": "-alpine", "build_type": "Community", "is_rc": false, "ghcr_name": "alpine"}')
               ;;
             "Secure Only")
               if [[ "$IS_RC_BUILD" == "true" ]]; then
-                matrix_items+=('{"dockerfile": "DockerfileSecure", "image_name": "liquibase-secure-rc", "suffix": "-secure", "build_type": "secure", "is_rc": true}')
+                matrix_items+=('{"dockerfile": "DockerfileSecure", "image_name": "liquibase-secure-rc", "suffix": "-secure", "build_type": "secure", "is_rc": true, "ghcr_name": "secure"}')
               else
-                matrix_items+=('{"dockerfile": "DockerfileSecure", "image_name": "liquibase-secure-qa", "suffix": "-secure", "build_type": "secure", "is_rc": false}')
+                matrix_items+=('{"dockerfile": "DockerfileSecure", "image_name": "liquibase-secure-qa", "suffix": "-secure", "build_type": "secure", "is_rc": false, "ghcr_name": "secure"}')
               fi
               ;;
             "Standard Community Only")
-              matrix_items+=('{"dockerfile": "Dockerfile", "image_name": "liquibase-qa", "suffix": "", "build_type": "Community", "is_rc": false}')
+              matrix_items+=('{"dockerfile": "Dockerfile", "image_name": "liquibase-qa", "suffix": "", "build_type": "Community", "is_rc": false, "ghcr_name": "community"}')
               ;;
             "Alpine Community Only")
-              matrix_items+=('{"dockerfile": "Dockerfile.alpine", "image_name": "liquibase-qa-alpine", "suffix": "-alpine", "build_type": "Community", "is_rc": false}')
+              matrix_items+=('{"dockerfile": "Dockerfile.alpine", "image_name": "liquibase-qa-alpine", "suffix": "-alpine", "build_type": "Community", "is_rc": false, "ghcr_name": "alpine"}')
               ;;
           esac
 
@@ -524,6 +525,14 @@ jobs:
           username: ${{ env.REPO_USER }}
           password: ${{ env.REPO_PASSWORD }}
 
+      - name: Login to GHCR
+        if: ${{ steps.validate-build.outcome == 'success' }}
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build and push Docker image
         if: ${{ steps.validate-build.outcome == 'success' }}
         uses: docker/build-push-action@v6
@@ -535,6 +544,7 @@ jobs:
           provenance: false
           tags: |
             ${{ env.REPO_URL }}/${{ matrix.image_name }}:${{ matrix.is_rc == true && inputs.secure-version || inputs.liquibaseBranch }}
+            ghcr.io/${{ github.repository }}/liquibase-${{ matrix.ghcr_name }}:${{ github.sha }}
           labels: |
             org.opencontainers.image.source=https://github.com/liquibase/docker
             org.opencontainers.image.description=Liquibase QA Container Image${{ matrix.suffix }}
@@ -608,3 +618,21 @@ jobs:
             echo "❌ Overall Status: FAILED"
             echo "🔍 Check the logs above for detailed error information"
           fi
+
+  vulnerability-scan:
+    needs: [set-matrix, build-qa-docker]
+    if: ${{ !cancelled() && needs.build-qa-docker.result == 'success' }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.set-matrix.outputs.matrix) }}
+    name: Scan ${{ matrix.image_name }}
+    uses: liquibase/build-logic/.github/workflows/reusable-vulnerability-scan.yml@main
+    with:
+      mode: docker
+      source: ghcr.io/${{ github.repository }}/liquibase-${{ matrix.ghcr_name }}:${{ github.sha }}
+      image_name: ${{ matrix.image_name }}
+      image_tag: qa
+      fail_on_vulnerabilities: true
+      upload_sarif: false
+      generate_sbom: true
+      build_logic_ref: main
