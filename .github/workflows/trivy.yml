@@ -155,14 +155,16 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          PACKAGE_NAME="liquibase-${{ matrix.image.ghcr_name }}"
+          REPO_NAME="${{ github.event.repository.name }}"
+          PACKAGE_NAME="${REPO_NAME}/liquibase-${{ matrix.image.ghcr_name }}"
+          ENCODED_PACKAGE_NAME="${REPO_NAME}%2Fliquibase-${{ matrix.image.ghcr_name }}"
           TAG="${{ github.sha }}"
           VERSION_ID=$(gh api \
-            "/orgs/${{ github.repository_owner }}/packages/container/${PACKAGE_NAME}/versions" \
+            "/orgs/${{ github.repository_owner }}/packages/container/${ENCODED_PACKAGE_NAME}/versions" \
             --jq ".[] | select(.metadata.container.tags[] == \"${TAG}\") | .id")
           if [ -n "$VERSION_ID" ]; then
             gh api --method DELETE \
-              "/orgs/${{ github.repository_owner }}/packages/container/${PACKAGE_NAME}/versions/${VERSION_ID}"
+              "/orgs/${{ github.repository_owner }}/packages/container/${ENCODED_PACKAGE_NAME}/versions/${VERSION_ID}"
             echo "Deleted ${PACKAGE_NAME}:${TAG}"
           else
             echo "No version found for ${PACKAGE_NAME}:${TAG}, skipping"
