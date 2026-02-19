@@ -161,7 +161,7 @@ jobs:
           TAG="${{ github.sha }}"
           VERSION_ID=$(gh api \
             "/orgs/${{ github.repository_owner }}/packages/container/${ENCODED_PACKAGE_NAME}/versions" \
-            --jq ".[] | select(.metadata.container.tags[] == \"${TAG}\") | .id")
+            --jq ".[] | select(.metadata.container.tags[] == \"${TAG}\") | .id" 2>/dev/null || echo "")
           if [ -n "$VERSION_ID" ]; then
             gh api --method DELETE \
               "/orgs/${{ github.repository_owner }}/packages/container/${ENCODED_PACKAGE_NAME}/versions/${VERSION_ID}"
