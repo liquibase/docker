@@ -115,7 +115,7 @@ jobs:
           echo "Dry run: ${{ steps.collect-data.outputs.dryRun }}"
 
       - name: Configure AWS credentials for vault access
-        uses: aws-actions/configure-aws-credentials@v5
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ secrets.LIQUIBASE_VAULT_OIDC_ROLE_ARN }}
           aws-region: us-east-1
@@ -259,7 +259,7 @@ jobs:
           ref: ${{ github.ref }}
 
       - name: Configure AWS credentials for vault access
-        uses: aws-actions/configure-aws-credentials@v5
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ secrets.LIQUIBASE_VAULT_OIDC_ROLE_ARN }}
           aws-region: us-east-1
@@ -391,7 +391,7 @@ jobs:
 
       - name: Configure AWS credentials for PROD ECR
         id: configure-aws-credentials-prod
-        uses: aws-actions/configure-aws-credentials@v5
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ env.AWS_PROD_GITHUB_OIDC_ROLE_ARN_INFRASTRUCTURE }}
           aws-region: us-east-1
@@ -553,7 +553,7 @@ jobs:
           echo "MAJOR_MINOR: ${VERSION%.*}"
 
       - name: Configure AWS credentials for vault access
-        uses: aws-actions/configure-aws-credentials@v5
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ secrets.LIQUIBASE_VAULT_OIDC_ROLE_ARN }}
           aws-region: us-east-1
