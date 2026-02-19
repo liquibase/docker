@@ -132,10 +132,49 @@ jobs:
       build_logic_ref: main
 
   # ============================================
+  # CLEANUP GHCR IMAGES
+  # ============================================
+  cleanup-ghcr:
+    needs: [vulnerability-scan]
+    if: always()
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        image:
+          [
+            { ghcr_name: community },
+            { ghcr_name: alpine },
+            { ghcr_name: secure },
+          ]
+    name: Cleanup ${{ matrix.image.ghcr_name }}
+    permissions:
+      packages: write
+    steps:
+      - name: Delete GHCR image
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          REPO_NAME="${{ github.event.repository.name }}"
+          PACKAGE_NAME="${REPO_NAME}/liquibase-${{ matrix.image.ghcr_name }}"
+          ENCODED_PACKAGE_NAME="${REPO_NAME}%2Fliquibase-${{ matrix.image.ghcr_name }}"
+          TAG="${{ github.sha }}"
+          VERSION_ID=$(gh api \
+            "/orgs/${{ github.repository_owner }}/packages/container/${ENCODED_PACKAGE_NAME}/versions" \
+            --jq ".[] | select(.metadata.container.tags[] == \"${TAG}\") | .id" 2>/dev/null || echo "")
+          if [ -n "$VERSION_ID" ]; then
+            gh api --method DELETE \
+              "/orgs/${{ github.repository_owner }}/packages/container/${ENCODED_PACKAGE_NAME}/versions/${VERSION_ID}"
+            echo "Deleted ${PACKAGE_NAME}:${TAG}"
+          else
+            echo "No version found for ${PACKAGE_NAME}:${TAG}, skipping"
+          fi
+
+  # ============================================
   # SLACK NOTIFICATION ON FAILURE
   # ============================================
   notify-failure:
-    needs: [build, vulnerability-scan]
+    needs: [build, vulnerability-scan, cleanup-ghcr]
     if: failure()
     runs-on: "ubuntu-22.04"
     steps:
