@@ -11,7 +11,7 @@ RUN groupadd --gid 1001 liquibase && \
 WORKDIR /liquibase
 
 ARG LIQUIBASE_SECURE_VERSION=5.1.0
-ARG LB_SECURE_SHA256=53b0373042d8ad7ebff44f930d0a79da2fa0a2a93c96d92cd18aa9934a205c97
+ARG LB_SECURE_SHA256=badff68d727a982048fa73e89d95138f8fe42de0872ea26e82fe25f2d8516e4e
 
 # Add metadata labels
 LABEL org.opencontainers.image.description="Liquibase Secure Container Image"
