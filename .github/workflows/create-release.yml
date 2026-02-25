@@ -62,6 +62,7 @@ jobs:
       pushDockerHub: ${{ steps.collect-data.outputs.pushDockerHub }}
       pushGHCR: ${{ steps.collect-data.outputs.pushGHCR }}
       pushECR: ${{ steps.collect-data.outputs.pushECR }}
+      changes_made: ${{ steps.update-dockerfiles.outputs.changes_made }}
 
     steps:
       - name: Collect Data
@@ -537,6 +538,35 @@ jobs:
           echo "Signing dry-run ECR image with Cosign keyless signing..."
           cosign sign --yes ${{ env.PRIVATE_ECR_DRY_RUN_REPO }}@${{ steps.build-and-push.outputs.digest }}
           echo "Dry-run ECR image signed successfully"
+
+  publish-release:
+    name: "Publish GitHub Release"
+    needs: [update-dockerfiles, setup-update-draft-build]
+    if: ${{ needs.update-dockerfiles.outputs.dryRun == 'false' && needs.update-dockerfiles.outputs.changes_made == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Determine Release Tag
+        id: release-tag
+        run: |
+          if [[ "${{ needs.update-dockerfiles.outputs.releaseType }}" == "liquibase-secure-release" ]]; then
+            echo "tag_name=v${{ needs.update-dockerfiles.outputs.extensionVersion }}-SECURE" >> $GITHUB_OUTPUT
+          else
+            echo "tag_name=v${{ needs.update-dockerfiles.outputs.extensionVersion }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Publish Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ steps.release-tag.outputs.tag_name }}"
+          if ! gh release view "${TAG}" --repo "${{ github.repository }}" &>/dev/null; then
+            echo "::warning::Release '${TAG}' not found — skipping publish."
+            exit 0
+          fi
+          gh release edit "${TAG}" \
+            --repo "${{ github.repository }}" \
+            --draft=false \
+            --latest=true
 
   update-official-repo:
     name: "Update Official Docker Repo"
