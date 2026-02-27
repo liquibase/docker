@@ -300,7 +300,7 @@ jobs:
 
       - name: Upload Security Report
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: security-report-scout${{ matrix.image.dockerfile == 'DockerfileSecure' && '-secure' || matrix.image.suffix }}
           path: ./reports/scout${{ matrix.image.dockerfile == 'DockerfileSecure' && '-secure' || matrix.image.suffix }}/summary.pdf
