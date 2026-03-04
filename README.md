@@ -16,7 +16,7 @@ Starting with **Liquibase 5.0**, we have introduced a clear separation between o
 | Version Range | Community Image                                 | Secure Image                 | License                 | Docker Official               |
 | ------------- | ----------------------------------------------- | ---------------------------- | ----------------------- | ----------------------------- |
 | **5.0+**      | `liquibase/liquibase`                           | `liquibase/liquibase-secure` | FSL\* / Commercial      | ❌ No\*\*                     |
-| **4.x**       | `liquibase:4.x`\*\*\*<br/>`liquibase/liquibase` | `liquibase/liquibase-secure` | Apache 2.0 / Commercial | ✅ Yes\*\*\* (Community only) |
+| **4.x**       | `liquibase:4.x`\*\*\*<br/>`liquibase/liquibase` | `liquibase/liquibase-secure` | FSL-1.1-ALv2 / Commercial | ✅ Yes\*\*\* (Community only) |
 
 - \*FSL = Functional Source License (See [Liquibase License Information](#license-information))
 - \*\*For Liquibase 5.0+, use the community registry image `liquibase/liquibase` (not available as official Docker image).
@@ -118,7 +118,7 @@ If you're upgrading from Liquibase 4 to 5.0, follow these steps:
 
 ### Step 1: Understand License Requirements
 
-- **Liquibase 4**: Uses Apache 2.0 license (always available)
+- **Liquibase 4**: Uses FSL-1.1-ALv2 license (always available)
 - **Liquibase 5.0 Community**: Uses Functional Source License (FSL)
 - **Liquibase 5.0 Secure**: Requires a commercial license
 
@@ -205,14 +205,14 @@ The Liquibase 5.0 Community edition is available under the Functional Source Lic
 
 - Allows you to freely use Liquibase for database migrations
 - Prohibits commercial use that competes with Liquibase’s products or services
-- Automatically transitions to the Apache 2.0 license after two years
+- Automatically transitions to the FSL-1.1-ALv2 license after two years
 - Provides full source code access (but not OSI-approved open source)
 
 Read the full license: [Functional Source License on fsl.software](https://fsl.software/)
 
-### Apache 2.0 License - Liquibase 4
+### FSL-1.1-ALv2 License - Liquibase 4
 
-Liquibase 4 versions continue to use the [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0).
+Liquibase 4 versions continue to use the [FSL-1.1-ALv2 license](https://fsl.software/FSL-1.1-ALv2.template.md).
 
 ### Commercial License - Liquibase Secure
 
@@ -384,7 +384,7 @@ The following tags are officially supported and can be found on [Docker Hub](htt
 - `liquibase/liquibase:latest` - Latest 5.0+ release
 - `liquibase/liquibase:5.0` - Latest 5.0.x release
 - `liquibase/liquibase:latest-alpine` - Latest Alpine variant
-- `liquibase/liquibase:4.x` - Liquibase 4 versions (Apache 2.0)
+- `liquibase/liquibase:4.x` - Liquibase 4 versions (FSL-1.1-ALv2)
 
 **Secure Image:**
 
@@ -397,7 +397,7 @@ The following tags are officially supported and can be found on [Docker Hub](htt
 - **For production**: Use major.minor tags (e.g., `5.0`) for reproducibility with latest patches
 - **For development**: Use `latest` or `latest-alpine` for convenience
 - **For Alpine Linux**: Append `-alpine` for smaller image size
-- **For Liquibase 4**: Use `4.x` versions (Apache 2.0 license)
+- **For Liquibase 4**: Use `4.x` versions (FSL-1.1-ALv2 license)
 
 ## 📦 Using the Docker Image
 
