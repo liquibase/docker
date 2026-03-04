@@ -205,7 +205,7 @@ The Liquibase 5.0 Community edition is available under the Functional Source Lic
 
 - Allows you to freely use Liquibase for database migrations
 - Prohibits commercial use that competes with Liquibase’s products or services
-- Automatically transitions to the FSL-1.1-ALv2 license after two years
+- Automatically transitions to the Apache 2.0 license after two years
 - Provides full source code access (but not OSI-approved open source)
 
 Read the full license: [Functional Source License on fsl.software](https://fsl.software/)
