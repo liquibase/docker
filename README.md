@@ -118,7 +118,7 @@ If you're upgrading from Liquibase 4 to 5.0, follow these steps:
 
 ### Step 1: Understand License Requirements
 
-- **Liquibase 4**: Uses FSL-1.1-ALv2 license (always available)
+- **Liquibase 4**: Uses Apache v2 license (always available)
 - **Liquibase 5.0 Community**: Uses Functional Source License (FSL)
 - **Liquibase 5.0 Secure**: Requires a commercial license
 
