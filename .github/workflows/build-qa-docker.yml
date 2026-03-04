@@ -516,7 +516,7 @@ jobs:
 
       - name: Set up QEMU
         if: ${{ steps.validate-build.outcome == 'success' }}
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
 
       - name: Log in to internal Nexus Docker Registry
         if: ${{ steps.validate-build.outcome == 'success' }}
