@@ -536,7 +536,7 @@ jobs:
 
       - name: Build and push Docker image
         if: ${{ steps.validate-build.outcome == 'success' }}
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: ${{ matrix.dockerfile }}
