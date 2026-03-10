@@ -160,7 +160,7 @@ MANIFEST=$(echo "$MANIFEST" | jq --arg ts "$SCANNED_AT" '.lastUpdated = $ts')
 # Sort version tags in descending order for each image
 MANIFEST=$(echo "$MANIFEST" | jq '
   .images |= with_entries(
-    .value |= sort_by(split(".") | map(tonumber? // 0)) | reverse
+    .value |= (sort_by(split(".") | map(tonumber? // 0)) | reverse)
   )
 ')
 
