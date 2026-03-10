@@ -1,0 +1,2002 @@
+{
+  "SchemaVersion": 2,
+  "Trivy": {
+    "Version": "0.69.1"
+  },
+  "ReportID": "019cd737-882a-74af-8d64-6ab6d0db7fd3",
+  "CreatedAt": "2026-03-10T10:07:46.730308178Z",
+  "ArtifactName": "/tmp/extracted-deps",
+  "ArtifactType": "filesystem",
+  "Results": [
+    {
+      "Target": "Java",
+      "Class": "lang-pkgs",
+      "Type": "jar",
+      "Packages": [
+        {
+          "Name": "com.fasterxml.jackson.core:jackson-annotations",
+          "Identifier": {
+            "PURL": "pkg:maven/com.fasterxml.jackson.core/jackson-annotations@2.18.3",
+            "UID": "cab1b323725edf28"
+          },
+          "Version": "2.18.3",
+          "FilePath": "internal-jars/lib/liquibase-commercial.jar",
+          "AnalyzedBy": "jar"
+        },
+        {
+          "Name": "com.fasterxml.jackson.core:jackson-core",
+          "Identifier": {
+            "PURL": "pkg:maven/com.fasterxml.jackson.core/jackson-core@2.18.3",
+            "UID": "6c47f02a12d2893e"
+          },
+          "Version": "2.18.3",
+          "FilePath": "internal-jars/lib/liquibase-commercial.jar",
+          "AnalyzedBy": "jar"
+        },
+        {
+          "Name": "com.fasterxml.jackson.core:jackson-databind",
+          "Identifier": {
+            "PURL": "pkg:maven/com.fasterxml.jackson.core/jackson-databind@2.18.3",
+            "UID": "99c3171647dc05d3"
+          },
+          "Version": "2.18.3",
+          "FilePath": "internal-jars/lib/liquibase-commercial.jar",
+          "AnalyzedBy": "jar"
+        },
+        {
+          "Name": "com.fasterxml.jackson.module:jackson-module-jaxb-annotations",
+          "Identifier": {
+            "PURL": "pkg:maven/com.fasterxml.jackson.module/jackson-module-jaxb-annotations@2.18.3",
+            "UID": "639773605d26c6a4"
+          },
+          "Version": "2.18.3",
+          "FilePath": "internal-jars/lib/liquibase-commercial.jar",
+          "AnalyzedBy": "jar"
+        },
+        {
+          "Name": "com.github.jsqlparser:jsqlparser",
+          "Identifier": {
+            "PURL": "pkg:maven/com.github.jsqlparser/jsqlparser@4.9",
+            "UID": "7d3beace11b23ca6"
+          },
+          "Version": "4.9",
+          "FilePath": "internal-jars/extensions/liquibase-checks.jar",
+          "AnalyzedBy": "jar"
+        },
+        {
+          "Name": "com.github.jsqlparser:jsqlparser",
+          "Identifier": {
+            "PURL": "pkg:maven/com.github.jsqlparser/jsqlparser@4.9",
+            "UID": "64e335e710e6fd08"
+          },
+          "Version": "4.9",
+          "FilePath": "internal-jars/lib/liquibase-commercial.jar",
+          "AnalyzedBy": "jar"
+        },
+        {
+          "Name": "com.github.spullara.mustache.java:compiler",
+          "Identifier": {
+            "PURL": "pkg:maven/com.github.spullara.mustache.java/compiler@0.9.13",
+            "UID": "821fe72b87a170a"
+          },
+          "Version": "0.9.13",
+          "FilePath": "internal-jars/lib/liquibase-commercial.jar",
+          "AnalyzedBy": "jar"
+        },
+        {
+          "Name": "com.github.vertical-blank:sql-formatter",
+          "Identifier": {
+            "PURL": "pkg:maven/com.github.vertical-blank/sql-formatter@2.0.5",
+            "UID": "a724abf87410cc99"
+          },
+          "Version": "2.0.5",
+          "FilePath": "internal-jars/lib/liquibase-commercial.jar",
+          "AnalyzedBy": "jar"
+        },
+        {
+          "Name": "com.h2database:h2",
+          "Identifier": {
+            "PURL": "pkg:maven/com.h2database/h2@2.2.224",
+            "UID": "4032cdff92231132"
+          },
+          "Version": "2.2.224",
+          "FilePath": "internal-jars/lib/h2.jar",
+          "AnalyzedBy": "jar"
+        },
+        {
+          "Name": "com.ibm.db2:jcc",
+          "Identifier": {
+            "PURL": "pkg:maven/com.ibm.db2/jcc@11.5.9.0",
+            "UID": "4279b7f7b1c97c07"
+          },
+          "Version": "11.5.9.0",
+          "FilePath": "internal-jars/lib/jcc.jar",
+          "AnalyzedBy": "jar"
+        },
+        {
+          "Name": "com.microsoft.sqlserver:mssql-jdbc",
+          "Identifier": {
+            "PURL": "pkg:maven/com.microsoft.sqlserver/mssql-jdbc@12.10.0",
+            "UID": "3e020fa28a0ef3d9"
+          },
+          "Version": "12.10.0",
+          "FilePath": "internal-jars/lib/mssql-jdbc.jar",
+          "AnalyzedBy": "jar"
+        },
+        {
+          "Name": "com.microsoft.sqlserver:mssql-jdbc",
+          "Identifier": {
+            "PURL": "pkg:maven/com.microsoft.sqlserver/mssql-jdbc@12.10.0.jre8",
+            "UID": "88293a83913ea0f4"
+          },
+          "Version": "12.10.0.jre8",
+          "FilePath": "internal-jars/lib/mssql-jdbc.jar",
+          "AnalyzedBy": "jar"
+        },
+        {
+          "Name": "com.opencsv:opencsv",
+          "Identifier": {
+            "PURL": "pkg:maven/com.opencsv/opencsv@5.11",
+            "UID": "493eff799d4800eb"
+          },
+          "Version": "5.11",
+          "FilePath": "internal-jars/lib/opencsv.jar",
+          "AnalyzedBy": "jar"
+        },
+        {
+          "Name": "com.oracle.database.jdbc:ojdbc8",
+          "Identifier": {
+            "PURL": "pkg:maven/com.oracle.database.jdbc/ojdbc8@19.27.0.0",
+            "UID": "f2c36346366690da"
+          },
+          "Version": "19.27.0.0",
+          "FilePath": "internal-jars/lib/ojdbc8.jar",
+          "AnalyzedBy": "jar"
+        },
+        {
+          "Name": "commons-codec:commons-codec",
+          "Identifier": {
+            "PURL": "pkg:maven/commons-codec/commons-codec@1.18.0",
+            "UID": "a3ded8754d0f1e9c"
+          },
+          "Version": "1.18.0",
+          "FilePath": "internal-jars/lib/liquibase-commercial.jar",
+          "AnalyzedBy": "jar"
+        },
+        {
+          "Name": "commons-io:commons-io",
+          "Identifier": {
+            "PURL": "pkg:maven/commons-io/commons-io@2.19.0",
+            "UID": "bbb1a865a800bc37"
+          },
+          "Version": "2.19.0",
+          "FilePath": "internal-jars/lib/commons-io.jar",
+          "AnalyzedBy": "jar"
+        },
+        {
+          "Name": "info.picocli:picocli",
+          "Identifier": {
+            "PURL": "pkg:maven/info.picocli/picocli@4.7.7",
+            "UID": "f054a9e493e0104d"
+          },
+          "Version": "4.7.7",
+          "FilePath": "internal-jars/lib/picocli.jar",
+          "AnalyzedBy": "jar"
+        },
+        {
+          "Name": "io.github.java-diff-utils:java-diff-utils",
+          "Identifier": {
+            "PURL": "pkg:maven/io.github.java-diff-utils/java-diff-utils@4.12",
+            "UID": "feae28cc1ddf9858"
+          },
+          "Version": "4.12",
+          "FilePath": "internal-jars/lib/liquibase-commercial.jar",
+          "AnalyzedBy": "jar"
+        },
+        {
+          "Name": "javax.xml.bind:jaxb-api",
+          "Identifier": {
+            "PURL": "pkg:maven/javax.xml.bind/jaxb-api@2.3.1",
+            "UID": "f6a09ef7b08580f1"
+          },
+          "Version": "2.3.1",
+          "FilePath": "internal-jars/lib/jaxb-api.jar",
+          "AnalyzedBy": "jar"
+        },
+        {
+          "Name": "net.java.truelicense:truelicense-core",
+          "Identifier": {
+            "PURL": "pkg:maven/net.java.truelicense/truelicense-core@2.6.6",
+            "UID": "67ffc5a19402b59d"
+          },
+          "Version": "2.6.6",
+          "FilePath": "internal-jars/lib/liquibase-commercial.jar",
+          "AnalyzedBy": "jar"
+        },
+        {
+          "Name": "net.java.truelicense:truelicense-json",
+          "Identifier": {
+            "PURL": "pkg:maven/net.java.truelicense/truelicense-json@2.6.6",
+            "UID": "f8c3f84cf5bcc76e"
+          },
+          "Version": "2.6.6",
+          "FilePath": "internal-jars/lib/liquibase-commercial.jar",
+          "AnalyzedBy": "jar"
+        },
+        {
+          "Name": "net.java.truelicense:truelicense-obfuscate",
+          "Identifier": {
+            "PURL": "pkg:maven/net.java.truelicense/truelicense-obfuscate@2.6.6",
+            "UID": "5496fd5331d3f6d8"
+          },
+          "Version": "2.6.6",
+          "FilePath": "internal-jars/lib/liquibase-commercial.jar",
+          "AnalyzedBy": "jar"
+        },
+        {
+          "Name": "net.snowflake:snowflake-jdbc",
+          "Identifier": {
+            "PURL": "pkg:maven/net.snowflake/snowflake-jdbc@3.24.0",
+            "UID": "3532e0d92897b1ad"
+          },
+          "Version": "3.24.0",
+          "FilePath": "internal-jars/lib/snowflake-jdbc.jar",
+          "AnalyzedBy": "jar"
+        },
+        {
+          "Name": "one.gfw:jaxb-api",
+          "Identifier": {
+            "PURL": "pkg:maven/one.gfw/jaxb-api@2.3.1",
+            "UID": "1987e1416acbc840"
+          },
+          "Version": "2.3.1",
+          "FilePath": "internal-jars/lib/jaxb-api.jar",
+          "AnalyzedBy": "jar"
+        },
+        {
+          "Name": "org.apache.commons:commons-collections4",
+          "Identifier": {
+            "PURL": "pkg:maven/org.apache.commons/commons-collections4@4.5.0",
+            "UID": "48b6ebcaa3bd717a"
+          },
+          "Version": "4.5.0",
+          "FilePath": "internal-jars/lib/commons-collections4.jar",
+          "AnalyzedBy": "jar"
+        },
+        {
+          "Name": "org.apache.commons:commons-lang3",
+          "Identifier": {
+            "PURL": "pkg:maven/org.apache.commons/commons-lang3@3.17.0",
+            "UID": "59b9b06792f0c22a"
+          },
+          "Version": "3.17.0",
+          "FilePath": "internal-jars/lib/commons-lang3.jar",
+          "AnalyzedBy": "jar"
+        },
+        {
+          "Name": "org.apache.commons:commons-text",
+          "Identifier": {
+            "PURL": "pkg:maven/org.apache.commons/commons-text@1.13.1",
+            "UID": "aabc4e74aea04428"
+          },
+          "Version": "1.13.1",
+          "FilePath": "internal-jars/lib/commons-text.jar",
+          "AnalyzedBy": "jar"
+        },
+        {
+          "Name": "org.firebirdsql.jdbc:jaybird",
+          "Identifier": {
+            "PURL": "pkg:maven/org.firebirdsql.jdbc/jaybird@5.0.7.java8",
+            "UID": "9b3101f47cc5d4bf"
+          },
+          "Version": "5.0.7.java8",
+          "FilePath": "internal-jars/lib/jaybird.jar",
+          "AnalyzedBy": "jar"
+        },
+        {
+          "Name": "org.glassfish.jaxb:jaxb-core",
+          "Identifier": {
+            "PURL": "pkg:maven/org.glassfish.jaxb/jaxb-core@4.0.5",
+            "UID": "712bf05616de5e07"
+          },
+          "Version": "4.0.5",
+          "FilePath": "internal-jars/lib/jaxb-core.jar",
+          "AnalyzedBy": "jar"
+        },
+        {
+          "Name": "org.glassfish.jaxb:jaxb-runtime",
+          "Identifier": {
+            "PURL": "pkg:maven/org.glassfish.jaxb/jaxb-runtime@4.0.5",
+            "UID": "8f2fa51109458693"
+          },
+          "Version": "4.0.5",
+          "FilePath": "internal-jars/lib/jaxb-runtime.jar",
+          "AnalyzedBy": "jar"
+        },
+        {
+          "Name": "org.hsqldb:hsqldb",
+          "Identifier": {
+            "PURL": "pkg:maven/org.hsqldb/hsqldb@2.7.4",
+            "UID": "1044db8242176e10"
+          },
+          "Version": "2.7.4",
+          "FilePath": "internal-jars/lib/hsqldb.jar",
+          "AnalyzedBy": "jar"
+        },
+        {
+          "Name": "org.liquibase.ext:liquibase-checks",
+          "Identifier": {
+            "PURL": "pkg:maven/org.liquibase.ext/liquibase-checks@2.0.2",
+            "UID": "b2cba905305f2ff1"
+          },
+          "Version": "2.0.2",
+          "FilePath": "internal-jars/extensions/liquibase-checks.jar",
+          "AnalyzedBy": "jar"
+        },
+        {
+          "Name": "org.liquibase:liquibase-commercial",
+          "Identifier": {
+            "PURL": "pkg:maven/org.liquibase/liquibase-commercial@4.32.0",
+            "UID": "3914021c067ca775"
+          },
+          "Version": "4.32.0",
+          "FilePath": "internal-jars/lib/liquibase-commercial.jar",
+          "AnalyzedBy": "jar"
+        },
+        {
+          "Name": "org.liquibase:liquibase-core",
+          "Identifier": {
+            "PURL": "pkg:maven/org.liquibase/liquibase-core@4.32.0",
+            "UID": "43c74e8606c28716"
+          },
+          "Version": "4.32.0",
+          "FilePath": "internal-jars/lib/liquibase-core.jar",
+          "AnalyzedBy": "jar"
+        },
+        {
+          "Name": "org.mariadb.jdbc:mariadb-java-client",
+          "Identifier": {
+            "PURL": "pkg:maven/org.mariadb.jdbc/mariadb-java-client@3.5.3",
+            "UID": "69f83114882cdb3a"
+          },
+          "Version": "3.5.3",
+          "FilePath": "internal-jars/lib/mariadb-java-client.jar",
+          "AnalyzedBy": "jar"
+        },
+        {
+          "Name": "org.mvel:mvel2",
+          "Identifier": {
+            "PURL": "pkg:maven/org.mvel/mvel2@2.5.2.Final",
+            "UID": "653142b4b78ea93"
+          },
+          "Version": "2.5.2.Final",
+          "FilePath": "internal-jars/lib/liquibase-commercial.jar",
+          "AnalyzedBy": "jar"
+        },
+        {
+          "Name": "org.postgresql:postgresql",
+          "Identifier": {
+            "PURL": "pkg:maven/org.postgresql/postgresql@42.7.5",
+            "UID": "bfb3cdf8bda4dca2"
+          },
+          "Version": "42.7.5",
+          "FilePath": "internal-jars/lib/postgresql.jar",
+          "AnalyzedBy": "jar"
+        },
+        {
+          "Name": "org.slf4j:slf4j-api",
+          "Identifier": {
+            "PURL": "pkg:maven/org.slf4j/slf4j-api@2.0.17",
+            "UID": "82dd8c290009cd6f"
+          },
+          "Version": "2.0.17",
+          "FilePath": "internal-jars/lib/slf4j-api.jar",
+          "AnalyzedBy": "jar"
+        },
+        {
+          "Name": "org.slf4j:slf4j-nop",
+          "Identifier": {
+            "PURL": "pkg:maven/org.slf4j/slf4j-nop@2.0.17",
+            "UID": "159767081947b70e"
+          },
+          "Version": "2.0.17",
+          "FilePath": "internal-jars/lib/slf4j-nop.jar",
+          "AnalyzedBy": "jar"
+        },
+        {
+          "Name": "org.xerial:sqlite-jdbc",
+          "Identifier": {
+            "PURL": "pkg:maven/org.xerial/sqlite-jdbc@3.49.1.0",
+            "UID": "eab6450a8a418506"
+          },
+          "Version": "3.49.1.0",
+          "FilePath": "internal-jars/lib/sqlite-jdbc.jar",
+          "AnalyzedBy": "jar"
+        },
+        {
+          "Name": "org.yaml:snakeyaml",
+          "Identifier": {
+            "PURL": "pkg:maven/org.yaml/snakeyaml@2.4",
+            "UID": "c767866c01cf92df"
+          },
+          "Version": "2.4",
+          "FilePath": "internal-jars/lib/snakeyaml.jar",
+          "AnalyzedBy": "jar"
+        }
+      ],
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "GHSA-72hv-8253-57qq",
+          "PkgName": "com.fasterxml.jackson.core:jackson-core",
+          "PkgPath": "internal-jars/lib/liquibase-commercial.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/com.fasterxml.jackson.core/jackson-core@2.18.3",
+            "UID": "6c47f02a12d2893e"
+          },
+          "InstalledVersion": "2.18.3",
+          "FixedVersion": "2.18.6, 2.21.1, 3.1.0",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://github.com/advisories/GHSA-72hv-8253-57qq",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:f0014f8cf1a196156284110f7aa29cbec88e905d3f1f6f0c5e285992bb3fb860",
+          "Title": "jackson-core: Number Length Constraint Bypass in Async Parser Leads to Potential DoS Condition",
+          "Description": "### Summary\nThe non-blocking (async) JSON parser in `jackson-core` bypasses the `maxNumberLength` constraint (default: 1000 characters) defined in `StreamReadConstraints`. This allows an attacker to send JSON with arbitrarily long numbers through the async parser API, leading to excessive memory allocation and potential CPU exhaustion, resulting in a Denial of Service (DoS).\n\nThe standard synchronous parser correctly enforces this limit, but the async parser fails to do so, creating an inconsistent enforcement policy.\n\n### Details\nThe root cause is that the async parsing path in `NonBlockingUtf8JsonParserBase` (and related classes) does not call the methods responsible for number length validation.\n\n- The number parsing methods (e.g., `_finishNumberIntegralPart`) accumulate digits into the `TextBuffer` without any length checks.\n- After parsing, they call `_valueComplete()`, which finalizes the token but does **not** call `resetInt()` or `resetFloat()`.\n- The `resetInt()`/`resetFloat()` methods in `ParserBase` are where the `validateIntegerLength()` and `validateFPLength()` checks are performed.\n- Because this validation step is skipped, the `maxNumberLength` constraint is never enforced in the async code path.\n\n### PoC\nThe following JUnit 5 test demonstrates the vulnerability. It shows that the async parser accepts a 5,000-digit number, whereas the limit should be 1,000.\n\n```java\npackage tools.jackson.core.unittest.dos;\n\nimport java.nio.charset.StandardCharsets;\n\nimport org.junit.jupiter.api.Test;\n\nimport tools.jackson.core.*;\nimport tools.jackson.core.exc.StreamConstraintsException;\nimport tools.jackson.core.json.JsonFactory;\nimport tools.jackson.core.json.async.NonBlockingByteArrayJsonParser;\n\nimport static org.junit.jupiter.api.Assertions.*;\n\n/**\n * POC: Number Length Constraint Bypass in Non-Blocking (Async) JSON Parsers\n *\n * Authors: sprabhav7, rohan-repos\n * \n * maxNumberLength default = 1000 characters (digits).\n * A number with more than 1000 digits should be rejected by any parser.\n *\n * BUG: The async parser never calls resetInt()/resetFloat() which is where\n * validateIntegerLength()/validateFPLength() lives. Instead it calls\n * _valueComplete() which skips all number length validation.\n *\n * CWE-770: Allocation of Resources Without Limits or Throttling\n */\nclass AsyncParserNumberLengthBypassTest {\n\n    private static final int MAX_NUMBER_LENGTH = 1000;\n    private static final int TEST_NUMBER_LENGTH = 5000;\n\n    private final JsonFactory factory = new JsonFactory();\n\n    // CONTROL: Sync parser correctly rejects a number exceeding maxNumberLength\n    @Test\n    void syncParserRejectsLongNumber() throws Exception {\n        byte[] payload = buildPayloadWithLongInteger(TEST_NUMBER_LENGTH);\n\t\t\n\t\t// Output to console\n        System.out.println(\"[SYNC] Parsing \" + TEST_NUMBER_LENGTH + \"-digit number (limit: \" + MAX_NUMBER_LENGTH + \")\");\n        try {\n            try (JsonParser p = factory.createParser(ObjectReadContext.empty(), payload)) {\n                while (p.nextToken() != null) {\n                    if (p.currentToken() == JsonToken.VALUE_NUMBER_INT) {\n                        System.out.println(\"[SYNC] Accepted number with \" + p.getText().length() + \" digits — UNEXPECTED\");\n                    }\n                }\n            }\n            fail(\"Sync parser must reject a \" + TEST_NUMBER_LENGTH + \"-digit number\");\n        } catch (StreamConstraintsException e) {\n            System.out.println(\"[SYNC] Rejected with StreamConstraintsException: \" + e.getMessage());\n        }\n    }\n\n    // VULNERABILITY: Async parser accepts the SAME number that sync rejects\n    @Test\n    void asyncParserAcceptsLongNumber() throws Exception {\n        byte[] payload = buildPayloadWithLongInteger(TEST_NUMBER_LENGTH);\n\n        NonBlockingByteArrayJsonParser p =\n            (NonBlockingByteArrayJsonParser) factory.createNonBlockingByteArrayParser(ObjectReadContext.empty());\n        p.feedInput(payload, 0, payload.length);\n        p.endOfInput();\n\n        boolean foundNumber = false;\n        try {\n            while (p.nextToken() != null) {\n                if (p.currentToken() == JsonToken.VALUE_NUMBER_INT) {\n                    foundNumber = true;\n                    String numberText = p.getText();\n                    assertEquals(TEST_NUMBER_LENGTH, numberText.length(),\n                        \"Async parser silently accepted all \" + TEST_NUMBER_LENGTH + \" digits\");\n                }\n            }\n            // Output to console\n            System.out.println(\"[ASYNC INT] Accepted number with \" + TEST_NUMBER_LENGTH + \" digits — BUG CONFIRMED\");\n            assertTrue(foundNumber, \"Parser should have produced a VALUE_NUMBER_INT token\");\n        } catch (StreamConstraintsException e) {\n            fail(\"Bug is fixed — async parser now correctly rejects long numbers: \" + e.getMessage());\n        }\n        p.close();\n    }\n\n    private byte[] buildPayloadWithLongInteger(int numDigits) {\n        StringBuilder sb = new StringBuilder(numDigits + 10);\n        sb.append(\"{\\\"v\\\":\");\n        for (int i = 0; i \u003c numDigits; i++) {\n            sb.append((char) ('1' + (i % 9)));\n        }\n        sb.append('}');\n        return sb.toString().getBytes(StandardCharsets.UTF_8);\n    }\n}\n\n```\n\n\n### Impact\nA malicious actor can send a JSON document with an arbitrarily long number to an application using the async parser (e.g., in a Spring WebFlux or other reactive application). This can cause:\n1.  **Memory Exhaustion:** Unbounded allocation of memory in the `TextBuffer` to store the number's digits, leading to an `OutOfMemoryError`.\n2.  **CPU Exhaustion:** If the application subsequently calls `getBigIntegerValue()` or `getDecimalValue()`, the JVM can be tied up in O(n^2) `BigInteger` parsing operations, leading to a CPU-based DoS.\n\n### Suggested Remediation\n\nThe async parsing path should be updated to respect the `maxNumberLength` constraint. The simplest fix appears to ensure that `_valueComplete()` or a similar method in the async path calls the appropriate validation methods (`resetInt()` or `resetFloat()`) already present in `ParserBase`, mirroring the behavior of the synchronous parsers.\n\n**NOTE:** This research was performed in collaboration with [rohan-repos](https://github.com/rohan-repos)",
+          "Severity": "HIGH",
+          "VendorSeverity": {
+            "ghsa": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N",
+              "V40Score": 8.7
+            }
+          },
+          "References": [
+            "https://github.com/FasterXML/jackson-core",
+            "https://github.com/FasterXML/jackson-core/commit/b0c428e6f993e1b5ece5c1c3cb2523e887cd52cf",
+            "https://github.com/FasterXML/jackson-core/pull/1555",
+            "https://github.com/FasterXML/jackson-core/security/advisories/GHSA-72hv-8253-57qq"
+          ],
+          "PublishedDate": "2026-02-28T02:01:05Z",
+          "LastModifiedDate": "2026-03-03T16:59:14Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2025-49146",
+          "VendorIDs": [
+            "GHSA-hq9p-pm7w-8p54"
+          ],
+          "PkgName": "org.postgresql:postgresql",
+          "PkgPath": "internal-jars/lib/postgresql.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/org.postgresql/postgresql@42.7.5",
+            "UID": "bfb3cdf8bda4dca2"
+          },
+          "InstalledVersion": "42.7.5",
+          "FixedVersion": "42.7.7",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2025-49146",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:9064d8c9810ed449e3e689ceba2ee10402d7090c4c545e3222f9812f1cc72007",
+          "Title": "pgjdbc: pgjdbc insecure authentication in channel binding",
+          "Description": "pgjdbc is an open source postgresql JDBC Driver. From 42.7.4 and until 42.7.7, when the PostgreSQL JDBC driver is configured with channel binding set to required (default value is prefer), the driver would incorrectly allow connections to proceed with authentication methods that do not support channel binding (such as password, MD5, GSS, or SSPI authentication). This could allow a man-in-the-middle attacker to intercept connections that users believed were protected by channel binding requirements. This vulnerability is fixed in 42.7.7.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-287"
+          ],
+          "VendorSeverity": {
+            "bitnami": 2,
+            "ghsa": 3,
+            "nvd": 2,
+            "redhat": 3
+          },
+          "CVSS": {
+            "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N",
+              "V3Score": 5.9
+            },
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:N",
+              "V3Score": 8.2
+            },
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N",
+              "V3Score": 5.9
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:N",
+              "V3Score": 8.2
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2025-49146",
+            "https://datatracker.ietf.org/doc/html/rfc5802",
+            "https://datatracker.ietf.org/doc/html/rfc7677",
+            "https://github.com/pgjdbc/pgjdbc",
+            "https://github.com/pgjdbc/pgjdbc/commit/9217ed16cb2918ab1b6b9258ae97e6ede244d8a0",
+            "https://github.com/pgjdbc/pgjdbc/security/advisories/GHSA-hq9p-pm7w-8p54",
+            "https://nvd.nist.gov/vuln/detail/CVE-2025-49146",
+            "https://www.cve.org/CVERecord?id=CVE-2025-49146",
+            "https://www.postgresql.org/docs/current/sasl-authentication.html#SASL-SCRAM-SHA-256"
+          ],
+          "PublishedDate": "2025-06-11T15:15:42.85Z",
+          "LastModifiedDate": "2025-10-06T19:29:58.977Z"
+        }
+      ]
+    },
+    {
+      "Target": "Python",
+      "Class": "lang-pkgs",
+      "Type": "python-pkg",
+      "Packages": [
+        {
+          "Name": "hpy",
+          "Identifier": {
+            "PURL": "pkg:pypi/hpy@0.9.0",
+            "UID": "48b24f7b13ef64ac"
+          },
+          "Version": "0.9.0",
+          "Licenses": [
+            "UNKNOWN"
+          ],
+          "FilePath": "extension-scan/liquibase-checks/META-INF/resources/libgraalpy/modules/hpy.egg-info/PKG-INFO",
+          "AnalyzedBy": "python-pkg"
+        },
+        {
+          "Name": "pip",
+          "Identifier": {
+            "PURL": "pkg:pypi/pip@23.2.1",
+            "UID": "e55699d9dfdd7508"
+          },
+          "Version": "23.2.1",
+          "Licenses": [
+            "MIT"
+          ],
+          "FilePath": "extension-scan/liquibase-checks/org.graalvm.python.vfs/venv/Lib/site-packages/pip-23.2.1.dist-info/METADATA",
+          "AnalyzedBy": "python-pkg"
+        },
+        {
+          "Name": "pip",
+          "Identifier": {
+            "PURL": "pkg:pypi/pip@23.2.1",
+            "UID": "88af1ace6b034f11"
+          },
+          "Version": "23.2.1",
+          "Licenses": [
+            "MIT"
+          ],
+          "FilePath": "extension-scan/liquibase-checks/org.graalvm.python.vfs/venv/lib/python3.11/site-packages/pip-23.2.1.dist-info/METADATA",
+          "AnalyzedBy": "python-pkg"
+        },
+        {
+          "Name": "pip",
+          "Identifier": {
+            "PURL": "pkg:pypi/pip@23.2.1",
+            "UID": "6ed68b9195efd93b"
+          },
+          "Version": "23.2.1",
+          "Licenses": [
+            "MIT"
+          ],
+          "FilePath": "python-packages/pip-23.2.1.dist-info/METADATA",
+          "AnalyzedBy": "python-pkg"
+        },
+        {
+          "Name": "setuptools",
+          "Identifier": {
+            "PURL": "pkg:pypi/setuptools@65.5.0",
+            "UID": "69698a26f05b15da"
+          },
+          "Version": "65.5.0",
+          "Licenses": [
+            "MIT"
+          ],
+          "FilePath": "extension-scan/liquibase-checks/org.graalvm.python.vfs/venv/Lib/site-packages/setuptools-65.5.0.dist-info/METADATA",
+          "AnalyzedBy": "python-pkg"
+        },
+        {
+          "Name": "setuptools",
+          "Identifier": {
+            "PURL": "pkg:pypi/setuptools@65.5.0",
+            "UID": "3518e2dd0f9f61ae"
+          },
+          "Version": "65.5.0",
+          "Licenses": [
+            "MIT"
+          ],
+          "FilePath": "extension-scan/liquibase-checks/org.graalvm.python.vfs/venv/lib/python3.11/site-packages/setuptools-65.5.0.dist-info/METADATA",
+          "AnalyzedBy": "python-pkg"
+        },
+        {
+          "Name": "setuptools",
+          "Identifier": {
+            "PURL": "pkg:pypi/setuptools@65.5.0",
+            "UID": "92ad67c9902d5f40"
+          },
+          "Version": "65.5.0",
+          "Licenses": [
+            "MIT"
+          ],
+          "FilePath": "python-packages/setuptools-65.5.0.dist-info/METADATA",
+          "AnalyzedBy": "python-pkg"
+        },
+        {
+          "Name": "simplejson",
+          "Identifier": {
+            "PURL": "pkg:pypi/simplejson@3.19.2",
+            "UID": "7d17228e10551bb3"
+          },
+          "Version": "3.19.2",
+          "Licenses": [
+            "MIT",
+            "AFL-2.1"
+          ],
+          "FilePath": "extension-scan/liquibase-checks/org.graalvm.python.vfs/venv/Lib/site-packages/simplejson-3.19.2.dist-info/METADATA",
+          "AnalyzedBy": "python-pkg"
+        },
+        {
+          "Name": "simplejson",
+          "Identifier": {
+            "PURL": "pkg:pypi/simplejson@3.19.2",
+            "UID": "e50696925f265011"
+          },
+          "Version": "3.19.2",
+          "Licenses": [
+            "MIT",
+            "AFL-2.1"
+          ],
+          "FilePath": "extension-scan/liquibase-checks/org.graalvm.python.vfs/venv/lib/python3.11/site-packages/simplejson-3.19.2.dist-info/METADATA",
+          "AnalyzedBy": "python-pkg"
+        },
+        {
+          "Name": "simplejson",
+          "Identifier": {
+            "PURL": "pkg:pypi/simplejson@3.19.2",
+            "UID": "cf9d2e8be1fd1ea9"
+          },
+          "Version": "3.19.2",
+          "Licenses": [
+            "MIT",
+            "AFL-2.1"
+          ],
+          "FilePath": "python-packages/simplejson-3.19.2.dist-info/METADATA",
+          "AnalyzedBy": "python-pkg"
+        },
+        {
+          "Name": "sqlparse",
+          "Identifier": {
+            "PURL": "pkg:pypi/sqlparse@0.4.3",
+            "UID": "ebc07f9e5db55aed"
+          },
+          "Version": "0.4.3",
+          "Licenses": [
+            "BSD-3-Clause"
+          ],
+          "FilePath": "extension-scan/liquibase-checks/org.graalvm.python.vfs/venv/Lib/site-packages/sqlparse-0.4.3.dist-info/METADATA",
+          "AnalyzedBy": "python-pkg"
+        },
+        {
+          "Name": "sqlparse",
+          "Identifier": {
+            "PURL": "pkg:pypi/sqlparse@0.4.3",
+            "UID": "f43df63a4fab8f5b"
+          },
+          "Version": "0.4.3",
+          "Licenses": [
+            "BSD-3-Clause"
+          ],
+          "FilePath": "extension-scan/liquibase-checks/org.graalvm.python.vfs/venv/lib/python3.11/site-packages/sqlparse-0.4.3.dist-info/METADATA",
+          "AnalyzedBy": "python-pkg"
+        },
+        {
+          "Name": "sqlparse",
+          "Identifier": {
+            "PURL": "pkg:pypi/sqlparse@0.4.3",
+            "UID": "ea0b573a528bb033"
+          },
+          "Version": "0.4.3",
+          "Licenses": [
+            "BSD-3-Clause"
+          ],
+          "FilePath": "python-packages/sqlparse-0.4.3.dist-info/METADATA",
+          "AnalyzedBy": "python-pkg"
+        },
+        {
+          "Name": "urllib3",
+          "Identifier": {
+            "PURL": "pkg:pypi/urllib3@1.26.15",
+            "UID": "a418be956c608109"
+          },
+          "Version": "1.26.15",
+          "Licenses": [
+            "MIT"
+          ],
+          "FilePath": "extension-scan/liquibase-checks/org.graalvm.python.vfs/venv/Lib/site-packages/urllib3-1.26.15.dist-info/METADATA",
+          "AnalyzedBy": "python-pkg"
+        },
+        {
+          "Name": "urllib3",
+          "Identifier": {
+            "PURL": "pkg:pypi/urllib3@1.26.15",
+            "UID": "21278b04840de694"
+          },
+          "Version": "1.26.15",
+          "Licenses": [
+            "MIT"
+          ],
+          "FilePath": "extension-scan/liquibase-checks/org.graalvm.python.vfs/venv/lib/python3.11/site-packages/urllib3-1.26.15.dist-info/METADATA",
+          "AnalyzedBy": "python-pkg"
+        },
+        {
+          "Name": "urllib3",
+          "Identifier": {
+            "PURL": "pkg:pypi/urllib3@1.26.15",
+            "UID": "b5bf8085478f735"
+          },
+          "Version": "1.26.15",
+          "Licenses": [
+            "MIT"
+          ],
+          "FilePath": "python-packages/urllib3-1.26.15.dist-info/METADATA",
+          "AnalyzedBy": "python-pkg"
+        }
+      ],
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2024-4340",
+          "VendorIDs": [
+            "GHSA-2m57-hf25-phgg"
+          ],
+          "PkgName": "sqlparse",
+          "PkgPath": "extension-scan/liquibase-checks/org.graalvm.python.vfs/venv/Lib/site-packages/sqlparse-0.4.3.dist-info/METADATA",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/sqlparse@0.4.3",
+            "UID": "ebc07f9e5db55aed"
+          },
+          "InstalledVersion": "0.4.3",
+          "FixedVersion": "0.5.0",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2024-4340",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Fingerprint": "sha256:e19980d7bfdfcdeed1f1cc923340f225166dddf81b4fde899fac97237bd92711",
+          "Title": "sqlparse: parsing heavily nested list leads to denial of service",
+          "Description": "Passing a heavily nested list to sqlparse.parse() leads to a Denial of Service due to RecursionError.\n\n",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-674"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "redhat": 2,
+            "ubuntu": 2
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2024-4340",
+            "https://github.com/advisories/GHSA-2m57-hf25-phgg",
+            "https://github.com/andialbrecht/sqlparse",
+            "https://github.com/andialbrecht/sqlparse/commit/b4a39d9850969b4e1d6940d32094ee0b42a2cf03",
+            "https://github.com/andialbrecht/sqlparse/security/advisories/GHSA-2m57-hf25-phgg",
+            "https://lists.debian.org/debian-lts-announce/2024/12/msg00022.html",
+            "https://nvd.nist.gov/vuln/detail/CVE-2024-4340",
+            "https://research.jfrog.com/vulnerabilities/sqlparse-stack-exhaustion-dos-jfsa-2024-001031292",
+            "https://research.jfrog.com/vulnerabilities/sqlparse-stack-exhaustion-dos-jfsa-2024-001031292/",
+            "https://ubuntu.com/security/notices/USN-6771-1",
+            "https://www.cve.org/CVERecord?id=CVE-2024-4340"
+          ],
+          "PublishedDate": "2024-04-30T15:15:53.407Z",
+          "LastModifiedDate": "2025-11-03T22:18:33.897Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2024-4340",
+          "VendorIDs": [
+            "GHSA-2m57-hf25-phgg"
+          ],
+          "PkgName": "sqlparse",
+          "PkgPath": "extension-scan/liquibase-checks/org.graalvm.python.vfs/venv/lib/python3.11/site-packages/sqlparse-0.4.3.dist-info/METADATA",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/sqlparse@0.4.3",
+            "UID": "f43df63a4fab8f5b"
+          },
+          "InstalledVersion": "0.4.3",
+          "FixedVersion": "0.5.0",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2024-4340",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Fingerprint": "sha256:e19980d7bfdfcdeed1f1cc923340f225166dddf81b4fde899fac97237bd92711",
+          "Title": "sqlparse: parsing heavily nested list leads to denial of service",
+          "Description": "Passing a heavily nested list to sqlparse.parse() leads to a Denial of Service due to RecursionError.\n\n",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-674"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "redhat": 2,
+            "ubuntu": 2
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2024-4340",
+            "https://github.com/advisories/GHSA-2m57-hf25-phgg",
+            "https://github.com/andialbrecht/sqlparse",
+            "https://github.com/andialbrecht/sqlparse/commit/b4a39d9850969b4e1d6940d32094ee0b42a2cf03",
+            "https://github.com/andialbrecht/sqlparse/security/advisories/GHSA-2m57-hf25-phgg",
+            "https://lists.debian.org/debian-lts-announce/2024/12/msg00022.html",
+            "https://nvd.nist.gov/vuln/detail/CVE-2024-4340",
+            "https://research.jfrog.com/vulnerabilities/sqlparse-stack-exhaustion-dos-jfsa-2024-001031292",
+            "https://research.jfrog.com/vulnerabilities/sqlparse-stack-exhaustion-dos-jfsa-2024-001031292/",
+            "https://ubuntu.com/security/notices/USN-6771-1",
+            "https://www.cve.org/CVERecord?id=CVE-2024-4340"
+          ],
+          "PublishedDate": "2024-04-30T15:15:53.407Z",
+          "LastModifiedDate": "2025-11-03T22:18:33.897Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2024-4340",
+          "VendorIDs": [
+            "GHSA-2m57-hf25-phgg"
+          ],
+          "PkgName": "sqlparse",
+          "PkgPath": "python-packages/sqlparse-0.4.3.dist-info/METADATA",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/sqlparse@0.4.3",
+            "UID": "ea0b573a528bb033"
+          },
+          "InstalledVersion": "0.4.3",
+          "FixedVersion": "0.5.0",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2024-4340",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Fingerprint": "sha256:e19980d7bfdfcdeed1f1cc923340f225166dddf81b4fde899fac97237bd92711",
+          "Title": "sqlparse: parsing heavily nested list leads to denial of service",
+          "Description": "Passing a heavily nested list to sqlparse.parse() leads to a Denial of Service due to RecursionError.\n\n",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-674"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "redhat": 2,
+            "ubuntu": 2
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2024-4340",
+            "https://github.com/advisories/GHSA-2m57-hf25-phgg",
+            "https://github.com/andialbrecht/sqlparse",
+            "https://github.com/andialbrecht/sqlparse/commit/b4a39d9850969b4e1d6940d32094ee0b42a2cf03",
+            "https://github.com/andialbrecht/sqlparse/security/advisories/GHSA-2m57-hf25-phgg",
+            "https://lists.debian.org/debian-lts-announce/2024/12/msg00022.html",
+            "https://nvd.nist.gov/vuln/detail/CVE-2024-4340",
+            "https://research.jfrog.com/vulnerabilities/sqlparse-stack-exhaustion-dos-jfsa-2024-001031292",
+            "https://research.jfrog.com/vulnerabilities/sqlparse-stack-exhaustion-dos-jfsa-2024-001031292/",
+            "https://ubuntu.com/security/notices/USN-6771-1",
+            "https://www.cve.org/CVERecord?id=CVE-2024-4340"
+          ],
+          "PublishedDate": "2024-04-30T15:15:53.407Z",
+          "LastModifiedDate": "2025-11-03T22:18:33.897Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2023-43804",
+          "VendorIDs": [
+            "GHSA-v845-jxx5-vc9f"
+          ],
+          "PkgName": "urllib3",
+          "PkgPath": "extension-scan/liquibase-checks/org.graalvm.python.vfs/venv/Lib/site-packages/urllib3-1.26.15.dist-info/METADATA",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/urllib3@1.26.15",
+            "UID": "a418be956c608109"
+          },
+          "InstalledVersion": "1.26.15",
+          "FixedVersion": "2.0.6, 1.26.17",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2023-43804",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Fingerprint": "sha256:2c94304807c6c43c0190b60e1e81b0f53c9218e8a19f8e7a09f81e149b3ab3cc",
+          "Title": "python-urllib3: Cookie request header isn't stripped during cross-origin redirects",
+          "Description": "urllib3 is a user-friendly HTTP client library for Python. urllib3 doesn't treat the `Cookie` HTTP header special or provide any helpers for managing cookies over HTTP, that is the responsibility of the user. However, it is possible for a user to specify a `Cookie` header and unknowingly leak information via HTTP redirects to a different origin if that user doesn't disable redirects explicitly. This issue has been patched in urllib3 version 1.26.17 or 2.0.5.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-200"
+          ],
+          "VendorSeverity": {
+            "alma": 2,
+            "amazon": 2,
+            "azure": 3,
+            "cbl-mariner": 2,
+            "ghsa": 3,
+            "nvd": 3,
+            "oracle-oval": 2,
+            "photon": 3,
+            "redhat": 2,
+            "rocky": 2,
+            "ubuntu": 2
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:H/PR:H/UI:N/S:U/C:H/I:H/A:N",
+              "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:P/PR:H/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N",
+              "V3Score": 5.9,
+              "V40Score": 7.4
+            },
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:N",
+              "V3Score": 8.1
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:H/PR:H/UI:N/S:U/C:H/I:H/A:N",
+              "V3Score": 5.9
+            }
+          },
+          "References": [
+            "https://access.redhat.com/errata/RHSA-2024:2987",
+            "https://access.redhat.com/security/cve/CVE-2023-43804",
+            "https://bugzilla.redhat.com/2158559",
+            "https://bugzilla.redhat.com/2240059",
+            "https://bugzilla.redhat.com/2242493",
+            "https://bugzilla.redhat.com/2249755",
+            "https://bugzilla.redhat.com/2257854",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2158559",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2240059",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2242493",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2249755",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2257854",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2022-40897",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2022-48560",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2022-48565",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-43804",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2024-22195",
+            "https://errata.almalinux.org/8/ALSA-2024-2987.html",
+            "https://errata.rockylinux.org/RLSA-2024:2987",
+            "https://github.com/pypa/advisory-database/tree/main/vulns/urllib3/PYSEC-2023-192.yaml",
+            "https://github.com/urllib3/urllib3",
+            "https://github.com/urllib3/urllib3/commit/01220354d389cd05474713f8c982d05c9b17aafb",
+            "https://github.com/urllib3/urllib3/commit/644124ecd0b6e417c527191f866daa05a5a2056d",
+            "https://github.com/urllib3/urllib3/security/advisories/GHSA-v845-jxx5-vc9f",
+            "https://linux.oracle.com/cve/CVE-2023-43804.html",
+            "https://linux.oracle.com/errata/ELSA-2024-2987.html",
+            "https://lists.debian.org/debian-lts-announce/2023/10/msg00012.html",
+            "https://lists.debian.org/debian-lts-announce/2024/12/msg00020.html",
+            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/5F5CUBAN5XMEBVBZPHFITBLMJV5FIJJ5",
+            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/5F5CUBAN5XMEBVBZPHFITBLMJV5FIJJ5/",
+            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/I3PR7C6RJ6JUBQKIJ644DMIJSUP36VDY",
+            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/I3PR7C6RJ6JUBQKIJ644DMIJSUP36VDY/",
+            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/NDAGZXYJ7H2G3SB47M453VQVNAWKAEJJ",
+            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/NDAGZXYJ7H2G3SB47M453VQVNAWKAEJJ/",
+            "https://nvd.nist.gov/vuln/detail/CVE-2023-43804",
+            "https://security.netapp.com/advisory/ntap-20241213-0007",
+            "https://security.netapp.com/advisory/ntap-20241213-0007/",
+            "https://ubuntu.com/security/notices/USN-6473-1",
+            "https://ubuntu.com/security/notices/USN-6473-2",
+            "https://www.cve.org/CVERecord?id=CVE-2023-43804",
+            "https://www.vicarius.io/vsociety/posts/cve-2023-43804-urllib3-vulnerability-3"
+          ],
+          "PublishedDate": "2023-10-04T17:15:10.163Z",
+          "LastModifiedDate": "2025-11-03T22:16:27.767Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2023-43804",
+          "VendorIDs": [
+            "GHSA-v845-jxx5-vc9f"
+          ],
+          "PkgName": "urllib3",
+          "PkgPath": "extension-scan/liquibase-checks/org.graalvm.python.vfs/venv/lib/python3.11/site-packages/urllib3-1.26.15.dist-info/METADATA",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/urllib3@1.26.15",
+            "UID": "21278b04840de694"
+          },
+          "InstalledVersion": "1.26.15",
+          "FixedVersion": "2.0.6, 1.26.17",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2023-43804",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Fingerprint": "sha256:2c94304807c6c43c0190b60e1e81b0f53c9218e8a19f8e7a09f81e149b3ab3cc",
+          "Title": "python-urllib3: Cookie request header isn't stripped during cross-origin redirects",
+          "Description": "urllib3 is a user-friendly HTTP client library for Python. urllib3 doesn't treat the `Cookie` HTTP header special or provide any helpers for managing cookies over HTTP, that is the responsibility of the user. However, it is possible for a user to specify a `Cookie` header and unknowingly leak information via HTTP redirects to a different origin if that user doesn't disable redirects explicitly. This issue has been patched in urllib3 version 1.26.17 or 2.0.5.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-200"
+          ],
+          "VendorSeverity": {
+            "alma": 2,
+            "amazon": 2,
+            "azure": 3,
+            "cbl-mariner": 2,
+            "ghsa": 3,
+            "nvd": 3,
+            "oracle-oval": 2,
+            "photon": 3,
+            "redhat": 2,
+            "rocky": 2,
+            "ubuntu": 2
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:H/PR:H/UI:N/S:U/C:H/I:H/A:N",
+              "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:P/PR:H/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N",
+              "V3Score": 5.9,
+              "V40Score": 7.4
+            },
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:N",
+              "V3Score": 8.1
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:H/PR:H/UI:N/S:U/C:H/I:H/A:N",
+              "V3Score": 5.9
+            }
+          },
+          "References": [
+            "https://access.redhat.com/errata/RHSA-2024:2987",
+            "https://access.redhat.com/security/cve/CVE-2023-43804",
+            "https://bugzilla.redhat.com/2158559",
+            "https://bugzilla.redhat.com/2240059",
+            "https://bugzilla.redhat.com/2242493",
+            "https://bugzilla.redhat.com/2249755",
+            "https://bugzilla.redhat.com/2257854",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2158559",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2240059",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2242493",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2249755",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2257854",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2022-40897",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2022-48560",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2022-48565",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-43804",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2024-22195",
+            "https://errata.almalinux.org/8/ALSA-2024-2987.html",
+            "https://errata.rockylinux.org/RLSA-2024:2987",
+            "https://github.com/pypa/advisory-database/tree/main/vulns/urllib3/PYSEC-2023-192.yaml",
+            "https://github.com/urllib3/urllib3",
+            "https://github.com/urllib3/urllib3/commit/01220354d389cd05474713f8c982d05c9b17aafb",
+            "https://github.com/urllib3/urllib3/commit/644124ecd0b6e417c527191f866daa05a5a2056d",
+            "https://github.com/urllib3/urllib3/security/advisories/GHSA-v845-jxx5-vc9f",
+            "https://linux.oracle.com/cve/CVE-2023-43804.html",
+            "https://linux.oracle.com/errata/ELSA-2024-2987.html",
+            "https://lists.debian.org/debian-lts-announce/2023/10/msg00012.html",
+            "https://lists.debian.org/debian-lts-announce/2024/12/msg00020.html",
+            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/5F5CUBAN5XMEBVBZPHFITBLMJV5FIJJ5",
+            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/5F5CUBAN5XMEBVBZPHFITBLMJV5FIJJ5/",
+            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/I3PR7C6RJ6JUBQKIJ644DMIJSUP36VDY",
+            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/I3PR7C6RJ6JUBQKIJ644DMIJSUP36VDY/",
+            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/NDAGZXYJ7H2G3SB47M453VQVNAWKAEJJ",
+            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/NDAGZXYJ7H2G3SB47M453VQVNAWKAEJJ/",
+            "https://nvd.nist.gov/vuln/detail/CVE-2023-43804",
+            "https://security.netapp.com/advisory/ntap-20241213-0007",
+            "https://security.netapp.com/advisory/ntap-20241213-0007/",
+            "https://ubuntu.com/security/notices/USN-6473-1",
+            "https://ubuntu.com/security/notices/USN-6473-2",
+            "https://www.cve.org/CVERecord?id=CVE-2023-43804",
+            "https://www.vicarius.io/vsociety/posts/cve-2023-43804-urllib3-vulnerability-3"
+          ],
+          "PublishedDate": "2023-10-04T17:15:10.163Z",
+          "LastModifiedDate": "2025-11-03T22:16:27.767Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2023-43804",
+          "VendorIDs": [
+            "GHSA-v845-jxx5-vc9f"
+          ],
+          "PkgName": "urllib3",
+          "PkgPath": "python-packages/urllib3-1.26.15.dist-info/METADATA",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/urllib3@1.26.15",
+            "UID": "b5bf8085478f735"
+          },
+          "InstalledVersion": "1.26.15",
+          "FixedVersion": "2.0.6, 1.26.17",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2023-43804",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Fingerprint": "sha256:2c94304807c6c43c0190b60e1e81b0f53c9218e8a19f8e7a09f81e149b3ab3cc",
+          "Title": "python-urllib3: Cookie request header isn't stripped during cross-origin redirects",
+          "Description": "urllib3 is a user-friendly HTTP client library for Python. urllib3 doesn't treat the `Cookie` HTTP header special or provide any helpers for managing cookies over HTTP, that is the responsibility of the user. However, it is possible for a user to specify a `Cookie` header and unknowingly leak information via HTTP redirects to a different origin if that user doesn't disable redirects explicitly. This issue has been patched in urllib3 version 1.26.17 or 2.0.5.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-200"
+          ],
+          "VendorSeverity": {
+            "alma": 2,
+            "amazon": 2,
+            "azure": 3,
+            "cbl-mariner": 2,
+            "ghsa": 3,
+            "nvd": 3,
+            "oracle-oval": 2,
+            "photon": 3,
+            "redhat": 2,
+            "rocky": 2,
+            "ubuntu": 2
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:H/PR:H/UI:N/S:U/C:H/I:H/A:N",
+              "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:P/PR:H/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N",
+              "V3Score": 5.9,
+              "V40Score": 7.4
+            },
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:N",
+              "V3Score": 8.1
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:H/PR:H/UI:N/S:U/C:H/I:H/A:N",
+              "V3Score": 5.9
+            }
+          },
+          "References": [
+            "https://access.redhat.com/errata/RHSA-2024:2987",
+            "https://access.redhat.com/security/cve/CVE-2023-43804",
+            "https://bugzilla.redhat.com/2158559",
+            "https://bugzilla.redhat.com/2240059",
+            "https://bugzilla.redhat.com/2242493",
+            "https://bugzilla.redhat.com/2249755",
+            "https://bugzilla.redhat.com/2257854",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2158559",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2240059",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2242493",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2249755",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2257854",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2022-40897",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2022-48560",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2022-48565",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-43804",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2024-22195",
+            "https://errata.almalinux.org/8/ALSA-2024-2987.html",
+            "https://errata.rockylinux.org/RLSA-2024:2987",
+            "https://github.com/pypa/advisory-database/tree/main/vulns/urllib3/PYSEC-2023-192.yaml",
+            "https://github.com/urllib3/urllib3",
+            "https://github.com/urllib3/urllib3/commit/01220354d389cd05474713f8c982d05c9b17aafb",
+            "https://github.com/urllib3/urllib3/commit/644124ecd0b6e417c527191f866daa05a5a2056d",
+            "https://github.com/urllib3/urllib3/security/advisories/GHSA-v845-jxx5-vc9f",
+            "https://linux.oracle.com/cve/CVE-2023-43804.html",
+            "https://linux.oracle.com/errata/ELSA-2024-2987.html",
+            "https://lists.debian.org/debian-lts-announce/2023/10/msg00012.html",
+            "https://lists.debian.org/debian-lts-announce/2024/12/msg00020.html",
+            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/5F5CUBAN5XMEBVBZPHFITBLMJV5FIJJ5",
+            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/5F5CUBAN5XMEBVBZPHFITBLMJV5FIJJ5/",
+            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/I3PR7C6RJ6JUBQKIJ644DMIJSUP36VDY",
+            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/I3PR7C6RJ6JUBQKIJ644DMIJSUP36VDY/",
+            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/NDAGZXYJ7H2G3SB47M453VQVNAWKAEJJ",
+            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/NDAGZXYJ7H2G3SB47M453VQVNAWKAEJJ/",
+            "https://nvd.nist.gov/vuln/detail/CVE-2023-43804",
+            "https://security.netapp.com/advisory/ntap-20241213-0007",
+            "https://security.netapp.com/advisory/ntap-20241213-0007/",
+            "https://ubuntu.com/security/notices/USN-6473-1",
+            "https://ubuntu.com/security/notices/USN-6473-2",
+            "https://www.cve.org/CVERecord?id=CVE-2023-43804",
+            "https://www.vicarius.io/vsociety/posts/cve-2023-43804-urllib3-vulnerability-3"
+          ],
+          "PublishedDate": "2023-10-04T17:15:10.163Z",
+          "LastModifiedDate": "2025-11-03T22:16:27.767Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2025-66418",
+          "VendorIDs": [
+            "GHSA-gm62-xv2j-4w53"
+          ],
+          "PkgName": "urllib3",
+          "PkgPath": "extension-scan/liquibase-checks/org.graalvm.python.vfs/venv/Lib/site-packages/urllib3-1.26.15.dist-info/METADATA",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/urllib3@1.26.15",
+            "UID": "a418be956c608109"
+          },
+          "InstalledVersion": "1.26.15",
+          "FixedVersion": "2.6.0",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2025-66418",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Fingerprint": "sha256:b4c88ebf4b966bb7b3a123640dcd66b65ca41fabe067c31f153ffc831bcf7401",
+          "Title": "urllib3: urllib3: Unbounded decompression chain leads to resource exhaustion",
+          "Description": "urllib3 is a user-friendly HTTP client library for Python. Starting in version 1.24 and prior to 2.6.0, the number of links in the decompression chain was unbounded allowing a malicious server to insert a virtually unlimited number of compression steps leading to high CPU usage and massive memory allocation for the decompressed data. This vulnerability is fixed in 2.6.0.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-770"
+          ],
+          "VendorSeverity": {
+            "alma": 3,
+            "amazon": 3,
+            "azure": 3,
+            "cbl-mariner": 3,
+            "ghsa": 3,
+            "nvd": 3,
+            "oracle-oval": 3,
+            "photon": 3,
+            "redhat": 3,
+            "rocky": 3,
+            "ubuntu": 2
+          },
+          "CVSS": {
+            "ghsa": {
+              "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:H",
+              "V40Score": 8.9
+            },
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/errata/RHSA-2026:1254",
+            "https://access.redhat.com/security/cve/CVE-2025-66418",
+            "https://bugzilla.redhat.com/2419455",
+            "https://bugzilla.redhat.com/2419467",
+            "https://bugzilla.redhat.com/2427726",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2419455",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2419467",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2427726",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-66418",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-66471",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2026-21441",
+            "https://errata.almalinux.org/8/ALSA-2026-1254.html",
+            "https://errata.rockylinux.org/RLSA-2026:1087",
+            "https://github.com/urllib3/urllib3",
+            "https://github.com/urllib3/urllib3/commit/24d7b67eac89f94e11003424bcf0d8f7b72222a8",
+            "https://github.com/urllib3/urllib3/security/advisories/GHSA-gm62-xv2j-4w53",
+            "https://linux.oracle.com/cve/CVE-2025-66418.html",
+            "https://linux.oracle.com/errata/ELSA-2026-1254.html",
+            "https://nvd.nist.gov/vuln/detail/CVE-2025-66418",
+            "https://ubuntu.com/security/notices/USN-7927-1",
+            "https://ubuntu.com/security/notices/USN-8010-1",
+            "https://www.cve.org/CVERecord?id=CVE-2025-66418",
+            "https://www.openwall.com/lists/oss-security/2025/12/05/4"
+          ],
+          "PublishedDate": "2025-12-05T16:15:51.053Z",
+          "LastModifiedDate": "2025-12-10T16:08:32.193Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2025-66418",
+          "VendorIDs": [
+            "GHSA-gm62-xv2j-4w53"
+          ],
+          "PkgName": "urllib3",
+          "PkgPath": "extension-scan/liquibase-checks/org.graalvm.python.vfs/venv/lib/python3.11/site-packages/urllib3-1.26.15.dist-info/METADATA",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/urllib3@1.26.15",
+            "UID": "21278b04840de694"
+          },
+          "InstalledVersion": "1.26.15",
+          "FixedVersion": "2.6.0",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2025-66418",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Fingerprint": "sha256:b4c88ebf4b966bb7b3a123640dcd66b65ca41fabe067c31f153ffc831bcf7401",
+          "Title": "urllib3: urllib3: Unbounded decompression chain leads to resource exhaustion",
+          "Description": "urllib3 is a user-friendly HTTP client library for Python. Starting in version 1.24 and prior to 2.6.0, the number of links in the decompression chain was unbounded allowing a malicious server to insert a virtually unlimited number of compression steps leading to high CPU usage and massive memory allocation for the decompressed data. This vulnerability is fixed in 2.6.0.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-770"
+          ],
+          "VendorSeverity": {
+            "alma": 3,
+            "amazon": 3,
+            "azure": 3,
+            "cbl-mariner": 3,
+            "ghsa": 3,
+            "nvd": 3,
+            "oracle-oval": 3,
+            "photon": 3,
+            "redhat": 3,
+            "rocky": 3,
+            "ubuntu": 2
+          },
+          "CVSS": {
+            "ghsa": {
+              "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:H",
+              "V40Score": 8.9
+            },
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/errata/RHSA-2026:1254",
+            "https://access.redhat.com/security/cve/CVE-2025-66418",
+            "https://bugzilla.redhat.com/2419455",
+            "https://bugzilla.redhat.com/2419467",
+            "https://bugzilla.redhat.com/2427726",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2419455",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2419467",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2427726",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-66418",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-66471",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2026-21441",
+            "https://errata.almalinux.org/8/ALSA-2026-1254.html",
+            "https://errata.rockylinux.org/RLSA-2026:1087",
+            "https://github.com/urllib3/urllib3",
+            "https://github.com/urllib3/urllib3/commit/24d7b67eac89f94e11003424bcf0d8f7b72222a8",
+            "https://github.com/urllib3/urllib3/security/advisories/GHSA-gm62-xv2j-4w53",
+            "https://linux.oracle.com/cve/CVE-2025-66418.html",
+            "https://linux.oracle.com/errata/ELSA-2026-1254.html",
+            "https://nvd.nist.gov/vuln/detail/CVE-2025-66418",
+            "https://ubuntu.com/security/notices/USN-7927-1",
+            "https://ubuntu.com/security/notices/USN-8010-1",
+            "https://www.cve.org/CVERecord?id=CVE-2025-66418",
+            "https://www.openwall.com/lists/oss-security/2025/12/05/4"
+          ],
+          "PublishedDate": "2025-12-05T16:15:51.053Z",
+          "LastModifiedDate": "2025-12-10T16:08:32.193Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2025-66418",
+          "VendorIDs": [
+            "GHSA-gm62-xv2j-4w53"
+          ],
+          "PkgName": "urllib3",
+          "PkgPath": "python-packages/urllib3-1.26.15.dist-info/METADATA",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/urllib3@1.26.15",
+            "UID": "b5bf8085478f735"
+          },
+          "InstalledVersion": "1.26.15",
+          "FixedVersion": "2.6.0",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2025-66418",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Fingerprint": "sha256:b4c88ebf4b966bb7b3a123640dcd66b65ca41fabe067c31f153ffc831bcf7401",
+          "Title": "urllib3: urllib3: Unbounded decompression chain leads to resource exhaustion",
+          "Description": "urllib3 is a user-friendly HTTP client library for Python. Starting in version 1.24 and prior to 2.6.0, the number of links in the decompression chain was unbounded allowing a malicious server to insert a virtually unlimited number of compression steps leading to high CPU usage and massive memory allocation for the decompressed data. This vulnerability is fixed in 2.6.0.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-770"
+          ],
+          "VendorSeverity": {
+            "alma": 3,
+            "amazon": 3,
+            "azure": 3,
+            "cbl-mariner": 3,
+            "ghsa": 3,
+            "nvd": 3,
+            "oracle-oval": 3,
+            "photon": 3,
+            "redhat": 3,
+            "rocky": 3,
+            "ubuntu": 2
+          },
+          "CVSS": {
+            "ghsa": {
+              "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:H",
+              "V40Score": 8.9
+            },
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/errata/RHSA-2026:1254",
+            "https://access.redhat.com/security/cve/CVE-2025-66418",
+            "https://bugzilla.redhat.com/2419455",
+            "https://bugzilla.redhat.com/2419467",
+            "https://bugzilla.redhat.com/2427726",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2419455",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2419467",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2427726",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-66418",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-66471",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2026-21441",
+            "https://errata.almalinux.org/8/ALSA-2026-1254.html",
+            "https://errata.rockylinux.org/RLSA-2026:1087",
+            "https://github.com/urllib3/urllib3",
+            "https://github.com/urllib3/urllib3/commit/24d7b67eac89f94e11003424bcf0d8f7b72222a8",
+            "https://github.com/urllib3/urllib3/security/advisories/GHSA-gm62-xv2j-4w53",
+            "https://linux.oracle.com/cve/CVE-2025-66418.html",
+            "https://linux.oracle.com/errata/ELSA-2026-1254.html",
+            "https://nvd.nist.gov/vuln/detail/CVE-2025-66418",
+            "https://ubuntu.com/security/notices/USN-7927-1",
+            "https://ubuntu.com/security/notices/USN-8010-1",
+            "https://www.cve.org/CVERecord?id=CVE-2025-66418",
+            "https://www.openwall.com/lists/oss-security/2025/12/05/4"
+          ],
+          "PublishedDate": "2025-12-05T16:15:51.053Z",
+          "LastModifiedDate": "2025-12-10T16:08:32.193Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2025-66471",
+          "VendorIDs": [
+            "GHSA-2xpw-w6gg-jr37"
+          ],
+          "PkgName": "urllib3",
+          "PkgPath": "extension-scan/liquibase-checks/org.graalvm.python.vfs/venv/Lib/site-packages/urllib3-1.26.15.dist-info/METADATA",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/urllib3@1.26.15",
+            "UID": "a418be956c608109"
+          },
+          "InstalledVersion": "1.26.15",
+          "FixedVersion": "2.6.0",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2025-66471",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Fingerprint": "sha256:06578667dda1b8ed5f48d2f08f16af906f89fbf0c511a0b32f48b54aac7036fe",
+          "Title": "urllib3: urllib3 Streaming API improperly handles highly compressed data",
+          "Description": "urllib3 is a user-friendly HTTP client library for Python. Starting in version 1.0 and prior to 2.6.0, the Streaming API improperly handles highly compressed data. urllib3's streaming API is designed for the efficient handling of large HTTP responses by reading the content in chunks, rather than loading the entire response body into memory at once. When streaming a compressed response, urllib3 can perform decoding or decompression based on the HTTP Content-Encoding header (e.g., gzip, deflate, br, or zstd). The library must read compressed data from the network and decompress it until the requested chunk size is met. Any resulting decompressed data that exceeds the requested amount is held in an internal buffer for the next read operation. The decompression logic could cause urllib3 to fully decode a small amount of highly compressed data in a single operation. This can result in excessive resource consumption (high CPU usage and massive memory allocation for the decompressed data.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-409"
+          ],
+          "VendorSeverity": {
+            "alma": 3,
+            "amazon": 3,
+            "azure": 3,
+            "cbl-mariner": 3,
+            "ghsa": 3,
+            "nvd": 3,
+            "oracle-oval": 3,
+            "photon": 3,
+            "redhat": 3,
+            "rocky": 3,
+            "ubuntu": 2
+          },
+          "CVSS": {
+            "ghsa": {
+              "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:H",
+              "V40Score": 8.9
+            },
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/errata/RHSA-2026:1254",
+            "https://access.redhat.com/security/cve/CVE-2025-66471",
+            "https://bugzilla.redhat.com/2419455",
+            "https://bugzilla.redhat.com/2419467",
+            "https://bugzilla.redhat.com/2427726",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2419455",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2419467",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2427726",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-66418",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-66471",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2026-21441",
+            "https://errata.almalinux.org/8/ALSA-2026-1254.html",
+            "https://errata.rockylinux.org/RLSA-2026:1087",
+            "https://github.com/urllib3/urllib3",
+            "https://github.com/urllib3/urllib3/commit/c19571de34c47de3a766541b041637ba5f716ed7",
+            "https://github.com/urllib3/urllib3/security/advisories/GHSA-2xpw-w6gg-jr37",
+            "https://linux.oracle.com/cve/CVE-2025-66471.html",
+            "https://linux.oracle.com/errata/ELSA-2026-1254.html",
+            "https://nvd.nist.gov/vuln/detail/CVE-2025-66471",
+            "https://ubuntu.com/security/notices/USN-7927-1",
+            "https://ubuntu.com/security/notices/USN-7927-2",
+            "https://ubuntu.com/security/notices/USN-7927-3",
+            "https://www.cve.org/CVERecord?id=CVE-2025-66471",
+            "https://www.openwall.com/lists/oss-security/2025/12/05/4"
+          ],
+          "PublishedDate": "2025-12-05T17:16:04.4Z",
+          "LastModifiedDate": "2025-12-10T16:10:33.5Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2025-66471",
+          "VendorIDs": [
+            "GHSA-2xpw-w6gg-jr37"
+          ],
+          "PkgName": "urllib3",
+          "PkgPath": "extension-scan/liquibase-checks/org.graalvm.python.vfs/venv/lib/python3.11/site-packages/urllib3-1.26.15.dist-info/METADATA",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/urllib3@1.26.15",
+            "UID": "21278b04840de694"
+          },
+          "InstalledVersion": "1.26.15",
+          "FixedVersion": "2.6.0",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2025-66471",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Fingerprint": "sha256:06578667dda1b8ed5f48d2f08f16af906f89fbf0c511a0b32f48b54aac7036fe",
+          "Title": "urllib3: urllib3 Streaming API improperly handles highly compressed data",
+          "Description": "urllib3 is a user-friendly HTTP client library for Python. Starting in version 1.0 and prior to 2.6.0, the Streaming API improperly handles highly compressed data. urllib3's streaming API is designed for the efficient handling of large HTTP responses by reading the content in chunks, rather than loading the entire response body into memory at once. When streaming a compressed response, urllib3 can perform decoding or decompression based on the HTTP Content-Encoding header (e.g., gzip, deflate, br, or zstd). The library must read compressed data from the network and decompress it until the requested chunk size is met. Any resulting decompressed data that exceeds the requested amount is held in an internal buffer for the next read operation. The decompression logic could cause urllib3 to fully decode a small amount of highly compressed data in a single operation. This can result in excessive resource consumption (high CPU usage and massive memory allocation for the decompressed data.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-409"
+          ],
+          "VendorSeverity": {
+            "alma": 3,
+            "amazon": 3,
+            "azure": 3,
+            "cbl-mariner": 3,
+            "ghsa": 3,
+            "nvd": 3,
+            "oracle-oval": 3,
+            "photon": 3,
+            "redhat": 3,
+            "rocky": 3,
+            "ubuntu": 2
+          },
+          "CVSS": {
+            "ghsa": {
+              "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:H",
+              "V40Score": 8.9
+            },
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/errata/RHSA-2026:1254",
+            "https://access.redhat.com/security/cve/CVE-2025-66471",
+            "https://bugzilla.redhat.com/2419455",
+            "https://bugzilla.redhat.com/2419467",
+            "https://bugzilla.redhat.com/2427726",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2419455",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2419467",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2427726",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-66418",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-66471",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2026-21441",
+            "https://errata.almalinux.org/8/ALSA-2026-1254.html",
+            "https://errata.rockylinux.org/RLSA-2026:1087",
+            "https://github.com/urllib3/urllib3",
+            "https://github.com/urllib3/urllib3/commit/c19571de34c47de3a766541b041637ba5f716ed7",
+            "https://github.com/urllib3/urllib3/security/advisories/GHSA-2xpw-w6gg-jr37",
+            "https://linux.oracle.com/cve/CVE-2025-66471.html",
+            "https://linux.oracle.com/errata/ELSA-2026-1254.html",
+            "https://nvd.nist.gov/vuln/detail/CVE-2025-66471",
+            "https://ubuntu.com/security/notices/USN-7927-1",
+            "https://ubuntu.com/security/notices/USN-7927-2",
+            "https://ubuntu.com/security/notices/USN-7927-3",
+            "https://www.cve.org/CVERecord?id=CVE-2025-66471",
+            "https://www.openwall.com/lists/oss-security/2025/12/05/4"
+          ],
+          "PublishedDate": "2025-12-05T17:16:04.4Z",
+          "LastModifiedDate": "2025-12-10T16:10:33.5Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2025-66471",
+          "VendorIDs": [
+            "GHSA-2xpw-w6gg-jr37"
+          ],
+          "PkgName": "urllib3",
+          "PkgPath": "python-packages/urllib3-1.26.15.dist-info/METADATA",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/urllib3@1.26.15",
+            "UID": "b5bf8085478f735"
+          },
+          "InstalledVersion": "1.26.15",
+          "FixedVersion": "2.6.0",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2025-66471",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Fingerprint": "sha256:06578667dda1b8ed5f48d2f08f16af906f89fbf0c511a0b32f48b54aac7036fe",
+          "Title": "urllib3: urllib3 Streaming API improperly handles highly compressed data",
+          "Description": "urllib3 is a user-friendly HTTP client library for Python. Starting in version 1.0 and prior to 2.6.0, the Streaming API improperly handles highly compressed data. urllib3's streaming API is designed for the efficient handling of large HTTP responses by reading the content in chunks, rather than loading the entire response body into memory at once. When streaming a compressed response, urllib3 can perform decoding or decompression based on the HTTP Content-Encoding header (e.g., gzip, deflate, br, or zstd). The library must read compressed data from the network and decompress it until the requested chunk size is met. Any resulting decompressed data that exceeds the requested amount is held in an internal buffer for the next read operation. The decompression logic could cause urllib3 to fully decode a small amount of highly compressed data in a single operation. This can result in excessive resource consumption (high CPU usage and massive memory allocation for the decompressed data.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-409"
+          ],
+          "VendorSeverity": {
+            "alma": 3,
+            "amazon": 3,
+            "azure": 3,
+            "cbl-mariner": 3,
+            "ghsa": 3,
+            "nvd": 3,
+            "oracle-oval": 3,
+            "photon": 3,
+            "redhat": 3,
+            "rocky": 3,
+            "ubuntu": 2
+          },
+          "CVSS": {
+            "ghsa": {
+              "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:H",
+              "V40Score": 8.9
+            },
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/errata/RHSA-2026:1254",
+            "https://access.redhat.com/security/cve/CVE-2025-66471",
+            "https://bugzilla.redhat.com/2419455",
+            "https://bugzilla.redhat.com/2419467",
+            "https://bugzilla.redhat.com/2427726",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2419455",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2419467",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2427726",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-66418",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-66471",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2026-21441",
+            "https://errata.almalinux.org/8/ALSA-2026-1254.html",
+            "https://errata.rockylinux.org/RLSA-2026:1087",
+            "https://github.com/urllib3/urllib3",
+            "https://github.com/urllib3/urllib3/commit/c19571de34c47de3a766541b041637ba5f716ed7",
+            "https://github.com/urllib3/urllib3/security/advisories/GHSA-2xpw-w6gg-jr37",
+            "https://linux.oracle.com/cve/CVE-2025-66471.html",
+            "https://linux.oracle.com/errata/ELSA-2026-1254.html",
+            "https://nvd.nist.gov/vuln/detail/CVE-2025-66471",
+            "https://ubuntu.com/security/notices/USN-7927-1",
+            "https://ubuntu.com/security/notices/USN-7927-2",
+            "https://ubuntu.com/security/notices/USN-7927-3",
+            "https://www.cve.org/CVERecord?id=CVE-2025-66471",
+            "https://www.openwall.com/lists/oss-security/2025/12/05/4"
+          ],
+          "PublishedDate": "2025-12-05T17:16:04.4Z",
+          "LastModifiedDate": "2025-12-10T16:10:33.5Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-21441",
+          "VendorIDs": [
+            "GHSA-38jv-5279-wg99"
+          ],
+          "PkgName": "urllib3",
+          "PkgPath": "extension-scan/liquibase-checks/org.graalvm.python.vfs/venv/Lib/site-packages/urllib3-1.26.15.dist-info/METADATA",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/urllib3@1.26.15",
+            "UID": "a418be956c608109"
+          },
+          "InstalledVersion": "1.26.15",
+          "FixedVersion": "2.6.3",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-21441",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Fingerprint": "sha256:f1549cd775106ad4528b8f4d2fefde6b3a95468a50f505b68479633aff32f94a",
+          "Title": "urllib3: urllib3 vulnerable to decompression-bomb safeguard bypass when following HTTP redirects (streaming API)",
+          "Description": "urllib3 is an HTTP client library for Python. urllib3's streaming API is designed for the efficient handling of large HTTP responses by reading the content in chunks, rather than loading the entire response body into memory at once. urllib3 can perform decoding or decompression based on the HTTP `Content-Encoding` header (e.g., `gzip`, `deflate`, `br`, or `zstd`). When using the streaming API, the library decompresses only the necessary bytes, enabling partial content consumption. Starting in version 1.22 and prior to version 2.6.3, for HTTP redirect responses, the library would read the entire response body to drain the connection and decompress the content unnecessarily. This decompression occurred even before any read methods were called, and configured read limits did not restrict the amount of decompressed data. As a result, there was no safeguard against decompression bombs. A malicious server could exploit this to trigger excessive resource consumption on the client. Applications and libraries are affected when they stream content from untrusted sources by setting `preload_content=False` when they do not disable redirects. Users should upgrade to at least urllib3 v2.6.3, in which the library does not decode content of redirect responses when `preload_content=False`. If upgrading is not immediately possible, disable redirects by setting `redirect=False` for requests to untrusted source.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-409"
+          ],
+          "VendorSeverity": {
+            "alma": 3,
+            "amazon": 3,
+            "azure": 3,
+            "cbl-mariner": 3,
+            "ghsa": 3,
+            "nvd": 3,
+            "oracle-oval": 3,
+            "photon": 3,
+            "redhat": 3,
+            "rocky": 3,
+            "ubuntu": 2
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:H",
+              "V3Score": 7.5,
+              "V40Score": 8.9
+            },
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/errata/RHSA-2026:1254",
+            "https://access.redhat.com/security/cve/CVE-2026-21441",
+            "https://bugzilla.redhat.com/2419455",
+            "https://bugzilla.redhat.com/2419467",
+            "https://bugzilla.redhat.com/2427726",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2419455",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2419467",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2427726",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-66418",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-66471",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2026-21441",
+            "https://errata.almalinux.org/8/ALSA-2026-1254.html",
+            "https://errata.rockylinux.org/RLSA-2026:1087",
+            "https://github.com/urllib3/urllib3",
+            "https://github.com/urllib3/urllib3/commit/8864ac407bba8607950025e0979c4c69bc7abc7b",
+            "https://github.com/urllib3/urllib3/security/advisories/GHSA-38jv-5279-wg99",
+            "https://linux.oracle.com/cve/CVE-2026-21441.html",
+            "https://linux.oracle.com/errata/ELSA-2026-1254.html",
+            "https://lists.debian.org/debian-lts-announce/2026/01/msg00017.html",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-21441",
+            "https://ubuntu.com/security/notices/USN-7955-1",
+            "https://ubuntu.com/security/notices/USN-7955-2",
+            "https://ubuntu.com/security/notices/USN-8010-1",
+            "https://www.cve.org/CVERecord?id=CVE-2026-21441"
+          ],
+          "PublishedDate": "2026-01-07T22:15:44.04Z",
+          "LastModifiedDate": "2026-01-23T09:15:47.823Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-21441",
+          "VendorIDs": [
+            "GHSA-38jv-5279-wg99"
+          ],
+          "PkgName": "urllib3",
+          "PkgPath": "extension-scan/liquibase-checks/org.graalvm.python.vfs/venv/lib/python3.11/site-packages/urllib3-1.26.15.dist-info/METADATA",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/urllib3@1.26.15",
+            "UID": "21278b04840de694"
+          },
+          "InstalledVersion": "1.26.15",
+          "FixedVersion": "2.6.3",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-21441",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Fingerprint": "sha256:f1549cd775106ad4528b8f4d2fefde6b3a95468a50f505b68479633aff32f94a",
+          "Title": "urllib3: urllib3 vulnerable to decompression-bomb safeguard bypass when following HTTP redirects (streaming API)",
+          "Description": "urllib3 is an HTTP client library for Python. urllib3's streaming API is designed for the efficient handling of large HTTP responses by reading the content in chunks, rather than loading the entire response body into memory at once. urllib3 can perform decoding or decompression based on the HTTP `Content-Encoding` header (e.g., `gzip`, `deflate`, `br`, or `zstd`). When using the streaming API, the library decompresses only the necessary bytes, enabling partial content consumption. Starting in version 1.22 and prior to version 2.6.3, for HTTP redirect responses, the library would read the entire response body to drain the connection and decompress the content unnecessarily. This decompression occurred even before any read methods were called, and configured read limits did not restrict the amount of decompressed data. As a result, there was no safeguard against decompression bombs. A malicious server could exploit this to trigger excessive resource consumption on the client. Applications and libraries are affected when they stream content from untrusted sources by setting `preload_content=False` when they do not disable redirects. Users should upgrade to at least urllib3 v2.6.3, in which the library does not decode content of redirect responses when `preload_content=False`. If upgrading is not immediately possible, disable redirects by setting `redirect=False` for requests to untrusted source.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-409"
+          ],
+          "VendorSeverity": {
+            "alma": 3,
+            "amazon": 3,
+            "azure": 3,
+            "cbl-mariner": 3,
+            "ghsa": 3,
+            "nvd": 3,
+            "oracle-oval": 3,
+            "photon": 3,
+            "redhat": 3,
+            "rocky": 3,
+            "ubuntu": 2
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:H",
+              "V3Score": 7.5,
+              "V40Score": 8.9
+            },
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/errata/RHSA-2026:1254",
+            "https://access.redhat.com/security/cve/CVE-2026-21441",
+            "https://bugzilla.redhat.com/2419455",
+            "https://bugzilla.redhat.com/2419467",
+            "https://bugzilla.redhat.com/2427726",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2419455",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2419467",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2427726",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-66418",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-66471",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2026-21441",
+            "https://errata.almalinux.org/8/ALSA-2026-1254.html",
+            "https://errata.rockylinux.org/RLSA-2026:1087",
+            "https://github.com/urllib3/urllib3",
+            "https://github.com/urllib3/urllib3/commit/8864ac407bba8607950025e0979c4c69bc7abc7b",
+            "https://github.com/urllib3/urllib3/security/advisories/GHSA-38jv-5279-wg99",
+            "https://linux.oracle.com/cve/CVE-2026-21441.html",
+            "https://linux.oracle.com/errata/ELSA-2026-1254.html",
+            "https://lists.debian.org/debian-lts-announce/2026/01/msg00017.html",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-21441",
+            "https://ubuntu.com/security/notices/USN-7955-1",
+            "https://ubuntu.com/security/notices/USN-7955-2",
+            "https://ubuntu.com/security/notices/USN-8010-1",
+            "https://www.cve.org/CVERecord?id=CVE-2026-21441"
+          ],
+          "PublishedDate": "2026-01-07T22:15:44.04Z",
+          "LastModifiedDate": "2026-01-23T09:15:47.823Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-21441",
+          "VendorIDs": [
+            "GHSA-38jv-5279-wg99"
+          ],
+          "PkgName": "urllib3",
+          "PkgPath": "python-packages/urllib3-1.26.15.dist-info/METADATA",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/urllib3@1.26.15",
+            "UID": "b5bf8085478f735"
+          },
+          "InstalledVersion": "1.26.15",
+          "FixedVersion": "2.6.3",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-21441",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Fingerprint": "sha256:f1549cd775106ad4528b8f4d2fefde6b3a95468a50f505b68479633aff32f94a",
+          "Title": "urllib3: urllib3 vulnerable to decompression-bomb safeguard bypass when following HTTP redirects (streaming API)",
+          "Description": "urllib3 is an HTTP client library for Python. urllib3's streaming API is designed for the efficient handling of large HTTP responses by reading the content in chunks, rather than loading the entire response body into memory at once. urllib3 can perform decoding or decompression based on the HTTP `Content-Encoding` header (e.g., `gzip`, `deflate`, `br`, or `zstd`). When using the streaming API, the library decompresses only the necessary bytes, enabling partial content consumption. Starting in version 1.22 and prior to version 2.6.3, for HTTP redirect responses, the library would read the entire response body to drain the connection and decompress the content unnecessarily. This decompression occurred even before any read methods were called, and configured read limits did not restrict the amount of decompressed data. As a result, there was no safeguard against decompression bombs. A malicious server could exploit this to trigger excessive resource consumption on the client. Applications and libraries are affected when they stream content from untrusted sources by setting `preload_content=False` when they do not disable redirects. Users should upgrade to at least urllib3 v2.6.3, in which the library does not decode content of redirect responses when `preload_content=False`. If upgrading is not immediately possible, disable redirects by setting `redirect=False` for requests to untrusted source.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-409"
+          ],
+          "VendorSeverity": {
+            "alma": 3,
+            "amazon": 3,
+            "azure": 3,
+            "cbl-mariner": 3,
+            "ghsa": 3,
+            "nvd": 3,
+            "oracle-oval": 3,
+            "photon": 3,
+            "redhat": 3,
+            "rocky": 3,
+            "ubuntu": 2
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:H",
+              "V3Score": 7.5,
+              "V40Score": 8.9
+            },
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/errata/RHSA-2026:1254",
+            "https://access.redhat.com/security/cve/CVE-2026-21441",
+            "https://bugzilla.redhat.com/2419455",
+            "https://bugzilla.redhat.com/2419467",
+            "https://bugzilla.redhat.com/2427726",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2419455",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2419467",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2427726",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-66418",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-66471",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2026-21441",
+            "https://errata.almalinux.org/8/ALSA-2026-1254.html",
+            "https://errata.rockylinux.org/RLSA-2026:1087",
+            "https://github.com/urllib3/urllib3",
+            "https://github.com/urllib3/urllib3/commit/8864ac407bba8607950025e0979c4c69bc7abc7b",
+            "https://github.com/urllib3/urllib3/security/advisories/GHSA-38jv-5279-wg99",
+            "https://linux.oracle.com/cve/CVE-2026-21441.html",
+            "https://linux.oracle.com/errata/ELSA-2026-1254.html",
+            "https://lists.debian.org/debian-lts-announce/2026/01/msg00017.html",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-21441",
+            "https://ubuntu.com/security/notices/USN-7955-1",
+            "https://ubuntu.com/security/notices/USN-7955-2",
+            "https://ubuntu.com/security/notices/USN-8010-1",
+            "https://www.cve.org/CVERecord?id=CVE-2026-21441"
+          ],
+          "PublishedDate": "2026-01-07T22:15:44.04Z",
+          "LastModifiedDate": "2026-01-23T09:15:47.823Z"
+        }
+      ]
+    }
+  ]
+}
