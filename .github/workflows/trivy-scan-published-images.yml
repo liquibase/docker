@@ -20,7 +20,7 @@ on:
     - cron: "0 10 * * 1-5"
 
 permissions:
-  contents: write
+  contents: read
   actions: read
 
 jobs:
@@ -56,26 +56,3 @@ jobs:
       upload_sarif: false
       generate_sbom: true
       build_logic_ref: main
-
-  persist-results:
-    name: Persist Scan Results
-    needs: vulnerability-scan
-    if: always() && needs.vulnerability-scan.result != 'cancelled'
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - name: Download all scan artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: scan-artifacts
-          pattern: vulnerability-report-*
-
-      - name: Persist to scan-results branch
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          scripts/persist-scan-results.sh scan-artifacts
