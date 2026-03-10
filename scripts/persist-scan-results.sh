@@ -31,7 +31,7 @@
 
 set -euo pipefail
 
-ARTIFACTS_DIR="${1:?Usage: persist-scan-results.sh <artifacts-dir>}"
+ARTIFACTS_DIR="$(cd "${1:?Usage: persist-scan-results.sh <artifacts-dir>}" && pwd)"
 BRANCH="scan-results"
 SCANNED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
@@ -51,8 +51,9 @@ echo "Found $ARTIFACT_COUNT scan artifact(s) to persist"
 
 # --- Set up worktree for the scan-results branch ---
 
+REPO_ROOT="$(pwd)"
 WORKTREE_DIR=$(mktemp -d)
-trap 'rm -rf "$WORKTREE_DIR"' EXIT
+trap 'cd "$REPO_ROOT" && git worktree remove --force "$WORKTREE_DIR" 2>/dev/null || rm -rf "$WORKTREE_DIR"' EXIT
 
 # Check if the branch exists on remote
 if git ls-remote --exit-code origin "refs/heads/$BRANCH" >/dev/null 2>&1; then
@@ -173,7 +174,7 @@ if git diff --cached --quiet; then
   exit 0
 fi
 
-CHANGED_COUNT=$(git diff --cached --name-only | grep -c "metadata.json" || echo 0)
+CHANGED_COUNT=$(git diff --cached --name-only | grep -c "metadata.json" || true)
 git commit -m "Update scan results ($CHANGED_COUNT version(s)) — $SCANNED_AT"
 git push origin "$BRANCH"
 
