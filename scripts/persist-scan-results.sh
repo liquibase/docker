@@ -90,35 +90,51 @@ for ARTIFACT_PATH in "$ARTIFACTS_DIR"/vulnerability-report-*; do
   # The reusable workflow sanitizes: tr '/' '-'
   # So liquibase/liquibase:5.0.1 becomes vulnerability-report-liquibase-liquibase-5.0.1
   # We need to reconstruct org/image and tag
+  #
+  # Strategy (data-driven, no hardcoded image list):
+  #   - First segment is always the org (liquibase)
+  #   - Last segment matching a version pattern (e.g. 5.0.1, 4.30.0, latest) is the tag
+  #   - Everything in between is the image name
   SUFFIX="${ARTIFACT_NAME#vulnerability-report-}"
 
-  # The tag is the last segment after the last hyphen that looks like a version
-  # Strategy: try known image prefixes first
-  IMAGE=""
-  TAG=""
-  for PREFIX in "liquibase-liquibase-secure" "liquibase-liquibase"; do
-    if [[ "$SUFFIX" == "$PREFIX-"* ]]; then
-      TAG="${SUFFIX#"$PREFIX-"}"
-      IMAGE="${PREFIX}"
+  # Split suffix into segments by hyphen
+  IFS='-' read -ra SEGMENTS <<< "$SUFFIX"
+
+  if [ "${#SEGMENTS[@]}" -lt 3 ]; then
+    echo "Error: cannot parse artifact name (too few segments): $ARTIFACT_NAME" >&2
+    exit 1
+  fi
+
+  ORG="${SEGMENTS[0]}"
+
+  # Find the tag: scan from the end for the last segment that looks like a version
+  # A version segment starts with a digit, or is a known non-semver tag like "latest"
+  TAG_INDEX=-1
+  for (( i=${#SEGMENTS[@]}-1; i>=2; i-- )); do
+    if [[ "${SEGMENTS[$i]}" =~ ^[0-9] ]] || [[ "${SEGMENTS[$i]}" == "latest" ]]; then
+      TAG_INDEX=$i
       break
     fi
   done
 
-  if [ -z "$IMAGE" ] || [ -z "$TAG" ]; then
-    echo "Warning: could not parse artifact name: $ARTIFACT_NAME, skipping" >&2
-    continue
+  if [ "$TAG_INDEX" -lt 0 ]; then
+    echo "Error: cannot identify version tag in artifact name: $ARTIFACT_NAME" >&2
+    exit 1
   fi
 
-  # Convert sanitized image name back to path: liquibase-liquibase -> liquibase/liquibase
-  # liquibase-liquibase-secure -> liquibase/liquibase-secure
-  case "$IMAGE" in
-    liquibase-liquibase-secure) IMAGE_PATH="liquibase/liquibase-secure" ;;
-    liquibase-liquibase)        IMAGE_PATH="liquibase/liquibase" ;;
-    *)
-      echo "Warning: unknown image prefix: $IMAGE, skipping" >&2
-      continue
-      ;;
-  esac
+  # Tag may contain hyphens (e.g. 5.0.1-beta) — rejoin from TAG_INDEX to end
+  TAG=$(IFS='-'; echo "${SEGMENTS[*]:$TAG_INDEX}")
+
+  # Image name is everything between org and tag
+  IMAGE_NAME=$(IFS='-'; echo "${SEGMENTS[*]:1:$((TAG_INDEX-1))}")
+
+  if [ -z "$IMAGE_NAME" ] || [ -z "$TAG" ]; then
+    echo "Error: could not parse artifact name: $ARTIFACT_NAME (org=$ORG, image=$IMAGE_NAME, tag=$TAG)" >&2
+    exit 1
+  fi
+
+  # Reconstruct image path: org/image-name
+  IMAGE_PATH="$ORG/$IMAGE_NAME"
 
   DEST_DIR="$IMAGE_PATH/$TAG"
   mkdir -p "$DEST_DIR"
@@ -157,10 +173,24 @@ done
 
 MANIFEST=$(echo "$MANIFEST" | jq --arg ts "$SCANNED_AT" '.lastUpdated = $ts')
 
-# Sort version tags in descending order for each image
+# Sort version tags in descending semver order for each image.
+# Semver tags (e.g. 5.0.1, 4.30.0) are sorted numerically by major.minor.patch.
+# Non-semver tags (e.g. "latest") are appended at the end in alphabetical order.
 MANIFEST=$(echo "$MANIFEST" | jq '
   .images |= with_entries(
-    .value |= (sort_by(split(".") | map(tonumber? // 0)) | reverse)
+    .value |= (
+      group_by(test("^[0-9]") | not) |
+      # group_by false=semver first, true=non-semver second
+      (.[0] // []) as $semver |
+      (.[1] // []) as $other |
+      ($semver | sort_by(
+        split(".") | [
+          (.[0] // "0" | tonumber),
+          (.[1] // "0" | tonumber),
+          (.[2] // "0" | split("-")[0] | tonumber)
+        ]
+      ) | reverse) + ($other | sort)
+    )
   )
 ')
 
@@ -174,7 +204,11 @@ if git diff --cached --quiet; then
   exit 0
 fi
 
-CHANGED_COUNT=$(git diff --cached --name-only | grep -c "metadata.json" || true)
+CHANGED_FILES=$(git diff --cached --name-only)
+CHANGED_COUNT=0
+if [ -n "$CHANGED_FILES" ]; then
+  CHANGED_COUNT=$(echo "$CHANGED_FILES" | grep -c "metadata.json" || true)
+fi
 git commit -m "Update scan results ($CHANGED_COUNT version(s)) — $SCANNED_AT"
 git push origin "$BRANCH"
 

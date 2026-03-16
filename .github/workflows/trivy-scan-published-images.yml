@@ -20,7 +20,7 @@ on:
     - cron: "0 10 * * 1-5"
 
 permissions:
-  contents: write
+  contents: read
   actions: read
 
 jobs:
@@ -62,6 +62,8 @@ jobs:
     needs: vulnerability-scan
     if: always() && needs.vulnerability-scan.result != 'cancelled'
     runs-on: ubuntu-22.04
+    permissions:
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
