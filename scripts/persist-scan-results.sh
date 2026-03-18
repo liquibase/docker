@@ -146,15 +146,29 @@ for ARTIFACT_PATH in "$ARTIFACTS_DIR"/vulnerability-report-*; do
 
   echo "Persisting $IMAGE_PATH:$TAG"
 
-  # Copy scan result files
-  for FILE in trivy-surface.json trivy-deep.json grype-results.json; do
+  # Copy scan result files and track any missing ones
+  MISSING_FILES=()
+  REQUIRED_SCAN_FILES=(trivy-surface.json trivy-deep.json grype-results.json)
+  for FILE in "${REQUIRED_SCAN_FILES[@]}"; do
     if [ -f "$ARTIFACT_PATH/$FILE" ]; then
       cp "$ARTIFACT_PATH/$FILE" "$DEST_DIR/$FILE"
+    else
+      MISSING_FILES+=("$FILE")
     fi
   done
 
+  if [ "${#MISSING_FILES[@]}" -gt 0 ]; then
+    echo "WARNING: $IMAGE_PATH:$TAG is missing scan files: ${MISSING_FILES[*]}"
+  fi
+
   # Also check for grype-results.json variants (some workflows output grype-results.sarif too)
   # We only need the JSON
+
+  # Build missing_files JSON array
+  MISSING_JSON="[]"
+  if [ "${#MISSING_FILES[@]}" -gt 0 ]; then
+    MISSING_JSON=$(printf '%s\n' "${MISSING_FILES[@]}" | jq -R . | jq -s .)
+  fi
 
   # Create metadata.json
   cat > "$DEST_DIR/metadata.json" <<EOF
@@ -163,6 +177,7 @@ for ARTIFACT_PATH in "$ARTIFACTS_DIR"/vulnerability-report-*; do
   "image": "$IMAGE_PATH",
   "tag": "$TAG",
   "status": "success",
+  "missing_files": $MISSING_JSON,
   "workflowRunId": "${GITHUB_RUN_ID:-}"
 }
 EOF
