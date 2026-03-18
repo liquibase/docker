@@ -59,7 +59,7 @@ jobs:
 
   persist-results:
     name: Persist Scan Results
-    needs: vulnerability-scan
+    needs: [generate-matrix, vulnerability-scan]
     if: always() && needs.vulnerability-scan.result != 'cancelled'
     runs-on: ubuntu-22.04
     permissions:
@@ -77,6 +77,8 @@ jobs:
           pattern: vulnerability-report-*
 
       - name: Persist to scan-results branch
+        env:
+          EXPECTED_MATRIX: ${{ needs.generate-matrix.outputs.matrix }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"

@@ -19,6 +19,9 @@
 #   GITHUB_REPOSITORY: owner/repo (set by GitHub Actions)
 #   GITHUB_SERVER_URL: GitHub server URL (set by GitHub Actions)
 #   GITHUB_RUN_ID:     Workflow run ID (set by GitHub Actions)
+#   EXPECTED_MATRIX:   JSON matrix from generate-matrix job (optional).
+#                      When set, images in the matrix that have no artifact
+#                      are recorded with status "failed" in metadata.json.
 #
 # Branch structure:
 #   scan-results/
@@ -42,7 +45,7 @@ fi
 
 # Count artifact directories
 ARTIFACT_COUNT=$(find "$ARTIFACTS_DIR" -mindepth 1 -maxdepth 1 -type d -name "vulnerability-report-*" | wc -l | tr -d ' ')
-if [ "$ARTIFACT_COUNT" -eq 0 ]; then
+if [ "$ARTIFACT_COUNT" -eq 0 ] && [ -z "${EXPECTED_MATRIX:-}" ]; then
   echo "No scan artifacts found in $ARTIFACTS_DIR" >&2
   exit 0
 fi
@@ -67,7 +70,7 @@ else
   cd "$WORKTREE_DIR"
   git checkout --orphan "$BRANCH"
   git rm -rf . 2>/dev/null || true
-  echo '{"lastUpdated":"","images":{}}' > manifest.json
+  echo '{"lastUpdated":"","images":{},"scan_status":{}}' > manifest.json
   git add manifest.json
   git commit -m "Initialize scan-results branch"
 fi
@@ -77,10 +80,12 @@ fi
 if [ -f manifest.json ]; then
   MANIFEST=$(cat manifest.json)
 else
-  MANIFEST='{"lastUpdated":"","images":{}}'
+  MANIFEST='{"lastUpdated":"","images":{},"scan_status":{}}'
 fi
 
 # --- Process each artifact ---
+
+PERSISTED_IMAGES=()
 
 for ARTIFACT_PATH in "$ARTIFACTS_DIR"/vulnerability-report-*; do
   [ -d "$ARTIFACT_PATH" ] || continue
@@ -157,17 +162,84 @@ for ARTIFACT_PATH in "$ARTIFACTS_DIR"/vulnerability-report-*; do
   "scannedAt": "$SCANNED_AT",
   "image": "$IMAGE_PATH",
   "tag": "$TAG",
+  "status": "success",
   "workflowRunId": "${GITHUB_RUN_ID:-}"
 }
 EOF
 
   git add "$DEST_DIR/"
 
+  # Track successfully persisted images
+  PERSISTED_IMAGES+=("${IMAGE_PATH}:${TAG}")
+
   # Update manifest in memory — add tag to image list if not already present
   MANIFEST=$(echo "$MANIFEST" | jq --arg img "$IMAGE_PATH" --arg tag "$TAG" '
     .images[$img] = ((.images[$img] // []) | if index($tag) then . else . + [$tag] end)
   ')
+
+  # Update scan_status for this image:tag
+  MANIFEST=$(echo "$MANIFEST" | jq --arg img "$IMAGE_PATH" --arg tag "$TAG" '
+    .scan_status[$img + ":" + $tag] = "success"
+  ')
 done
+
+# --- Handle missing expected scans ---
+# If EXPECTED_MATRIX is set (passed from workflow), check for images that
+# were expected to be scanned but have no artifact (scan job failed).
+
+if [ -n "${EXPECTED_MATRIX:-}" ]; then
+  # Extract expected image:tag pairs from the matrix JSON
+  EXPECTED_PAIRS=$(echo "$EXPECTED_MATRIX" | jq -r '.include[] | "\(.image):\(.tag)"')
+
+  while IFS= read -r PAIR; do
+    [ -z "$PAIR" ] && continue
+
+    # Check if this pair was already persisted successfully
+    FOUND=false
+    for PERSISTED in "${PERSISTED_IMAGES[@]:-}"; do
+      if [ "$PERSISTED" = "$PAIR" ]; then
+        FOUND=true
+        break
+      fi
+    done
+
+    if [ "$FOUND" = true ]; then
+      continue
+    fi
+
+    # This image:tag was expected but not found — scan failed
+    FAIL_IMAGE="${PAIR%%:*}"
+    FAIL_TAG="${PAIR##*:}"
+
+    echo "WARNING: Expected scan missing for $FAIL_IMAGE:$FAIL_TAG — recording as failed"
+
+    DEST_DIR="$FAIL_IMAGE/$FAIL_TAG"
+    mkdir -p "$DEST_DIR"
+
+    # Create metadata.json with failed status
+    cat > "$DEST_DIR/metadata.json" <<EOF
+{
+  "scannedAt": "$SCANNED_AT",
+  "image": "$FAIL_IMAGE",
+  "tag": "$FAIL_TAG",
+  "status": "failed",
+  "workflowRunId": "${GITHUB_RUN_ID:-}"
+}
+EOF
+
+    git add "$DEST_DIR/"
+
+    # Update manifest — ensure the tag is tracked
+    MANIFEST=$(echo "$MANIFEST" | jq --arg img "$FAIL_IMAGE" --arg tag "$FAIL_TAG" '
+      .images[$img] = ((.images[$img] // []) | if index($tag) then . else . + [$tag] end)
+    ')
+
+    # Update scan_status as failed
+    MANIFEST=$(echo "$MANIFEST" | jq --arg img "$FAIL_IMAGE" --arg tag "$FAIL_TAG" '
+      .scan_status[$img + ":" + $tag] = "failed"
+    ')
+  done <<< "$EXPECTED_PAIRS"
+fi
 
 # --- Update manifest ---
 
