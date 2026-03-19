@@ -56,3 +56,30 @@ jobs:
       upload_sarif: false
       generate_sbom: true
       build_logic_ref: main
+
+  persist-results:
+    name: Persist Scan Results
+    needs: [generate-matrix, vulnerability-scan]
+    if: always() && needs.vulnerability-scan.result != 'cancelled'
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Download all scan artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: scan-artifacts
+          pattern: vulnerability-report-*
+
+      - name: Persist to scan-results branch
+        env:
+          EXPECTED_MATRIX: ${{ needs.generate-matrix.outputs.matrix }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          scripts/persist-scan-results.sh scan-artifacts
