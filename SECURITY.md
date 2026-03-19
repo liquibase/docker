@@ -120,7 +120,7 @@ Scan results from published image scans are persisted to the `scan-results` bran
 
 The `scan-results` branch contains:
 
-```
+```text
 scan-results/
   manifest.json                          # Index of all scanned images and versions
   liquibase/liquibase/<version>/
@@ -140,8 +140,8 @@ The `manifest.json` file is an index of all available scan data:
 {
   "lastUpdated": "2026-03-10T10:00:00Z",
   "images": {
-    "liquibase/liquibase": ["5.0.1", "5.0.0", "4.31.0", "..."],
-    "liquibase/liquibase-secure": ["5.0.1", "5.0.0", "..."]
+    "liquibase/liquibase": ["5.0.1", "5.0.0", "4.31.0"],
+    "liquibase/liquibase-secure": ["5.0.1", "5.0.0"]
   }
 }
 ```
