@@ -520,7 +520,7 @@ jobs:
 
       - name: Log in to internal Nexus Docker Registry
         if: ${{ steps.validate-build.outcome == 'success' }}
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ${{ env.REPO_URL }}
           username: ${{ env.REPO_USER }}
@@ -528,7 +528,7 @@ jobs:
 
       - name: Login to GHCR
         if: ${{ steps.validate-build.outcome == 'success' }}
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
