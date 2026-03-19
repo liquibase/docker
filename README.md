@@ -278,7 +278,7 @@ docker buildx imagetools inspect liquibase/liquibase-secure:latest --format '{{ 
 
 ## 🛡️ Vulnerability Scanning
 
-Every published Liquibase Docker image (Community and Secure) is automatically scanned for known vulnerabilities using multiple security scanners. Scans run Monday through Friday at 10 AM UTC and cover the most recent tags of each image.
+Published Liquibase Docker images (Community and Secure) are automatically scanned for known vulnerabilities using multiple security scanners. Scans run Monday through Friday at 10 AM UTC and cover the most recent tags of each image (up to 10 per repository by default).
 
 ### What Gets Scanned
 
