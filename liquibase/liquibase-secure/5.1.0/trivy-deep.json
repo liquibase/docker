@@ -1,10 +1,10 @@
 {
   "SchemaVersion": 2,
   "Trivy": {
-    "Version": "0.69.1"
+    "Version": "0.69.3"
   },
-  "ReportID": "019cd7b0-f8cb-794f-9f7a-eb15d4878493",
-  "CreatedAt": "2026-03-10T12:20:25.419611613Z",
+  "ReportID": "019d0596-aa33-773c-9e28-a9db9c2135a7",
+  "CreatedAt": "2026-03-19T10:14:13.299475511Z",
   "ArtifactName": "/tmp/extracted-deps",
   "ArtifactType": "filesystem",
   "Results": [
@@ -5765,12 +5765,17 @@
           ],
           "VendorSeverity": {
             "ghsa": 3,
+            "nvd": 3,
             "redhat": 3
           },
           "CVSS": {
             "ghsa": {
               "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N",
               "V40Score": 8.7
+            },
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
             },
             "redhat": {
               "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
@@ -5789,7 +5794,7 @@
             "https://www.cve.org/CVERecord?id=CVE-2026-29062"
           ],
           "PublishedDate": "2026-03-06T08:16:26.603Z",
-          "LastModifiedDate": "2026-03-09T13:35:34.633Z"
+          "LastModifiedDate": "2026-03-10T19:05:19.067Z"
         },
         {
           "VulnerabilityID": "CVE-2026-29062",
@@ -5821,12 +5826,17 @@
           ],
           "VendorSeverity": {
             "ghsa": 3,
+            "nvd": 3,
             "redhat": 3
           },
           "CVSS": {
             "ghsa": {
               "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N",
               "V40Score": 8.7
+            },
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
             },
             "redhat": {
               "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
@@ -5845,7 +5855,7 @@
             "https://www.cve.org/CVERecord?id=CVE-2026-29062"
           ],
           "PublishedDate": "2026-03-06T08:16:26.603Z",
-          "LastModifiedDate": "2026-03-09T13:35:34.633Z"
+          "LastModifiedDate": "2026-03-10T19:05:19.067Z"
         },
         {
           "VulnerabilityID": "GHSA-72hv-8253-57qq",
