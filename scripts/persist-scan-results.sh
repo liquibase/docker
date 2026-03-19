@@ -164,10 +164,12 @@ for ARTIFACT_PATH in "$ARTIFACTS_DIR"/vulnerability-report-*; do
   # Also check for grype-results.json variants (some workflows output grype-results.sarif too)
   # We only need the JSON
 
-  # Build missing_files JSON array
+  # Build missing_files JSON array and determine status
   MISSING_JSON="[]"
+  SCAN_STATUS="success"
   if [ "${#MISSING_FILES[@]}" -gt 0 ]; then
     MISSING_JSON=$(printf '%s\n' "${MISSING_FILES[@]}" | jq -R . | jq -s .)
+    SCAN_STATUS="partial"
   fi
 
   # Create metadata.json
@@ -176,7 +178,7 @@ for ARTIFACT_PATH in "$ARTIFACTS_DIR"/vulnerability-report-*; do
   "scannedAt": "$SCANNED_AT",
   "image": "$IMAGE_PATH",
   "tag": "$TAG",
-  "status": "success",
+  "status": "$SCAN_STATUS",
   "missing_files": $MISSING_JSON,
   "workflowRunId": "${GITHUB_RUN_ID:-}"
 }
@@ -193,8 +195,8 @@ EOF
   ')
 
   # Update scan_status for this image:tag
-  MANIFEST=$(echo "$MANIFEST" | jq --arg img "$IMAGE_PATH" --arg tag "$TAG" '
-    .scan_status[$img + ":" + $tag] = "success"
+  MANIFEST=$(echo "$MANIFEST" | jq --arg img "$IMAGE_PATH" --arg tag "$TAG" --arg status "$SCAN_STATUS" '
+    .scan_status[$img + ":" + $tag] = $status
   ')
 done
 
@@ -297,6 +299,19 @@ if [ -n "$CHANGED_FILES" ]; then
   CHANGED_COUNT=$(echo "$CHANGED_FILES" | grep -c "metadata.json" || true)
 fi
 git commit -m "Update scan results ($CHANGED_COUNT version(s)) — $SCANNED_AT"
-git push origin "$BRANCH"
+
+MAX_RETRIES=3
+for attempt in $(seq 1 $MAX_RETRIES); do
+  if git push origin "$BRANCH"; then
+    break
+  fi
+  if [ "$attempt" -eq "$MAX_RETRIES" ]; then
+    echo "Error: push failed after $MAX_RETRIES attempts" >&2
+    exit 1
+  fi
+  echo "Push failed (attempt $attempt), rebasing and retrying..."
+  git fetch origin "$BRANCH"
+  git rebase "origin/$BRANCH"
+done
 
 echo "Persisted scan results to $BRANCH branch ($CHANGED_COUNT version(s))"
