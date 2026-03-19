@@ -276,6 +276,36 @@ docker buildx imagetools inspect liquibase/liquibase-secure:latest --format '{{ 
 
 ---
 
+## 🛡️ Vulnerability Scanning
+
+Published Liquibase Docker images (Community and Secure) are automatically scanned for known vulnerabilities using multiple security scanners. Scans run Monday through Friday at 10 AM UTC and cover the most recent tags of each image (up to 10 per repository by default).
+
+### What Gets Scanned
+
+| Scan | Scanner | Coverage |
+|------|---------|----------|
+| OS & Application Libraries | Trivy | Operating system packages and top-level Java libraries |
+| Nested JAR Dependencies | Trivy | Libraries bundled inside Liquibase JARs |
+| SBOM-based Scan | Grype | Full Software Bill of Materials analysis |
+
+### Viewing Scan Results
+
+**Security Dashboard** — [Liquibase Security](https://security.liquibase.com/docker) provides an interactive interface to explore vulnerability scan results across all image versions:
+
+- **Image Overview** — Browse all scanned versions with severity breakdowns, CVSS trends, and total counts
+- **Version Detail** — View every CVE in a specific image version, filterable by severity and component type (OS, JRE, JAR, Driver), with upgrade recommendations
+- **Version Compare** — Compare two versions side by side to see which CVEs were fixed, which are new, and which are shared
+- **Export** — Download vulnerability data as CSV or print reports as PDF
+
+**GitHub Actions** — Raw scan results are also available directly from this repository:
+1. Go to the **Actions** tab
+2. Select **Published Images Vulnerability Scanning**
+3. Choose a workflow run to view the summary or download artifacts
+
+For a detailed guide on reading vulnerability reports, see [SECURITY.md](SECURITY.md).
+
+---
+
 ## Dockerfile
 
 ```dockerfile
