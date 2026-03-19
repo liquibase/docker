@@ -102,7 +102,61 @@ A: Trivy's database may not always be synchronized with the latest vendor assess
 A: The workflow runs Monday-Friday at 10 AM UTC, scanning the most recent tags of each image.
 
 **Q: Where can I view the scan results?**
-A: Go to the repository's Actions tab > "Published Images Vulnerability Scanning" workflow > select a run > view the summary or download artifacts.
+A: There are two ways to view scan results:
+1. **Security Dashboard** (recommended) — Visit [Liquibase Security](https://security.liquibase.com/docker) for an interactive view of all scan results across all versions. You can browse vulnerabilities by version, compare versions, filter by severity or component type, and export reports.
+2. **GitHub Actions** — Go to the repository's Actions tab > "Published Images Vulnerability Scanning" workflow > select a run > view the summary or download artifacts.
+
+**Q: Can I compare vulnerabilities between two versions?**
+A: Yes. The [Version Compare](https://security.liquibase.com/docker/compare) page on Liquibase Security lets you select any two versions of the same image and shows which CVEs were fixed, which are new, and which are shared between them.
+
+**Q: How do I know if upgrading will fix a specific CVE?**
+A: Each version detail page on Liquibase Security includes an "Upgrade Recommendations" section that groups fixable vulnerabilities by package and shows which upgrades would resolve the most CVEs.
+
+## Vulnerability Scan Data
+
+Scan results from published image scans are persisted to the `scan-results` branch in this repository. This enables historical tracking and powers the interactive Security Dashboard.
+
+### Data Structure
+
+The `scan-results` branch contains:
+
+```text
+scan-results/
+  manifest.json                          # Index of all scanned images and versions
+  liquibase/liquibase/<version>/
+    trivy-surface.json                   # OS and top-level library scan (Trivy)
+    trivy-deep.json                      # Nested JAR dependency scan (Trivy)
+    grype-results.json                   # SBOM-based scan (Grype)
+    metadata.json                        # Scan timestamp, image digest, workflow run ID
+  liquibase/liquibase-secure/<version>/
+    ...
+```
+
+### Manifest Format
+
+The `manifest.json` file is an index of all available scan data:
+
+```json
+{
+  "lastUpdated": "2026-03-10T10:00:00Z",
+  "images": {
+    "liquibase/liquibase": ["5.0.1", "5.0.0", "4.31.0"],
+    "liquibase/liquibase-secure": ["5.0.1", "5.0.0"]
+  }
+}
+```
+
+### Component Classification
+
+Vulnerabilities are classified by component type to help identify the source:
+
+| Component | Description | Examples |
+|-----------|-------------|----------|
+| **OS** | Operating system packages from the base image | `libc`, `openssl`, `curl` |
+| **JRE** | Java Runtime Environment libraries | `openjdk`, `java-runtime` |
+| **JAR** | Java application dependencies | Spring, Jackson, Log4j |
+| **Driver** | JDBC database drivers | PostgreSQL, MySQL, MSSQL |
+| **Other** | Components that don't fit the above categories | Python packages, misc |
 
 ## Workflow Schedule
 
@@ -113,7 +167,7 @@ A: Go to the repository's Actions tab > "Published Images Vulnerability Scanning
 
 ## Related Documentation
 
-- [Vulnerability Scanning Scripts](README.md) - Technical documentation for developers
+- [Vulnerability Scanning Scripts](scripts/README.md) - Technical documentation for developers
 - [Trivy Documentation](https://trivy.dev/) - Official Trivy scanner documentation
 - [Grype Documentation](https://github.com/anchore/grype) - Official Grype scanner documentation
 - [NVD](https://nvd.nist.gov/) - National Vulnerability Database
