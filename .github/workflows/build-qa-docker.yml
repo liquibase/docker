@@ -431,7 +431,7 @@ jobs:
           fi
 
           # Replace version ARG with branch name
-          sed -i "s/ARG ${VERSION_ARG}=.*/ARG ${VERSION_ARG}=${{ inputs.liquibaseBranch }}/" "${{ matrix.dockerfile }}"
+          sed -i "s|ARG ${VERSION_ARG}=.*|ARG ${VERSION_ARG}=${{ inputs.liquibaseBranch }}|" "${{ matrix.dockerfile }}"
 
           # Create modified Dockerfile using awk for cleaner handling
           cat "${{ matrix.dockerfile }}" | awk -v dockerfile="${{ matrix.dockerfile }}" -v branch="${{ inputs.liquibaseBranch }}" '
