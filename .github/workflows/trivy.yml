@@ -253,7 +253,7 @@ jobs:
           decoded_username=$(echo "${{ env.DOCKERHUB_USERNAME }}" | base64 -d)
           echo "DOCKERHUB_USERNAME_DECODED=$decoded_username" >> $GITHUB_ENV
 
-      uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2 # v4
+      - uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2 # v4
         with:
           username: ${{ env.DOCKERHUB_USERNAME_DECODED }}
           password: ${{ env.DOCKERHUB_TOKEN }}
