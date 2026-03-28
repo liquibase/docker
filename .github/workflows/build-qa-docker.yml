@@ -119,7 +119,7 @@ jobs:
       - name: Get GitHub App token for Liquibase-Secure workflow trigger
         if: ${{ matrix.build_type == 'secure' }}
         id: get-token
-        uses: actions/create-github-app-token@v2
+        uses: actions/create-github-app-token@v3
         with:
           app-id: ${{ env.LIQUIBASE_GITHUB_APP_ID }}
           private-key: ${{ env.LIQUIBASE_GITHUB_APP_PRIVATE_KEY }}
