@@ -113,10 +113,10 @@ for ARTIFACT_PATH in "$ARTIFACTS_DIR"/vulnerability-report-*; do
   ORG="${SEGMENTS[0]}"
 
   # Find the tag: scan from the end for the last segment that looks like a version
-  # A version segment starts with a digit, or is a known non-semver tag like "latest"
+  # A version segment starts with a digit, or is a known non-semver tag like "latest" or "alpine"
   TAG_INDEX=-1
   for (( i=${#SEGMENTS[@]}-1; i>=2; i-- )); do
-    if [[ "${SEGMENTS[$i]}" =~ ^[0-9] ]] || [[ "${SEGMENTS[$i]}" == "latest" ]]; then
+    if [[ "${SEGMENTS[$i]}" =~ ^[0-9] ]] || [[ "${SEGMENTS[$i]}" == "latest" ]] || [[ "${SEGMENTS[$i]}" =~ ^(alpine|slim|jammy|focal|bullseye|noble)$ ]]; then
       TAG_INDEX=$i
       break
     fi
