@@ -64,11 +64,19 @@ jobs:
     runs-on: ubuntu-22.04
     permissions:
       contents: write
+      id-token: write
     steps:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
+
+      - name: Checkout build-logic
+        uses: actions/checkout@v6
+        with:
+          repository: liquibase/build-logic
+          ref: main
+          path: build-logic
 
       - name: Download all scan artifacts
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
@@ -83,3 +91,138 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           scripts/persist-scan-results.sh scan-artifacts
+
+      - name: Configure AWS credentials for vault access (CVE dispatch)
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.LIQUIBASE_VAULT_OIDC_ROLE_ARN }}
+          aws-region: us-east-1
+        continue-on-error: true
+
+      - name: Get secrets from vault (CVE dispatch)
+        id: vault-secrets-cve
+        uses: aws-actions/aws-secretsmanager-get-secrets@v2
+        with:
+          secret-ids: |
+            ,/vault/liquibase
+          parse-json-secrets: true
+        continue-on-error: true
+
+      - name: Get GitHub App token for liquibase-pro (CVE dispatch)
+        id: get-token-cve
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ env.LIQUIBASE_GITHUB_APP_ID }}
+          private-key: ${{ env.LIQUIBASE_GITHUB_APP_PRIVATE_KEY }}
+          owner: liquibase
+          repositories: liquibase-pro
+          permission-actions: write
+        continue-on-error: true
+
+      - name: Dispatch new CVEs for investigation
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ steps.get-token-cve.outputs.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set +e  # Never fail the parent workflow
+
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::warning::CVE dispatch skipped -- GitHub App token unavailable (vault step may have failed)"
+            echo "## CVE Investigation Dispatch (published images)" >> "$GITHUB_STEP_SUMMARY"
+            echo "Skipped -- GitHub App token unavailable." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          chmod +x build-logic/scripts/vulnerability-scanning/diff-new-cves.sh
+
+          echo "## CVE Investigation Dispatch (published images)" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+
+          TOTAL_BATCHES=0
+          TOTAL_FAILED=0
+
+          for ARTIFACT_DIR in scan-artifacts/vulnerability-report-*/; do
+            [ -d "$ARTIFACT_DIR" ] || continue
+
+            ARTIFACT_NAME=$(basename "$ARTIFACT_DIR")
+            # Derive image:tag from artifact name (vulnerability-report-<org>-<image>-<tag>)
+            # Parse logic mirrors persist-scan-results.sh
+            SUFFIX="${ARTIFACT_NAME#vulnerability-report-}"
+            IFS='-' read -ra SEGMENTS <<< "$SUFFIX"
+
+            if [ "${#SEGMENTS[@]}" -lt 3 ]; then
+              echo "::warning::Cannot parse artifact name: $ARTIFACT_NAME -- skipping"
+              continue
+            fi
+
+            ORG="${SEGMENTS[0]}"
+
+            TAG_INDEX=-1
+            for (( i=${#SEGMENTS[@]}-1; i>=2; i-- )); do
+              if [[ "${SEGMENTS[$i]}" =~ ^[0-9] ]] || [[ "${SEGMENTS[$i]}" == "latest" ]]; then
+                TAG_INDEX=$i
+                break
+              fi
+            done
+
+            if [ "$TAG_INDEX" -lt 0 ]; then
+              echo "::warning::Cannot find tag in artifact name: $ARTIFACT_NAME -- skipping"
+              continue
+            fi
+
+            TAG=$(IFS='-'; echo "${SEGMENTS[*]:$TAG_INDEX}")
+            IMAGE_NAME_PART=$(IFS='-'; echo "${SEGMENTS[*]:1:$((TAG_INDEX-1))}")
+            IMAGE_OR_VERSION="${ORG}/${IMAGE_NAME_PART}:${TAG}"
+
+            echo "Diffing CVEs for ${IMAGE_OR_VERSION}..."
+
+            BATCHES=$(build-logic/scripts/vulnerability-scanning/diff-new-cves.sh \
+              --scan-dir   "$ARTIFACT_DIR" \
+              --source     docker \
+              --image-or-version "$IMAGE_OR_VERSION" \
+              --run-url    "$RUN_URL" \
+              2>/tmp/diff-err-$$.txt) || {
+              ERR=$(cat /tmp/diff-err-$$.txt 2>/dev/null || echo "unknown error")
+              echo "::warning::diff-new-cves.sh failed for ${IMAGE_OR_VERSION}: $ERR"
+              echo "- **${IMAGE_OR_VERSION}**: diff failed -- $ERR" >> "$GITHUB_STEP_SUMMARY"
+              rm -f "/tmp/diff-err-$$.txt"
+              continue
+            }
+            rm -f "/tmp/diff-err-$$.txt"
+
+            if [ -z "$BATCHES" ]; then
+              echo "No unassessed CVEs for ${IMAGE_OR_VERSION} -- skipping"
+              echo "- **${IMAGE_OR_VERSION}**: no unassessed CVEs" >> "$GITHUB_STEP_SUMMARY"
+              continue
+            fi
+
+            BATCH_NUM=0
+            FAILED=0
+
+            while IFS= read -r batch_json; do
+              [ -z "$batch_json" ] && continue
+              BATCH_NUM=$((BATCH_NUM + 1))
+              CVE_COUNT=$(echo "$batch_json" | jq '.cves | length' 2>/dev/null || echo "?")
+
+              if gh workflow run investigate-cve.md \
+                  -R liquibase/liquibase-pro \
+                  -f "cve_json=$batch_json" 2>/tmp/dispatch-err-$$.txt; then
+                echo "- **${IMAGE_OR_VERSION}** batch $BATCH_NUM: dispatched $CVE_COUNT CVEs" >> "$GITHUB_STEP_SUMMARY"
+              else
+                ERR=$(cat /tmp/dispatch-err-$$.txt 2>/dev/null || echo "unknown error")
+                echo "::warning::CVE dispatch failed for ${IMAGE_OR_VERSION} batch $BATCH_NUM: $ERR"
+                echo "- **${IMAGE_OR_VERSION}** batch $BATCH_NUM: FAILED -- $ERR" >> "$GITHUB_STEP_SUMMARY"
+                FAILED=$((FAILED + 1))
+              fi
+              rm -f "/tmp/dispatch-err-$$.txt"
+            done <<< "$BATCHES"
+
+            TOTAL_BATCHES=$((TOTAL_BATCHES + BATCH_NUM))
+            TOTAL_FAILED=$((TOTAL_FAILED + FAILED))
+          done
+
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Total dispatched**: $TOTAL_BATCHES batch(es), $TOTAL_FAILED failure(s)" >> "$GITHUB_STEP_SUMMARY"
+          echo "CVE dispatch complete: $TOTAL_BATCHES batch(es), $TOTAL_FAILED failure(s)"
+          exit 0  # Never fail the parent workflow

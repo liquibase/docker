@@ -161,6 +161,15 @@ for ARTIFACT_PATH in "$ARTIFACTS_DIR"/vulnerability-report-*; do
     echo "WARNING: $IMAGE_PATH:$TAG is missing scan files: ${MISSING_FILES[*]}"
   fi
 
+  # Copy optional Scout JSON if present (not all images get a Scout scan)
+  OPTIONAL_SCAN_FILES=(scout-results.json)
+  for FILE in "${OPTIONAL_SCAN_FILES[@]}"; do
+    if [ -f "$ARTIFACT_PATH/$FILE" ]; then
+      cp "$ARTIFACT_PATH/$FILE" "$DEST_DIR/$FILE"
+      echo "  Included optional file: $FILE"
+    fi
+  done
+
   # Also check for grype-results.json variants (some workflows output grype-results.sarif too)
   # We only need the JSON
 
