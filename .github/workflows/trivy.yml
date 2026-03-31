@@ -181,7 +181,8 @@ jobs:
           IMAGE_NAME: ${{ matrix.image.name }}
           IMAGE_SUFFIX: ${{ matrix.image.suffix }}
         run: |
-          IMAGE_TAG="${IMAGE_SUFFIX:-latest}"
+          IMAGE_TAG="${IMAGE_SUFFIX#-}"
+          IMAGE_TAG="${IMAGE_TAG:-latest}"
           SAFE_NAME=$(echo "$IMAGE_NAME" | tr '/' '-')
           SAFE_TAG=$(echo "$IMAGE_TAG" | tr '/' '-')
           echo "artifact=vulnerability-report-${SAFE_NAME}-${SAFE_TAG}" >> "$GITHUB_OUTPUT"
@@ -225,7 +226,7 @@ jobs:
         continue-on-error: true
         env:
           GH_TOKEN: ${{ steps.get-token.outputs.token }}
-          SCAN_DIR: ${{ github.workspace }}/scan-artifacts
+          SCAN_DIR: ${{ github.workspace }}/scan-artifacts/${{ steps.artifact-name.outputs.artifact }}
           IMAGE_NAME: ${{ matrix.image.name }}
           IMAGE_TAG: ${{ steps.artifact-name.outputs.image_tag }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
