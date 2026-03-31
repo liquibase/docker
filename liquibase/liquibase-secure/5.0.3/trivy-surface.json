@@ -3,8 +3,8 @@
   "Trivy": {
     "Version": "0.69.3"
   },
-  "ReportID": "019d3e48-d168-70b8-a656-fb06dd8f8065",
-  "CreatedAt": "2026-03-30T10:27:32.840049172Z",
+  "ReportID": "019d4367-fd4d-7c42-bed9-59d687873bed",
+  "CreatedAt": "2026-03-31T10:19:41.77380622Z",
   "ArtifactID": "sha256:34b9677e9d46a576cbfc14751d2d02dfee02b72aca8158935734516cf646dc85",
   "ArtifactName": "liquibase/liquibase-secure:5.0.3",
   "ArtifactType": "container_image",
@@ -15068,163 +15068,273 @@
       ],
       "Vulnerabilities": [
         {
-          "VulnerabilityID": "GHSA-72hv-8253-57qq",
-          "PkgName": "com.fasterxml.jackson.core:jackson-core",
+          "VulnerabilityID": "CVE-2026-33870",
+          "VendorIDs": [
+            "GHSA-pwqr-wmgm-9rr8"
+          ],
+          "PkgName": "io.netty:netty-codec-http",
           "PkgPath": "liquibase/internal/lib/liquibase-azure-deps.jar",
           "PkgIdentifier": {
-            "PURL": "pkg:maven/com.fasterxml.jackson.core/jackson-core@2.17.2",
-            "UID": "1890f05ce8956bf"
+            "PURL": "pkg:maven/io.netty/netty-codec-http@4.1.125.Final",
+            "UID": "9ccdd9f146f7daa1"
           },
-          "InstalledVersion": "2.17.2",
-          "FixedVersion": "2.18.6, 2.21.1, 3.1.0",
+          "InstalledVersion": "4.1.125.Final",
+          "FixedVersion": "4.1.132.Final, 4.2.10.Final",
           "Status": "fixed",
           "Layer": {
             "Digest": "sha256:8892312c98ae2d25e50e3204f38afb80a1c1746a90a75f79626b38e8704bd428",
             "DiffID": "sha256:4a6a8d6537971b3cf8217b6d0ab06b982004990917c5e61d7ac9fd26de6ada65"
           },
           "SeveritySource": "ghsa",
-          "PrimaryURL": "https://github.com/advisories/GHSA-72hv-8253-57qq",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-33870",
           "DataSource": {
             "ID": "ghsa",
             "Name": "GitHub Security Advisory Maven",
             "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
           },
-          "Fingerprint": "sha256:b7efcb374b7ecf482838d7402e320e86b6f97db4e675502da2b7324c33b80bb1",
-          "Title": "jackson-core: Number Length Constraint Bypass in Async Parser Leads to Potential DoS Condition",
-          "Description": "### Summary\nThe non-blocking (async) JSON parser in `jackson-core` bypasses the `maxNumberLength` constraint (default: 1000 characters) defined in `StreamReadConstraints`. This allows an attacker to send JSON with arbitrarily long numbers through the async parser API, leading to excessive memory allocation and potential CPU exhaustion, resulting in a Denial of Service (DoS).\n\nThe standard synchronous parser correctly enforces this limit, but the async parser fails to do so, creating an inconsistent enforcement policy.\n\n### Details\nThe root cause is that the async parsing path in `NonBlockingUtf8JsonParserBase` (and related classes) does not call the methods responsible for number length validation.\n\n- The number parsing methods (e.g., `_finishNumberIntegralPart`) accumulate digits into the `TextBuffer` without any length checks.\n- After parsing, they call `_valueComplete()`, which finalizes the token but does **not** call `resetInt()` or `resetFloat()`.\n- The `resetInt()`/`resetFloat()` methods in `ParserBase` are where the `validateIntegerLength()` and `validateFPLength()` checks are performed.\n- Because this validation step is skipped, the `maxNumberLength` constraint is never enforced in the async code path.\n\n### PoC\nThe following JUnit 5 test demonstrates the vulnerability. It shows that the async parser accepts a 5,000-digit number, whereas the limit should be 1,000.\n\n```java\npackage tools.jackson.core.unittest.dos;\n\nimport java.nio.charset.StandardCharsets;\n\nimport org.junit.jupiter.api.Test;\n\nimport tools.jackson.core.*;\nimport tools.jackson.core.exc.StreamConstraintsException;\nimport tools.jackson.core.json.JsonFactory;\nimport tools.jackson.core.json.async.NonBlockingByteArrayJsonParser;\n\nimport static org.junit.jupiter.api.Assertions.*;\n\n/**\n * POC: Number Length Constraint Bypass in Non-Blocking (Async) JSON Parsers\n *\n * Authors: sprabhav7, rohan-repos\n * \n * maxNumberLength default = 1000 characters (digits).\n * A number with more than 1000 digits should be rejected by any parser.\n *\n * BUG: The async parser never calls resetInt()/resetFloat() which is where\n * validateIntegerLength()/validateFPLength() lives. Instead it calls\n * _valueComplete() which skips all number length validation.\n *\n * CWE-770: Allocation of Resources Without Limits or Throttling\n */\nclass AsyncParserNumberLengthBypassTest {\n\n    private static final int MAX_NUMBER_LENGTH = 1000;\n    private static final int TEST_NUMBER_LENGTH = 5000;\n\n    private final JsonFactory factory = new JsonFactory();\n\n    // CONTROL: Sync parser correctly rejects a number exceeding maxNumberLength\n    @Test\n    void syncParserRejectsLongNumber() throws Exception {\n        byte[] payload = buildPayloadWithLongInteger(TEST_NUMBER_LENGTH);\n\t\t\n\t\t// Output to console\n        System.out.println(\"[SYNC] Parsing \" + TEST_NUMBER_LENGTH + \"-digit number (limit: \" + MAX_NUMBER_LENGTH + \")\");\n        try {\n            try (JsonParser p = factory.createParser(ObjectReadContext.empty(), payload)) {\n                while (p.nextToken() != null) {\n                    if (p.currentToken() == JsonToken.VALUE_NUMBER_INT) {\n                        System.out.println(\"[SYNC] Accepted number with \" + p.getText().length() + \" digits — UNEXPECTED\");\n                    }\n                }\n            }\n            fail(\"Sync parser must reject a \" + TEST_NUMBER_LENGTH + \"-digit number\");\n        } catch (StreamConstraintsException e) {\n            System.out.println(\"[SYNC] Rejected with StreamConstraintsException: \" + e.getMessage());\n        }\n    }\n\n    // VULNERABILITY: Async parser accepts the SAME number that sync rejects\n    @Test\n    void asyncParserAcceptsLongNumber() throws Exception {\n        byte[] payload = buildPayloadWithLongInteger(TEST_NUMBER_LENGTH);\n\n        NonBlockingByteArrayJsonParser p =\n            (NonBlockingByteArrayJsonParser) factory.createNonBlockingByteArrayParser(ObjectReadContext.empty());\n        p.feedInput(payload, 0, payload.length);\n        p.endOfInput();\n\n        boolean foundNumber = false;\n        try {\n            while (p.nextToken() != null) {\n                if (p.currentToken() == JsonToken.VALUE_NUMBER_INT) {\n                    foundNumber = true;\n                    String numberText = p.getText();\n                    assertEquals(TEST_NUMBER_LENGTH, numberText.length(),\n                        \"Async parser silently accepted all \" + TEST_NUMBER_LENGTH + \" digits\");\n                }\n            }\n            // Output to console\n            System.out.println(\"[ASYNC INT] Accepted number with \" + TEST_NUMBER_LENGTH + \" digits — BUG CONFIRMED\");\n            assertTrue(foundNumber, \"Parser should have produced a VALUE_NUMBER_INT token\");\n        } catch (StreamConstraintsException e) {\n            fail(\"Bug is fixed — async parser now correctly rejects long numbers: \" + e.getMessage());\n        }\n        p.close();\n    }\n\n    private byte[] buildPayloadWithLongInteger(int numDigits) {\n        StringBuilder sb = new StringBuilder(numDigits + 10);\n        sb.append(\"{\\\"v\\\":\");\n        for (int i = 0; i \u003c numDigits; i++) {\n            sb.append((char) ('1' + (i % 9)));\n        }\n        sb.append('}');\n        return sb.toString().getBytes(StandardCharsets.UTF_8);\n    }\n}\n\n```\n\n\n### Impact\nA malicious actor can send a JSON document with an arbitrarily long number to an application using the async parser (e.g., in a Spring WebFlux or other reactive application). This can cause:\n1.  **Memory Exhaustion:** Unbounded allocation of memory in the `TextBuffer` to store the number's digits, leading to an `OutOfMemoryError`.\n2.  **CPU Exhaustion:** If the application subsequently calls `getBigIntegerValue()` or `getDecimalValue()`, the JVM can be tied up in O(n^2) `BigInteger` parsing operations, leading to a CPU-based DoS.\n\n### Suggested Remediation\n\nThe async parsing path should be updated to respect the `maxNumberLength` constraint. The simplest fix appears to ensure that `_valueComplete()` or a similar method in the async path calls the appropriate validation methods (`resetInt()` or `resetFloat()`) already present in `ParserBase`, mirroring the behavior of the synchronous parsers.\n\n**NOTE:** This research was performed in collaboration with [rohan-repos](https://github.com/rohan-repos)",
+          "Fingerprint": "sha256:4c7cfdd44f25157ae2b0d1277ebb6b5c0f46902a9003da4caf5a35645051b62c",
+          "Title": "io.netty/netty-codec-http: Netty: Request smuggling via incorrect parsing of HTTP/1.1 chunked transfer encoding extension values",
+          "Description": "Netty is an asynchronous, event-driven network application framework. In versions prior to 4.1.132.Final and 4.2.10.Final, Netty incorrectly parses quoted strings in HTTP/1.1 chunked transfer encoding extension values, enabling request smuggling attacks. Versions 4.1.132.Final and 4.2.10.Final fix the issue.",
           "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-444"
+          ],
           "VendorSeverity": {
-            "ghsa": 3
+            "ghsa": 3,
+            "redhat": 3
           },
           "CVSS": {
             "ghsa": {
-              "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N",
-              "V40Score": 8.7
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N",
+              "V3Score": 7.5
             }
           },
           "References": [
-            "https://github.com/FasterXML/jackson-core",
-            "https://github.com/FasterXML/jackson-core/commit/b0c428e6f993e1b5ece5c1c3cb2523e887cd52cf",
-            "https://github.com/FasterXML/jackson-core/pull/1555",
-            "https://github.com/FasterXML/jackson-core/security/advisories/GHSA-72hv-8253-57qq"
+            "https://access.redhat.com/security/cve/CVE-2026-33870",
+            "https://github.com/netty/netty",
+            "https://github.com/netty/netty/security/advisories/GHSA-pwqr-wmgm-9rr8",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-33870",
+            "https://w4ke.info/2025/06/18/funky-chunks.html",
+            "https://w4ke.info/2025/10/29/funky-chunks-2.html",
+            "https://www.cve.org/CVERecord?id=CVE-2026-33870",
+            "https://www.rfc-editor.org/rfc/rfc9110"
           ],
-          "PublishedDate": "2026-02-28T02:01:05Z",
-          "LastModifiedDate": "2026-03-03T16:59:14Z"
+          "PublishedDate": "2026-03-27T20:16:34.663Z",
+          "LastModifiedDate": "2026-03-30T13:26:29.793Z"
         },
         {
-          "VulnerabilityID": "GHSA-72hv-8253-57qq",
-          "PkgName": "com.fasterxml.jackson.core:jackson-core",
-          "PkgPath": "liquibase/internal/extensions/liquibase-commercial-cassandra.jar",
-          "PkgIdentifier": {
-            "PURL": "pkg:maven/com.fasterxml.jackson.core/jackson-core@2.19.2",
-            "UID": "b7925e64cff1f802"
-          },
-          "InstalledVersion": "2.19.2",
-          "FixedVersion": "2.18.6, 2.21.1, 3.1.0",
-          "Status": "fixed",
-          "Layer": {
-            "Digest": "sha256:8892312c98ae2d25e50e3204f38afb80a1c1746a90a75f79626b38e8704bd428",
-            "DiffID": "sha256:4a6a8d6537971b3cf8217b6d0ab06b982004990917c5e61d7ac9fd26de6ada65"
-          },
-          "SeveritySource": "ghsa",
-          "PrimaryURL": "https://github.com/advisories/GHSA-72hv-8253-57qq",
-          "DataSource": {
-            "ID": "ghsa",
-            "Name": "GitHub Security Advisory Maven",
-            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
-          },
-          "Fingerprint": "sha256:b7efcb374b7ecf482838d7402e320e86b6f97db4e675502da2b7324c33b80bb1",
-          "Title": "jackson-core: Number Length Constraint Bypass in Async Parser Leads to Potential DoS Condition",
-          "Description": "### Summary\nThe non-blocking (async) JSON parser in `jackson-core` bypasses the `maxNumberLength` constraint (default: 1000 characters) defined in `StreamReadConstraints`. This allows an attacker to send JSON with arbitrarily long numbers through the async parser API, leading to excessive memory allocation and potential CPU exhaustion, resulting in a Denial of Service (DoS).\n\nThe standard synchronous parser correctly enforces this limit, but the async parser fails to do so, creating an inconsistent enforcement policy.\n\n### Details\nThe root cause is that the async parsing path in `NonBlockingUtf8JsonParserBase` (and related classes) does not call the methods responsible for number length validation.\n\n- The number parsing methods (e.g., `_finishNumberIntegralPart`) accumulate digits into the `TextBuffer` without any length checks.\n- After parsing, they call `_valueComplete()`, which finalizes the token but does **not** call `resetInt()` or `resetFloat()`.\n- The `resetInt()`/`resetFloat()` methods in `ParserBase` are where the `validateIntegerLength()` and `validateFPLength()` checks are performed.\n- Because this validation step is skipped, the `maxNumberLength` constraint is never enforced in the async code path.\n\n### PoC\nThe following JUnit 5 test demonstrates the vulnerability. It shows that the async parser accepts a 5,000-digit number, whereas the limit should be 1,000.\n\n```java\npackage tools.jackson.core.unittest.dos;\n\nimport java.nio.charset.StandardCharsets;\n\nimport org.junit.jupiter.api.Test;\n\nimport tools.jackson.core.*;\nimport tools.jackson.core.exc.StreamConstraintsException;\nimport tools.jackson.core.json.JsonFactory;\nimport tools.jackson.core.json.async.NonBlockingByteArrayJsonParser;\n\nimport static org.junit.jupiter.api.Assertions.*;\n\n/**\n * POC: Number Length Constraint Bypass in Non-Blocking (Async) JSON Parsers\n *\n * Authors: sprabhav7, rohan-repos\n * \n * maxNumberLength default = 1000 characters (digits).\n * A number with more than 1000 digits should be rejected by any parser.\n *\n * BUG: The async parser never calls resetInt()/resetFloat() which is where\n * validateIntegerLength()/validateFPLength() lives. Instead it calls\n * _valueComplete() which skips all number length validation.\n *\n * CWE-770: Allocation of Resources Without Limits or Throttling\n */\nclass AsyncParserNumberLengthBypassTest {\n\n    private static final int MAX_NUMBER_LENGTH = 1000;\n    private static final int TEST_NUMBER_LENGTH = 5000;\n\n    private final JsonFactory factory = new JsonFactory();\n\n    // CONTROL: Sync parser correctly rejects a number exceeding maxNumberLength\n    @Test\n    void syncParserRejectsLongNumber() throws Exception {\n        byte[] payload = buildPayloadWithLongInteger(TEST_NUMBER_LENGTH);\n\t\t\n\t\t// Output to console\n        System.out.println(\"[SYNC] Parsing \" + TEST_NUMBER_LENGTH + \"-digit number (limit: \" + MAX_NUMBER_LENGTH + \")\");\n        try {\n            try (JsonParser p = factory.createParser(ObjectReadContext.empty(), payload)) {\n                while (p.nextToken() != null) {\n                    if (p.currentToken() == JsonToken.VALUE_NUMBER_INT) {\n                        System.out.println(\"[SYNC] Accepted number with \" + p.getText().length() + \" digits — UNEXPECTED\");\n                    }\n                }\n            }\n            fail(\"Sync parser must reject a \" + TEST_NUMBER_LENGTH + \"-digit number\");\n        } catch (StreamConstraintsException e) {\n            System.out.println(\"[SYNC] Rejected with StreamConstraintsException: \" + e.getMessage());\n        }\n    }\n\n    // VULNERABILITY: Async parser accepts the SAME number that sync rejects\n    @Test\n    void asyncParserAcceptsLongNumber() throws Exception {\n        byte[] payload = buildPayloadWithLongInteger(TEST_NUMBER_LENGTH);\n\n        NonBlockingByteArrayJsonParser p =\n            (NonBlockingByteArrayJsonParser) factory.createNonBlockingByteArrayParser(ObjectReadContext.empty());\n        p.feedInput(payload, 0, payload.length);\n        p.endOfInput();\n\n        boolean foundNumber = false;\n        try {\n            while (p.nextToken() != null) {\n                if (p.currentToken() == JsonToken.VALUE_NUMBER_INT) {\n                    foundNumber = true;\n                    String numberText = p.getText();\n                    assertEquals(TEST_NUMBER_LENGTH, numberText.length(),\n                        \"Async parser silently accepted all \" + TEST_NUMBER_LENGTH + \" digits\");\n                }\n            }\n            // Output to console\n            System.out.println(\"[ASYNC INT] Accepted number with \" + TEST_NUMBER_LENGTH + \" digits — BUG CONFIRMED\");\n            assertTrue(foundNumber, \"Parser should have produced a VALUE_NUMBER_INT token\");\n        } catch (StreamConstraintsException e) {\n            fail(\"Bug is fixed — async parser now correctly rejects long numbers: \" + e.getMessage());\n        }\n        p.close();\n    }\n\n    private byte[] buildPayloadWithLongInteger(int numDigits) {\n        StringBuilder sb = new StringBuilder(numDigits + 10);\n        sb.append(\"{\\\"v\\\":\");\n        for (int i = 0; i \u003c numDigits; i++) {\n            sb.append((char) ('1' + (i % 9)));\n        }\n        sb.append('}');\n        return sb.toString().getBytes(StandardCharsets.UTF_8);\n    }\n}\n\n```\n\n\n### Impact\nA malicious actor can send a JSON document with an arbitrarily long number to an application using the async parser (e.g., in a Spring WebFlux or other reactive application). This can cause:\n1.  **Memory Exhaustion:** Unbounded allocation of memory in the `TextBuffer` to store the number's digits, leading to an `OutOfMemoryError`.\n2.  **CPU Exhaustion:** If the application subsequently calls `getBigIntegerValue()` or `getDecimalValue()`, the JVM can be tied up in O(n^2) `BigInteger` parsing operations, leading to a CPU-based DoS.\n\n### Suggested Remediation\n\nThe async parsing path should be updated to respect the `maxNumberLength` constraint. The simplest fix appears to ensure that `_valueComplete()` or a similar method in the async path calls the appropriate validation methods (`resetInt()` or `resetFloat()`) already present in `ParserBase`, mirroring the behavior of the synchronous parsers.\n\n**NOTE:** This research was performed in collaboration with [rohan-repos](https://github.com/rohan-repos)",
-          "Severity": "HIGH",
-          "VendorSeverity": {
-            "ghsa": 3
-          },
-          "CVSS": {
-            "ghsa": {
-              "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N",
-              "V40Score": 8.7
-            }
-          },
-          "References": [
-            "https://github.com/FasterXML/jackson-core",
-            "https://github.com/FasterXML/jackson-core/commit/b0c428e6f993e1b5ece5c1c3cb2523e887cd52cf",
-            "https://github.com/FasterXML/jackson-core/pull/1555",
-            "https://github.com/FasterXML/jackson-core/security/advisories/GHSA-72hv-8253-57qq"
+          "VulnerabilityID": "CVE-2026-33870",
+          "VendorIDs": [
+            "GHSA-pwqr-wmgm-9rr8"
           ],
-          "PublishedDate": "2026-02-28T02:01:05Z",
-          "LastModifiedDate": "2026-03-03T16:59:14Z"
-        },
-        {
-          "VulnerabilityID": "GHSA-72hv-8253-57qq",
-          "PkgName": "com.fasterxml.jackson.core:jackson-core",
+          "PkgName": "io.netty:netty-codec-http",
           "PkgPath": "liquibase/internal/extensions/liquibase-aws-extension.jar",
           "PkgIdentifier": {
-            "PURL": "pkg:maven/com.fasterxml.jackson.core/jackson-core@2.20.0",
-            "UID": "d5a1351d621a4696"
+            "PURL": "pkg:maven/io.netty/netty-codec-http@4.1.126.Final",
+            "UID": "e7e0e089899e2039"
           },
-          "InstalledVersion": "2.20.0",
-          "FixedVersion": "2.18.6, 2.21.1, 3.1.0",
+          "InstalledVersion": "4.1.126.Final",
+          "FixedVersion": "4.1.132.Final, 4.2.10.Final",
           "Status": "fixed",
           "Layer": {
             "Digest": "sha256:8892312c98ae2d25e50e3204f38afb80a1c1746a90a75f79626b38e8704bd428",
             "DiffID": "sha256:4a6a8d6537971b3cf8217b6d0ab06b982004990917c5e61d7ac9fd26de6ada65"
           },
           "SeveritySource": "ghsa",
-          "PrimaryURL": "https://github.com/advisories/GHSA-72hv-8253-57qq",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-33870",
           "DataSource": {
             "ID": "ghsa",
             "Name": "GitHub Security Advisory Maven",
             "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
           },
-          "Fingerprint": "sha256:b7efcb374b7ecf482838d7402e320e86b6f97db4e675502da2b7324c33b80bb1",
-          "Title": "jackson-core: Number Length Constraint Bypass in Async Parser Leads to Potential DoS Condition",
-          "Description": "### Summary\nThe non-blocking (async) JSON parser in `jackson-core` bypasses the `maxNumberLength` constraint (default: 1000 characters) defined in `StreamReadConstraints`. This allows an attacker to send JSON with arbitrarily long numbers through the async parser API, leading to excessive memory allocation and potential CPU exhaustion, resulting in a Denial of Service (DoS).\n\nThe standard synchronous parser correctly enforces this limit, but the async parser fails to do so, creating an inconsistent enforcement policy.\n\n### Details\nThe root cause is that the async parsing path in `NonBlockingUtf8JsonParserBase` (and related classes) does not call the methods responsible for number length validation.\n\n- The number parsing methods (e.g., `_finishNumberIntegralPart`) accumulate digits into the `TextBuffer` without any length checks.\n- After parsing, they call `_valueComplete()`, which finalizes the token but does **not** call `resetInt()` or `resetFloat()`.\n- The `resetInt()`/`resetFloat()` methods in `ParserBase` are where the `validateIntegerLength()` and `validateFPLength()` checks are performed.\n- Because this validation step is skipped, the `maxNumberLength` constraint is never enforced in the async code path.\n\n### PoC\nThe following JUnit 5 test demonstrates the vulnerability. It shows that the async parser accepts a 5,000-digit number, whereas the limit should be 1,000.\n\n```java\npackage tools.jackson.core.unittest.dos;\n\nimport java.nio.charset.StandardCharsets;\n\nimport org.junit.jupiter.api.Test;\n\nimport tools.jackson.core.*;\nimport tools.jackson.core.exc.StreamConstraintsException;\nimport tools.jackson.core.json.JsonFactory;\nimport tools.jackson.core.json.async.NonBlockingByteArrayJsonParser;\n\nimport static org.junit.jupiter.api.Assertions.*;\n\n/**\n * POC: Number Length Constraint Bypass in Non-Blocking (Async) JSON Parsers\n *\n * Authors: sprabhav7, rohan-repos\n * \n * maxNumberLength default = 1000 characters (digits).\n * A number with more than 1000 digits should be rejected by any parser.\n *\n * BUG: The async parser never calls resetInt()/resetFloat() which is where\n * validateIntegerLength()/validateFPLength() lives. Instead it calls\n * _valueComplete() which skips all number length validation.\n *\n * CWE-770: Allocation of Resources Without Limits or Throttling\n */\nclass AsyncParserNumberLengthBypassTest {\n\n    private static final int MAX_NUMBER_LENGTH = 1000;\n    private static final int TEST_NUMBER_LENGTH = 5000;\n\n    private final JsonFactory factory = new JsonFactory();\n\n    // CONTROL: Sync parser correctly rejects a number exceeding maxNumberLength\n    @Test\n    void syncParserRejectsLongNumber() throws Exception {\n        byte[] payload = buildPayloadWithLongInteger(TEST_NUMBER_LENGTH);\n\t\t\n\t\t// Output to console\n        System.out.println(\"[SYNC] Parsing \" + TEST_NUMBER_LENGTH + \"-digit number (limit: \" + MAX_NUMBER_LENGTH + \")\");\n        try {\n            try (JsonParser p = factory.createParser(ObjectReadContext.empty(), payload)) {\n                while (p.nextToken() != null) {\n                    if (p.currentToken() == JsonToken.VALUE_NUMBER_INT) {\n                        System.out.println(\"[SYNC] Accepted number with \" + p.getText().length() + \" digits — UNEXPECTED\");\n                    }\n                }\n            }\n            fail(\"Sync parser must reject a \" + TEST_NUMBER_LENGTH + \"-digit number\");\n        } catch (StreamConstraintsException e) {\n            System.out.println(\"[SYNC] Rejected with StreamConstraintsException: \" + e.getMessage());\n        }\n    }\n\n    // VULNERABILITY: Async parser accepts the SAME number that sync rejects\n    @Test\n    void asyncParserAcceptsLongNumber() throws Exception {\n        byte[] payload = buildPayloadWithLongInteger(TEST_NUMBER_LENGTH);\n\n        NonBlockingByteArrayJsonParser p =\n            (NonBlockingByteArrayJsonParser) factory.createNonBlockingByteArrayParser(ObjectReadContext.empty());\n        p.feedInput(payload, 0, payload.length);\n        p.endOfInput();\n\n        boolean foundNumber = false;\n        try {\n            while (p.nextToken() != null) {\n                if (p.currentToken() == JsonToken.VALUE_NUMBER_INT) {\n                    foundNumber = true;\n                    String numberText = p.getText();\n                    assertEquals(TEST_NUMBER_LENGTH, numberText.length(),\n                        \"Async parser silently accepted all \" + TEST_NUMBER_LENGTH + \" digits\");\n                }\n            }\n            // Output to console\n            System.out.println(\"[ASYNC INT] Accepted number with \" + TEST_NUMBER_LENGTH + \" digits — BUG CONFIRMED\");\n            assertTrue(foundNumber, \"Parser should have produced a VALUE_NUMBER_INT token\");\n        } catch (StreamConstraintsException e) {\n            fail(\"Bug is fixed — async parser now correctly rejects long numbers: \" + e.getMessage());\n        }\n        p.close();\n    }\n\n    private byte[] buildPayloadWithLongInteger(int numDigits) {\n        StringBuilder sb = new StringBuilder(numDigits + 10);\n        sb.append(\"{\\\"v\\\":\");\n        for (int i = 0; i \u003c numDigits; i++) {\n            sb.append((char) ('1' + (i % 9)));\n        }\n        sb.append('}');\n        return sb.toString().getBytes(StandardCharsets.UTF_8);\n    }\n}\n\n```\n\n\n### Impact\nA malicious actor can send a JSON document with an arbitrarily long number to an application using the async parser (e.g., in a Spring WebFlux or other reactive application). This can cause:\n1.  **Memory Exhaustion:** Unbounded allocation of memory in the `TextBuffer` to store the number's digits, leading to an `OutOfMemoryError`.\n2.  **CPU Exhaustion:** If the application subsequently calls `getBigIntegerValue()` or `getDecimalValue()`, the JVM can be tied up in O(n^2) `BigInteger` parsing operations, leading to a CPU-based DoS.\n\n### Suggested Remediation\n\nThe async parsing path should be updated to respect the `maxNumberLength` constraint. The simplest fix appears to ensure that `_valueComplete()` or a similar method in the async path calls the appropriate validation methods (`resetInt()` or `resetFloat()`) already present in `ParserBase`, mirroring the behavior of the synchronous parsers.\n\n**NOTE:** This research was performed in collaboration with [rohan-repos](https://github.com/rohan-repos)",
+          "Fingerprint": "sha256:4c7cfdd44f25157ae2b0d1277ebb6b5c0f46902a9003da4caf5a35645051b62c",
+          "Title": "io.netty/netty-codec-http: Netty: Request smuggling via incorrect parsing of HTTP/1.1 chunked transfer encoding extension values",
+          "Description": "Netty is an asynchronous, event-driven network application framework. In versions prior to 4.1.132.Final and 4.2.10.Final, Netty incorrectly parses quoted strings in HTTP/1.1 chunked transfer encoding extension values, enabling request smuggling attacks. Versions 4.1.132.Final and 4.2.10.Final fix the issue.",
           "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-444"
+          ],
           "VendorSeverity": {
-            "ghsa": 3
+            "ghsa": 3,
+            "redhat": 3
           },
           "CVSS": {
             "ghsa": {
-              "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N",
-              "V40Score": 8.7
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N",
+              "V3Score": 7.5
             }
           },
           "References": [
-            "https://github.com/FasterXML/jackson-core",
-            "https://github.com/FasterXML/jackson-core/commit/b0c428e6f993e1b5ece5c1c3cb2523e887cd52cf",
-            "https://github.com/FasterXML/jackson-core/pull/1555",
-            "https://github.com/FasterXML/jackson-core/security/advisories/GHSA-72hv-8253-57qq"
+            "https://access.redhat.com/security/cve/CVE-2026-33870",
+            "https://github.com/netty/netty",
+            "https://github.com/netty/netty/security/advisories/GHSA-pwqr-wmgm-9rr8",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-33870",
+            "https://w4ke.info/2025/06/18/funky-chunks.html",
+            "https://w4ke.info/2025/10/29/funky-chunks-2.html",
+            "https://www.cve.org/CVERecord?id=CVE-2026-33870",
+            "https://www.rfc-editor.org/rfc/rfc9110"
           ],
-          "PublishedDate": "2026-02-28T02:01:05Z",
-          "LastModifiedDate": "2026-03-03T16:59:14Z"
+          "PublishedDate": "2026-03-27T20:16:34.663Z",
+          "LastModifiedDate": "2026-03-30T13:26:29.793Z"
         },
         {
-          "VulnerabilityID": "GHSA-72hv-8253-57qq",
-          "PkgName": "com.fasterxml.jackson.core:jackson-core",
+          "VulnerabilityID": "CVE-2026-33870",
+          "VendorIDs": [
+            "GHSA-pwqr-wmgm-9rr8"
+          ],
+          "PkgName": "io.netty:netty-codec-http",
           "PkgPath": "liquibase/internal/extensions/liquibase-azure.jar",
           "PkgIdentifier": {
-            "PURL": "pkg:maven/com.fasterxml.jackson.core/jackson-core@2.20.0",
-            "UID": "fa0d5d21e4bd902b"
+            "PURL": "pkg:maven/io.netty/netty-codec-http@4.1.126.Final",
+            "UID": "a2eefef2e7246d36"
           },
-          "InstalledVersion": "2.20.0",
-          "FixedVersion": "2.18.6, 2.21.1, 3.1.0",
+          "InstalledVersion": "4.1.126.Final",
+          "FixedVersion": "4.1.132.Final, 4.2.10.Final",
           "Status": "fixed",
           "Layer": {
             "Digest": "sha256:8892312c98ae2d25e50e3204f38afb80a1c1746a90a75f79626b38e8704bd428",
             "DiffID": "sha256:4a6a8d6537971b3cf8217b6d0ab06b982004990917c5e61d7ac9fd26de6ada65"
           },
           "SeveritySource": "ghsa",
-          "PrimaryURL": "https://github.com/advisories/GHSA-72hv-8253-57qq",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-33870",
           "DataSource": {
             "ID": "ghsa",
             "Name": "GitHub Security Advisory Maven",
             "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
           },
-          "Fingerprint": "sha256:b7efcb374b7ecf482838d7402e320e86b6f97db4e675502da2b7324c33b80bb1",
-          "Title": "jackson-core: Number Length Constraint Bypass in Async Parser Leads to Potential DoS Condition",
-          "Description": "### Summary\nThe non-blocking (async) JSON parser in `jackson-core` bypasses the `maxNumberLength` constraint (default: 1000 characters) defined in `StreamReadConstraints`. This allows an attacker to send JSON with arbitrarily long numbers through the async parser API, leading to excessive memory allocation and potential CPU exhaustion, resulting in a Denial of Service (DoS).\n\nThe standard synchronous parser correctly enforces this limit, but the async parser fails to do so, creating an inconsistent enforcement policy.\n\n### Details\nThe root cause is that the async parsing path in `NonBlockingUtf8JsonParserBase` (and related classes) does not call the methods responsible for number length validation.\n\n- The number parsing methods (e.g., `_finishNumberIntegralPart`) accumulate digits into the `TextBuffer` without any length checks.\n- After parsing, they call `_valueComplete()`, which finalizes the token but does **not** call `resetInt()` or `resetFloat()`.\n- The `resetInt()`/`resetFloat()` methods in `ParserBase` are where the `validateIntegerLength()` and `validateFPLength()` checks are performed.\n- Because this validation step is skipped, the `maxNumberLength` constraint is never enforced in the async code path.\n\n### PoC\nThe following JUnit 5 test demonstrates the vulnerability. It shows that the async parser accepts a 5,000-digit number, whereas the limit should be 1,000.\n\n```java\npackage tools.jackson.core.unittest.dos;\n\nimport java.nio.charset.StandardCharsets;\n\nimport org.junit.jupiter.api.Test;\n\nimport tools.jackson.core.*;\nimport tools.jackson.core.exc.StreamConstraintsException;\nimport tools.jackson.core.json.JsonFactory;\nimport tools.jackson.core.json.async.NonBlockingByteArrayJsonParser;\n\nimport static org.junit.jupiter.api.Assertions.*;\n\n/**\n * POC: Number Length Constraint Bypass in Non-Blocking (Async) JSON Parsers\n *\n * Authors: sprabhav7, rohan-repos\n * \n * maxNumberLength default = 1000 characters (digits).\n * A number with more than 1000 digits should be rejected by any parser.\n *\n * BUG: The async parser never calls resetInt()/resetFloat() which is where\n * validateIntegerLength()/validateFPLength() lives. Instead it calls\n * _valueComplete() which skips all number length validation.\n *\n * CWE-770: Allocation of Resources Without Limits or Throttling\n */\nclass AsyncParserNumberLengthBypassTest {\n\n    private static final int MAX_NUMBER_LENGTH = 1000;\n    private static final int TEST_NUMBER_LENGTH = 5000;\n\n    private final JsonFactory factory = new JsonFactory();\n\n    // CONTROL: Sync parser correctly rejects a number exceeding maxNumberLength\n    @Test\n    void syncParserRejectsLongNumber() throws Exception {\n        byte[] payload = buildPayloadWithLongInteger(TEST_NUMBER_LENGTH);\n\t\t\n\t\t// Output to console\n        System.out.println(\"[SYNC] Parsing \" + TEST_NUMBER_LENGTH + \"-digit number (limit: \" + MAX_NUMBER_LENGTH + \")\");\n        try {\n            try (JsonParser p = factory.createParser(ObjectReadContext.empty(), payload)) {\n                while (p.nextToken() != null) {\n                    if (p.currentToken() == JsonToken.VALUE_NUMBER_INT) {\n                        System.out.println(\"[SYNC] Accepted number with \" + p.getText().length() + \" digits — UNEXPECTED\");\n                    }\n                }\n            }\n            fail(\"Sync parser must reject a \" + TEST_NUMBER_LENGTH + \"-digit number\");\n        } catch (StreamConstraintsException e) {\n            System.out.println(\"[SYNC] Rejected with StreamConstraintsException: \" + e.getMessage());\n        }\n    }\n\n    // VULNERABILITY: Async parser accepts the SAME number that sync rejects\n    @Test\n    void asyncParserAcceptsLongNumber() throws Exception {\n        byte[] payload = buildPayloadWithLongInteger(TEST_NUMBER_LENGTH);\n\n        NonBlockingByteArrayJsonParser p =\n            (NonBlockingByteArrayJsonParser) factory.createNonBlockingByteArrayParser(ObjectReadContext.empty());\n        p.feedInput(payload, 0, payload.length);\n        p.endOfInput();\n\n        boolean foundNumber = false;\n        try {\n            while (p.nextToken() != null) {\n                if (p.currentToken() == JsonToken.VALUE_NUMBER_INT) {\n                    foundNumber = true;\n                    String numberText = p.getText();\n                    assertEquals(TEST_NUMBER_LENGTH, numberText.length(),\n                        \"Async parser silently accepted all \" + TEST_NUMBER_LENGTH + \" digits\");\n                }\n            }\n            // Output to console\n            System.out.println(\"[ASYNC INT] Accepted number with \" + TEST_NUMBER_LENGTH + \" digits — BUG CONFIRMED\");\n            assertTrue(foundNumber, \"Parser should have produced a VALUE_NUMBER_INT token\");\n        } catch (StreamConstraintsException e) {\n            fail(\"Bug is fixed — async parser now correctly rejects long numbers: \" + e.getMessage());\n        }\n        p.close();\n    }\n\n    private byte[] buildPayloadWithLongInteger(int numDigits) {\n        StringBuilder sb = new StringBuilder(numDigits + 10);\n        sb.append(\"{\\\"v\\\":\");\n        for (int i = 0; i \u003c numDigits; i++) {\n            sb.append((char) ('1' + (i % 9)));\n        }\n        sb.append('}');\n        return sb.toString().getBytes(StandardCharsets.UTF_8);\n    }\n}\n\n```\n\n\n### Impact\nA malicious actor can send a JSON document with an arbitrarily long number to an application using the async parser (e.g., in a Spring WebFlux or other reactive application). This can cause:\n1.  **Memory Exhaustion:** Unbounded allocation of memory in the `TextBuffer` to store the number's digits, leading to an `OutOfMemoryError`.\n2.  **CPU Exhaustion:** If the application subsequently calls `getBigIntegerValue()` or `getDecimalValue()`, the JVM can be tied up in O(n^2) `BigInteger` parsing operations, leading to a CPU-based DoS.\n\n### Suggested Remediation\n\nThe async parsing path should be updated to respect the `maxNumberLength` constraint. The simplest fix appears to ensure that `_valueComplete()` or a similar method in the async path calls the appropriate validation methods (`resetInt()` or `resetFloat()`) already present in `ParserBase`, mirroring the behavior of the synchronous parsers.\n\n**NOTE:** This research was performed in collaboration with [rohan-repos](https://github.com/rohan-repos)",
+          "Fingerprint": "sha256:4c7cfdd44f25157ae2b0d1277ebb6b5c0f46902a9003da4caf5a35645051b62c",
+          "Title": "io.netty/netty-codec-http: Netty: Request smuggling via incorrect parsing of HTTP/1.1 chunked transfer encoding extension values",
+          "Description": "Netty is an asynchronous, event-driven network application framework. In versions prior to 4.1.132.Final and 4.2.10.Final, Netty incorrectly parses quoted strings in HTTP/1.1 chunked transfer encoding extension values, enabling request smuggling attacks. Versions 4.1.132.Final and 4.2.10.Final fix the issue.",
           "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-444"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "redhat": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2026-33870",
+            "https://github.com/netty/netty",
+            "https://github.com/netty/netty/security/advisories/GHSA-pwqr-wmgm-9rr8",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-33870",
+            "https://w4ke.info/2025/06/18/funky-chunks.html",
+            "https://w4ke.info/2025/10/29/funky-chunks-2.html",
+            "https://www.cve.org/CVERecord?id=CVE-2026-33870",
+            "https://www.rfc-editor.org/rfc/rfc9110"
+          ],
+          "PublishedDate": "2026-03-27T20:16:34.663Z",
+          "LastModifiedDate": "2026-03-30T13:26:29.793Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-33870",
+          "VendorIDs": [
+            "GHSA-pwqr-wmgm-9rr8"
+          ],
+          "PkgName": "io.netty:netty-codec-http",
+          "PkgPath": "liquibase/internal/extensions/liquibase-commercial-cassandra.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/io.netty/netty-codec-http@4.2.6.Final",
+            "UID": "8e4e2f0d38b3f53e"
+          },
+          "InstalledVersion": "4.2.6.Final",
+          "FixedVersion": "4.1.132.Final, 4.2.10.Final",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:8892312c98ae2d25e50e3204f38afb80a1c1746a90a75f79626b38e8704bd428",
+            "DiffID": "sha256:4a6a8d6537971b3cf8217b6d0ab06b982004990917c5e61d7ac9fd26de6ada65"
+          },
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-33870",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:4c7cfdd44f25157ae2b0d1277ebb6b5c0f46902a9003da4caf5a35645051b62c",
+          "Title": "io.netty/netty-codec-http: Netty: Request smuggling via incorrect parsing of HTTP/1.1 chunked transfer encoding extension values",
+          "Description": "Netty is an asynchronous, event-driven network application framework. In versions prior to 4.1.132.Final and 4.2.10.Final, Netty incorrectly parses quoted strings in HTTP/1.1 chunked transfer encoding extension values, enabling request smuggling attacks. Versions 4.1.132.Final and 4.2.10.Final fix the issue.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-444"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "redhat": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2026-33870",
+            "https://github.com/netty/netty",
+            "https://github.com/netty/netty/security/advisories/GHSA-pwqr-wmgm-9rr8",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-33870",
+            "https://w4ke.info/2025/06/18/funky-chunks.html",
+            "https://w4ke.info/2025/10/29/funky-chunks-2.html",
+            "https://www.cve.org/CVERecord?id=CVE-2026-33870",
+            "https://www.rfc-editor.org/rfc/rfc9110"
+          ],
+          "PublishedDate": "2026-03-27T20:16:34.663Z",
+          "LastModifiedDate": "2026-03-30T13:26:29.793Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-33871",
+          "VendorIDs": [
+            "GHSA-w9fj-cfpg-grvv"
+          ],
+          "PkgName": "io.netty:netty-codec-http2",
+          "PkgPath": "liquibase/internal/lib/liquibase-azure-deps.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/io.netty/netty-codec-http2@4.1.125.Final",
+            "UID": "2564442e2b040add"
+          },
+          "InstalledVersion": "4.1.125.Final",
+          "FixedVersion": "4.1.132.Final, 4.2.11.Final",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:8892312c98ae2d25e50e3204f38afb80a1c1746a90a75f79626b38e8704bd428",
+            "DiffID": "sha256:4a6a8d6537971b3cf8217b6d0ab06b982004990917c5e61d7ac9fd26de6ada65"
+          },
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-33871",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:5abfee3e5ca4e49fd9540fd9d799f2413ec745f0243287171b6d5c37b5855e72",
+          "Title": "Netty is an asynchronous, event-driven network application framework.  ...",
+          "Description": "Netty is an asynchronous, event-driven network application framework. In versions prior to 4.1.132.Final and 4.2.10.Final, a remote user can trigger a Denial of Service (DoS) against a Netty HTTP/2 server by sending a flood of `CONTINUATION` frames. The server's lack of a limit on the number of `CONTINUATION` frames, combined with a bypass of existing size-based mitigations using zero-byte frames, allows an user to cause excessive CPU consumption with minimal bandwidth, rendering the server unresponsive. Versions 4.1.132.Final and 4.2.10.Final fix the issue.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-770"
+          ],
           "VendorSeverity": {
             "ghsa": 3
           },
@@ -15235,13 +15345,159 @@
             }
           },
           "References": [
-            "https://github.com/FasterXML/jackson-core",
-            "https://github.com/FasterXML/jackson-core/commit/b0c428e6f993e1b5ece5c1c3cb2523e887cd52cf",
-            "https://github.com/FasterXML/jackson-core/pull/1555",
-            "https://github.com/FasterXML/jackson-core/security/advisories/GHSA-72hv-8253-57qq"
+            "https://github.com/netty/netty",
+            "https://github.com/netty/netty/security/advisories/GHSA-w9fj-cfpg-grvv",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-33871"
           ],
-          "PublishedDate": "2026-02-28T02:01:05Z",
-          "LastModifiedDate": "2026-03-03T16:59:14Z"
+          "PublishedDate": "2026-03-27T20:16:34.833Z",
+          "LastModifiedDate": "2026-03-30T13:26:29.793Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-33871",
+          "VendorIDs": [
+            "GHSA-w9fj-cfpg-grvv"
+          ],
+          "PkgName": "io.netty:netty-codec-http2",
+          "PkgPath": "liquibase/internal/extensions/liquibase-aws-extension.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/io.netty/netty-codec-http2@4.1.126.Final",
+            "UID": "4f7949f2d6252cc5"
+          },
+          "InstalledVersion": "4.1.126.Final",
+          "FixedVersion": "4.1.132.Final, 4.2.11.Final",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:8892312c98ae2d25e50e3204f38afb80a1c1746a90a75f79626b38e8704bd428",
+            "DiffID": "sha256:4a6a8d6537971b3cf8217b6d0ab06b982004990917c5e61d7ac9fd26de6ada65"
+          },
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-33871",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:5abfee3e5ca4e49fd9540fd9d799f2413ec745f0243287171b6d5c37b5855e72",
+          "Title": "Netty is an asynchronous, event-driven network application framework.  ...",
+          "Description": "Netty is an asynchronous, event-driven network application framework. In versions prior to 4.1.132.Final and 4.2.10.Final, a remote user can trigger a Denial of Service (DoS) against a Netty HTTP/2 server by sending a flood of `CONTINUATION` frames. The server's lack of a limit on the number of `CONTINUATION` frames, combined with a bypass of existing size-based mitigations using zero-byte frames, allows an user to cause excessive CPU consumption with minimal bandwidth, rendering the server unresponsive. Versions 4.1.132.Final and 4.2.10.Final fix the issue.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-770"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N",
+              "V40Score": 8.7
+            }
+          },
+          "References": [
+            "https://github.com/netty/netty",
+            "https://github.com/netty/netty/security/advisories/GHSA-w9fj-cfpg-grvv",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-33871"
+          ],
+          "PublishedDate": "2026-03-27T20:16:34.833Z",
+          "LastModifiedDate": "2026-03-30T13:26:29.793Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-33871",
+          "VendorIDs": [
+            "GHSA-w9fj-cfpg-grvv"
+          ],
+          "PkgName": "io.netty:netty-codec-http2",
+          "PkgPath": "liquibase/internal/extensions/liquibase-azure.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/io.netty/netty-codec-http2@4.1.126.Final",
+            "UID": "d3505ef1afb39b2b"
+          },
+          "InstalledVersion": "4.1.126.Final",
+          "FixedVersion": "4.1.132.Final, 4.2.11.Final",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:8892312c98ae2d25e50e3204f38afb80a1c1746a90a75f79626b38e8704bd428",
+            "DiffID": "sha256:4a6a8d6537971b3cf8217b6d0ab06b982004990917c5e61d7ac9fd26de6ada65"
+          },
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-33871",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:5abfee3e5ca4e49fd9540fd9d799f2413ec745f0243287171b6d5c37b5855e72",
+          "Title": "Netty is an asynchronous, event-driven network application framework.  ...",
+          "Description": "Netty is an asynchronous, event-driven network application framework. In versions prior to 4.1.132.Final and 4.2.10.Final, a remote user can trigger a Denial of Service (DoS) against a Netty HTTP/2 server by sending a flood of `CONTINUATION` frames. The server's lack of a limit on the number of `CONTINUATION` frames, combined with a bypass of existing size-based mitigations using zero-byte frames, allows an user to cause excessive CPU consumption with minimal bandwidth, rendering the server unresponsive. Versions 4.1.132.Final and 4.2.10.Final fix the issue.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-770"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N",
+              "V40Score": 8.7
+            }
+          },
+          "References": [
+            "https://github.com/netty/netty",
+            "https://github.com/netty/netty/security/advisories/GHSA-w9fj-cfpg-grvv",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-33871"
+          ],
+          "PublishedDate": "2026-03-27T20:16:34.833Z",
+          "LastModifiedDate": "2026-03-30T13:26:29.793Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-33871",
+          "VendorIDs": [
+            "GHSA-w9fj-cfpg-grvv"
+          ],
+          "PkgName": "io.netty:netty-codec-http2",
+          "PkgPath": "liquibase/internal/extensions/liquibase-commercial-cassandra.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/io.netty/netty-codec-http2@4.2.6.Final",
+            "UID": "a1f7cb63006a6f0c"
+          },
+          "InstalledVersion": "4.2.6.Final",
+          "FixedVersion": "4.1.132.Final, 4.2.11.Final",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:8892312c98ae2d25e50e3204f38afb80a1c1746a90a75f79626b38e8704bd428",
+            "DiffID": "sha256:4a6a8d6537971b3cf8217b6d0ab06b982004990917c5e61d7ac9fd26de6ada65"
+          },
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-33871",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:5abfee3e5ca4e49fd9540fd9d799f2413ec745f0243287171b6d5c37b5855e72",
+          "Title": "Netty is an asynchronous, event-driven network application framework.  ...",
+          "Description": "Netty is an asynchronous, event-driven network application framework. In versions prior to 4.1.132.Final and 4.2.10.Final, a remote user can trigger a Denial of Service (DoS) against a Netty HTTP/2 server by sending a flood of `CONTINUATION` frames. The server's lack of a limit on the number of `CONTINUATION` frames, combined with a bypass of existing size-based mitigations using zero-byte frames, allows an user to cause excessive CPU consumption with minimal bandwidth, rendering the server unresponsive. Versions 4.1.132.Final and 4.2.10.Final fix the issue.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-770"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N",
+              "V40Score": 8.7
+            }
+          },
+          "References": [
+            "https://github.com/netty/netty",
+            "https://github.com/netty/netty/security/advisories/GHSA-w9fj-cfpg-grvv",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-33871"
+          ],
+          "PublishedDate": "2026-03-27T20:16:34.833Z",
+          "LastModifiedDate": "2026-03-30T13:26:29.793Z"
         }
       ]
     },
@@ -15395,7 +15651,7 @@
             "https://go.dev/issue/77217",
             "https://groups.google.com/g/golang-announce/c/K09ubi9FQFk",
             "https://linux.oracle.com/cve/CVE-2025-68121.html",
-            "https://linux.oracle.com/errata/ELSA-2026-4672.html",
+            "https://linux.oracle.com/errata/ELSA-2026-5146.html",
             "https://nvd.nist.gov/vuln/detail/CVE-2025-68121",
             "https://pkg.go.dev/vuln/GO-2026-4337",
             "https://www.cve.org/CVERecord?id=CVE-2025-68121"
@@ -15470,7 +15726,7 @@
             "https://go.dev/issue/77101",
             "https://groups.google.com/g/golang-announce/c/Vd2tYVM8eUc",
             "https://linux.oracle.com/cve/CVE-2025-61726.html",
-            "https://linux.oracle.com/errata/ELSA-2026-4672.html",
+            "https://linux.oracle.com/errata/ELSA-2026-5146.html",
             "https://nvd.nist.gov/vuln/detail/CVE-2025-61726",
             "https://pkg.go.dev/vuln/GO-2026-4341",
             "https://www.cve.org/CVERecord?id=CVE-2025-61726"
@@ -15588,7 +15844,11 @@
           "Description": "url.Parse insufficiently validated the host/authority component and accepted some invalid URLs.",
           "Severity": "HIGH",
           "VendorSeverity": {
+            "alma": 3,
+            "amazon": 2,
+            "azure": 3,
             "bitnami": 3,
+            "oracle-oval": 3,
             "redhat": 3
           },
           "CVSS": {
@@ -15602,10 +15862,16 @@
             }
           },
           "References": [
+            "https://access.redhat.com/errata/RHSA-2026:5942",
             "https://access.redhat.com/security/cve/CVE-2026-25679",
+            "https://bugzilla.redhat.com/2434433",
+            "https://bugzilla.redhat.com/2445356",
+            "https://errata.almalinux.org/9/ALSA-2026-5942.html",
             "https://go.dev/cl/752180",
             "https://go.dev/issue/77578",
             "https://groups.google.com/g/golang-announce/c/EdhZqrQ98hk",
+            "https://linux.oracle.com/cve/CVE-2026-25679.html",
+            "https://linux.oracle.com/errata/ELSA-2026-5942.html",
             "https://nvd.nist.gov/vuln/detail/CVE-2026-25679",
             "https://pkg.go.dev/vuln/GO-2026-4601",
             "https://www.cve.org/CVERecord?id=CVE-2026-25679"

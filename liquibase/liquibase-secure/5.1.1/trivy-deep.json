@@ -3,8 +3,8 @@
   "Trivy": {
     "Version": "0.69.3"
   },
-  "ReportID": "019d3e49-34da-7690-b2ad-6343765ea9b4",
-  "CreatedAt": "2026-03-30T10:27:58.298431589Z",
+  "ReportID": "019d4368-af8f-702c-afa2-afce8c182c85",
+  "CreatedAt": "2026-03-31T10:20:27.407012353Z",
   "ArtifactName": "/tmp/extracted-deps",
   "ArtifactType": "filesystem",
   "Results": [
@@ -5072,6 +5072,508 @@
           "Version": "3.1.0",
           "FilePath": "dist/liquibase-license-tracking-1.0.0-beta/liquibase-license-tracking/BOOT-INF/lib/jackson-databind-3.1.0.jar",
           "AnalyzedBy": "jar"
+        }
+      ],
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2026-33870",
+          "VendorIDs": [
+            "GHSA-pwqr-wmgm-9rr8"
+          ],
+          "PkgName": "io.netty:netty-codec-http",
+          "PkgPath": "internal-jars/extensions/liquibase-commercial-cassandra.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/io.netty/netty-codec-http@4.1.129.Final",
+            "UID": "bd899c47a7c729b2"
+          },
+          "InstalledVersion": "4.1.129.Final",
+          "FixedVersion": "4.1.132.Final, 4.2.10.Final",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-33870",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:c8d08c989d08dd28a95ee75a6dcb6d35334112d46eb361eeab51a5859c38b260",
+          "Title": "io.netty/netty-codec-http: Netty: Request smuggling via incorrect parsing of HTTP/1.1 chunked transfer encoding extension values",
+          "Description": "Netty is an asynchronous, event-driven network application framework. In versions prior to 4.1.132.Final and 4.2.10.Final, Netty incorrectly parses quoted strings in HTTP/1.1 chunked transfer encoding extension values, enabling request smuggling attacks. Versions 4.1.132.Final and 4.2.10.Final fix the issue.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-444"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "redhat": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2026-33870",
+            "https://github.com/netty/netty",
+            "https://github.com/netty/netty/security/advisories/GHSA-pwqr-wmgm-9rr8",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-33870",
+            "https://w4ke.info/2025/06/18/funky-chunks.html",
+            "https://w4ke.info/2025/10/29/funky-chunks-2.html",
+            "https://www.cve.org/CVERecord?id=CVE-2026-33870",
+            "https://www.rfc-editor.org/rfc/rfc9110"
+          ],
+          "PublishedDate": "2026-03-27T20:16:34.663Z",
+          "LastModifiedDate": "2026-03-30T13:26:29.793Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-33870",
+          "VendorIDs": [
+            "GHSA-pwqr-wmgm-9rr8"
+          ],
+          "PkgName": "io.netty:netty-codec-http",
+          "PkgPath": "internal-jars/lib/liquibase-azure-deps.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/io.netty/netty-codec-http@4.1.129.Final",
+            "UID": "b048837b15793426"
+          },
+          "InstalledVersion": "4.1.129.Final",
+          "FixedVersion": "4.1.132.Final, 4.2.10.Final",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-33870",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:c8d08c989d08dd28a95ee75a6dcb6d35334112d46eb361eeab51a5859c38b260",
+          "Title": "io.netty/netty-codec-http: Netty: Request smuggling via incorrect parsing of HTTP/1.1 chunked transfer encoding extension values",
+          "Description": "Netty is an asynchronous, event-driven network application framework. In versions prior to 4.1.132.Final and 4.2.10.Final, Netty incorrectly parses quoted strings in HTTP/1.1 chunked transfer encoding extension values, enabling request smuggling attacks. Versions 4.1.132.Final and 4.2.10.Final fix the issue.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-444"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "redhat": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2026-33870",
+            "https://github.com/netty/netty",
+            "https://github.com/netty/netty/security/advisories/GHSA-pwqr-wmgm-9rr8",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-33870",
+            "https://w4ke.info/2025/06/18/funky-chunks.html",
+            "https://w4ke.info/2025/10/29/funky-chunks-2.html",
+            "https://www.cve.org/CVERecord?id=CVE-2026-33870",
+            "https://www.rfc-editor.org/rfc/rfc9110"
+          ],
+          "PublishedDate": "2026-03-27T20:16:34.663Z",
+          "LastModifiedDate": "2026-03-30T13:26:29.793Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-33870",
+          "VendorIDs": [
+            "GHSA-pwqr-wmgm-9rr8"
+          ],
+          "PkgName": "io.netty:netty-codec-http",
+          "PkgPath": "internal-jars/extensions/liquibase-aws-extension.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/io.netty/netty-codec-http@4.1.130.Final",
+            "UID": "a91a18812818e8e8"
+          },
+          "InstalledVersion": "4.1.130.Final",
+          "FixedVersion": "4.1.132.Final, 4.2.10.Final",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-33870",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:c8d08c989d08dd28a95ee75a6dcb6d35334112d46eb361eeab51a5859c38b260",
+          "Title": "io.netty/netty-codec-http: Netty: Request smuggling via incorrect parsing of HTTP/1.1 chunked transfer encoding extension values",
+          "Description": "Netty is an asynchronous, event-driven network application framework. In versions prior to 4.1.132.Final and 4.2.10.Final, Netty incorrectly parses quoted strings in HTTP/1.1 chunked transfer encoding extension values, enabling request smuggling attacks. Versions 4.1.132.Final and 4.2.10.Final fix the issue.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-444"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "redhat": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2026-33870",
+            "https://github.com/netty/netty",
+            "https://github.com/netty/netty/security/advisories/GHSA-pwqr-wmgm-9rr8",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-33870",
+            "https://w4ke.info/2025/06/18/funky-chunks.html",
+            "https://w4ke.info/2025/10/29/funky-chunks-2.html",
+            "https://www.cve.org/CVERecord?id=CVE-2026-33870",
+            "https://www.rfc-editor.org/rfc/rfc9110"
+          ],
+          "PublishedDate": "2026-03-27T20:16:34.663Z",
+          "LastModifiedDate": "2026-03-30T13:26:29.793Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-33870",
+          "VendorIDs": [
+            "GHSA-pwqr-wmgm-9rr8"
+          ],
+          "PkgName": "io.netty:netty-codec-http",
+          "PkgPath": "internal-jars/extensions/liquibase-azure.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/io.netty/netty-codec-http@4.1.130.Final",
+            "UID": "d6c57a273e5e20a4"
+          },
+          "InstalledVersion": "4.1.130.Final",
+          "FixedVersion": "4.1.132.Final, 4.2.10.Final",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-33870",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:c8d08c989d08dd28a95ee75a6dcb6d35334112d46eb361eeab51a5859c38b260",
+          "Title": "io.netty/netty-codec-http: Netty: Request smuggling via incorrect parsing of HTTP/1.1 chunked transfer encoding extension values",
+          "Description": "Netty is an asynchronous, event-driven network application framework. In versions prior to 4.1.132.Final and 4.2.10.Final, Netty incorrectly parses quoted strings in HTTP/1.1 chunked transfer encoding extension values, enabling request smuggling attacks. Versions 4.1.132.Final and 4.2.10.Final fix the issue.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-444"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "redhat": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2026-33870",
+            "https://github.com/netty/netty",
+            "https://github.com/netty/netty/security/advisories/GHSA-pwqr-wmgm-9rr8",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-33870",
+            "https://w4ke.info/2025/06/18/funky-chunks.html",
+            "https://w4ke.info/2025/10/29/funky-chunks-2.html",
+            "https://www.cve.org/CVERecord?id=CVE-2026-33870",
+            "https://www.rfc-editor.org/rfc/rfc9110"
+          ],
+          "PublishedDate": "2026-03-27T20:16:34.663Z",
+          "LastModifiedDate": "2026-03-30T13:26:29.793Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-33870",
+          "VendorIDs": [
+            "GHSA-pwqr-wmgm-9rr8"
+          ],
+          "PkgName": "io.netty:netty-codec-http",
+          "PkgPath": "internal-jars/extensions/liquibase-commercial-couchbase.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/io.netty/netty-codec-http@4.2.9.Final",
+            "UID": "3b5bd6ede8c0e52c"
+          },
+          "InstalledVersion": "4.2.9.Final",
+          "FixedVersion": "4.1.132.Final, 4.2.10.Final",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-33870",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:c8d08c989d08dd28a95ee75a6dcb6d35334112d46eb361eeab51a5859c38b260",
+          "Title": "io.netty/netty-codec-http: Netty: Request smuggling via incorrect parsing of HTTP/1.1 chunked transfer encoding extension values",
+          "Description": "Netty is an asynchronous, event-driven network application framework. In versions prior to 4.1.132.Final and 4.2.10.Final, Netty incorrectly parses quoted strings in HTTP/1.1 chunked transfer encoding extension values, enabling request smuggling attacks. Versions 4.1.132.Final and 4.2.10.Final fix the issue.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-444"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "redhat": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2026-33870",
+            "https://github.com/netty/netty",
+            "https://github.com/netty/netty/security/advisories/GHSA-pwqr-wmgm-9rr8",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-33870",
+            "https://w4ke.info/2025/06/18/funky-chunks.html",
+            "https://w4ke.info/2025/10/29/funky-chunks-2.html",
+            "https://www.cve.org/CVERecord?id=CVE-2026-33870",
+            "https://www.rfc-editor.org/rfc/rfc9110"
+          ],
+          "PublishedDate": "2026-03-27T20:16:34.663Z",
+          "LastModifiedDate": "2026-03-30T13:26:29.793Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-33871",
+          "VendorIDs": [
+            "GHSA-w9fj-cfpg-grvv"
+          ],
+          "PkgName": "io.netty:netty-codec-http2",
+          "PkgPath": "internal-jars/extensions/liquibase-commercial-cassandra.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/io.netty/netty-codec-http2@4.1.129.Final",
+            "UID": "9ac0b1da624045ac"
+          },
+          "InstalledVersion": "4.1.129.Final",
+          "FixedVersion": "4.1.132.Final, 4.2.11.Final",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-33871",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:a01cb2bbdfe6b3199f937ac02bdb868524dc923aa9ab6fc7a8b908f6d7c41447",
+          "Title": "Netty is an asynchronous, event-driven network application framework.  ...",
+          "Description": "Netty is an asynchronous, event-driven network application framework. In versions prior to 4.1.132.Final and 4.2.10.Final, a remote user can trigger a Denial of Service (DoS) against a Netty HTTP/2 server by sending a flood of `CONTINUATION` frames. The server's lack of a limit on the number of `CONTINUATION` frames, combined with a bypass of existing size-based mitigations using zero-byte frames, allows an user to cause excessive CPU consumption with minimal bandwidth, rendering the server unresponsive. Versions 4.1.132.Final and 4.2.10.Final fix the issue.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-770"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N",
+              "V40Score": 8.7
+            }
+          },
+          "References": [
+            "https://github.com/netty/netty",
+            "https://github.com/netty/netty/security/advisories/GHSA-w9fj-cfpg-grvv",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-33871"
+          ],
+          "PublishedDate": "2026-03-27T20:16:34.833Z",
+          "LastModifiedDate": "2026-03-30T13:26:29.793Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-33871",
+          "VendorIDs": [
+            "GHSA-w9fj-cfpg-grvv"
+          ],
+          "PkgName": "io.netty:netty-codec-http2",
+          "PkgPath": "internal-jars/lib/liquibase-azure-deps.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/io.netty/netty-codec-http2@4.1.129.Final",
+            "UID": "31de90b19f0c66ed"
+          },
+          "InstalledVersion": "4.1.129.Final",
+          "FixedVersion": "4.1.132.Final, 4.2.11.Final",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-33871",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:a01cb2bbdfe6b3199f937ac02bdb868524dc923aa9ab6fc7a8b908f6d7c41447",
+          "Title": "Netty is an asynchronous, event-driven network application framework.  ...",
+          "Description": "Netty is an asynchronous, event-driven network application framework. In versions prior to 4.1.132.Final and 4.2.10.Final, a remote user can trigger a Denial of Service (DoS) against a Netty HTTP/2 server by sending a flood of `CONTINUATION` frames. The server's lack of a limit on the number of `CONTINUATION` frames, combined with a bypass of existing size-based mitigations using zero-byte frames, allows an user to cause excessive CPU consumption with minimal bandwidth, rendering the server unresponsive. Versions 4.1.132.Final and 4.2.10.Final fix the issue.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-770"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N",
+              "V40Score": 8.7
+            }
+          },
+          "References": [
+            "https://github.com/netty/netty",
+            "https://github.com/netty/netty/security/advisories/GHSA-w9fj-cfpg-grvv",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-33871"
+          ],
+          "PublishedDate": "2026-03-27T20:16:34.833Z",
+          "LastModifiedDate": "2026-03-30T13:26:29.793Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-33871",
+          "VendorIDs": [
+            "GHSA-w9fj-cfpg-grvv"
+          ],
+          "PkgName": "io.netty:netty-codec-http2",
+          "PkgPath": "internal-jars/extensions/liquibase-aws-extension.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/io.netty/netty-codec-http2@4.1.130.Final",
+            "UID": "e360bf663c568c8f"
+          },
+          "InstalledVersion": "4.1.130.Final",
+          "FixedVersion": "4.1.132.Final, 4.2.11.Final",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-33871",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:a01cb2bbdfe6b3199f937ac02bdb868524dc923aa9ab6fc7a8b908f6d7c41447",
+          "Title": "Netty is an asynchronous, event-driven network application framework.  ...",
+          "Description": "Netty is an asynchronous, event-driven network application framework. In versions prior to 4.1.132.Final and 4.2.10.Final, a remote user can trigger a Denial of Service (DoS) against a Netty HTTP/2 server by sending a flood of `CONTINUATION` frames. The server's lack of a limit on the number of `CONTINUATION` frames, combined with a bypass of existing size-based mitigations using zero-byte frames, allows an user to cause excessive CPU consumption with minimal bandwidth, rendering the server unresponsive. Versions 4.1.132.Final and 4.2.10.Final fix the issue.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-770"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N",
+              "V40Score": 8.7
+            }
+          },
+          "References": [
+            "https://github.com/netty/netty",
+            "https://github.com/netty/netty/security/advisories/GHSA-w9fj-cfpg-grvv",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-33871"
+          ],
+          "PublishedDate": "2026-03-27T20:16:34.833Z",
+          "LastModifiedDate": "2026-03-30T13:26:29.793Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-33871",
+          "VendorIDs": [
+            "GHSA-w9fj-cfpg-grvv"
+          ],
+          "PkgName": "io.netty:netty-codec-http2",
+          "PkgPath": "internal-jars/extensions/liquibase-azure.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/io.netty/netty-codec-http2@4.1.130.Final",
+            "UID": "a89cb5f06410824f"
+          },
+          "InstalledVersion": "4.1.130.Final",
+          "FixedVersion": "4.1.132.Final, 4.2.11.Final",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-33871",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:a01cb2bbdfe6b3199f937ac02bdb868524dc923aa9ab6fc7a8b908f6d7c41447",
+          "Title": "Netty is an asynchronous, event-driven network application framework.  ...",
+          "Description": "Netty is an asynchronous, event-driven network application framework. In versions prior to 4.1.132.Final and 4.2.10.Final, a remote user can trigger a Denial of Service (DoS) against a Netty HTTP/2 server by sending a flood of `CONTINUATION` frames. The server's lack of a limit on the number of `CONTINUATION` frames, combined with a bypass of existing size-based mitigations using zero-byte frames, allows an user to cause excessive CPU consumption with minimal bandwidth, rendering the server unresponsive. Versions 4.1.132.Final and 4.2.10.Final fix the issue.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-770"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N",
+              "V40Score": 8.7
+            }
+          },
+          "References": [
+            "https://github.com/netty/netty",
+            "https://github.com/netty/netty/security/advisories/GHSA-w9fj-cfpg-grvv",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-33871"
+          ],
+          "PublishedDate": "2026-03-27T20:16:34.833Z",
+          "LastModifiedDate": "2026-03-30T13:26:29.793Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-33871",
+          "VendorIDs": [
+            "GHSA-w9fj-cfpg-grvv"
+          ],
+          "PkgName": "io.netty:netty-codec-http2",
+          "PkgPath": "internal-jars/extensions/liquibase-commercial-couchbase.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/io.netty/netty-codec-http2@4.2.9.Final",
+            "UID": "4875c6ce370a815a"
+          },
+          "InstalledVersion": "4.2.9.Final",
+          "FixedVersion": "4.1.132.Final, 4.2.11.Final",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-33871",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:a01cb2bbdfe6b3199f937ac02bdb868524dc923aa9ab6fc7a8b908f6d7c41447",
+          "Title": "Netty is an asynchronous, event-driven network application framework.  ...",
+          "Description": "Netty is an asynchronous, event-driven network application framework. In versions prior to 4.1.132.Final and 4.2.10.Final, a remote user can trigger a Denial of Service (DoS) against a Netty HTTP/2 server by sending a flood of `CONTINUATION` frames. The server's lack of a limit on the number of `CONTINUATION` frames, combined with a bypass of existing size-based mitigations using zero-byte frames, allows an user to cause excessive CPU consumption with minimal bandwidth, rendering the server unresponsive. Versions 4.1.132.Final and 4.2.10.Final fix the issue.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-770"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N",
+              "V40Score": 8.7
+            }
+          },
+          "References": [
+            "https://github.com/netty/netty",
+            "https://github.com/netty/netty/security/advisories/GHSA-w9fj-cfpg-grvv",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-33871"
+          ],
+          "PublishedDate": "2026-03-27T20:16:34.833Z",
+          "LastModifiedDate": "2026-03-30T13:26:29.793Z"
         }
       ]
     },
