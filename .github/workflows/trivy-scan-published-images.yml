@@ -205,7 +205,7 @@ jobs:
               BATCH_NUM=$((BATCH_NUM + 1))
               CVE_COUNT=$(echo "$batch_json" | jq '.cves | length' 2>/dev/null || echo "?")
 
-              if gh workflow run investigate-cve.md \
+              if gh workflow run investigate-cve.lock.yml \
                   -R liquibase/liquibase-pro \
                   -f "cve_json=$batch_json" 2>/tmp/dispatch-err-$$.txt; then
                 echo "- **${IMAGE_OR_VERSION}** batch $BATCH_NUM: dispatched $CVE_COUNT CVEs" >> "$GITHUB_STEP_SUMMARY"

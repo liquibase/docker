@@ -286,7 +286,7 @@ jobs:
 
             echo "Dispatching batch $BATCH_NUM ($CVE_COUNT CVEs) to investigate-cve workflow..."
 
-            if gh workflow run investigate-cve.md \
+            if gh workflow run investigate-cve.lock.yml \
                 -R liquibase/liquibase-pro \
                 -f "cve_json=$batch_json" 2>/tmp/dispatch-err-$$.txt; then
               echo "- Batch $BATCH_NUM: dispatched $CVE_COUNT CVEs" >> "$GITHUB_STEP_SUMMARY"
