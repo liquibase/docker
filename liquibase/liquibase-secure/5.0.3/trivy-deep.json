@@ -3,8 +3,8 @@
   "Trivy": {
     "Version": "0.69.3"
   },
-  "ReportID": "019d4368-c5d5-70ce-b9a0-e27ca634e923",
-  "CreatedAt": "2026-03-31T10:20:33.1090543Z",
+  "ReportID": "019d488f-268d-7e31-ba48-f715b697fb05",
+  "CreatedAt": "2026-04-01T10:20:34.31793128Z",
   "ArtifactName": "/tmp/extracted-deps",
   "ArtifactType": "filesystem",
   "Results": [
@@ -4338,7 +4338,7 @@
             "https://www.rfc-editor.org/rfc/rfc9110"
           ],
           "PublishedDate": "2026-03-27T20:16:34.663Z",
-          "LastModifiedDate": "2026-03-30T13:26:29.793Z"
+          "LastModifiedDate": "2026-03-30T20:12:16.33Z"
         },
         {
           "VulnerabilityID": "CVE-2026-33870",
@@ -4393,7 +4393,7 @@
             "https://www.rfc-editor.org/rfc/rfc9110"
           ],
           "PublishedDate": "2026-03-27T20:16:34.663Z",
-          "LastModifiedDate": "2026-03-30T13:26:29.793Z"
+          "LastModifiedDate": "2026-03-30T20:12:16.33Z"
         },
         {
           "VulnerabilityID": "CVE-2026-33870",
@@ -4448,7 +4448,7 @@
             "https://www.rfc-editor.org/rfc/rfc9110"
           ],
           "PublishedDate": "2026-03-27T20:16:34.663Z",
-          "LastModifiedDate": "2026-03-30T13:26:29.793Z"
+          "LastModifiedDate": "2026-03-30T20:12:16.33Z"
         },
         {
           "VulnerabilityID": "CVE-2026-33870",
@@ -4503,7 +4503,7 @@
             "https://www.rfc-editor.org/rfc/rfc9110"
           ],
           "PublishedDate": "2026-03-27T20:16:34.663Z",
-          "LastModifiedDate": "2026-03-30T13:26:29.793Z"
+          "LastModifiedDate": "2026-03-30T20:12:16.33Z"
         },
         {
           "VulnerabilityID": "CVE-2026-33871",
@@ -4527,28 +4527,40 @@
             "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
           },
           "Fingerprint": "sha256:a01cb2bbdfe6b3199f937ac02bdb868524dc923aa9ab6fc7a8b908f6d7c41447",
-          "Title": "Netty is an asynchronous, event-driven network application framework.  ...",
+          "Title": "netty: Netty: Denial of Service via HTTP/2 CONTINUATION frame flood",
           "Description": "Netty is an asynchronous, event-driven network application framework. In versions prior to 4.1.132.Final and 4.2.10.Final, a remote user can trigger a Denial of Service (DoS) against a Netty HTTP/2 server by sending a flood of `CONTINUATION` frames. The server's lack of a limit on the number of `CONTINUATION` frames, combined with a bypass of existing size-based mitigations using zero-byte frames, allows an user to cause excessive CPU consumption with minimal bandwidth, rendering the server unresponsive. Versions 4.1.132.Final and 4.2.10.Final fix the issue.",
           "Severity": "HIGH",
           "CweIDs": [
             "CWE-770"
           ],
           "VendorSeverity": {
-            "ghsa": 3
+            "ghsa": 3,
+            "nvd": 3,
+            "redhat": 3
           },
           "CVSS": {
             "ghsa": {
               "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N",
               "V40Score": 8.7
+            },
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
             }
           },
           "References": [
+            "https://access.redhat.com/security/cve/CVE-2026-33871",
             "https://github.com/netty/netty",
             "https://github.com/netty/netty/security/advisories/GHSA-w9fj-cfpg-grvv",
-            "https://nvd.nist.gov/vuln/detail/CVE-2026-33871"
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-33871",
+            "https://www.cve.org/CVERecord?id=CVE-2026-33871"
           ],
           "PublishedDate": "2026-03-27T20:16:34.833Z",
-          "LastModifiedDate": "2026-03-30T13:26:29.793Z"
+          "LastModifiedDate": "2026-03-30T20:10:17.62Z"
         },
         {
           "VulnerabilityID": "CVE-2026-33871",
@@ -4572,28 +4584,40 @@
             "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
           },
           "Fingerprint": "sha256:a01cb2bbdfe6b3199f937ac02bdb868524dc923aa9ab6fc7a8b908f6d7c41447",
-          "Title": "Netty is an asynchronous, event-driven network application framework.  ...",
+          "Title": "netty: Netty: Denial of Service via HTTP/2 CONTINUATION frame flood",
           "Description": "Netty is an asynchronous, event-driven network application framework. In versions prior to 4.1.132.Final and 4.2.10.Final, a remote user can trigger a Denial of Service (DoS) against a Netty HTTP/2 server by sending a flood of `CONTINUATION` frames. The server's lack of a limit on the number of `CONTINUATION` frames, combined with a bypass of existing size-based mitigations using zero-byte frames, allows an user to cause excessive CPU consumption with minimal bandwidth, rendering the server unresponsive. Versions 4.1.132.Final and 4.2.10.Final fix the issue.",
           "Severity": "HIGH",
           "CweIDs": [
             "CWE-770"
           ],
           "VendorSeverity": {
-            "ghsa": 3
+            "ghsa": 3,
+            "nvd": 3,
+            "redhat": 3
           },
           "CVSS": {
             "ghsa": {
               "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N",
               "V40Score": 8.7
+            },
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
             }
           },
           "References": [
+            "https://access.redhat.com/security/cve/CVE-2026-33871",
             "https://github.com/netty/netty",
             "https://github.com/netty/netty/security/advisories/GHSA-w9fj-cfpg-grvv",
-            "https://nvd.nist.gov/vuln/detail/CVE-2026-33871"
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-33871",
+            "https://www.cve.org/CVERecord?id=CVE-2026-33871"
           ],
           "PublishedDate": "2026-03-27T20:16:34.833Z",
-          "LastModifiedDate": "2026-03-30T13:26:29.793Z"
+          "LastModifiedDate": "2026-03-30T20:10:17.62Z"
         },
         {
           "VulnerabilityID": "CVE-2026-33871",
@@ -4617,28 +4641,40 @@
             "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
           },
           "Fingerprint": "sha256:a01cb2bbdfe6b3199f937ac02bdb868524dc923aa9ab6fc7a8b908f6d7c41447",
-          "Title": "Netty is an asynchronous, event-driven network application framework.  ...",
+          "Title": "netty: Netty: Denial of Service via HTTP/2 CONTINUATION frame flood",
           "Description": "Netty is an asynchronous, event-driven network application framework. In versions prior to 4.1.132.Final and 4.2.10.Final, a remote user can trigger a Denial of Service (DoS) against a Netty HTTP/2 server by sending a flood of `CONTINUATION` frames. The server's lack of a limit on the number of `CONTINUATION` frames, combined with a bypass of existing size-based mitigations using zero-byte frames, allows an user to cause excessive CPU consumption with minimal bandwidth, rendering the server unresponsive. Versions 4.1.132.Final and 4.2.10.Final fix the issue.",
           "Severity": "HIGH",
           "CweIDs": [
             "CWE-770"
           ],
           "VendorSeverity": {
-            "ghsa": 3
+            "ghsa": 3,
+            "nvd": 3,
+            "redhat": 3
           },
           "CVSS": {
             "ghsa": {
               "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N",
               "V40Score": 8.7
+            },
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
             }
           },
           "References": [
+            "https://access.redhat.com/security/cve/CVE-2026-33871",
             "https://github.com/netty/netty",
             "https://github.com/netty/netty/security/advisories/GHSA-w9fj-cfpg-grvv",
-            "https://nvd.nist.gov/vuln/detail/CVE-2026-33871"
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-33871",
+            "https://www.cve.org/CVERecord?id=CVE-2026-33871"
           ],
           "PublishedDate": "2026-03-27T20:16:34.833Z",
-          "LastModifiedDate": "2026-03-30T13:26:29.793Z"
+          "LastModifiedDate": "2026-03-30T20:10:17.62Z"
         },
         {
           "VulnerabilityID": "CVE-2026-33871",
@@ -4662,28 +4698,40 @@
             "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
           },
           "Fingerprint": "sha256:a01cb2bbdfe6b3199f937ac02bdb868524dc923aa9ab6fc7a8b908f6d7c41447",
-          "Title": "Netty is an asynchronous, event-driven network application framework.  ...",
+          "Title": "netty: Netty: Denial of Service via HTTP/2 CONTINUATION frame flood",
           "Description": "Netty is an asynchronous, event-driven network application framework. In versions prior to 4.1.132.Final and 4.2.10.Final, a remote user can trigger a Denial of Service (DoS) against a Netty HTTP/2 server by sending a flood of `CONTINUATION` frames. The server's lack of a limit on the number of `CONTINUATION` frames, combined with a bypass of existing size-based mitigations using zero-byte frames, allows an user to cause excessive CPU consumption with minimal bandwidth, rendering the server unresponsive. Versions 4.1.132.Final and 4.2.10.Final fix the issue.",
           "Severity": "HIGH",
           "CweIDs": [
             "CWE-770"
           ],
           "VendorSeverity": {
-            "ghsa": 3
+            "ghsa": 3,
+            "nvd": 3,
+            "redhat": 3
           },
           "CVSS": {
             "ghsa": {
               "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N",
               "V40Score": 8.7
+            },
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
             }
           },
           "References": [
+            "https://access.redhat.com/security/cve/CVE-2026-33871",
             "https://github.com/netty/netty",
             "https://github.com/netty/netty/security/advisories/GHSA-w9fj-cfpg-grvv",
-            "https://nvd.nist.gov/vuln/detail/CVE-2026-33871"
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-33871",
+            "https://www.cve.org/CVERecord?id=CVE-2026-33871"
           ],
           "PublishedDate": "2026-03-27T20:16:34.833Z",
-          "LastModifiedDate": "2026-03-30T13:26:29.793Z"
+          "LastModifiedDate": "2026-03-30T20:10:17.62Z"
         },
         {
           "VulnerabilityID": "CVE-2026-24734",
@@ -5061,7 +5109,7 @@
           ],
           "VendorSeverity": {
             "alma": 3,
-            "amazon": 2,
+            "amazon": 3,
             "azure": 3,
             "cbl-mariner": 3,
             "ghsa": 3,
@@ -5144,7 +5192,7 @@
           ],
           "VendorSeverity": {
             "alma": 3,
-            "amazon": 2,
+            "amazon": 3,
             "azure": 3,
             "cbl-mariner": 3,
             "ghsa": 3,
@@ -5227,7 +5275,7 @@
           ],
           "VendorSeverity": {
             "alma": 3,
-            "amazon": 2,
+            "amazon": 3,
             "azure": 3,
             "cbl-mariner": 3,
             "ghsa": 3,
@@ -5310,7 +5358,7 @@
           ],
           "VendorSeverity": {
             "alma": 3,
-            "amazon": 2,
+            "amazon": 3,
             "azure": 3,
             "cbl-mariner": 3,
             "ghsa": 3,
@@ -5394,7 +5442,7 @@
           ],
           "VendorSeverity": {
             "alma": 3,
-            "amazon": 2,
+            "amazon": 3,
             "azure": 3,
             "cbl-mariner": 3,
             "ghsa": 3,
@@ -5478,7 +5526,7 @@
           ],
           "VendorSeverity": {
             "alma": 3,
-            "amazon": 2,
+            "amazon": 3,
             "azure": 3,
             "cbl-mariner": 3,
             "ghsa": 3,
