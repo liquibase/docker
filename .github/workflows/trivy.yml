@@ -192,7 +192,7 @@ jobs:
           parse-json-secrets: true
 
       - name: Notify Slack on Build Failure
-        uses: rtCamp/action-slack-notify@f43175ac92c1fb2e8f9cd89aa2984941ac0d30dc # v2.3.3
+        uses: rtCamp/action-slack-notify@e31e87e03dd19038e411e38ae27cbad084a90661 # v2.3.3
         env:
           SLACK_COLOR: "failure"
           SLACK_MESSAGE: "View details on GitHub Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Triggered by repository: ${{ github.repository }}"
@@ -272,7 +272,7 @@ jobs:
 
       - name: Notify Slack on Build Failure
         if: failure()
-        uses: rtCamp/action-slack-notify@f43175ac92c1fb2e8f9cd89aa2984941ac0d30dc # v2.3.3
+        uses: rtCamp/action-slack-notify@e31e87e03dd19038e411e38ae27cbad084a90661 # v2.3.3
         env:
           SLACK_COLOR: "failure"
           SLACK_MESSAGE: "View details on GitHub Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Triggered by repository: ${{ github.repository }} and job: ${{ github.job }}"
