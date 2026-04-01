@@ -113,10 +113,10 @@ for ARTIFACT_PATH in "$ARTIFACTS_DIR"/vulnerability-report-*; do
   ORG="${SEGMENTS[0]}"
 
   # Find the tag: scan from the end for the last segment that looks like a version
-  # A version segment starts with a digit, or is a known non-semver tag like "latest"
+  # A version segment starts with a digit, or is a known non-semver tag like "latest" or "alpine"
   TAG_INDEX=-1
   for (( i=${#SEGMENTS[@]}-1; i>=2; i-- )); do
-    if [[ "${SEGMENTS[$i]}" =~ ^[0-9] ]] || [[ "${SEGMENTS[$i]}" == "latest" ]]; then
+    if [[ "${SEGMENTS[$i]}" =~ ^[0-9] ]] || [[ "${SEGMENTS[$i]}" == "latest" ]] || [[ "${SEGMENTS[$i]}" =~ ^(alpine|slim|jammy|focal|bullseye|noble)$ ]]; then
       TAG_INDEX=$i
       break
     fi
@@ -160,6 +160,18 @@ for ARTIFACT_PATH in "$ARTIFACTS_DIR"/vulnerability-report-*; do
   if [ "${#MISSING_FILES[@]}" -gt 0 ]; then
     echo "WARNING: $IMAGE_PATH:$TAG is missing scan files: ${MISSING_FILES[*]}"
   fi
+
+  # Copy optional Scout JSON if present (not all images get a Scout scan).
+  # When absent, remove any stale copy from a previous run (the branch is persistent).
+  OPTIONAL_SCAN_FILES=(scout-results.json)
+  for FILE in "${OPTIONAL_SCAN_FILES[@]}"; do
+    if [ -f "$ARTIFACT_PATH/$FILE" ]; then
+      cp "$ARTIFACT_PATH/$FILE" "$DEST_DIR/$FILE"
+      echo "  Included optional file: $FILE"
+    else
+      rm -f "$DEST_DIR/$FILE"
+    fi
+  done
 
   # Also check for grype-results.json variants (some workflows output grype-results.sarif too)
   # We only need the JSON
