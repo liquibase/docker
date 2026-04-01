@@ -23,6 +23,18 @@ if [ -d "/liquibase/.ssh-mount" ] || [ -n "$SSH_AUTH_SOCK" ]; then
     fi
 fi
 
+# Redirect Java temp directory to project filesystem to prevent "Operation not permitted"
+# errors when Java 21 moves files across filesystem boundaries (e.g., /tmp → mounted volume).
+# Java 21 enforces POSIX attribute preservation on Files.move() fallback copy, which fails on
+# non-POSIX filesystems (NTFS via WSL2/Docker Desktop). Same-filesystem moves use atomic
+# rename() and skip attribute copying entirely.
+if [ -d "/liquibase/project" ]; then
+    _LB_TMPDIR="/liquibase/project/.liquibase-tmp"
+    mkdir -p "$_LB_TMPDIR" 2>/dev/null || true
+    export JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS:+$JAVA_TOOL_OPTIONS }-Djava.io.tmpdir=$_LB_TMPDIR"
+    trap 'rm -rf "$_LB_TMPDIR" 2>/dev/null || true' EXIT
+fi
+
 # Execute command
 if [[ "$1" != "history" ]] && type "$1" > /dev/null 2>&1; then
     # First argument is an actual OS command. Run it directly
