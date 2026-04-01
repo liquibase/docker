@@ -30,9 +30,9 @@ fi
 # rename() and skip attribute copying entirely.
 if [ -d "/liquibase/project" ]; then
     _LB_TMPDIR="/liquibase/project/.liquibase-tmp"
+    rm -rf "$_LB_TMPDIR" 2>/dev/null || true
     mkdir -p "$_LB_TMPDIR" 2>/dev/null || true
     export JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS:+$JAVA_TOOL_OPTIONS }-Djava.io.tmpdir=$_LB_TMPDIR"
-    trap 'rm -rf "$_LB_TMPDIR" 2>/dev/null || true' EXIT
 fi
 
 # Execute command
