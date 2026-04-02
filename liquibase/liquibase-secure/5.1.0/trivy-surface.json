@@ -3,8 +3,8 @@
   "Trivy": {
     "Version": "0.69.3"
   },
-  "ReportID": "019d488e-9e10-7e19-b513-811ae264adb3",
-  "CreatedAt": "2026-04-01T10:19:59.376926411Z",
+  "ReportID": "019d4db3-4911-7a7e-8ccb-8708f346c56c",
+  "CreatedAt": "2026-04-02T10:18:08.52968936Z",
   "ArtifactID": "sha256:176b2facc69b5d6abc2ce362a642d232d93f5e82c6a7756b17a0e7a722591a3b",
   "ArtifactName": "liquibase/liquibase-secure:5.1.0",
   "ArtifactType": "container_image",
@@ -16029,16 +16029,16 @@
             }
           },
           "References": [
-            "https://access.redhat.com/errata/RHSA-2026:5942",
+            "https://access.redhat.com/errata/RHSA-2026:5941",
             "https://access.redhat.com/security/cve/CVE-2026-25679",
             "https://bugzilla.redhat.com/2434433",
             "https://bugzilla.redhat.com/2445356",
-            "https://errata.almalinux.org/9/ALSA-2026-5942.html",
+            "https://errata.almalinux.org/10/ALSA-2026-5941.html",
             "https://go.dev/cl/752180",
             "https://go.dev/issue/77578",
             "https://groups.google.com/g/golang-announce/c/EdhZqrQ98hk",
             "https://linux.oracle.com/cve/CVE-2026-25679.html",
-            "https://linux.oracle.com/errata/ELSA-2026-5942.html",
+            "https://linux.oracle.com/errata/ELSA-2026-6388.html",
             "https://nvd.nist.gov/vuln/detail/CVE-2026-25679",
             "https://pkg.go.dev/vuln/GO-2026-4601",
             "https://www.cve.org/CVERecord?id=CVE-2026-25679"
