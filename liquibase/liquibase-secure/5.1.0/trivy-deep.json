@@ -3,8 +3,8 @@
   "Trivy": {
     "Version": "0.69.3"
   },
-  "ReportID": "019d52d5-8e5a-71f9-8b87-2a4cb79ae0de",
-  "CreatedAt": "2026-04-03T10:13:40.570130967Z",
+  "ReportID": "019d6251-864d-76ad-9b92-cc10e3c23c3c",
+  "CreatedAt": "2026-04-06T10:23:23.213438628Z",
   "ArtifactName": "/tmp/extracted-deps",
   "ArtifactType": "filesystem",
   "Results": [
@@ -6262,6 +6262,80 @@
           ],
           "PublishedDate": "2026-03-06T08:16:26.603Z",
           "LastModifiedDate": "2026-03-10T19:05:19.067Z"
+        },
+        {
+          "VulnerabilityID": "GHSA-2m67-wjpj-xhg9",
+          "PkgName": "tools.jackson.core:jackson-core",
+          "PkgPath": "dist/liquibase-license-tracking-1.0.0-beta/liquibase-license-tracking-nested-jars/jackson-core-3.0.4.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/tools.jackson.core/jackson-core@3.0.4",
+            "UID": "4a80750149d89085"
+          },
+          "InstalledVersion": "3.0.4",
+          "Status": "affected",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://github.com/advisories/GHSA-2m67-wjpj-xhg9",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:b4cca0f49e1ad724d464550479b8cd1c042e134ea08ca92ba4d1700e79ad647d",
+          "Title": "Jackson Core: Document length constraint bypass in blocking, async, and DataInput parsers",
+          "Description": "## Summary\n\nJackson Core 3.x does not consistently enforce `StreamReadConstraints.maxDocumentLength`. Oversized JSON documents can be accepted without a `StreamConstraintsException` in multiple parser entry points, which allows configured size limits to be bypassed and weakens denial-of-service protections.\n\n## Details\n\nThree code paths where `maxDocumentLength` is not fully enforced:\n\n### 1. Blocking parsers skip validation of the final in-memory buffer\n\nBlocking parsers validate only previously processed buffers, not the final in-memory buffer:\n\n- `ReaderBasedJsonParser.java:255`\n- `UTF8StreamJsonParser.java:208`\n\nRelevant code:\n\n```java\n_currInputProcessed += bufSize;\n_streamReadConstraints.validateDocumentLength(_currInputProcessed);\n```\n\nThis means the check occurs only when a completed buffer is rolled over. If an oversized document is fully contained in the final buffer, parsing can complete without any document-length exception.\n\n### 2. Async parsers skip validation of the final chunk on end-of-input\n\nAsync parsers validate previously processed chunks, but do not validate the final chunk on end-of-input:\n\n- `NonBlockingByteArrayJsonParser.java:49`\n- `NonBlockingByteBufferJsonParser.java:57`\n- `NonBlockingUtf8JsonParserBase.java:75`\n\nRelevant code:\n\n```java\n_currInputProcessed += _origBufferLen;\n_streamReadConstraints.validateDocumentLength(_currInputProcessed);\n\npublic void endOfInput() {\n    _endOfInput = true;\n}\n```\n\n`endOfInput()` marks EOF but does not perform a final `validateDocumentLength(...)` call, so an oversized last chunk is accepted.\n\n### 3. DataInput parser path does not enforce `maxDocumentLength` at all\n\n- `JsonFactory.java:457`\n\nRelevant construction path:\n\n```java\nint firstByte = ByteSourceJsonBootstrapper.skipUTF8BOM(input);\nreturn new UTF8DataInputJsonParser(readCtxt, ioCtxt,\n        readCtxt.getStreamReadFeatures(_streamReadFeatures),\n        readCtxt.getFormatReadFeatures(_formatReadFeatures),\n        input, can, firstByte);\n```\n\n`UTF8DataInputJsonParser` does not call `StreamReadConstraints.validateDocumentLength(...)`, so `maxDocumentLength` is effectively disabled for `createParser(..., DataInput)` users.\n\n\u003e **Note:** This issue appears distinct from the recently published nesting-depth and number-length constraint advisories because it affects document-length enforcement.\n\n## PoC\n\n### Async path reproducer\n\n```java\nimport java.nio.charset.StandardCharsets;\nimport tools.jackson.core.JsonParser;\nimport tools.jackson.core.ObjectReadContext;\nimport tools.jackson.core.StreamReadConstraints;\nimport tools.jackson.core.async.ByteArrayFeeder;\nimport tools.jackson.core.json.JsonFactory;\n\npublic class Poc {\n    public static void main(String[] args) throws Exception {\n        JsonFactory factory = JsonFactory.builder()\n                .streamReadConstraints(StreamReadConstraints.builder()\n                        .maxDocumentLength(10L)\n                        .build())\n                .build();\n\n        byte[] doc = \"{\\\"a\\\":1,\\\"b\\\":2}\".getBytes(StandardCharsets.UTF_8);\n\n        try (JsonParser p = factory.createNonBlockingByteArrayParser(ObjectReadContext.empty())) {\n            ByteArrayFeeder feeder = (ByteArrayFeeder) p.nonBlockingInputFeeder();\n            feeder.feedInput(doc, 0, doc.length);\n            feeder.endOfInput();\n\n            while (p.nextToken() != null) { }\n        }\n\n        System.out.println(\"Parsed successfully\");\n    }\n}\n```\n\n- **Expected result:** Parsing should fail because the configured document-length limit is 10, while the input is longer than 10 bytes.\n- **Actual result:** The document is accepted and parsing completes.\n\n### Blocking path reproducer\n\n```java\nimport java.io.ByteArrayInputStream;\nimport java.nio.charset.StandardCharsets;\nimport tools.jackson.core.JsonParser;\nimport tools.jackson.core.StreamReadConstraints;\nimport tools.jackson.core.json.JsonFactory;\n\npublic class Poc2 {\n    public static void main(String[] args) throws Exception {\n        JsonFactory factory = JsonFactory.builder()\n                .streamReadConstraints(StreamReadConstraints.builder()\n                        .maxDocumentLength(10L)\n                        .build())\n                .build();\n\n        byte[] doc = \"{\\\"a\\\":1,\\\"b\\\":2}\".getBytes(StandardCharsets.UTF_8);\n\n        try (JsonParser p = factory.createParser(new ByteArrayInputStream(doc))) {\n            while (p.nextToken() != null) { }\n        }\n\n        System.out.println(\"Parsed successfully\");\n    }\n}\n```\n\n## Impact\n\nApplications that rely on `maxDocumentLength` as a safety control for untrusted JSON can accept oversized inputs without error. In network-facing services this weakens an explicit denial-of-service protection and can increase CPU and memory consumption by allowing larger-than-configured request bodies to be processed.",
+          "Severity": "HIGH",
+          "VendorSeverity": {
+            "ghsa": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://github.com/FasterXML/jackson-core",
+            "https://github.com/FasterXML/jackson-core/security/advisories/GHSA-2m67-wjpj-xhg9"
+          ],
+          "PublishedDate": "2026-04-04T04:17:07Z",
+          "LastModifiedDate": "2026-04-04T04:17:07Z"
+        },
+        {
+          "VulnerabilityID": "GHSA-2m67-wjpj-xhg9",
+          "PkgName": "tools.jackson.core:jackson-core",
+          "PkgPath": "dist/liquibase-license-tracking-1.0.0-beta/liquibase-license-tracking/BOOT-INF/lib/jackson-core-3.0.4.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/tools.jackson.core/jackson-core@3.0.4",
+            "UID": "5e72398148acb17c"
+          },
+          "InstalledVersion": "3.0.4",
+          "Status": "affected",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://github.com/advisories/GHSA-2m67-wjpj-xhg9",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:b4cca0f49e1ad724d464550479b8cd1c042e134ea08ca92ba4d1700e79ad647d",
+          "Title": "Jackson Core: Document length constraint bypass in blocking, async, and DataInput parsers",
+          "Description": "## Summary\n\nJackson Core 3.x does not consistently enforce `StreamReadConstraints.maxDocumentLength`. Oversized JSON documents can be accepted without a `StreamConstraintsException` in multiple parser entry points, which allows configured size limits to be bypassed and weakens denial-of-service protections.\n\n## Details\n\nThree code paths where `maxDocumentLength` is not fully enforced:\n\n### 1. Blocking parsers skip validation of the final in-memory buffer\n\nBlocking parsers validate only previously processed buffers, not the final in-memory buffer:\n\n- `ReaderBasedJsonParser.java:255`\n- `UTF8StreamJsonParser.java:208`\n\nRelevant code:\n\n```java\n_currInputProcessed += bufSize;\n_streamReadConstraints.validateDocumentLength(_currInputProcessed);\n```\n\nThis means the check occurs only when a completed buffer is rolled over. If an oversized document is fully contained in the final buffer, parsing can complete without any document-length exception.\n\n### 2. Async parsers skip validation of the final chunk on end-of-input\n\nAsync parsers validate previously processed chunks, but do not validate the final chunk on end-of-input:\n\n- `NonBlockingByteArrayJsonParser.java:49`\n- `NonBlockingByteBufferJsonParser.java:57`\n- `NonBlockingUtf8JsonParserBase.java:75`\n\nRelevant code:\n\n```java\n_currInputProcessed += _origBufferLen;\n_streamReadConstraints.validateDocumentLength(_currInputProcessed);\n\npublic void endOfInput() {\n    _endOfInput = true;\n}\n```\n\n`endOfInput()` marks EOF but does not perform a final `validateDocumentLength(...)` call, so an oversized last chunk is accepted.\n\n### 3. DataInput parser path does not enforce `maxDocumentLength` at all\n\n- `JsonFactory.java:457`\n\nRelevant construction path:\n\n```java\nint firstByte = ByteSourceJsonBootstrapper.skipUTF8BOM(input);\nreturn new UTF8DataInputJsonParser(readCtxt, ioCtxt,\n        readCtxt.getStreamReadFeatures(_streamReadFeatures),\n        readCtxt.getFormatReadFeatures(_formatReadFeatures),\n        input, can, firstByte);\n```\n\n`UTF8DataInputJsonParser` does not call `StreamReadConstraints.validateDocumentLength(...)`, so `maxDocumentLength` is effectively disabled for `createParser(..., DataInput)` users.\n\n\u003e **Note:** This issue appears distinct from the recently published nesting-depth and number-length constraint advisories because it affects document-length enforcement.\n\n## PoC\n\n### Async path reproducer\n\n```java\nimport java.nio.charset.StandardCharsets;\nimport tools.jackson.core.JsonParser;\nimport tools.jackson.core.ObjectReadContext;\nimport tools.jackson.core.StreamReadConstraints;\nimport tools.jackson.core.async.ByteArrayFeeder;\nimport tools.jackson.core.json.JsonFactory;\n\npublic class Poc {\n    public static void main(String[] args) throws Exception {\n        JsonFactory factory = JsonFactory.builder()\n                .streamReadConstraints(StreamReadConstraints.builder()\n                        .maxDocumentLength(10L)\n                        .build())\n                .build();\n\n        byte[] doc = \"{\\\"a\\\":1,\\\"b\\\":2}\".getBytes(StandardCharsets.UTF_8);\n\n        try (JsonParser p = factory.createNonBlockingByteArrayParser(ObjectReadContext.empty())) {\n            ByteArrayFeeder feeder = (ByteArrayFeeder) p.nonBlockingInputFeeder();\n            feeder.feedInput(doc, 0, doc.length);\n            feeder.endOfInput();\n\n            while (p.nextToken() != null) { }\n        }\n\n        System.out.println(\"Parsed successfully\");\n    }\n}\n```\n\n- **Expected result:** Parsing should fail because the configured document-length limit is 10, while the input is longer than 10 bytes.\n- **Actual result:** The document is accepted and parsing completes.\n\n### Blocking path reproducer\n\n```java\nimport java.io.ByteArrayInputStream;\nimport java.nio.charset.StandardCharsets;\nimport tools.jackson.core.JsonParser;\nimport tools.jackson.core.StreamReadConstraints;\nimport tools.jackson.core.json.JsonFactory;\n\npublic class Poc2 {\n    public static void main(String[] args) throws Exception {\n        JsonFactory factory = JsonFactory.builder()\n                .streamReadConstraints(StreamReadConstraints.builder()\n                        .maxDocumentLength(10L)\n                        .build())\n                .build();\n\n        byte[] doc = \"{\\\"a\\\":1,\\\"b\\\":2}\".getBytes(StandardCharsets.UTF_8);\n\n        try (JsonParser p = factory.createParser(new ByteArrayInputStream(doc))) {\n            while (p.nextToken() != null) { }\n        }\n\n        System.out.println(\"Parsed successfully\");\n    }\n}\n```\n\n## Impact\n\nApplications that rely on `maxDocumentLength` as a safety control for untrusted JSON can accept oversized inputs without error. In network-facing services this weakens an explicit denial-of-service protection and can increase CPU and memory consumption by allowing larger-than-configured request bodies to be processed.",
+          "Severity": "HIGH",
+          "VendorSeverity": {
+            "ghsa": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://github.com/FasterXML/jackson-core",
+            "https://github.com/FasterXML/jackson-core/security/advisories/GHSA-2m67-wjpj-xhg9"
+          ],
+          "PublishedDate": "2026-04-04T04:17:07Z",
+          "LastModifiedDate": "2026-04-04T04:17:07Z"
         }
       ]
     },
