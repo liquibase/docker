@@ -3,8 +3,8 @@
   "Trivy": {
     "Version": "0.69.3"
   },
-  "ReportID": "019d6250-32e9-7a6a-a119-2cb070ab40d5",
-  "CreatedAt": "2026-04-06T10:21:56.329683624Z",
+  "ReportID": "019d6774-e331-7347-ae36-30cbe90c320b",
+  "CreatedAt": "2026-04-07T10:20:06.833216299Z",
   "ArtifactID": "sha256:ff9ccc0f412885d2f350273b856e29f33d5cbd3a86b57d23715fdffe9f11c356",
   "ArtifactName": "liquibase/liquibase:5.0.2",
   "ArtifactType": "container_image",
@@ -10886,10 +10886,10 @@
             }
           },
           "References": [
-            "https://access.redhat.com/errata/RHSA-2026:6388",
+            "https://access.redhat.com/errata/RHSA-2026:6383",
             "https://access.redhat.com/security/cve/CVE-2026-25679",
             "https://bugzilla.redhat.com/2445356",
-            "https://errata.almalinux.org/10/ALSA-2026-6388.html",
+            "https://errata.almalinux.org/9/ALSA-2026-6383.html",
             "https://go.dev/cl/752180",
             "https://go.dev/issue/77578",
             "https://groups.google.com/g/golang-announce/c/EdhZqrQ98hk",
