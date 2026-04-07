@@ -123,6 +123,7 @@ jobs:
         env:
           GH_TOKEN: ${{ steps.get-token-cve.outputs.token }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          EXPECTED_MATRIX: ${{ needs.generate-matrix.outputs.matrix }}
         run: |
           set +e  # Never fail the parent workflow
 
