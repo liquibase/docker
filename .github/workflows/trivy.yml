@@ -165,6 +165,7 @@ jobs:
     name: Dispatch CVEs ${{ matrix.image.name }}${{ matrix.image.suffix }}
     runs-on: ubuntu-22.04
     permissions:
+      actions: read
       contents: read
       id-token: write
     steps:
@@ -225,7 +226,7 @@ jobs:
         continue-on-error: true
         env:
           GH_TOKEN: ${{ steps.get-token.outputs.token }}
-          SCAN_DIR: ${{ github.workspace }}/scan-artifacts/${{ steps.artifact-name.outputs.artifact }}
+          SCAN_DIR: ${{ github.workspace }}/scan-artifacts
           IMAGE_NAME: ${{ matrix.image.name }}
           IMAGE_TAG: ${{ steps.artifact-name.outputs.image_tag }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
@@ -505,6 +506,7 @@ jobs:
     if: always() && github.event_name != 'pull_request' && needs.vulnerability-scan.result != 'cancelled'
     runs-on: ubuntu-22.04
     permissions:
+      actions: read
       contents: write
       id-token: write
     steps:

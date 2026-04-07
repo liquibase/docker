@@ -63,6 +63,7 @@ jobs:
     if: always() && needs.vulnerability-scan.result != 'cancelled'
     runs-on: ubuntu-22.04
     permissions:
+      actions: read
       contents: write
       id-token: write
     steps:
@@ -142,38 +143,24 @@ jobs:
           TOTAL_BATCHES=0
           TOTAL_FAILED=0
 
-          for ARTIFACT_DIR in scan-artifacts/vulnerability-report-*/; do
-            [ -d "$ARTIFACT_DIR" ] || continue
+          # Derive image:tag from the matrix JSON directly (avoids fragile artifact-name parsing)
+          ENTRY_COUNT=$(echo "$EXPECTED_MATRIX" | jq '.include | length')
 
-            ARTIFACT_NAME=$(basename "$ARTIFACT_DIR")
-            # Derive image:tag from artifact name (vulnerability-report-<org>-<image>-<tag>)
-            # Parse logic mirrors persist-scan-results.sh
-            SUFFIX="${ARTIFACT_NAME#vulnerability-report-}"
-            IFS='-' read -ra SEGMENTS <<< "$SUFFIX"
+          for (( idx=0; idx<ENTRY_COUNT; idx++ )); do
+            IMAGE_NAME=$(echo "$EXPECTED_MATRIX" | jq -r ".include[$idx].image")
+            IMAGE_TAG=$(echo "$EXPECTED_MATRIX" | jq -r ".include[$idx].tag")
+            IMAGE_OR_VERSION="${IMAGE_NAME}:${IMAGE_TAG}"
 
-            if [ "${#SEGMENTS[@]}" -lt 3 ]; then
-              echo "::warning::Cannot parse artifact name: $ARTIFACT_NAME -- skipping"
+            # Reconstruct artifact directory name (same convention as the reusable workflow)
+            SAFE_NAME=$(echo "$IMAGE_NAME" | tr '/' '-')
+            SAFE_TAG=$(echo "$IMAGE_TAG" | tr '/' '-')
+            ARTIFACT_DIR="scan-artifacts/vulnerability-report-${SAFE_NAME}-${SAFE_TAG}"
+
+            if [ ! -d "$ARTIFACT_DIR" ] || [ -z "$(ls -A "$ARTIFACT_DIR" 2>/dev/null)" ]; then
+              echo "::warning::No scan artifacts for ${IMAGE_OR_VERSION} -- skipping CVE dispatch"
+              echo "- **${IMAGE_OR_VERSION}**: no scan artifacts found" >> "$GITHUB_STEP_SUMMARY"
               continue
             fi
-
-            ORG="${SEGMENTS[0]}"
-
-            TAG_INDEX=-1
-            for (( i=${#SEGMENTS[@]}-1; i>=2; i-- )); do
-              if [[ "${SEGMENTS[$i]}" =~ ^[0-9] ]] || [[ "${SEGMENTS[$i]}" == "latest" ]] || [[ "${SEGMENTS[$i]}" =~ ^(alpine|slim|jammy|focal|bullseye|noble)$ ]]; then
-                TAG_INDEX=$i
-                break
-              fi
-            done
-
-            if [ "$TAG_INDEX" -lt 0 ]; then
-              echo "::warning::Cannot find tag in artifact name: $ARTIFACT_NAME -- skipping"
-              continue
-            fi
-
-            TAG=$(IFS='-'; echo "${SEGMENTS[*]:$TAG_INDEX}")
-            IMAGE_NAME_PART=$(IFS='-'; echo "${SEGMENTS[*]:1:$((TAG_INDEX-1))}")
-            IMAGE_OR_VERSION="${ORG}/${IMAGE_NAME_PART}:${TAG}"
 
             echo "Diffing CVEs for ${IMAGE_OR_VERSION}..."
 
