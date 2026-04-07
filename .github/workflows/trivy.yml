@@ -366,7 +366,7 @@ jobs:
           parse-json-secrets: true
 
       - name: Notify Slack on Build Failure
-        uses: rtCamp/action-slack-notify@f43175ac92c1fb2e8f9cd89aa2984941ac0d30dc # v2.3.3
+        uses: rtCamp/action-slack-notify@e31e87e03dd19038e411e38ae27cbad084a90661 # v2.3.3
         env:
           SLACK_COLOR: "failure"
           SLACK_MESSAGE: "View details on GitHub Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Triggered by repository: ${{ github.repository }}"
@@ -463,7 +463,7 @@ jobs:
 
       - name: Notify Slack on Build Failure
         if: failure()
-        uses: rtCamp/action-slack-notify@f43175ac92c1fb2e8f9cd89aa2984941ac0d30dc # v2.3.3
+        uses: rtCamp/action-slack-notify@e31e87e03dd19038e411e38ae27cbad084a90661 # v2.3.3
         env:
           SLACK_COLOR: "failure"
           SLACK_MESSAGE: "View details on GitHub Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Triggered by repository: ${{ github.repository }} and job: ${{ github.job }}"
@@ -476,7 +476,7 @@ jobs:
 
       - name: Upload Scout scan results to GitHub Security tab
         if: always()
-        uses: github/codeql-action/upload-sarif@f0213c31c702f929cf06ddb900ac315d246a8997 # v4.33.0
+        uses: github/codeql-action/upload-sarif@b1bff81932f5cdfc8695c7752dcee935dcd061c8 # v4.33.0
         with:
           sarif_file: "scout-results.sarif"
           category: "${{ matrix.image.name }}${{ matrix.image.suffix }}"
