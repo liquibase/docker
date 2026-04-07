@@ -136,7 +136,7 @@ jobs:
   # ============================================
   dispatch-new-cves:
     needs: [vulnerability-scan]
-    if: github.event_name != 'pull_request'
+    if: always() && github.event_name != 'pull_request' && needs.vulnerability-scan.result != 'cancelled'
     continue-on-error: true
     strategy:
       fail-fast: false
@@ -181,10 +181,15 @@ jobs:
           IMAGE_NAME: ${{ matrix.image.name }}
           IMAGE_SUFFIX: ${{ matrix.image.suffix }}
         run: |
+          # image_tag for display/dispatch (stripped of leading dash)
           IMAGE_TAG="${IMAGE_SUFFIX#-}"
           IMAGE_TAG="${IMAGE_TAG:-latest}"
+          # Artifact name must match what the reusable workflow uploads.
+          # The reusable workflow receives image_tag = suffix || 'latest' (raw, with leading dash for alpine),
+          # so use the raw suffix for artifact lookup to avoid single-dash vs double-dash mismatch.
+          RAW_IMAGE_TAG="${IMAGE_SUFFIX:-latest}"
           SAFE_NAME=$(echo "$IMAGE_NAME" | tr '/' '-')
-          SAFE_TAG=$(echo "$IMAGE_TAG" | tr '/' '-')
+          SAFE_TAG=$(echo "$RAW_IMAGE_TAG" | tr '/' '-')
           echo "artifact=vulnerability-report-${SAFE_NAME}-${SAFE_TAG}" >> "$GITHUB_OUTPUT"
           echo "image_tag=${IMAGE_TAG}" >> "$GITHUB_OUTPUT"
 
