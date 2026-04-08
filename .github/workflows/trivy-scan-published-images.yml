@@ -118,6 +118,7 @@ jobs:
           owner: liquibase
           repositories: liquibase-pro
           permission-actions: write
+          permission-contents: read
         continue-on-error: true
 
       - name: Dispatch new CVEs for investigation
