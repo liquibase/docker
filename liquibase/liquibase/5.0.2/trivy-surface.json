@@ -3,8 +3,8 @@
   "Trivy": {
     "Version": "0.69.3"
   },
-  "ReportID": "019d6b92-1c97-7a4a-958b-034227a81429",
-  "CreatedAt": "2026-04-08T05:30:30.935676041Z",
+  "ReportID": "019d6b9c-8aea-74a4-9595-831c451d2173",
+  "CreatedAt": "2026-04-08T05:41:54.53830521Z",
   "ArtifactID": "sha256:ff9ccc0f412885d2f350273b856e29f33d5cbd3a86b57d23715fdffe9f11c356",
   "ArtifactName": "liquibase/liquibase:5.0.2",
   "ArtifactType": "container_image",
@@ -10635,6 +10635,7 @@
       "Type": "jar",
       "Packages": [
         {
+          "ID": "com.h2database:h2@2.4.240",
           "Name": "com.h2database:h2",
           "Identifier": {
             "PURL": "pkg:maven/com.h2database/h2@2.4.240",
@@ -10649,6 +10650,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "com.opencsv:opencsv@5.12.0",
           "Name": "com.opencsv:opencsv",
           "Identifier": {
             "PURL": "pkg:maven/com.opencsv/opencsv@5.12.0",
@@ -10663,6 +10665,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "commons-io:commons-io@2.21.0",
           "Name": "commons-io:commons-io",
           "Identifier": {
             "PURL": "pkg:maven/commons-io/commons-io@2.21.0",
@@ -10677,6 +10680,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "info.picocli:picocli@4.7.7",
           "Name": "info.picocli:picocli",
           "Identifier": {
             "PURL": "pkg:maven/info.picocli/picocli@4.7.7",
@@ -10691,6 +10695,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "org.apache.commons:commons-collections4@4.5.0",
           "Name": "org.apache.commons:commons-collections4",
           "Identifier": {
             "PURL": "pkg:maven/org.apache.commons/commons-collections4@4.5.0",
@@ -10705,6 +10710,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "org.apache.commons:commons-lang3@3.20.0",
           "Name": "org.apache.commons:commons-lang3",
           "Identifier": {
             "PURL": "pkg:maven/org.apache.commons/commons-lang3@3.20.0",
@@ -10719,6 +10725,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "org.apache.commons:commons-text@1.15.0",
           "Name": "org.apache.commons:commons-text",
           "Identifier": {
             "PURL": "pkg:maven/org.apache.commons/commons-text@1.15.0",
@@ -10733,6 +10740,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "org.liquibase:liquibase-core@5.0.2",
           "Name": "org.liquibase:liquibase-core",
           "Identifier": {
             "PURL": "pkg:maven/org.liquibase/liquibase-core@5.0.2",
@@ -10747,6 +10755,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "org.yaml:snakeyaml@2.5",
           "Name": "org.yaml:snakeyaml",
           "Identifier": {
             "PURL": "pkg:maven/org.yaml/snakeyaml@2.5",
