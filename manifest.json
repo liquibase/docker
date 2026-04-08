@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-04-08T05:33:09Z",
+  "lastUpdated": "2026-04-08T05:35:07Z",
   "images": {
     "liquibase/liquibase": [
       "5.0.2",
@@ -51,7 +51,9 @@
       "4.4.3",
       "4.4.2",
       "4.4.1",
-      "4.4.0"
+      "4.4.0",
+      "alpine",
+      "latest"
     ],
     "liquibase/liquibase-secure": [
       "5.1.1",
@@ -59,7 +61,8 @@
       "5.0.3",
       "5.0.2",
       "5.0.1",
-      "5.0.0"
+      "5.0.0",
+      "latest"
     ]
   },
   "scan_status": {
@@ -78,6 +81,9 @@
     "liquibase/liquibase-secure:5.0.2": "success",
     "liquibase/liquibase-secure:5.0.3": "success",
     "liquibase/liquibase-secure:5.1.0": "success",
-    "liquibase/liquibase-secure:5.1.1": "success"
+    "liquibase/liquibase-secure:5.1.1": "success",
+    "liquibase/liquibase:alpine": "success",
+    "liquibase/liquibase:latest": "success",
+    "liquibase/liquibase-secure:latest": "success"
   }
 }
