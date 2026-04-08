@@ -438,6 +438,13 @@ jobs:
           username: ${{ env.DOCKERHUB_USERNAME_DECODED }}
           password: ${{ env.DOCKERHUB_TOKEN }}
 
+      - name: Download VEX files for Scout
+        run: |
+          mkdir -p ./vex
+          curl -sSfL "https://raw.githubusercontent.com/liquibase/vex-repo/main/pkg/maven/org.liquibase/liquibase-core/vex.openvex.json" \
+            -o ./vex/liquibase-core.vex.json
+          echo "VEX file downloaded: $(jq '.statements | length' ./vex/liquibase-core.vex.json) statements"
+
       - name: Docker Scout
         uses: docker/scout-action@8910519cee8ac046f3ee99686b0dc6654d5ba1a7 # v1.20.3
         with:
@@ -449,6 +456,7 @@ jobs:
           summary: true
           exit-code: true
           only-severities: "critical,high"
+          vex-location: ./vex
 
       - name: Docker Scout JSON output
         if: always()
@@ -457,6 +465,7 @@ jobs:
             --format json \
             --output scout-results.json \
             --only-severities critical,high \
+            --vex-location ./vex \
             "${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}" || true
 
       - name: Upload Scout JSON results
