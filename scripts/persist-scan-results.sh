@@ -102,8 +102,14 @@ for ARTIFACT_PATH in "$ARTIFACTS_DIR"/vulnerability-report-*; do
   #   - Everything in between is the image name
   SUFFIX="${ARTIFACT_NAME#vulnerability-report-}"
 
-  # Split suffix into segments by hyphen
-  IFS='-' read -ra SEGMENTS <<< "$SUFFIX"
+  # Split suffix into segments by hyphen, filtering out empty segments
+  # (empty segments appear when image_tag has a leading dash, e.g. "-alpine"
+  #  produces a double-dash: vulnerability-report-liquibase-liquibase--alpine)
+  IFS='-' read -ra RAW_SEGMENTS <<< "$SUFFIX"
+  SEGMENTS=()
+  for seg in "${RAW_SEGMENTS[@]}"; do
+    [ -n "$seg" ] && SEGMENTS+=("$seg")
+  done
 
   if [ "${#SEGMENTS[@]}" -lt 3 ]; then
     echo "Error: cannot parse artifact name (too few segments): $ARTIFACT_NAME" >&2
