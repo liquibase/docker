@@ -3,8 +3,8 @@
   "Trivy": {
     "Version": "0.69.3"
   },
-  "ReportID": "019d6775-733e-7b5c-be0d-c9de3a05c492",
-  "CreatedAt": "2026-04-07T10:20:43.710746662Z",
+  "ReportID": "019d6b92-d74c-78d4-9fd1-605493f6536f",
+  "CreatedAt": "2026-04-08T05:31:18.732579759Z",
   "ArtifactID": "sha256:176b2facc69b5d6abc2ce362a642d232d93f5e82c6a7756b17a0e7a722591a3b",
   "ArtifactName": "liquibase/liquibase-secure:5.1.0",
   "ArtifactType": "container_image",
@@ -15303,6 +15303,69 @@
         }
       ],
       "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2025-59250",
+          "VendorIDs": [
+            "GHSA-m494-w24q-6f7w"
+          ],
+          "PkgName": "com.microsoft.sqlserver:mssql-jdbc",
+          "PkgPath": "liquibase/internal/lib/mssql-jdbc.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/com.microsoft.sqlserver/mssql-jdbc@13.2.1",
+            "UID": "c3b08da0da15489a"
+          },
+          "InstalledVersion": "13.2.1",
+          "FixedVersion": "10.2.4.jre11, 11.2.4.jre11, 12.2.1.jre11, 12.6.5.jre11, 12.8.2.jre11, 12.10.2.jre11, 13.2.1.jre11",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:2dce4ba2c160154b16d707c7d44e11db456541cca7f03277276c813e5a66b125",
+            "DiffID": "sha256:3913693ae7084d654c1a7e3184f805ac5efd660ee596b0661f4eff319580f6cf"
+          },
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2025-59250",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:3a1360a02827944234c71c1cf6c6279e183ca6118db19a96576c464523f61881",
+          "Title": "JDBC Driver for SQL Server has improper input validation issue",
+          "Description": "Improper input validation in JDBC Driver for SQL Server allows an unauthorized attacker to perform spoofing over a network.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-20"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "nvd": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:N",
+              "V3Score": 8.1
+            },
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:N",
+              "V3Score": 8.1
+            }
+          },
+          "References": [
+            "https://github.com/microsoft/mssql-jdbc",
+            "https://github.com/microsoft/mssql-jdbc/blob/main/CHANGELOG.md",
+            "https://github.com/microsoft/mssql-jdbc/commit/9732e1bbc6ec44166fda2cddab31ce1c86c873dd#diff-45367b99a1951943bfecfc7765e80df687967aa56286a5b2e039f77cd9a0e118",
+            "https://github.com/microsoft/mssql-jdbc/pull/2798",
+            "https://github.com/microsoft/mssql-jdbc/pull/2800",
+            "https://github.com/microsoft/mssql-jdbc/pull/2801",
+            "https://github.com/microsoft/mssql-jdbc/pull/2802",
+            "https://github.com/microsoft/mssql-jdbc/pull/2803",
+            "https://github.com/microsoft/mssql-jdbc/pull/2807",
+            "https://learn.microsoft.com/en-us/sql/connect/jdbc/microsoft-jdbc-driver-for-sql-server-support-matrix",
+            "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-59250",
+            "https://nvd.nist.gov/vuln/detail/CVE-2025-59250"
+          ],
+          "PublishedDate": "2025-10-14T17:16:07.24Z",
+          "LastModifiedDate": "2025-10-30T16:35:42.213Z"
+        },
         {
           "VulnerabilityID": "CVE-2026-33870",
           "VendorIDs": [
