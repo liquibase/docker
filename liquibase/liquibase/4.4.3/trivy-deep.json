@@ -1,10 +1,10 @@
 {
   "SchemaVersion": 2,
   "Trivy": {
-    "Version": "0.69.1"
+    "Version": "0.69.3"
   },
-  "ReportID": "019cd7af-912d-7ee4-95f8-5bcebc352e8b",
-  "CreatedAt": "2026-03-10T12:18:53.357976732Z",
+  "ReportID": "019d6bfa-38c1-7d78-b790-be2462936293",
+  "CreatedAt": "2026-04-08T07:24:13.88988424Z",
   "ArtifactName": "/tmp/extracted-deps",
   "ArtifactType": "filesystem"
 }
