@@ -3,10 +3,10 @@
   "Trivy": {
     "Version": "0.69.3"
   },
-  "ReportID": "019d6c02-67b2-7a13-8321-7a7c13860264",
-  "CreatedAt": "2026-04-08T07:33:10.194663321Z",
-  "ArtifactID": "sha256:49cca0814b26bb40a8db16dbd62c13b8bc7f14c74e5ed6115b7ef50a5142bd6d",
-  "ArtifactName": "ghcr.io/liquibase/docker/liquibase-secure:327fd458ecfadbe77f06a9d158b54d47ad4aea4d",
+  "ReportID": "019d6c66-0b16-745c-a144-c74de47c7753",
+  "CreatedAt": "2026-04-08T09:22:00.086287457Z",
+  "ArtifactID": "sha256:6f632d24f7ec6abacd6e61e081858b42d9173b209d2f13447e71aff9fe106846",
+  "ArtifactName": "ghcr.io/liquibase/docker/liquibase-secure:c0f73de0e5f6c89fc3ba6188c63e90eddfc06256",
   "ArtifactType": "container_image",
   "Metadata": {
     "Size": 1082704896,
@@ -14,7 +14,7 @@
       "Family": "ubuntu",
       "Name": "24.04"
     },
-    "ImageID": "sha256:a9c7464d227d5d338c0d6b078347aa7eed0035c9514dc0924df4626d8472148e",
+    "ImageID": "sha256:9176a59e9de37bf71b9b3bec83cbb59e29b6f832b3812deb017190f45e208cbb",
     "DiffIDs": [
       "sha256:5e732af9e7c568c9b41ecabc76ac93a58471934d5155070dfd64a9567667fd9d",
       "sha256:2fd594683ffb575ab267d7e1bd843f75c53afac133723dbbe55abc1b550c47cb",
@@ -30,12 +30,12 @@
       "sha256:def0d8da7005b5ee3a5a2f0fe5fd6c7a80a67d27f0a1bbf605af54a471f52323"
     ],
     "RepoTags": [
-      "ghcr.io/liquibase/docker/liquibase-secure:327fd458ecfadbe77f06a9d158b54d47ad4aea4d"
+      "ghcr.io/liquibase/docker/liquibase-secure:c0f73de0e5f6c89fc3ba6188c63e90eddfc06256"
     ],
     "RepoDigests": [
-      "ghcr.io/liquibase/docker/liquibase-secure@sha256:6c75d8fa8613c499e85b19d318cc0ced6200b9712bdf1678ac9d9975042cee18"
+      "ghcr.io/liquibase/docker/liquibase-secure@sha256:f11f8d5c6c823a87f21b3d11f7ab226fa3469f277912b88ce5e423b3cf08b11c"
     ],
-    "Reference": "ghcr.io/liquibase/docker/liquibase-secure:327fd458ecfadbe77f06a9d158b54d47ad4aea4d",
+    "Reference": "ghcr.io/liquibase/docker/liquibase-secure:c0f73de0e5f6c89fc3ba6188c63e90eddfc06256",
     "ImageConfig": {
       "architecture": "amd64",
       "created": "2026-04-08T07:30:45.519255593Z",
@@ -120,7 +120,7 @@
           "comment": "buildkit.dockerfile.v0"
         },
         {
-          "created": "2026-04-08T05:36:53.708626314Z",
+          "created": "2026-04-08T07:30:08.695036062Z",
           "created_by": "WORKDIR /liquibase",
           "comment": "buildkit.dockerfile.v0"
         },
@@ -359,7 +359,7 @@
   },
   "Results": [
     {
-      "Target": "ghcr.io/liquibase/docker/liquibase-secure:327fd458ecfadbe77f06a9d158b54d47ad4aea4d (ubuntu 24.04)",
+      "Target": "ghcr.io/liquibase/docker/liquibase-secure:c0f73de0e5f6c89fc3ba6188c63e90eddfc06256 (ubuntu 24.04)",
       "Class": "os-pkgs",
       "Type": "ubuntu",
       "Packages": [
