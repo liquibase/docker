@@ -144,6 +144,11 @@ jobs:
 
           TOTAL_BATCHES=0
           TOTAL_FAILED=0
+          TOTAL_DEDUPED=0
+
+          # Track CVE IDs already dispatched across all tags to avoid flooding
+          # the investigate-cve workflow with duplicate CVEs from different tags
+          DISPATCHED_CVES_FILE=$(mktemp)
 
           # Derive image:tag from the matrix JSON directly (avoids fragile artifact-name parsing)
           ENTRY_COUNT=$(echo "$EXPECTED_MATRIX" | jq '.include | length')
@@ -191,13 +196,39 @@ jobs:
 
             while IFS= read -r batch_json; do
               [ -z "$batch_json" ] && continue
+
+              # Deduplicate: remove CVEs already dispatched from a previous tag
+              NEW_CVES=$(echo "$batch_json" | jq -c --slurpfile seen "$DISPATCHED_CVES_FILE" '
+                ($seen | if length > 0 then .[0] else [] end) as $already |
+                .cves |= [.[] | select(.id as $id | $already | index($id) | not)]
+              ' 2>/dev/null || echo "$batch_json")
+
+              NEW_COUNT=$(echo "$NEW_CVES" | jq '.cves | length' 2>/dev/null || echo 0)
+              ORIG_COUNT=$(echo "$batch_json" | jq '.cves | length' 2>/dev/null || echo 0)
+              SKIPPED=$((ORIG_COUNT - NEW_COUNT))
+
+              if [ "$SKIPPED" -gt 0 ]; then
+                TOTAL_DEDUPED=$((TOTAL_DEDUPED + SKIPPED))
+                echo "  Deduped $SKIPPED CVE(s) already dispatched from previous tag"
+              fi
+
+              if [ "$NEW_COUNT" -eq 0 ]; then
+                echo "- **${IMAGE_OR_VERSION}**: all CVEs already dispatched from previous tag" >> "$GITHUB_STEP_SUMMARY"
+                continue
+              fi
+
               BATCH_NUM=$((BATCH_NUM + 1))
-              CVE_COUNT=$(echo "$batch_json" | jq '.cves | length' 2>/dev/null || echo "?")
 
               if gh workflow run investigate-cve.lock.yml \
                   -R liquibase/liquibase-pro \
-                  -f "cve_json=$batch_json" 2>/tmp/dispatch-err-$$.txt; then
-                echo "- **${IMAGE_OR_VERSION}** batch $BATCH_NUM: dispatched $CVE_COUNT CVEs" >> "$GITHUB_STEP_SUMMARY"
+                  -f "cve_json=$NEW_CVES" 2>/tmp/dispatch-err-$$.txt; then
+                echo "- **${IMAGE_OR_VERSION}** batch $BATCH_NUM: dispatched $NEW_COUNT CVEs" >> "$GITHUB_STEP_SUMMARY"
+                # Record dispatched CVE IDs
+                echo "$NEW_CVES" | jq -r '.cves[].id' >> "$DISPATCHED_CVES_FILE.ids"
+                # Rebuild JSON array for jq --slurpfile
+                if [ -f "$DISPATCHED_CVES_FILE.ids" ]; then
+                  sort -u "$DISPATCHED_CVES_FILE.ids" | jq -R . | jq -s . > "$DISPATCHED_CVES_FILE"
+                fi
               else
                 ERR=$(cat /tmp/dispatch-err-$$.txt 2>/dev/null || echo "unknown error")
                 echo "::warning::CVE dispatch failed for ${IMAGE_OR_VERSION} batch $BATCH_NUM: $ERR"
@@ -210,6 +241,8 @@ jobs:
             TOTAL_BATCHES=$((TOTAL_BATCHES + BATCH_NUM))
             TOTAL_FAILED=$((TOTAL_FAILED + FAILED))
           done
+
+          rm -f "$DISPATCHED_CVES_FILE" "$DISPATCHED_CVES_FILE.ids"
 
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "**Total dispatched**: $TOTAL_BATCHES batch(es), $TOTAL_FAILED failure(s)" >> "$GITHUB_STEP_SUMMARY"
