@@ -3,8 +3,8 @@
   "Trivy": {
     "Version": "0.69.3"
   },
-  "ReportID": "019d6775-373d-732f-b135-9cc756b67433",
-  "CreatedAt": "2026-04-07T10:20:28.349210361Z",
+  "ReportID": "019d6bd3-1609-784b-889c-32e7f997ec09",
+  "CreatedAt": "2026-04-08T06:41:29.097545Z",
   "ArtifactID": "sha256:e7e081a7e3694fb8b42307622ba7f47f327e178eeb8e4f00ab5da0b12bd0cfb3",
   "ArtifactName": "liquibase/liquibase:4.32.0",
   "ArtifactType": "container_image",
@@ -11544,7 +11544,7 @@
             "https://dev.gnupg.org/T7906",
             "https://dev.gnupg.org/T8001",
             "https://errata.almalinux.org/9/ALSA-2026-0719.html",
-            "https://errata.rockylinux.org/RLSA-2026:0697",
+            "https://errata.rockylinux.org/RLSA-2026:0719",
             "https://github.com/gpg/gnupg/blob/ff30683418695f5d2cc9e6cf8c9418e09378ebe4/g10/armor.c#L1305-L1306",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9 (gnupg-2.5.14)",
@@ -11628,7 +11628,7 @@
             "https://dev.gnupg.org/T7906",
             "https://dev.gnupg.org/T8001",
             "https://errata.almalinux.org/9/ALSA-2026-0719.html",
-            "https://errata.rockylinux.org/RLSA-2026:0697",
+            "https://errata.rockylinux.org/RLSA-2026:0719",
             "https://github.com/gpg/gnupg/blob/ff30683418695f5d2cc9e6cf8c9418e09378ebe4/g10/armor.c#L1305-L1306",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9 (gnupg-2.5.14)",
@@ -11712,7 +11712,7 @@
             "https://dev.gnupg.org/T7906",
             "https://dev.gnupg.org/T8001",
             "https://errata.almalinux.org/9/ALSA-2026-0719.html",
-            "https://errata.rockylinux.org/RLSA-2026:0697",
+            "https://errata.rockylinux.org/RLSA-2026:0719",
             "https://github.com/gpg/gnupg/blob/ff30683418695f5d2cc9e6cf8c9418e09378ebe4/g10/armor.c#L1305-L1306",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9 (gnupg-2.5.14)",
@@ -11796,7 +11796,7 @@
             "https://dev.gnupg.org/T7906",
             "https://dev.gnupg.org/T8001",
             "https://errata.almalinux.org/9/ALSA-2026-0719.html",
-            "https://errata.rockylinux.org/RLSA-2026:0697",
+            "https://errata.rockylinux.org/RLSA-2026:0719",
             "https://github.com/gpg/gnupg/blob/ff30683418695f5d2cc9e6cf8c9418e09378ebe4/g10/armor.c#L1305-L1306",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9 (gnupg-2.5.14)",
@@ -11880,7 +11880,7 @@
             "https://dev.gnupg.org/T7906",
             "https://dev.gnupg.org/T8001",
             "https://errata.almalinux.org/9/ALSA-2026-0719.html",
-            "https://errata.rockylinux.org/RLSA-2026:0697",
+            "https://errata.rockylinux.org/RLSA-2026:0719",
             "https://github.com/gpg/gnupg/blob/ff30683418695f5d2cc9e6cf8c9418e09378ebe4/g10/armor.c#L1305-L1306",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9 (gnupg-2.5.14)",
@@ -11964,7 +11964,7 @@
             "https://dev.gnupg.org/T7906",
             "https://dev.gnupg.org/T8001",
             "https://errata.almalinux.org/9/ALSA-2026-0719.html",
-            "https://errata.rockylinux.org/RLSA-2026:0697",
+            "https://errata.rockylinux.org/RLSA-2026:0719",
             "https://github.com/gpg/gnupg/blob/ff30683418695f5d2cc9e6cf8c9418e09378ebe4/g10/armor.c#L1305-L1306",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9 (gnupg-2.5.14)",
@@ -12048,7 +12048,7 @@
             "https://dev.gnupg.org/T7906",
             "https://dev.gnupg.org/T8001",
             "https://errata.almalinux.org/9/ALSA-2026-0719.html",
-            "https://errata.rockylinux.org/RLSA-2026:0697",
+            "https://errata.rockylinux.org/RLSA-2026:0719",
             "https://github.com/gpg/gnupg/blob/ff30683418695f5d2cc9e6cf8c9418e09378ebe4/g10/armor.c#L1305-L1306",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9 (gnupg-2.5.14)",
@@ -12132,7 +12132,7 @@
             "https://dev.gnupg.org/T7906",
             "https://dev.gnupg.org/T8001",
             "https://errata.almalinux.org/9/ALSA-2026-0719.html",
-            "https://errata.rockylinux.org/RLSA-2026:0697",
+            "https://errata.rockylinux.org/RLSA-2026:0719",
             "https://github.com/gpg/gnupg/blob/ff30683418695f5d2cc9e6cf8c9418e09378ebe4/g10/armor.c#L1305-L1306",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9 (gnupg-2.5.14)",
@@ -12216,7 +12216,7 @@
             "https://dev.gnupg.org/T7906",
             "https://dev.gnupg.org/T8001",
             "https://errata.almalinux.org/9/ALSA-2026-0719.html",
-            "https://errata.rockylinux.org/RLSA-2026:0697",
+            "https://errata.rockylinux.org/RLSA-2026:0719",
             "https://github.com/gpg/gnupg/blob/ff30683418695f5d2cc9e6cf8c9418e09378ebe4/g10/armor.c#L1305-L1306",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9 (gnupg-2.5.14)",
@@ -12300,7 +12300,7 @@
             "https://dev.gnupg.org/T7906",
             "https://dev.gnupg.org/T8001",
             "https://errata.almalinux.org/9/ALSA-2026-0719.html",
-            "https://errata.rockylinux.org/RLSA-2026:0697",
+            "https://errata.rockylinux.org/RLSA-2026:0719",
             "https://github.com/gpg/gnupg/blob/ff30683418695f5d2cc9e6cf8c9418e09378ebe4/g10/armor.c#L1305-L1306",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9 (gnupg-2.5.14)",
@@ -12384,7 +12384,7 @@
             "https://dev.gnupg.org/T7906",
             "https://dev.gnupg.org/T8001",
             "https://errata.almalinux.org/9/ALSA-2026-0719.html",
-            "https://errata.rockylinux.org/RLSA-2026:0697",
+            "https://errata.rockylinux.org/RLSA-2026:0719",
             "https://github.com/gpg/gnupg/blob/ff30683418695f5d2cc9e6cf8c9418e09378ebe4/g10/armor.c#L1305-L1306",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9 (gnupg-2.5.14)",
@@ -12414,6 +12414,7 @@
       "Type": "jar",
       "Packages": [
         {
+          "ID": "com.fasterxml.jackson.core:jackson-annotations@2.18.3",
           "Name": "com.fasterxml.jackson.core:jackson-annotations",
           "Identifier": {
             "PURL": "pkg:maven/com.fasterxml.jackson.core/jackson-annotations@2.18.3",
@@ -12428,6 +12429,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "com.fasterxml.jackson.core:jackson-core@2.18.3",
           "Name": "com.fasterxml.jackson.core:jackson-core",
           "Identifier": {
             "PURL": "pkg:maven/com.fasterxml.jackson.core/jackson-core@2.18.3",
@@ -12442,6 +12444,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "com.fasterxml.jackson.core:jackson-databind@2.18.3",
           "Name": "com.fasterxml.jackson.core:jackson-databind",
           "Identifier": {
             "PURL": "pkg:maven/com.fasterxml.jackson.core/jackson-databind@2.18.3",
@@ -12456,6 +12459,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "com.fasterxml.jackson.module:jackson-module-jaxb-annotations@2.18.3",
           "Name": "com.fasterxml.jackson.module:jackson-module-jaxb-annotations",
           "Identifier": {
             "PURL": "pkg:maven/com.fasterxml.jackson.module/jackson-module-jaxb-annotations@2.18.3",
@@ -12470,6 +12474,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "com.github.jsqlparser:jsqlparser@4.9",
           "Name": "com.github.jsqlparser:jsqlparser",
           "Identifier": {
             "PURL": "pkg:maven/com.github.jsqlparser/jsqlparser@4.9",
@@ -12484,6 +12489,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "com.github.jsqlparser:jsqlparser@4.9",
           "Name": "com.github.jsqlparser:jsqlparser",
           "Identifier": {
             "PURL": "pkg:maven/com.github.jsqlparser/jsqlparser@4.9",
@@ -12498,6 +12504,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "com.github.spullara.mustache.java:compiler@0.9.13",
           "Name": "com.github.spullara.mustache.java:compiler",
           "Identifier": {
             "PURL": "pkg:maven/com.github.spullara.mustache.java/compiler@0.9.13",
@@ -12512,6 +12519,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "com.github.vertical-blank:sql-formatter@2.0.5",
           "Name": "com.github.vertical-blank:sql-formatter",
           "Identifier": {
             "PURL": "pkg:maven/com.github.vertical-blank/sql-formatter@2.0.5",
@@ -12526,6 +12534,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "com.h2database:h2@2.2.224",
           "Name": "com.h2database:h2",
           "Identifier": {
             "PURL": "pkg:maven/com.h2database/h2@2.2.224",
@@ -12540,6 +12549,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "com.ibm.db2:jcc@11.5.9.0",
           "Name": "com.ibm.db2:jcc",
           "Identifier": {
             "PURL": "pkg:maven/com.ibm.db2/jcc@11.5.9.0",
@@ -12554,6 +12564,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "com.microsoft.sqlserver:mssql-jdbc@12.10.0",
           "Name": "com.microsoft.sqlserver:mssql-jdbc",
           "Identifier": {
             "PURL": "pkg:maven/com.microsoft.sqlserver/mssql-jdbc@12.10.0",
@@ -12568,6 +12579,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "com.microsoft.sqlserver:mssql-jdbc@12.10.0.jre8",
           "Name": "com.microsoft.sqlserver:mssql-jdbc",
           "Identifier": {
             "PURL": "pkg:maven/com.microsoft.sqlserver/mssql-jdbc@12.10.0.jre8",
@@ -12582,6 +12594,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "com.opencsv:opencsv@5.11",
           "Name": "com.opencsv:opencsv",
           "Identifier": {
             "PURL": "pkg:maven/com.opencsv/opencsv@5.11",
@@ -12596,6 +12609,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "com.oracle.database.jdbc:ojdbc8@19.27.0.0",
           "Name": "com.oracle.database.jdbc:ojdbc8",
           "Identifier": {
             "PURL": "pkg:maven/com.oracle.database.jdbc/ojdbc8@19.27.0.0",
@@ -12610,6 +12624,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "commons-codec:commons-codec@1.18.0",
           "Name": "commons-codec:commons-codec",
           "Identifier": {
             "PURL": "pkg:maven/commons-codec/commons-codec@1.18.0",
@@ -12624,6 +12639,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "commons-io:commons-io@2.19.0",
           "Name": "commons-io:commons-io",
           "Identifier": {
             "PURL": "pkg:maven/commons-io/commons-io@2.19.0",
@@ -12638,6 +12654,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "info.picocli:picocli@4.7.7",
           "Name": "info.picocli:picocli",
           "Identifier": {
             "PURL": "pkg:maven/info.picocli/picocli@4.7.7",
@@ -12652,6 +12669,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "io.github.java-diff-utils:java-diff-utils@4.12",
           "Name": "io.github.java-diff-utils:java-diff-utils",
           "Identifier": {
             "PURL": "pkg:maven/io.github.java-diff-utils/java-diff-utils@4.12",
@@ -12666,6 +12684,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "javax.xml.bind:jaxb-api@2.3.1",
           "Name": "javax.xml.bind:jaxb-api",
           "Identifier": {
             "PURL": "pkg:maven/javax.xml.bind/jaxb-api@2.3.1",
@@ -12680,6 +12699,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "net.java.truelicense:truelicense-core@2.6.6",
           "Name": "net.java.truelicense:truelicense-core",
           "Identifier": {
             "PURL": "pkg:maven/net.java.truelicense/truelicense-core@2.6.6",
@@ -12694,6 +12714,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "net.java.truelicense:truelicense-json@2.6.6",
           "Name": "net.java.truelicense:truelicense-json",
           "Identifier": {
             "PURL": "pkg:maven/net.java.truelicense/truelicense-json@2.6.6",
@@ -12708,6 +12729,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "net.java.truelicense:truelicense-obfuscate@2.6.6",
           "Name": "net.java.truelicense:truelicense-obfuscate",
           "Identifier": {
             "PURL": "pkg:maven/net.java.truelicense/truelicense-obfuscate@2.6.6",
@@ -12722,6 +12744,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "net.snowflake:snowflake-jdbc@3.24.0",
           "Name": "net.snowflake:snowflake-jdbc",
           "Identifier": {
             "PURL": "pkg:maven/net.snowflake/snowflake-jdbc@3.24.0",
@@ -12736,6 +12759,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "one.gfw:jaxb-api@2.3.1",
           "Name": "one.gfw:jaxb-api",
           "Identifier": {
             "PURL": "pkg:maven/one.gfw/jaxb-api@2.3.1",
@@ -12750,6 +12774,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "org.apache.commons:commons-collections4@4.5.0",
           "Name": "org.apache.commons:commons-collections4",
           "Identifier": {
             "PURL": "pkg:maven/org.apache.commons/commons-collections4@4.5.0",
@@ -12764,6 +12789,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "org.apache.commons:commons-lang3@3.17.0",
           "Name": "org.apache.commons:commons-lang3",
           "Identifier": {
             "PURL": "pkg:maven/org.apache.commons/commons-lang3@3.17.0",
@@ -12778,6 +12804,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "org.apache.commons:commons-text@1.13.1",
           "Name": "org.apache.commons:commons-text",
           "Identifier": {
             "PURL": "pkg:maven/org.apache.commons/commons-text@1.13.1",
@@ -12792,6 +12819,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "org.firebirdsql.jdbc:jaybird@5.0.7.java8",
           "Name": "org.firebirdsql.jdbc:jaybird",
           "Identifier": {
             "PURL": "pkg:maven/org.firebirdsql.jdbc/jaybird@5.0.7.java8",
@@ -12806,6 +12834,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "org.glassfish.jaxb:jaxb-core@4.0.5",
           "Name": "org.glassfish.jaxb:jaxb-core",
           "Identifier": {
             "PURL": "pkg:maven/org.glassfish.jaxb/jaxb-core@4.0.5",
@@ -12820,6 +12849,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "org.glassfish.jaxb:jaxb-runtime@4.0.5",
           "Name": "org.glassfish.jaxb:jaxb-runtime",
           "Identifier": {
             "PURL": "pkg:maven/org.glassfish.jaxb/jaxb-runtime@4.0.5",
@@ -12834,6 +12864,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "org.hsqldb:hsqldb@2.7.4",
           "Name": "org.hsqldb:hsqldb",
           "Identifier": {
             "PURL": "pkg:maven/org.hsqldb/hsqldb@2.7.4",
@@ -12848,6 +12879,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "org.liquibase.ext:liquibase-checks@2.0.2",
           "Name": "org.liquibase.ext:liquibase-checks",
           "Identifier": {
             "PURL": "pkg:maven/org.liquibase.ext/liquibase-checks@2.0.2",
@@ -12862,6 +12894,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "org.liquibase:liquibase-commercial@4.32.0",
           "Name": "org.liquibase:liquibase-commercial",
           "Identifier": {
             "PURL": "pkg:maven/org.liquibase/liquibase-commercial@4.32.0",
@@ -12876,6 +12909,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "org.liquibase:liquibase-core@4.32.0",
           "Name": "org.liquibase:liquibase-core",
           "Identifier": {
             "PURL": "pkg:maven/org.liquibase/liquibase-core@4.32.0",
@@ -12890,6 +12924,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "org.mariadb.jdbc:mariadb-java-client@3.5.3",
           "Name": "org.mariadb.jdbc:mariadb-java-client",
           "Identifier": {
             "PURL": "pkg:maven/org.mariadb.jdbc/mariadb-java-client@3.5.3",
@@ -12904,6 +12939,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "org.mvel:mvel2@2.5.2.Final",
           "Name": "org.mvel:mvel2",
           "Identifier": {
             "PURL": "pkg:maven/org.mvel/mvel2@2.5.2.Final",
@@ -12918,6 +12954,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "org.postgresql:postgresql@42.7.5",
           "Name": "org.postgresql:postgresql",
           "Identifier": {
             "PURL": "pkg:maven/org.postgresql/postgresql@42.7.5",
@@ -12932,6 +12969,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "org.slf4j:slf4j-api@2.0.17",
           "Name": "org.slf4j:slf4j-api",
           "Identifier": {
             "PURL": "pkg:maven/org.slf4j/slf4j-api@2.0.17",
@@ -12946,6 +12984,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "org.slf4j:slf4j-nop@2.0.17",
           "Name": "org.slf4j:slf4j-nop",
           "Identifier": {
             "PURL": "pkg:maven/org.slf4j/slf4j-nop@2.0.17",
@@ -12960,6 +12999,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "org.xerial:sqlite-jdbc@3.49.1.0",
           "Name": "org.xerial:sqlite-jdbc",
           "Identifier": {
             "PURL": "pkg:maven/org.xerial/sqlite-jdbc@3.49.1.0",
@@ -12974,6 +13014,7 @@
           "AnalyzedBy": "jar"
         },
         {
+          "ID": "org.yaml:snakeyaml@2.4",
           "Name": "org.yaml:snakeyaml",
           "Identifier": {
             "PURL": "pkg:maven/org.yaml/snakeyaml@2.4",
@@ -13164,7 +13205,7 @@
             "URL": "https://pkg.go.dev/vuln/"
           },
           "Fingerprint": "sha256:bb97ac3eb1342e59b4ca714af777b90c494bcfaeffd48ff4a917f0c73824075a",
-          "Title": "crypto/tls: Unexpected session resumption in crypto/tls",
+          "Title": "crypto/tls: crypto/tls: Incorrect certificate validation during TLS session resumption",
           "Description": "During session resumption in crypto/tls, if the underlying Config has its ClientCAs or RootCAs fields mutated between the initial handshake and the resumed handshake, the resumed handshake may succeed when it should have failed. This may happen when a user calls Config.Clone and mutates the returned Config, or uses Config.GetConfigForClient. This can cause a client to resume a session with a server that it would not have resumed with during the initial handshake, or cause a server to resume a session with a client that it would not have resumed with during the initial handshake.",
           "Severity": "CRITICAL",
           "CweIDs": [
@@ -13201,14 +13242,12 @@
             "https://access.redhat.com/security/cve/CVE-2025-68121",
             "https://bugzilla.redhat.com/2434432",
             "https://bugzilla.redhat.com/2437111",
-            "https://bugzilla.redhat.com/show_bug.cgi?id=2418462",
             "https://bugzilla.redhat.com/show_bug.cgi?id=2434432",
             "https://bugzilla.redhat.com/show_bug.cgi?id=2437111",
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-61726",
-            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-61729",
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-68121",
             "https://errata.almalinux.org/9/ALSA-2026-4177.html",
-            "https://errata.rockylinux.org/RLSA-2026:5146",
+            "https://errata.rockylinux.org/RLSA-2026:4177",
             "https://go.dev/cl/737700",
             "https://go.dev/issue/77217",
             "https://groups.google.com/g/golang-announce/c/K09ubi9FQFk",
@@ -13348,7 +13387,7 @@
             "https://bugzilla.redhat.com/show_bug.cgi?id=2407258",
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-58183",
             "https://errata.almalinux.org/9/ALSA-2026-1381.html",
-            "https://errata.rockylinux.org/RLSA-2025:23295",
+            "https://errata.rockylinux.org/RLSA-2025:23326",
             "https://go.dev/cl/709861",
             "https://go.dev/issue/75677",
             "https://groups.google.com/g/golang-announce/c/4Emdl2iQ_bI",
@@ -13418,14 +13457,12 @@
             "https://access.redhat.com/security/cve/CVE-2025-61726",
             "https://bugzilla.redhat.com/2434432",
             "https://bugzilla.redhat.com/2437111",
-            "https://bugzilla.redhat.com/show_bug.cgi?id=2418462",
             "https://bugzilla.redhat.com/show_bug.cgi?id=2434432",
             "https://bugzilla.redhat.com/show_bug.cgi?id=2437111",
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-61726",
-            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-61729",
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-68121",
             "https://errata.almalinux.org/9/ALSA-2026-4177.html",
-            "https://errata.rockylinux.org/RLSA-2026:5146",
+            "https://errata.rockylinux.org/RLSA-2026:4177",
             "https://go.dev/cl/736712",
             "https://go.dev/issue/77101",
             "https://groups.google.com/g/golang-announce/c/Vd2tYVM8eUc",
@@ -13506,7 +13543,7 @@
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-61729",
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-68121",
             "https://errata.almalinux.org/9/ALSA-2026-3753.html",
-            "https://errata.rockylinux.org/RLSA-2026:3336",
+            "https://errata.rockylinux.org/RLSA-2026:3337",
             "https://go.dev/cl/736713",
             "https://go.dev/issue/77102",
             "https://groups.google.com/g/golang-announce/c/Vd2tYVM8eUc",
@@ -13583,7 +13620,7 @@
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-61729",
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-68121",
             "https://errata.almalinux.org/9/ALSA-2026-3928.html",
-            "https://errata.rockylinux.org/RLSA-2026:5146",
+            "https://errata.rockylinux.org/RLSA-2026:3928",
             "https://go.dev/cl/725920",
             "https://go.dev/issue/76445",
             "https://groups.google.com/g/golang-announce/c/8FJoBkPddm4",
