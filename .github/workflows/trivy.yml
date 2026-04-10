@@ -130,6 +130,7 @@ jobs:
       sarif_category: ${{ matrix.image.name }}${{ matrix.image.suffix }}
       generate_sbom: true
       build_logic_ref: main
+    secrets: inherit
 
   # ============================================
   # DISPATCH NEW CVEs FOR INVESTIGATION
@@ -458,6 +459,8 @@ jobs:
           exit-code: true
           only-severities: "critical,high"
           vex-location: ./vex
+          only-vex-affected: true
+          vex-author: "Liquibase Security Team"
 
       - name: Docker Scout JSON output
         if: always()
@@ -467,6 +470,8 @@ jobs:
             --output scout-results.json \
             --only-severities critical,high \
             --vex-location ./vex \
+            --only-vex-affected \
+            --vex-author "Liquibase Security Team" \
             "${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}" || true
 
       - name: Upload Scout JSON results
