@@ -130,6 +130,7 @@ jobs:
       sarif_category: ${{ matrix.image.name }}${{ matrix.image.suffix }}
       generate_sbom: true
       build_logic_ref: main
+    secrets: inherit
 
   # ============================================
   # DISPATCH NEW CVEs FOR INVESTIGATION
