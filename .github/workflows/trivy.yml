@@ -129,6 +129,7 @@ jobs:
       upload_sarif: true
       sarif_category: ${{ matrix.image.name }}${{ matrix.image.suffix }}
       generate_sbom: true
+      vex_enabled: ${{ matrix.image.name == 'liquibase/liquibase-secure' }}
       build_logic_ref: main
     secrets: inherit
 
@@ -441,6 +442,7 @@ jobs:
           password: ${{ env.DOCKERHUB_TOKEN }}
 
       - name: Download VEX files for Scout
+        if: matrix.image.name == 'liquibase/liquibase-secure'
         run: |
           mkdir -p ./vex
           curl -sSfL "https://raw.githubusercontent.com/liquibase/vex-repo/main/pkg/maven/org.liquibase/liquibase-core/vex.openvex.json" \
@@ -458,20 +460,22 @@ jobs:
           summary: true
           exit-code: true
           only-severities: "critical,high"
-          vex-location: ./vex
-          only-vex-affected: true
-          vex-author: "Liquibase Security Team"
+          vex-location: ${{ matrix.image.name == 'liquibase/liquibase-secure' && './vex' || '' }}
+          only-vex-affected: ${{ matrix.image.name == 'liquibase/liquibase-secure' }}
+          vex-author: ${{ matrix.image.name == 'liquibase/liquibase-secure' && 'Liquibase Security Team' || '' }}
 
       - name: Docker Scout JSON output
         if: always()
         run: |
-          docker scout cves \
-            --format json \
-            --output scout-results.json \
-            --only-severities critical,high \
-            --vex-location ./vex \
-            --only-vex-affected \
-            --vex-author "Liquibase Security Team" \
+          SCOUT_ARGS=(
+            --format json
+            --output scout-results.json
+            --only-severities critical,high
+          )
+          if [[ "${{ matrix.image.name }}" == "liquibase/liquibase-secure" ]]; then
+            SCOUT_ARGS+=(--vex-location ./vex --only-vex-affected --vex-author "Liquibase Security Team")
+          fi
+          docker scout cves "${SCOUT_ARGS[@]}" \
             "${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}" || true
 
       - name: Upload Scout JSON results
