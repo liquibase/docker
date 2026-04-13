@@ -3,9 +3,9 @@
   "Trivy": {
     "Version": "0.69.3"
   },
-  "ReportID": "019d7650-97dc-7630-8ad2-2898cf8cd1e6",
-  "CreatedAt": "2026-04-10T07:34:46.492409149Z",
-  "ArtifactID": "sha256:3386e13fe2385c1c888ae74479ce3c8fbff29b262490ca582be2e689a892970a",
+  "ReportID": "019d85c3-ee2f-7e7e-9111-29fea54ad90e",
+  "CreatedAt": "2026-04-13T07:35:03.471952524Z",
+  "ArtifactID": "sha256:69a7f34f0309d2fd31abb66fb450bec12e526eaa63b5a29b830f861972ad8bbe",
   "ArtifactName": "ghcr.io/liquibase/docker/liquibase-secure:b83ae31d960bcd0d5ad192de1233752bc38e03c1",
   "ArtifactType": "container_image",
   "Metadata": {
@@ -14,7 +14,7 @@
       "Family": "ubuntu",
       "Name": "24.04"
     },
-    "ImageID": "sha256:c44f058480ad593717c1538129e3a3b4b24de6cdde6371e4d3cd4ac436e8d224",
+    "ImageID": "sha256:3851caaff2ff34e3fb3251eb6b10735b4cbd214894cdb887f3d76d06fbc9e78f",
     "DiffIDs": [
       "sha256:5e732af9e7c568c9b41ecabc76ac93a58471934d5155070dfd64a9567667fd9d",
       "sha256:2fd594683ffb575ab267d7e1bd843f75c53afac133723dbbe55abc1b550c47cb",
@@ -33,7 +33,7 @@
       "ghcr.io/liquibase/docker/liquibase-secure:b83ae31d960bcd0d5ad192de1233752bc38e03c1"
     ],
     "RepoDigests": [
-      "ghcr.io/liquibase/docker/liquibase-secure@sha256:ba6e1bceb458d320f8866d13ec9d342a6bc85a1ccf9c4ab167a9a7bd4ad53754"
+      "ghcr.io/liquibase/docker/liquibase-secure@sha256:e673cb0ecb540dc473de711c0df194ba47cb61fcee6c0473005ba8c2c3cc93f7"
     ],
     "Reference": "ghcr.io/liquibase/docker/liquibase-secure:b83ae31d960bcd0d5ad192de1233752bc38e03c1",
     "ImageConfig": {
@@ -120,7 +120,7 @@
           "comment": "buildkit.dockerfile.v0"
         },
         {
-          "created": "2026-04-10T04:57:34.833598788Z",
+          "created": "2026-04-10T07:30:57.400727667Z",
           "created_by": "WORKDIR /liquibase",
           "comment": "buildkit.dockerfile.v0"
         },
@@ -15672,6 +15672,57 @@
             "DiffID": "sha256:453825c7d78554246e5988e62a2fcf068c1307afc35ab2730251ca14c5cae485"
           },
           "AnalyzedBy": "gobinary"
+        }
+      ],
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2026-32282",
+          "VendorIDs": [
+            "GO-2026-4864"
+          ],
+          "PkgID": "stdlib@v1.25.8",
+          "PkgName": "stdlib",
+          "PkgIdentifier": {
+            "PURL": "pkg:golang/stdlib@v1.25.8",
+            "UID": "29cd6c80b7e61dc8"
+          },
+          "InstalledVersion": "v1.25.8",
+          "FixedVersion": "1.25.9, 1.26.2",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:13990658936d0840d600e2af7d1eacb6566fe01cccd67af06b45dbccf6c4a781",
+            "DiffID": "sha256:453825c7d78554246e5988e62a2fcf068c1307afc35ab2730251ca14c5cae485"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-32282",
+          "DataSource": {
+            "ID": "govulndb",
+            "Name": "The Go Vulnerability Database",
+            "URL": "https://pkg.go.dev/vuln/"
+          },
+          "Fingerprint": "sha256:1e8b3e1a3c5ba1536fc13daf407d31f0a1875811dcbf125f1ecb039b2e96814e",
+          "Title": "golang: internal/syscall/unix: Root.Chmod can follow symlinks out of the root",
+          "Description": "On Linux, if the target of Root.Chmod is replaced with a symlink while the chmod operation is in progress, Chmod can operate on the target of the symlink, even when the target lies outside the root. The Linux fchmodat syscall silently ignores the AT_SYMLINK_NOFOLLOW flag, which Root.Chmod uses to avoid symlink traversal. Root.Chmod checks its target before acting and returns an error if the target is a symlink lying outside the root, so the impact is limited to cases where the target is replaced with a symlink between the check and operation.",
+          "Severity": "HIGH",
+          "VendorSeverity": {
+            "redhat": 2
+          },
+          "CVSS": {
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:C/C:H/I:H/A:H",
+              "V3Score": 7.8
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2026-32282",
+            "https://go.dev/cl/763761",
+            "https://go.dev/issue/78293",
+            "https://groups.google.com/g/golang-announce/c/0uYbvbPZRWU",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-32282",
+            "https://pkg.go.dev/vuln/GO-2026-4864",
+            "https://www.cve.org/CVERecord?id=CVE-2026-32282"
+          ],
+          "PublishedDate": "2026-04-08T02:16:03.467Z",
+          "LastModifiedDate": "2026-04-08T21:26:35.91Z"
         }
       ]
     }

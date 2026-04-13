@@ -3,8 +3,8 @@
   "Trivy": {
     "Version": "0.69.3"
   },
-  "ReportID": "019d7651-5555-79dc-aa62-b055baa5652f",
-  "CreatedAt": "2026-04-10T07:35:34.997648999Z",
+  "ReportID": "019d85c4-c2b0-710a-acd2-7b7111870461",
+  "CreatedAt": "2026-04-13T07:35:57.872070138Z",
   "ArtifactName": "/tmp/extracted-deps",
   "ArtifactType": "filesystem",
   "Results": [
@@ -5578,6 +5578,650 @@
           "Version": "3.1.0",
           "FilePath": "dist/liquibase-license-tracking-1.0.0-beta/liquibase-license-tracking/BOOT-INF/lib/jackson-databind-3.1.0.jar",
           "AnalyzedBy": "jar"
+        }
+      ],
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2026-29145",
+          "VendorIDs": [
+            "GHSA-95jq-rwvf-vjx4"
+          ],
+          "PkgName": "org.apache.tomcat.embed:tomcat-embed-core",
+          "PkgPath": "dist/liquibase-license-tracking-1.0.0-beta/liquibase-license-tracking-nested-jars/tomcat-embed-core-11.0.18.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/org.apache.tomcat.embed/tomcat-embed-core@11.0.18",
+            "UID": "a01f52da8c80d1bc"
+          },
+          "InstalledVersion": "11.0.18",
+          "FixedVersion": "9.0.116, 10.1.53, 11.0.20",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-29145",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:7f1f7d4000afcefdeca3f7028018a58aaab3787de2937686e68aa744af556425",
+          "Title": "Apache Tomcat: Apache Tomcat: Authentication bypass due to CLIENT_CERT soft fail misconfiguration",
+          "Description": "CLIENT_CERT authentication does not fail as expected for some scenarios when soft fail is disabled vulnerability in Apache Tomcat, Apache Tomcat Native.\n\nThis issue affects Apache Tomcat: from 11.0.0-M1 through 11.0.18, from 10.1.0-M7 through 10.1.52, from 9.0.83 through 9.0.115; Apache Tomcat Native: from 1.1.23 through 1.1.34, from 1.2.0 through 1.2.39, from 1.3.0 through 1.3.6, from 2.0.0 through 2.0.13.\n\nUsers are recommended to upgrade to version Tomcat Native 1.3.7 or 2.0.14 and Tomcat 11.0.20, 10.1.53 and 9.0.116, which fix the issue.",
+          "Severity": "CRITICAL",
+          "CweIDs": [
+            "CWE-287"
+          ],
+          "VendorSeverity": {
+            "ghsa": 4,
+            "redhat": 2
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N",
+              "V3Score": 9.1
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N",
+              "V3Score": 5.9
+            }
+          },
+          "References": [
+            "http://www.openwall.com/lists/oss-security/2026/04/09/23",
+            "https://access.redhat.com/security/cve/CVE-2026-29145",
+            "https://github.com/apache/tomcat",
+            "https://lists.apache.org/thread/yz5fxmhd2j43wgqykssdo7kltws57jfz",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-29145",
+            "https://www.cve.org/CVERecord?id=CVE-2026-29145"
+          ],
+          "PublishedDate": "2026-04-09T20:16:24.447Z",
+          "LastModifiedDate": "2026-04-10T19:16:21.763Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-29145",
+          "VendorIDs": [
+            "GHSA-95jq-rwvf-vjx4"
+          ],
+          "PkgName": "org.apache.tomcat.embed:tomcat-embed-core",
+          "PkgPath": "dist/liquibase-license-tracking-1.0.0-beta/liquibase-license-tracking/BOOT-INF/lib/tomcat-embed-core-11.0.18.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/org.apache.tomcat.embed/tomcat-embed-core@11.0.18",
+            "UID": "c707183c8267ddcb"
+          },
+          "InstalledVersion": "11.0.18",
+          "FixedVersion": "9.0.116, 10.1.53, 11.0.20",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-29145",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:7f1f7d4000afcefdeca3f7028018a58aaab3787de2937686e68aa744af556425",
+          "Title": "Apache Tomcat: Apache Tomcat: Authentication bypass due to CLIENT_CERT soft fail misconfiguration",
+          "Description": "CLIENT_CERT authentication does not fail as expected for some scenarios when soft fail is disabled vulnerability in Apache Tomcat, Apache Tomcat Native.\n\nThis issue affects Apache Tomcat: from 11.0.0-M1 through 11.0.18, from 10.1.0-M7 through 10.1.52, from 9.0.83 through 9.0.115; Apache Tomcat Native: from 1.1.23 through 1.1.34, from 1.2.0 through 1.2.39, from 1.3.0 through 1.3.6, from 2.0.0 through 2.0.13.\n\nUsers are recommended to upgrade to version Tomcat Native 1.3.7 or 2.0.14 and Tomcat 11.0.20, 10.1.53 and 9.0.116, which fix the issue.",
+          "Severity": "CRITICAL",
+          "CweIDs": [
+            "CWE-287"
+          ],
+          "VendorSeverity": {
+            "ghsa": 4,
+            "redhat": 2
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N",
+              "V3Score": 9.1
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N",
+              "V3Score": 5.9
+            }
+          },
+          "References": [
+            "http://www.openwall.com/lists/oss-security/2026/04/09/23",
+            "https://access.redhat.com/security/cve/CVE-2026-29145",
+            "https://github.com/apache/tomcat",
+            "https://lists.apache.org/thread/yz5fxmhd2j43wgqykssdo7kltws57jfz",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-29145",
+            "https://www.cve.org/CVERecord?id=CVE-2026-29145"
+          ],
+          "PublishedDate": "2026-04-09T20:16:24.447Z",
+          "LastModifiedDate": "2026-04-10T19:16:21.763Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-24880",
+          "VendorIDs": [
+            "GHSA-563x-q5rq-57qp"
+          ],
+          "PkgName": "org.apache.tomcat.embed:tomcat-embed-core",
+          "PkgPath": "dist/liquibase-license-tracking-1.0.0-beta/liquibase-license-tracking-nested-jars/tomcat-embed-core-11.0.18.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/org.apache.tomcat.embed/tomcat-embed-core@11.0.18",
+            "UID": "a01f52da8c80d1bc"
+          },
+          "InstalledVersion": "11.0.18",
+          "FixedVersion": "9.0.116, 10.1.52, 11.0.20",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-24880",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:673f84279d4b04c6cebd09ecb90e1c4c393efbad7befb12bbbc8faa3164524b5",
+          "Title": "Apache Tomcat: Apache Tomcat: HTTP Request/Response Smuggling via invalid chunk extension",
+          "Description": "Inconsistent Interpretation of HTTP Requests ('HTTP Request/Response Smuggling') vulnerability in Apache Tomcat via invalid chunk extension.\n\nThis issue affects Apache Tomcat: from 11.0.0-M1 through 11.0.18, from 10.1.0-M1 through 10.1.52, from 9.0.0.M1 through 9.0.115, from 8.5.0 through 8.5.100, from 7.0.0 through 7.0.109.\nOther, unsupported versions may also be affected.\n\nUsers are recommended to upgrade to version 11.0.20, 10.1.52 or 9.0.116, which fix the issue.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-444"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "redhat": 1
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:N/A:N",
+              "V3Score": 4.3
+            }
+          },
+          "References": [
+            "http://www.openwall.com/lists/oss-security/2026/04/09/20",
+            "https://access.redhat.com/security/cve/CVE-2026-24880",
+            "https://github.com/apache/tomcat",
+            "https://lists.apache.org/thread/2c682qnlg2tv4o5knlggqbl9yc2gb5sn",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-24880",
+            "https://www.cve.org/CVERecord?id=CVE-2026-24880"
+          ],
+          "PublishedDate": "2026-04-09T20:16:24.06Z",
+          "LastModifiedDate": "2026-04-10T19:16:21.033Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-24880",
+          "VendorIDs": [
+            "GHSA-563x-q5rq-57qp"
+          ],
+          "PkgName": "org.apache.tomcat.embed:tomcat-embed-core",
+          "PkgPath": "dist/liquibase-license-tracking-1.0.0-beta/liquibase-license-tracking/BOOT-INF/lib/tomcat-embed-core-11.0.18.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/org.apache.tomcat.embed/tomcat-embed-core@11.0.18",
+            "UID": "c707183c8267ddcb"
+          },
+          "InstalledVersion": "11.0.18",
+          "FixedVersion": "9.0.116, 10.1.52, 11.0.20",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-24880",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:673f84279d4b04c6cebd09ecb90e1c4c393efbad7befb12bbbc8faa3164524b5",
+          "Title": "Apache Tomcat: Apache Tomcat: HTTP Request/Response Smuggling via invalid chunk extension",
+          "Description": "Inconsistent Interpretation of HTTP Requests ('HTTP Request/Response Smuggling') vulnerability in Apache Tomcat via invalid chunk extension.\n\nThis issue affects Apache Tomcat: from 11.0.0-M1 through 11.0.18, from 10.1.0-M1 through 10.1.52, from 9.0.0.M1 through 9.0.115, from 8.5.0 through 8.5.100, from 7.0.0 through 7.0.109.\nOther, unsupported versions may also be affected.\n\nUsers are recommended to upgrade to version 11.0.20, 10.1.52 or 9.0.116, which fix the issue.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-444"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "redhat": 1
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:N/A:N",
+              "V3Score": 4.3
+            }
+          },
+          "References": [
+            "http://www.openwall.com/lists/oss-security/2026/04/09/20",
+            "https://access.redhat.com/security/cve/CVE-2026-24880",
+            "https://github.com/apache/tomcat",
+            "https://lists.apache.org/thread/2c682qnlg2tv4o5knlggqbl9yc2gb5sn",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-24880",
+            "https://www.cve.org/CVERecord?id=CVE-2026-24880"
+          ],
+          "PublishedDate": "2026-04-09T20:16:24.06Z",
+          "LastModifiedDate": "2026-04-10T19:16:21.033Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-29129",
+          "VendorIDs": [
+            "GHSA-69cc-cv78-qc8g"
+          ],
+          "PkgName": "org.apache.tomcat.embed:tomcat-embed-core",
+          "PkgPath": "dist/liquibase-license-tracking-1.0.0-beta/liquibase-license-tracking-nested-jars/tomcat-embed-core-11.0.18.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/org.apache.tomcat.embed/tomcat-embed-core@11.0.18",
+            "UID": "a01f52da8c80d1bc"
+          },
+          "InstalledVersion": "11.0.18",
+          "FixedVersion": "9.0.116, 10.1.53, 11.0.20",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-29129",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:8158928394ceab11a0787fff9f0dc64b14e828185fc795354a66b6e76b98da0c",
+          "Title": "Apache Tomcat: Apache Tomcat: Configured cipher preference order not preserved",
+          "Description": "Configured cipher preference order not preserved vulnerability in Apache Tomcat.\n\nThis issue affects Apache Tomcat: from 11.0.16 through 11.0.18, from 10.1.51 through 10.1.52, from 9.0.114 through 9.0.115.\n\nUsers are recommended to upgrade to version 11.0.20, 10.1.53 or 9.0.116, which fix the issue.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-327"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "redhat": 1
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N",
+              "V3Score": 6.5
+            }
+          },
+          "References": [
+            "http://www.openwall.com/lists/oss-security/2026/04/09/22",
+            "https://access.redhat.com/security/cve/CVE-2026-29129",
+            "https://github.com/apache/tomcat",
+            "https://lists.apache.org/thread/r4h1t6f8xhxsxfm6c2z5cprolsosho3f",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-29129",
+            "https://www.cve.org/CVERecord?id=CVE-2026-29129"
+          ],
+          "PublishedDate": "2026-04-09T20:16:24.343Z",
+          "LastModifiedDate": "2026-04-10T19:16:21.58Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-29129",
+          "VendorIDs": [
+            "GHSA-69cc-cv78-qc8g"
+          ],
+          "PkgName": "org.apache.tomcat.embed:tomcat-embed-core",
+          "PkgPath": "dist/liquibase-license-tracking-1.0.0-beta/liquibase-license-tracking/BOOT-INF/lib/tomcat-embed-core-11.0.18.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/org.apache.tomcat.embed/tomcat-embed-core@11.0.18",
+            "UID": "c707183c8267ddcb"
+          },
+          "InstalledVersion": "11.0.18",
+          "FixedVersion": "9.0.116, 10.1.53, 11.0.20",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-29129",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:8158928394ceab11a0787fff9f0dc64b14e828185fc795354a66b6e76b98da0c",
+          "Title": "Apache Tomcat: Apache Tomcat: Configured cipher preference order not preserved",
+          "Description": "Configured cipher preference order not preserved vulnerability in Apache Tomcat.\n\nThis issue affects Apache Tomcat: from 11.0.16 through 11.0.18, from 10.1.51 through 10.1.52, from 9.0.114 through 9.0.115.\n\nUsers are recommended to upgrade to version 11.0.20, 10.1.53 or 9.0.116, which fix the issue.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-327"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "redhat": 1
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N",
+              "V3Score": 6.5
+            }
+          },
+          "References": [
+            "http://www.openwall.com/lists/oss-security/2026/04/09/22",
+            "https://access.redhat.com/security/cve/CVE-2026-29129",
+            "https://github.com/apache/tomcat",
+            "https://lists.apache.org/thread/r4h1t6f8xhxsxfm6c2z5cprolsosho3f",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-29129",
+            "https://www.cve.org/CVERecord?id=CVE-2026-29129"
+          ],
+          "PublishedDate": "2026-04-09T20:16:24.343Z",
+          "LastModifiedDate": "2026-04-10T19:16:21.58Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-29146",
+          "VendorIDs": [
+            "GHSA-h468-7pvh-8vr8"
+          ],
+          "PkgName": "org.apache.tomcat.embed:tomcat-embed-core",
+          "PkgPath": "dist/liquibase-license-tracking-1.0.0-beta/liquibase-license-tracking-nested-jars/tomcat-embed-core-11.0.18.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/org.apache.tomcat.embed/tomcat-embed-core@11.0.18",
+            "UID": "a01f52da8c80d1bc"
+          },
+          "InstalledVersion": "11.0.18",
+          "FixedVersion": "9.0.116, 10.1.53, 11.0.19",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-29146",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:87db7afcbe6b6b003bf9116c56415914f1ca525f77c7e39cb49a75e58154d24e",
+          "Title": "Apache Tomcat: Apache Tomcat: Information disclosure via Padding Oracle vulnerability in EncryptInterceptor",
+          "Description": "Padding Oracle vulnerability in Apache Tomcat's EncryptInterceptor with default configuration.\n\nThis issue affects Apache Tomcat: from 11.0.0-M1 through 11.0.18, from 10.0.0-M1 through 10.1.52, from 9.0.13 through 9..115, from 8.5.38 through 8.5.100, from 7.0.100 through 7.0.109.\n\nUsers are recommended to upgrade to version 11.0.19, 10.1.53 and 9.0.116, which fixes the issue.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-209",
+            "CWE-642"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "redhat": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+              "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N",
+              "V3Score": 7.5,
+              "V40Score": 8.7
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "http://www.openwall.com/lists/oss-security/2026/04/09/24",
+            "https://access.redhat.com/security/cve/CVE-2026-29146",
+            "https://github.com/apache/tomcat",
+            "https://lists.apache.org/thread/lzt04z2pb3dc5tk85obn80xygw3z1p0w",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-29146",
+            "https://www.cve.org/CVERecord?id=CVE-2026-29146"
+          ],
+          "PublishedDate": "2026-04-09T20:16:24.577Z",
+          "LastModifiedDate": "2026-04-10T19:16:21.97Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-29146",
+          "VendorIDs": [
+            "GHSA-h468-7pvh-8vr8"
+          ],
+          "PkgName": "org.apache.tomcat.embed:tomcat-embed-core",
+          "PkgPath": "dist/liquibase-license-tracking-1.0.0-beta/liquibase-license-tracking/BOOT-INF/lib/tomcat-embed-core-11.0.18.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/org.apache.tomcat.embed/tomcat-embed-core@11.0.18",
+            "UID": "c707183c8267ddcb"
+          },
+          "InstalledVersion": "11.0.18",
+          "FixedVersion": "9.0.116, 10.1.53, 11.0.19",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-29146",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:87db7afcbe6b6b003bf9116c56415914f1ca525f77c7e39cb49a75e58154d24e",
+          "Title": "Apache Tomcat: Apache Tomcat: Information disclosure via Padding Oracle vulnerability in EncryptInterceptor",
+          "Description": "Padding Oracle vulnerability in Apache Tomcat's EncryptInterceptor with default configuration.\n\nThis issue affects Apache Tomcat: from 11.0.0-M1 through 11.0.18, from 10.0.0-M1 through 10.1.52, from 9.0.13 through 9..115, from 8.5.38 through 8.5.100, from 7.0.100 through 7.0.109.\n\nUsers are recommended to upgrade to version 11.0.19, 10.1.53 and 9.0.116, which fixes the issue.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-209",
+            "CWE-642"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "redhat": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+              "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N",
+              "V3Score": 7.5,
+              "V40Score": 8.7
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "http://www.openwall.com/lists/oss-security/2026/04/09/24",
+            "https://access.redhat.com/security/cve/CVE-2026-29146",
+            "https://github.com/apache/tomcat",
+            "https://lists.apache.org/thread/lzt04z2pb3dc5tk85obn80xygw3z1p0w",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-29146",
+            "https://www.cve.org/CVERecord?id=CVE-2026-29146"
+          ],
+          "PublishedDate": "2026-04-09T20:16:24.577Z",
+          "LastModifiedDate": "2026-04-10T19:16:21.97Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-34483",
+          "VendorIDs": [
+            "GHSA-rv64-5gf8-9qq8"
+          ],
+          "PkgName": "org.apache.tomcat.embed:tomcat-embed-core",
+          "PkgPath": "dist/liquibase-license-tracking-1.0.0-beta/liquibase-license-tracking-nested-jars/tomcat-embed-core-11.0.18.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/org.apache.tomcat.embed/tomcat-embed-core@11.0.18",
+            "UID": "a01f52da8c80d1bc"
+          },
+          "InstalledVersion": "11.0.18",
+          "FixedVersion": "9.0.116, 10.1.54, 11.0.21",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-34483",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:0486321117f6b925ba7f0f0f1be1bdbd94393004b2d9f13430deddafc07f24c6",
+          "Title": "Apache Tomcat: Apache Tomcat: Information disclosure due to improper encoding in JsonAccessLogValve",
+          "Description": "Improper Encoding or Escaping of Output vulnerability in the JsonAccessLogValve component of Apache Tomcat.\n\nThis issue affects Apache Tomcat: from 11.0.0-M1 through 11.0.20, from 10.1.0-M1 through 10.1.53, from 9.0.40 through 9.0.116.\n\nUsers are recommended to upgrade to version 11.0.21, 10.1.54 or 9.0.117 , which fix the issue.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-116"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "redhat": 1
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:L/A:N",
+              "V3Score": 5.4
+            }
+          },
+          "References": [
+            "http://www.openwall.com/lists/oss-security/2026/04/09/26",
+            "https://access.redhat.com/security/cve/CVE-2026-34483",
+            "https://github.com/apache/tomcat",
+            "https://lists.apache.org/thread/j1w7304yonlr8vo1tkb5nfs7od1y228b",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-34483",
+            "https://www.cve.org/CVERecord?id=CVE-2026-34483"
+          ],
+          "PublishedDate": "2026-04-09T20:16:24.937Z",
+          "LastModifiedDate": "2026-04-10T21:16:24.76Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-34483",
+          "VendorIDs": [
+            "GHSA-rv64-5gf8-9qq8"
+          ],
+          "PkgName": "org.apache.tomcat.embed:tomcat-embed-core",
+          "PkgPath": "dist/liquibase-license-tracking-1.0.0-beta/liquibase-license-tracking/BOOT-INF/lib/tomcat-embed-core-11.0.18.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/org.apache.tomcat.embed/tomcat-embed-core@11.0.18",
+            "UID": "c707183c8267ddcb"
+          },
+          "InstalledVersion": "11.0.18",
+          "FixedVersion": "9.0.116, 10.1.54, 11.0.21",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-34483",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:0486321117f6b925ba7f0f0f1be1bdbd94393004b2d9f13430deddafc07f24c6",
+          "Title": "Apache Tomcat: Apache Tomcat: Information disclosure due to improper encoding in JsonAccessLogValve",
+          "Description": "Improper Encoding or Escaping of Output vulnerability in the JsonAccessLogValve component of Apache Tomcat.\n\nThis issue affects Apache Tomcat: from 11.0.0-M1 through 11.0.20, from 10.1.0-M1 through 10.1.53, from 9.0.40 through 9.0.116.\n\nUsers are recommended to upgrade to version 11.0.21, 10.1.54 or 9.0.117 , which fix the issue.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-116"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "redhat": 1
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:L/A:N",
+              "V3Score": 5.4
+            }
+          },
+          "References": [
+            "http://www.openwall.com/lists/oss-security/2026/04/09/26",
+            "https://access.redhat.com/security/cve/CVE-2026-34483",
+            "https://github.com/apache/tomcat",
+            "https://lists.apache.org/thread/j1w7304yonlr8vo1tkb5nfs7od1y228b",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-34483",
+            "https://www.cve.org/CVERecord?id=CVE-2026-34483"
+          ],
+          "PublishedDate": "2026-04-09T20:16:24.937Z",
+          "LastModifiedDate": "2026-04-10T21:16:24.76Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-34487",
+          "VendorIDs": [
+            "GHSA-x4m4-345f-5h5g"
+          ],
+          "PkgName": "org.apache.tomcat.embed:tomcat-embed-core",
+          "PkgPath": "dist/liquibase-license-tracking-1.0.0-beta/liquibase-license-tracking-nested-jars/tomcat-embed-core-11.0.18.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/org.apache.tomcat.embed/tomcat-embed-core@11.0.18",
+            "UID": "a01f52da8c80d1bc"
+          },
+          "InstalledVersion": "11.0.18",
+          "FixedVersion": "9.0.117, 10.1.54, 11.0.21",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-34487",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:07a46e94195baab6d02112d0488ee92c0f6a76abe22b4c749ad984ddf741f546",
+          "Title": "Apache Tomcat: Apache Tomcat: Information disclosure via sensitive data in log files",
+          "Description": "Insertion of Sensitive Information into Log File vulnerability in the cloud membership for clustering component of Apache Tomcat exposed the Kubernetes bearer token.\n\nThis issue affects Apache Tomcat: from 11.0.0-M1 through 11.0.20, from 10.1.0-M1 through 10.1.53, from 9.0.13 through 9.0.116.\n\nUsers are recommended to upgrade to version 11.0.21, 10.1.54 or 9.0.117, which fix the issue.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-532"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "redhat": 1
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:C/C:H/I:N/A:N",
+              "V3Score": 6.5
+            }
+          },
+          "References": [
+            "http://www.openwall.com/lists/oss-security/2026/04/09/28",
+            "https://access.redhat.com/security/cve/CVE-2026-34487",
+            "https://github.com/apache/tomcat",
+            "https://lists.apache.org/thread/4xpkwolpkrj8v5xzp5nyovtlqp3y850h",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-34487",
+            "https://www.cve.org/CVERecord?id=CVE-2026-34487"
+          ],
+          "PublishedDate": "2026-04-09T20:16:25.203Z",
+          "LastModifiedDate": "2026-04-10T18:16:43.713Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-34487",
+          "VendorIDs": [
+            "GHSA-x4m4-345f-5h5g"
+          ],
+          "PkgName": "org.apache.tomcat.embed:tomcat-embed-core",
+          "PkgPath": "dist/liquibase-license-tracking-1.0.0-beta/liquibase-license-tracking/BOOT-INF/lib/tomcat-embed-core-11.0.18.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/org.apache.tomcat.embed/tomcat-embed-core@11.0.18",
+            "UID": "c707183c8267ddcb"
+          },
+          "InstalledVersion": "11.0.18",
+          "FixedVersion": "9.0.117, 10.1.54, 11.0.21",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-34487",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:07a46e94195baab6d02112d0488ee92c0f6a76abe22b4c749ad984ddf741f546",
+          "Title": "Apache Tomcat: Apache Tomcat: Information disclosure via sensitive data in log files",
+          "Description": "Insertion of Sensitive Information into Log File vulnerability in the cloud membership for clustering component of Apache Tomcat exposed the Kubernetes bearer token.\n\nThis issue affects Apache Tomcat: from 11.0.0-M1 through 11.0.20, from 10.1.0-M1 through 10.1.53, from 9.0.13 through 9.0.116.\n\nUsers are recommended to upgrade to version 11.0.21, 10.1.54 or 9.0.117, which fix the issue.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-532"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "redhat": 1
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:C/C:H/I:N/A:N",
+              "V3Score": 6.5
+            }
+          },
+          "References": [
+            "http://www.openwall.com/lists/oss-security/2026/04/09/28",
+            "https://access.redhat.com/security/cve/CVE-2026-34487",
+            "https://github.com/apache/tomcat",
+            "https://lists.apache.org/thread/4xpkwolpkrj8v5xzp5nyovtlqp3y850h",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-34487",
+            "https://www.cve.org/CVERecord?id=CVE-2026-34487"
+          ],
+          "PublishedDate": "2026-04-09T20:16:25.203Z",
+          "LastModifiedDate": "2026-04-10T18:16:43.713Z"
         }
       ]
     },
