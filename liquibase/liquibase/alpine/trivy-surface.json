@@ -3,8 +3,8 @@
   "Trivy": {
     "Version": "0.69.3"
   },
-  "ReportID": "019d85c3-3d6d-7f0c-8185-007e53f94a19",
-  "CreatedAt": "2026-04-13T07:34:18.221987275Z",
+  "ReportID": "019d8ae8-7f28-75bf-8f27-08e9ecf05dfc",
+  "CreatedAt": "2026-04-14T07:33:05.960377841Z",
   "ArtifactID": "sha256:3519949387d9cc7afeb61ffb7ae0bf7e3053b3c82e4b73afb8203da2a000c427",
   "ArtifactName": "ghcr.io/liquibase/docker/liquibase-alpine:b83ae31d960bcd0d5ad192de1233752bc38e03c1",
   "ArtifactType": "container_image",
@@ -29,7 +29,7 @@
       "ghcr.io/liquibase/docker/liquibase-alpine:b83ae31d960bcd0d5ad192de1233752bc38e03c1"
     ],
     "RepoDigests": [
-      "ghcr.io/liquibase/docker/liquibase-alpine@sha256:c389114751d5e0a3096e5e67188d0ff2357e08aec02b5d309c41b47c92316f97"
+      "ghcr.io/liquibase/docker/liquibase-alpine@sha256:529435ef4be8f19af9df560676959cc9872b5b1a2bc714d6fb902310d73df56f"
     ],
     "Reference": "ghcr.io/liquibase/docker/liquibase-alpine:b83ae31d960bcd0d5ad192de1233752bc38e03c1",
     "ImageConfig": {
@@ -2104,6 +2104,56 @@
       ],
       "Vulnerabilities": [
         {
+          "VulnerabilityID": "CVE-2026-32280",
+          "VendorIDs": [
+            "GO-2026-4947"
+          ],
+          "PkgID": "stdlib@v1.25.8",
+          "PkgName": "stdlib",
+          "PkgIdentifier": {
+            "PURL": "pkg:golang/stdlib@v1.25.8",
+            "UID": "29cd6c80b7e61dc8"
+          },
+          "InstalledVersion": "v1.25.8",
+          "FixedVersion": "1.25.9, 1.26.2",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:cf9f252df71f309ab0f1c5f07685ee95dfe0972b24023e96ebf2982c7d3adc1d",
+            "DiffID": "sha256:7eaf407e709c87cd4b08090fa87025b0a15179b04cda13d89bc78ec0736d649a"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-32280",
+          "DataSource": {
+            "ID": "govulndb",
+            "Name": "The Go Vulnerability Database",
+            "URL": "https://pkg.go.dev/vuln/"
+          },
+          "Fingerprint": "sha256:1150cfca0bce948c1701ad6dbd9d77fd9613e74e01c27465992292cc0709c953",
+          "Title": "During chain building, the amount of work that is done is not correctl ...",
+          "Description": "During chain building, the amount of work that is done is not correctly limited when a large number of intermediate certificates are passed in VerifyOptions.Intermediates, which can lead to a denial of service. This affects both direct users of crypto/x509 and users of crypto/tls.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-770"
+          ],
+          "VendorSeverity": {
+            "bitnami": 3
+          },
+          "CVSS": {
+            "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://go.dev/cl/758320",
+            "https://go.dev/issue/78282",
+            "https://groups.google.com/g/golang-announce/c/0uYbvbPZRWU",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-32280",
+            "https://pkg.go.dev/vuln/GO-2026-4947"
+          ],
+          "PublishedDate": "2026-04-08T02:16:03.247Z",
+          "LastModifiedDate": "2026-04-08T21:26:35.91Z"
+        },
+        {
           "VulnerabilityID": "CVE-2026-32282",
           "VendorIDs": [
             "GO-2026-4864"
@@ -2150,7 +2200,7 @@
             "https://www.cve.org/CVERecord?id=CVE-2026-32282"
           ],
           "PublishedDate": "2026-04-08T02:16:03.467Z",
-          "LastModifiedDate": "2026-04-08T21:26:35.91Z"
+          "LastModifiedDate": "2026-04-13T19:16:39.807Z"
         }
       ]
     }
