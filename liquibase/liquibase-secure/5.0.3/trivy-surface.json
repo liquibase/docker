@@ -3,8 +3,8 @@
   "Trivy": {
     "Version": "0.69.3"
   },
-  "ReportID": "019d8665-cbf4-720d-a237-7c2e3cffe5f5",
-  "CreatedAt": "2026-04-13T10:31:51.540136189Z",
+  "ReportID": "019d8b87-b7c3-7491-ad75-3af9e00b68db",
+  "CreatedAt": "2026-04-14T10:27:00.675301978Z",
   "ArtifactID": "sha256:34b9677e9d46a576cbfc14751d2d02dfee02b72aca8158935734516cf646dc85",
   "ArtifactName": "liquibase/liquibase-secure:5.0.3",
   "ArtifactType": "container_image",
@@ -15706,6 +15706,56 @@
           "LastModifiedDate": "2026-03-10T18:18:37.74Z"
         },
         {
+          "VulnerabilityID": "CVE-2026-32280",
+          "VendorIDs": [
+            "GO-2026-4947"
+          ],
+          "PkgID": "stdlib@v1.25.5",
+          "PkgName": "stdlib",
+          "PkgIdentifier": {
+            "PURL": "pkg:golang/stdlib@v1.25.5",
+            "UID": "67d8dee280b50991"
+          },
+          "InstalledVersion": "v1.25.5",
+          "FixedVersion": "1.25.9, 1.26.2",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:4e4f244c1234869d388d2ec62093a2bbc380672c4f98d22a1ebc06065579381a",
+            "DiffID": "sha256:5884bfe990f5fa6570fdfb80449ab64f50e2b1eee3e7f846251123ec546fcba6"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-32280",
+          "DataSource": {
+            "ID": "govulndb",
+            "Name": "The Go Vulnerability Database",
+            "URL": "https://pkg.go.dev/vuln/"
+          },
+          "Fingerprint": "sha256:9ddf185b26eb81d3dc6e532623cc4c6e9b0718e111e65f9d109b1ec59f2ed4d9",
+          "Title": "During chain building, the amount of work that is done is not correctl ...",
+          "Description": "During chain building, the amount of work that is done is not correctly limited when a large number of intermediate certificates are passed in VerifyOptions.Intermediates, which can lead to a denial of service. This affects both direct users of crypto/x509 and users of crypto/tls.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-770"
+          ],
+          "VendorSeverity": {
+            "bitnami": 3
+          },
+          "CVSS": {
+            "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://go.dev/cl/758320",
+            "https://go.dev/issue/78282",
+            "https://groups.google.com/g/golang-announce/c/0uYbvbPZRWU",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-32280",
+            "https://pkg.go.dev/vuln/GO-2026-4947"
+          ],
+          "PublishedDate": "2026-04-08T02:16:03.247Z",
+          "LastModifiedDate": "2026-04-08T21:26:35.91Z"
+        },
+        {
           "VulnerabilityID": "CVE-2026-32282",
           "VendorIDs": [
             "GO-2026-4864"
@@ -15752,7 +15802,7 @@
             "https://www.cve.org/CVERecord?id=CVE-2026-32282"
           ],
           "PublishedDate": "2026-04-08T02:16:03.467Z",
-          "LastModifiedDate": "2026-04-08T21:26:35.91Z"
+          "LastModifiedDate": "2026-04-13T19:16:39.807Z"
         }
       ]
     }

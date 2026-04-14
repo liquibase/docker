@@ -3,8 +3,8 @@
   "Trivy": {
     "Version": "0.69.3"
   },
-  "ReportID": "019d8666-8cb6-7083-bbda-65b14f723bd6",
-  "CreatedAt": "2026-04-13T10:32:40.88603526Z",
+  "ReportID": "019d8b88-665d-74d1-a524-3f3c550e9709",
+  "CreatedAt": "2026-04-14T10:27:45.373317937Z",
   "ArtifactName": "/tmp/extracted-deps",
   "ArtifactType": "filesystem",
   "Results": [
@@ -5610,10 +5610,15 @@
             "CWE-287"
           ],
           "VendorSeverity": {
+            "bitnami": 4,
             "ghsa": 4,
             "redhat": 2
           },
           "CVSS": {
+            "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N",
+              "V3Score": 9.1
+            },
             "ghsa": {
               "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N",
               "V3Score": 9.1
@@ -5632,7 +5637,7 @@
             "https://www.cve.org/CVERecord?id=CVE-2026-29145"
           ],
           "PublishedDate": "2026-04-09T20:16:24.447Z",
-          "LastModifiedDate": "2026-04-10T19:16:21.763Z"
+          "LastModifiedDate": "2026-04-13T15:02:27.76Z"
         },
         {
           "VulnerabilityID": "CVE-2026-29145",
@@ -5663,10 +5668,15 @@
             "CWE-287"
           ],
           "VendorSeverity": {
+            "bitnami": 4,
             "ghsa": 4,
             "redhat": 2
           },
           "CVSS": {
+            "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N",
+              "V3Score": 9.1
+            },
             "ghsa": {
               "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N",
               "V3Score": 9.1
@@ -5685,7 +5695,7 @@
             "https://www.cve.org/CVERecord?id=CVE-2026-29145"
           ],
           "PublishedDate": "2026-04-09T20:16:24.447Z",
-          "LastModifiedDate": "2026-04-10T19:16:21.763Z"
+          "LastModifiedDate": "2026-04-13T15:02:27.76Z"
         },
         {
           "VulnerabilityID": "CVE-2026-24880",
@@ -5716,10 +5726,15 @@
             "CWE-444"
           ],
           "VendorSeverity": {
+            "bitnami": 3,
             "ghsa": 3,
             "redhat": 1
           },
           "CVSS": {
+            "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N",
+              "V3Score": 7.5
+            },
             "ghsa": {
               "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N",
               "V3Score": 7.5
@@ -5738,7 +5753,7 @@
             "https://www.cve.org/CVERecord?id=CVE-2026-24880"
           ],
           "PublishedDate": "2026-04-09T20:16:24.06Z",
-          "LastModifiedDate": "2026-04-10T19:16:21.033Z"
+          "LastModifiedDate": "2026-04-13T15:02:27.76Z"
         },
         {
           "VulnerabilityID": "CVE-2026-24880",
@@ -5769,10 +5784,15 @@
             "CWE-444"
           ],
           "VendorSeverity": {
+            "bitnami": 3,
             "ghsa": 3,
             "redhat": 1
           },
           "CVSS": {
+            "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N",
+              "V3Score": 7.5
+            },
             "ghsa": {
               "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N",
               "V3Score": 7.5
@@ -5791,7 +5811,7 @@
             "https://www.cve.org/CVERecord?id=CVE-2026-24880"
           ],
           "PublishedDate": "2026-04-09T20:16:24.06Z",
-          "LastModifiedDate": "2026-04-10T19:16:21.033Z"
+          "LastModifiedDate": "2026-04-13T15:02:27.76Z"
         },
         {
           "VulnerabilityID": "CVE-2026-29129",
@@ -5822,10 +5842,15 @@
             "CWE-327"
           ],
           "VendorSeverity": {
+            "bitnami": 3,
             "ghsa": 3,
             "redhat": 1
           },
           "CVSS": {
+            "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+              "V3Score": 7.5
+            },
             "ghsa": {
               "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
               "V3Score": 7.5
@@ -5844,7 +5869,7 @@
             "https://www.cve.org/CVERecord?id=CVE-2026-29129"
           ],
           "PublishedDate": "2026-04-09T20:16:24.343Z",
-          "LastModifiedDate": "2026-04-10T19:16:21.58Z"
+          "LastModifiedDate": "2026-04-13T15:02:27.76Z"
         },
         {
           "VulnerabilityID": "CVE-2026-29129",
@@ -5875,10 +5900,15 @@
             "CWE-327"
           ],
           "VendorSeverity": {
+            "bitnami": 3,
             "ghsa": 3,
             "redhat": 1
           },
           "CVSS": {
+            "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+              "V3Score": 7.5
+            },
             "ghsa": {
               "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
               "V3Score": 7.5
@@ -5897,7 +5927,7 @@
             "https://www.cve.org/CVERecord?id=CVE-2026-29129"
           ],
           "PublishedDate": "2026-04-09T20:16:24.343Z",
-          "LastModifiedDate": "2026-04-10T19:16:21.58Z"
+          "LastModifiedDate": "2026-04-13T15:02:27.76Z"
         },
         {
           "VulnerabilityID": "CVE-2026-29146",
@@ -5929,10 +5959,15 @@
             "CWE-642"
           ],
           "VendorSeverity": {
+            "bitnami": 3,
             "ghsa": 3,
             "redhat": 3
           },
           "CVSS": {
+            "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+              "V3Score": 7.5
+            },
             "ghsa": {
               "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
               "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N",
@@ -5953,7 +5988,7 @@
             "https://www.cve.org/CVERecord?id=CVE-2026-29146"
           ],
           "PublishedDate": "2026-04-09T20:16:24.577Z",
-          "LastModifiedDate": "2026-04-10T19:16:21.97Z"
+          "LastModifiedDate": "2026-04-13T15:02:27.76Z"
         },
         {
           "VulnerabilityID": "CVE-2026-29146",
@@ -5985,10 +6020,15 @@
             "CWE-642"
           ],
           "VendorSeverity": {
+            "bitnami": 3,
             "ghsa": 3,
             "redhat": 3
           },
           "CVSS": {
+            "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+              "V3Score": 7.5
+            },
             "ghsa": {
               "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
               "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N",
@@ -6009,7 +6049,7 @@
             "https://www.cve.org/CVERecord?id=CVE-2026-29146"
           ],
           "PublishedDate": "2026-04-09T20:16:24.577Z",
-          "LastModifiedDate": "2026-04-10T19:16:21.97Z"
+          "LastModifiedDate": "2026-04-13T15:02:27.76Z"
         },
         {
           "VulnerabilityID": "CVE-2026-34483",
@@ -6040,10 +6080,15 @@
             "CWE-116"
           ],
           "VendorSeverity": {
+            "bitnami": 3,
             "ghsa": 3,
             "redhat": 1
           },
           "CVSS": {
+            "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+              "V3Score": 7.5
+            },
             "ghsa": {
               "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
               "V3Score": 7.5
@@ -6062,7 +6107,7 @@
             "https://www.cve.org/CVERecord?id=CVE-2026-34483"
           ],
           "PublishedDate": "2026-04-09T20:16:24.937Z",
-          "LastModifiedDate": "2026-04-10T21:16:24.76Z"
+          "LastModifiedDate": "2026-04-13T15:02:27.76Z"
         },
         {
           "VulnerabilityID": "CVE-2026-34483",
@@ -6093,10 +6138,15 @@
             "CWE-116"
           ],
           "VendorSeverity": {
+            "bitnami": 3,
             "ghsa": 3,
             "redhat": 1
           },
           "CVSS": {
+            "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+              "V3Score": 7.5
+            },
             "ghsa": {
               "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
               "V3Score": 7.5
@@ -6115,7 +6165,7 @@
             "https://www.cve.org/CVERecord?id=CVE-2026-34483"
           ],
           "PublishedDate": "2026-04-09T20:16:24.937Z",
-          "LastModifiedDate": "2026-04-10T21:16:24.76Z"
+          "LastModifiedDate": "2026-04-13T15:02:27.76Z"
         },
         {
           "VulnerabilityID": "CVE-2026-34487",
@@ -6146,10 +6196,15 @@
             "CWE-532"
           ],
           "VendorSeverity": {
+            "bitnami": 3,
             "ghsa": 3,
             "redhat": 1
           },
           "CVSS": {
+            "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+              "V3Score": 7.5
+            },
             "ghsa": {
               "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
               "V3Score": 7.5
@@ -6168,7 +6223,7 @@
             "https://www.cve.org/CVERecord?id=CVE-2026-34487"
           ],
           "PublishedDate": "2026-04-09T20:16:25.203Z",
-          "LastModifiedDate": "2026-04-10T18:16:43.713Z"
+          "LastModifiedDate": "2026-04-13T15:02:27.76Z"
         },
         {
           "VulnerabilityID": "CVE-2026-34487",
@@ -6199,10 +6254,15 @@
             "CWE-532"
           ],
           "VendorSeverity": {
+            "bitnami": 3,
             "ghsa": 3,
             "redhat": 1
           },
           "CVSS": {
+            "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+              "V3Score": 7.5
+            },
             "ghsa": {
               "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
               "V3Score": 7.5
@@ -6221,7 +6281,7 @@
             "https://www.cve.org/CVERecord?id=CVE-2026-34487"
           ],
           "PublishedDate": "2026-04-09T20:16:25.203Z",
-          "LastModifiedDate": "2026-04-10T18:16:43.713Z"
+          "LastModifiedDate": "2026-04-13T15:02:27.76Z"
         }
       ]
     },
