@@ -3,38 +3,38 @@
   "Trivy": {
     "Version": "0.69.3"
   },
-  "ReportID": "019d8ae8-7f28-75bf-8f27-08e9ecf05dfc",
-  "CreatedAt": "2026-04-14T07:33:05.960377841Z",
-  "ArtifactID": "sha256:3519949387d9cc7afeb61ffb7ae0bf7e3053b3c82e4b73afb8203da2a000c427",
+  "ReportID": "019d900e-10cb-791f-bbcf-48f47b8aabdd",
+  "CreatedAt": "2026-04-15T07:32:14.155599215Z",
+  "ArtifactID": "sha256:60917f66ddf11333ce67d0dce1adf9573917c56261107eb85089490147208ae3",
   "ArtifactName": "ghcr.io/liquibase/docker/liquibase-alpine:b83ae31d960bcd0d5ad192de1233752bc38e03c1",
   "ArtifactType": "container_image",
   "Metadata": {
-    "Size": 230368256,
+    "Size": 230351360,
     "OS": {
       "Family": "alpine",
       "Name": "3.23.3"
     },
-    "ImageID": "sha256:29c58a01a423e2321a4e9e761c6dff405be82d2a59383a6181f57c72e616f115",
+    "ImageID": "sha256:846536c3efe329476ffbd4bd64d39dd2d01cc1d16173696359df79671300fb66",
     "DiffIDs": [
       "sha256:989e799e634906e94dc9a5ee2ee26fc92ad260522990f26e707861a5f52bf64e",
-      "sha256:4a8c46c74a0ceb621e2f9851be42f2ab36609117c192277769615b2dbfbaf717",
-      "sha256:79a1b01420722cb0ec1fd251f54005522bc4c8037546bedddabee90b800bd6b0",
+      "sha256:3fdb223f4cdd3e485cc7cf0f6d36e33fade9fc72ab05eb5069afc3295a8e25d7",
+      "sha256:c0d228847b03ea2dfaa36771352f4f89b0b63c3c2b50b61a00a0ed1bc808e672",
       "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
-      "sha256:987abf34d2221a3d579ea3574682c6d51264544c7c641822f82c925cc059542f",
-      "sha256:7eaf407e709c87cd4b08090fa87025b0a15179b04cda13d89bc78ec0736d649a",
-      "sha256:8f2a1e2ac54182f3cfc0b8c45d203c98a62c78794671fce814bbe5af02877ce2",
-      "sha256:b41fb03bf0e8a9d91e3d70703b9cf4948be4c71b9ccd903ef7e596238bd8311f"
+      "sha256:9b4163715939dfa8895e4a68ee8d780796945a63a4c8ee61bd7ee0d2acd4fdee",
+      "sha256:c845abb214f58e185128aad871e902efc06b2f162d8feb91b9b7281a34c6f021",
+      "sha256:47ede1eea8999ee9858123cefe85c4c01ff27942b677e83d407c57bba676a574",
+      "sha256:3f918206b8b7a9bdea4d4220be889372534ff92e3956426e376cbb6acd9905b5"
     ],
     "RepoTags": [
       "ghcr.io/liquibase/docker/liquibase-alpine:b83ae31d960bcd0d5ad192de1233752bc38e03c1"
     ],
     "RepoDigests": [
-      "ghcr.io/liquibase/docker/liquibase-alpine@sha256:529435ef4be8f19af9df560676959cc9872b5b1a2bc714d6fb902310d73df56f"
+      "ghcr.io/liquibase/docker/liquibase-alpine@sha256:04805853737cb050594c9a167f2bb9ad94d1e53621951fbe8b8ad2ef42b57c6e"
     ],
     "Reference": "ghcr.io/liquibase/docker/liquibase-alpine:b83ae31d960bcd0d5ad192de1233752bc38e03c1",
     "ImageConfig": {
       "architecture": "amd64",
-      "created": "2026-04-13T07:33:11.937553629Z",
+      "created": "2026-04-15T07:31:00.246267358Z",
       "history": [
         {
           "created": "2026-01-28T01:18:04.977843834Z",
@@ -48,126 +48,126 @@
           "empty_layer": true
         },
         {
-          "created": "2026-04-13T07:33:07.751344124Z",
+          "created": "2026-04-15T07:30:55.821868106Z",
           "created_by": "RUN /bin/sh -c addgroup --gid 1001 liquibase \u0026\u0026     adduser --disabled-password --uid 1001 --ingroup liquibase --home /liquibase liquibase \u0026\u0026     chown liquibase:root /liquibase \u0026\u0026     chmod g+rx /liquibase # buildkit",
           "comment": "buildkit.dockerfile.v0"
         },
         {
-          "created": "2026-04-13T07:33:09.522970279Z",
+          "created": "2026-04-15T07:30:57.724046291Z",
           "created_by": "RUN /bin/sh -c apk add --no-cache openjdk21-jre-headless bash # buildkit",
           "comment": "buildkit.dockerfile.v0"
         },
         {
-          "created": "2026-04-13T07:33:09.538840515Z",
+          "created": "2026-04-15T07:30:57.785952008Z",
           "created_by": "WORKDIR /liquibase",
           "comment": "buildkit.dockerfile.v0"
         },
         {
-          "created": "2026-04-13T07:33:11.123423902Z",
+          "created": "2026-04-15T07:30:59.453986264Z",
           "created_by": "ARG LIQUIBASE_VERSION=5.0.2",
           "comment": "buildkit.dockerfile.v0",
           "empty_layer": true
         },
         {
-          "created": "2026-04-13T07:33:11.123423902Z",
+          "created": "2026-04-15T07:30:59.453986264Z",
           "created_by": "ARG LB_SHA256=10356bea9dc57868a57fc3af88ad471f5027d67ad1f5fc88a9c2221401cbae23",
           "comment": "buildkit.dockerfile.v0",
           "empty_layer": true
         },
         {
-          "created": "2026-04-13T07:33:11.123423902Z",
+          "created": "2026-04-15T07:30:59.453986264Z",
           "created_by": "RUN |2 LIQUIBASE_VERSION=5.0.2 LB_SHA256=10356bea9dc57868a57fc3af88ad471f5027d67ad1f5fc88a9c2221401cbae23 /bin/sh -c set -x \u0026\u0026     apk add --no-cache --virtual .fetch-deps wget \u0026\u0026     wget -q -O liquibase-${LIQUIBASE_VERSION}.tar.gz \"https://github.com/liquibase/liquibase/releases/download/v${LIQUIBASE_VERSION}/liquibase-${LIQUIBASE_VERSION}.tar.gz\" \u0026\u0026     echo \"$LB_SHA256 *liquibase-${LIQUIBASE_VERSION}.tar.gz\" | sha256sum -c - \u0026\u0026     tar -xzf liquibase-${LIQUIBASE_VERSION}.tar.gz \u0026\u0026     rm liquibase-${LIQUIBASE_VERSION}.tar.gz \u0026\u0026     apk del --no-network .fetch-deps \u0026\u0026     ln -s /liquibase/liquibase /usr/local/bin/liquibase \u0026\u0026     ln -s /liquibase/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh \u0026\u0026     liquibase --version # buildkit",
           "comment": "buildkit.dockerfile.v0"
         },
         {
-          "created": "2026-04-13T07:33:11.123423902Z",
+          "created": "2026-04-15T07:30:59.453986264Z",
           "created_by": "ARG LPM_VERSION=0.3.2",
           "comment": "buildkit.dockerfile.v0",
           "empty_layer": true
         },
         {
-          "created": "2026-04-13T07:33:11.123423902Z",
+          "created": "2026-04-15T07:30:59.453986264Z",
           "created_by": "ARG LPM_SHA256=29c1fcb345e4fd97d423d02eea9adaa37b6f43ca5d244b3e1cb40b9743e67b5c",
           "comment": "buildkit.dockerfile.v0",
           "empty_layer": true
         },
         {
-          "created": "2026-04-13T07:33:11.123423902Z",
+          "created": "2026-04-15T07:30:59.453986264Z",
           "created_by": "ARG LPM_SHA256_ARM=39045a541ac7e0bcc42a7939737ec2f0150fa8c2f07361a3fcd58e6f5efb12e5",
           "comment": "buildkit.dockerfile.v0",
           "empty_layer": true
         },
         {
-          "created": "2026-04-13T07:33:11.123423902Z",
+          "created": "2026-04-15T07:30:59.453986264Z",
           "created_by": "LABEL org.opencontainers.image.description=Liquibase Container Image (Alpine)",
           "comment": "buildkit.dockerfile.v0",
           "empty_layer": true
         },
         {
-          "created": "2026-04-13T07:33:11.123423902Z",
+          "created": "2026-04-15T07:30:59.453986264Z",
           "created_by": "LABEL org.opencontainers.image.licenses=FSL-1.1-ALv2",
           "comment": "buildkit.dockerfile.v0",
           "empty_layer": true
         },
         {
-          "created": "2026-04-13T07:33:11.123423902Z",
+          "created": "2026-04-15T07:30:59.453986264Z",
           "created_by": "LABEL org.opencontainers.image.vendor=Liquibase",
           "comment": "buildkit.dockerfile.v0",
           "empty_layer": true
         },
         {
-          "created": "2026-04-13T07:33:11.123423902Z",
+          "created": "2026-04-15T07:30:59.453986264Z",
           "created_by": "LABEL org.opencontainers.image.version=5.0.2",
           "comment": "buildkit.dockerfile.v0",
           "empty_layer": true
         },
         {
-          "created": "2026-04-13T07:33:11.123423902Z",
+          "created": "2026-04-15T07:30:59.453986264Z",
           "created_by": "LABEL org.opencontainers.image.documentation=https://docs.liquibase.com",
           "comment": "buildkit.dockerfile.v0",
           "empty_layer": true
         },
         {
-          "created": "2026-04-13T07:33:11.911824884Z",
+          "created": "2026-04-15T07:31:00.22137858Z",
           "created_by": "RUN |5 LIQUIBASE_VERSION=5.0.2 LB_SHA256=10356bea9dc57868a57fc3af88ad471f5027d67ad1f5fc88a9c2221401cbae23 LPM_VERSION=0.3.2 LPM_SHA256=29c1fcb345e4fd97d423d02eea9adaa37b6f43ca5d244b3e1cb40b9743e67b5c LPM_SHA256_ARM=39045a541ac7e0bcc42a7939737ec2f0150fa8c2f07361a3fcd58e6f5efb12e5 /bin/sh -c mkdir /liquibase/bin \u0026\u0026     apk add --no-cache --virtual .fetch-deps wget unzip \u0026\u0026     arch=\"$(apk --print-arch)\" \u0026\u0026     case \"$arch\" in       x86_64)   DOWNLOAD_ARCH=\"\"  ;;       aarch64)  DOWNLOAD_ARCH=\"-arm64\" \u0026\u0026 LPM_SHA256=$LPM_SHA256_ARM  ;;       *) echo \u003e\u00262 \"error: unsupported architecture '$arch'\" \u0026\u0026 exit 1 ;;     esac \u0026\u0026 wget -q -O lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip \"https://github.com/liquibase/liquibase-package-manager/releases/download/v${LPM_VERSION}/lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip\" \u0026\u0026     echo \"$LPM_SHA256 *lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip\" | sha256sum -c - \u0026\u0026     unzip lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip -d bin/ \u0026\u0026     rm lpm-${LPM_VERSION}-linux${DOWNLOAD_ARCH}.zip \u0026\u0026     apk del --no-network .fetch-deps \u0026\u0026     ln -s /liquibase/bin/lpm /usr/local/bin/lpm \u0026\u0026     lpm --version # buildkit",
           "comment": "buildkit.dockerfile.v0"
         },
         {
-          "created": "2026-04-13T07:33:11.911824884Z",
+          "created": "2026-04-15T07:31:00.22137858Z",
           "created_by": "ENV LIQUIBASE_HOME=/liquibase",
           "comment": "buildkit.dockerfile.v0",
           "empty_layer": true
         },
         {
-          "created": "2026-04-13T07:33:11.911824884Z",
+          "created": "2026-04-15T07:31:00.22137858Z",
           "created_by": "ENV DOCKER_LIQUIBASE=true",
           "comment": "buildkit.dockerfile.v0",
           "empty_layer": true
         },
         {
-          "created": "2026-04-13T07:33:11.925322682Z",
+          "created": "2026-04-15T07:31:00.239271467Z",
           "created_by": "COPY docker-entrypoint.sh ./ # buildkit",
           "comment": "buildkit.dockerfile.v0"
         },
         {
-          "created": "2026-04-13T07:33:11.937553629Z",
+          "created": "2026-04-15T07:31:00.246267358Z",
           "created_by": "COPY liquibase.docker.properties ./ # buildkit",
           "comment": "buildkit.dockerfile.v0"
         },
         {
-          "created": "2026-04-13T07:33:11.937553629Z",
+          "created": "2026-04-15T07:31:00.246267358Z",
           "created_by": "USER liquibase:liquibase",
           "comment": "buildkit.dockerfile.v0",
           "empty_layer": true
         },
         {
-          "created": "2026-04-13T07:33:11.937553629Z",
+          "created": "2026-04-15T07:31:00.246267358Z",
           "created_by": "ENTRYPOINT [\"/liquibase/docker-entrypoint.sh\"]",
           "comment": "buildkit.dockerfile.v0",
           "empty_layer": true
         },
         {
-          "created": "2026-04-13T07:33:11.937553629Z",
+          "created": "2026-04-15T07:31:00.246267358Z",
           "created_by": "CMD [\"--help\"]",
           "comment": "buildkit.dockerfile.v0",
           "empty_layer": true
@@ -178,13 +178,13 @@
         "type": "layers",
         "diff_ids": [
           "sha256:989e799e634906e94dc9a5ee2ee26fc92ad260522990f26e707861a5f52bf64e",
-          "sha256:4a8c46c74a0ceb621e2f9851be42f2ab36609117c192277769615b2dbfbaf717",
-          "sha256:79a1b01420722cb0ec1fd251f54005522bc4c8037546bedddabee90b800bd6b0",
+          "sha256:3fdb223f4cdd3e485cc7cf0f6d36e33fade9fc72ab05eb5069afc3295a8e25d7",
+          "sha256:c0d228847b03ea2dfaa36771352f4f89b0b63c3c2b50b61a00a0ed1bc808e672",
           "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
-          "sha256:987abf34d2221a3d579ea3574682c6d51264544c7c641822f82c925cc059542f",
-          "sha256:7eaf407e709c87cd4b08090fa87025b0a15179b04cda13d89bc78ec0736d649a",
-          "sha256:8f2a1e2ac54182f3cfc0b8c45d203c98a62c78794671fce814bbe5af02877ce2",
-          "sha256:b41fb03bf0e8a9d91e3d70703b9cf4948be4c71b9ccd903ef7e596238bd8311f"
+          "sha256:9b4163715939dfa8895e4a68ee8d780796945a63a4c8ee61bd7ee0d2acd4fdee",
+          "sha256:c845abb214f58e185128aad871e902efc06b2f162d8feb91b9b7281a34c6f021",
+          "sha256:47ede1eea8999ee9858123cefe85c4c01ff27942b677e83d407c57bba676a574",
+          "sha256:3f918206b8b7a9bdea4d4220be889372534ff92e3956426e376cbb6acd9905b5"
         ]
       },
       "config": {
@@ -219,13 +219,13 @@
       },
       {
         "Size": 10240,
-        "Digest": "sha256:bbe667dc7146fd05ef3a7c534bae13d0ef1328597df77e104a7ec7ce421a5645",
-        "DiffID": "sha256:4a8c46c74a0ceb621e2f9851be42f2ab36609117c192277769615b2dbfbaf717"
+        "Digest": "sha256:be7f475468b8df1bc40ec6bcb559249ddd24a55692af772a954608d288628dbd",
+        "DiffID": "sha256:3fdb223f4cdd3e485cc7cf0f6d36e33fade9fc72ab05eb5069afc3295a8e25d7"
       },
       {
-        "Size": 202207232,
-        "Digest": "sha256:a1d21b5a07db9c709f7d4edf164b61a6b24dbb0ffa5b9b28852c0b1d22ab1f53",
-        "DiffID": "sha256:79a1b01420722cb0ec1fd251f54005522bc4c8037546bedddabee90b800bd6b0"
+        "Size": 202190336,
+        "Digest": "sha256:215a1f740952bc6df0406115afbf54933aeccade267c3446aff929371eec22d9",
+        "DiffID": "sha256:c0d228847b03ea2dfaa36771352f4f89b0b63c3c2b50b61a00a0ed1bc808e672"
       },
       {
         "Size": 1024,
@@ -234,23 +234,23 @@
       },
       {
         "Size": 9958912,
-        "Digest": "sha256:639789f59b0e8cb0de62c3ca594b06bd1077fe062bc7b0503d3e84f814ef9ab7",
-        "DiffID": "sha256:987abf34d2221a3d579ea3574682c6d51264544c7c641822f82c925cc059542f"
+        "Digest": "sha256:2eee4180491184f557884f1a93cc8334e629cedc3750fc0a3bdef7ff4eaca085",
+        "DiffID": "sha256:9b4163715939dfa8895e4a68ee8d780796945a63a4c8ee61bd7ee0d2acd4fdee"
       },
       {
         "Size": 9456640,
-        "Digest": "sha256:cf9f252df71f309ab0f1c5f07685ee95dfe0972b24023e96ebf2982c7d3adc1d",
-        "DiffID": "sha256:7eaf407e709c87cd4b08090fa87025b0a15179b04cda13d89bc78ec0736d649a"
+        "Digest": "sha256:498456daf690265836dabdc9bc4a6520701de5ab65b0c268cfba7d669909002a",
+        "DiffID": "sha256:c845abb214f58e185128aad871e902efc06b2f162d8feb91b9b7281a34c6f021"
       },
       {
         "Size": 7168,
-        "Digest": "sha256:e5aa894db0c564360fc201b1598a2e913effd7b167ba68ad77d42bca8001a77e",
-        "DiffID": "sha256:8f2a1e2ac54182f3cfc0b8c45d203c98a62c78794671fce814bbe5af02877ce2"
+        "Digest": "sha256:ed10926a4dd123e7de13ddf75d0cf28d782ba4ffb391af3741049057ed42075a",
+        "DiffID": "sha256:47ede1eea8999ee9858123cefe85c4c01ff27942b677e83d407c57bba676a574"
       },
       {
         "Size": 2560,
-        "Digest": "sha256:d6e105dcf146846d02e25480ef70545ce7d3c29e85cb0214dc264eb83d3b78f1",
-        "DiffID": "sha256:b41fb03bf0e8a9d91e3d70703b9cf4948be4c71b9ccd903ef7e596238bd8311f"
+        "Digest": "sha256:a9c9e948816c656d1f1ec5db7406bf8af4a0a8f9e7917fa20413300ff3a94c03",
+        "DiffID": "sha256:3f918206b8b7a9bdea4d4220be889372534ff92e3956426e376cbb6acd9905b5"
       }
     ]
   },
@@ -490,8 +490,8 @@
             "readline@8.3.1-r0"
           ],
           "Layer": {
-            "Digest": "sha256:a1d21b5a07db9c709f7d4edf164b61a6b24dbb0ffa5b9b28852c0b1d22ab1f53",
-            "DiffID": "sha256:79a1b01420722cb0ec1fd251f54005522bc4c8037546bedddabee90b800bd6b0"
+            "Digest": "sha256:215a1f740952bc6df0406115afbf54933aeccade267c3446aff929371eec22d9",
+            "DiffID": "sha256:c0d228847b03ea2dfaa36771352f4f89b0b63c3c2b50b61a00a0ed1bc808e672"
           },
           "Digest": "sha1:8e9ab21d4dfbe0faa8151517bd855b63b4e3301c",
           "InstalledFiles": [
@@ -604,16 +604,16 @@
           "AnalyzedBy": "apk"
         },
         {
-          "ID": "ca-certificates@20251003-r0",
+          "ID": "ca-certificates@20260413-r0",
           "Name": "ca-certificates",
           "Identifier": {
-            "PURL": "pkg:apk/alpine/ca-certificates@20251003-r0?arch=x86_64\u0026distro=3.23.3",
-            "UID": "209bcc6fdf94c4a5"
+            "PURL": "pkg:apk/alpine/ca-certificates@20260413-r0?arch=x86_64\u0026distro=3.23.3",
+            "UID": "48d5a874bbec291a"
           },
-          "Version": "20251003-r0",
+          "Version": "20260413-r0",
           "Arch": "x86_64",
           "SrcName": "ca-certificates",
-          "SrcVersion": "20251003-r0",
+          "SrcVersion": "20260413-r0",
           "Licenses": [
             "MPL-2.0",
             "MIT"
@@ -625,10 +625,10 @@
             "musl@1.2.5-r21"
           ],
           "Layer": {
-            "Digest": "sha256:a1d21b5a07db9c709f7d4edf164b61a6b24dbb0ffa5b9b28852c0b1d22ab1f53",
-            "DiffID": "sha256:79a1b01420722cb0ec1fd251f54005522bc4c8037546bedddabee90b800bd6b0"
+            "Digest": "sha256:215a1f740952bc6df0406115afbf54933aeccade267c3446aff929371eec22d9",
+            "DiffID": "sha256:c0d228847b03ea2dfaa36771352f4f89b0b63c3c2b50b61a00a0ed1bc808e672"
           },
-          "Digest": "sha1:3b10fd335b2af819c4fd3562900e76fd6ea304c5",
+          "Digest": "sha1:af25e0f0a0412b141942909ed199144cc46f5bbc",
           "InstalledFiles": [
             "etc/ca-certificates.conf",
             "etc/apk/protected_paths.d/ca-certificates.list",
@@ -669,10 +669,6 @@
             "usr/share/ca-certificates/mozilla/Certum_Trusted_Network_CA.crt",
             "usr/share/ca-certificates/mozilla/Certum_Trusted_Network_CA_2.crt",
             "usr/share/ca-certificates/mozilla/Certum_Trusted_Root_CA.crt",
-            "usr/share/ca-certificates/mozilla/CommScope_Public_Trust_ECC_Root-01.crt",
-            "usr/share/ca-certificates/mozilla/CommScope_Public_Trust_ECC_Root-02.crt",
-            "usr/share/ca-certificates/mozilla/CommScope_Public_Trust_RSA_Root-01.crt",
-            "usr/share/ca-certificates/mozilla/CommScope_Public_Trust_RSA_Root-02.crt",
             "usr/share/ca-certificates/mozilla/D-TRUST_BR_Root_CA_1_2020.crt",
             "usr/share/ca-certificates/mozilla/D-TRUST_BR_Root_CA_2_2023.crt",
             "usr/share/ca-certificates/mozilla/D-TRUST_EV_Root_CA_1_2020.crt",
@@ -776,6 +772,7 @@
             "usr/share/ca-certificates/mozilla/certSIGN_ROOT_CA.crt",
             "usr/share/ca-certificates/mozilla/certSIGN_Root_CA_G2.crt",
             "usr/share/ca-certificates/mozilla/e-Szigno_Root_CA_2017.crt",
+            "usr/share/ca-certificates/mozilla/e-Szigno_TLS_Root_CA_2023.crt",
             "usr/share/ca-certificates/mozilla/ePKI_Root_Certification_Authority.crt",
             "usr/share/ca-certificates/mozilla/emSign_ECC_Root_CA_-_C3.crt",
             "usr/share/ca-certificates/mozilla/emSign_ECC_Root_CA_-_G3.crt",
@@ -820,7 +817,7 @@
           "Name": "java-cacerts",
           "Identifier": {
             "PURL": "pkg:apk/alpine/java-cacerts@1.1-r0?arch=x86_64\u0026distro=3.23.3",
-            "UID": "b90b2364a9802c9a"
+            "UID": "82567377d4988db4"
           },
           "Version": "1.1-r0",
           "Arch": "x86_64",
@@ -832,13 +829,13 @@
           "Maintainer": "Natanael Copa \u003cncopa@alpinelinux.org\u003e",
           "DependsOn": [
             "busybox-binsh@1.37.0-r30",
-            "ca-certificates@20251003-r0",
+            "ca-certificates@20260413-r0",
             "p11-kit-trust@0.25.5-r2",
             "p11-kit@0.25.5-r2"
           ],
           "Layer": {
-            "Digest": "sha256:a1d21b5a07db9c709f7d4edf164b61a6b24dbb0ffa5b9b28852c0b1d22ab1f53",
-            "DiffID": "sha256:79a1b01420722cb0ec1fd251f54005522bc4c8037546bedddabee90b800bd6b0"
+            "Digest": "sha256:215a1f740952bc6df0406115afbf54933aeccade267c3446aff929371eec22d9",
+            "DiffID": "sha256:c0d228847b03ea2dfaa36771352f4f89b0b63c3c2b50b61a00a0ed1bc808e672"
           },
           "Digest": "sha1:dd6d704f5e91ed26d9c026eac28bcd716f49a753",
           "InstalledFiles": [
@@ -865,8 +862,8 @@
             "busybox-binsh@1.37.0-r30"
           ],
           "Layer": {
-            "Digest": "sha256:a1d21b5a07db9c709f7d4edf164b61a6b24dbb0ffa5b9b28852c0b1d22ab1f53",
-            "DiffID": "sha256:79a1b01420722cb0ec1fd251f54005522bc4c8037546bedddabee90b800bd6b0"
+            "Digest": "sha256:215a1f740952bc6df0406115afbf54933aeccade267c3446aff929371eec22d9",
+            "DiffID": "sha256:c0d228847b03ea2dfaa36771352f4f89b0b63c3c2b50b61a00a0ed1bc808e672"
           },
           "Digest": "sha1:52205baa8687d26c879a55110a0a258d4dbfe8a6",
           "InstalledFiles": [
@@ -961,8 +958,8 @@
             "musl@1.2.5-r21"
           ],
           "Layer": {
-            "Digest": "sha256:a1d21b5a07db9c709f7d4edf164b61a6b24dbb0ffa5b9b28852c0b1d22ab1f53",
-            "DiffID": "sha256:79a1b01420722cb0ec1fd251f54005522bc4c8037546bedddabee90b800bd6b0"
+            "Digest": "sha256:215a1f740952bc6df0406115afbf54933aeccade267c3446aff929371eec22d9",
+            "DiffID": "sha256:c0d228847b03ea2dfaa36771352f4f89b0b63c3c2b50b61a00a0ed1bc808e672"
           },
           "Digest": "sha1:fa51bf028f40768bfe1c7ef494b1fe3f8590c19f",
           "InstalledFiles": [
@@ -991,8 +988,8 @@
             "ncurses-terminfo-base@6.5_p20251123-r0"
           ],
           "Layer": {
-            "Digest": "sha256:a1d21b5a07db9c709f7d4edf164b61a6b24dbb0ffa5b9b28852c0b1d22ab1f53",
-            "DiffID": "sha256:79a1b01420722cb0ec1fd251f54005522bc4c8037546bedddabee90b800bd6b0"
+            "Digest": "sha256:215a1f740952bc6df0406115afbf54933aeccade267c3446aff929371eec22d9",
+            "DiffID": "sha256:c0d228847b03ea2dfaa36771352f4f89b0b63c3c2b50b61a00a0ed1bc808e672"
           },
           "Digest": "sha1:649d3041c52b80620fb50a98f5979d25ebbe1523",
           "InstalledFiles": [
@@ -1049,8 +1046,8 @@
             "musl@1.2.5-r21"
           ],
           "Layer": {
-            "Digest": "sha256:a1d21b5a07db9c709f7d4edf164b61a6b24dbb0ffa5b9b28852c0b1d22ab1f53",
-            "DiffID": "sha256:79a1b01420722cb0ec1fd251f54005522bc4c8037546bedddabee90b800bd6b0"
+            "Digest": "sha256:215a1f740952bc6df0406115afbf54933aeccade267c3446aff929371eec22d9",
+            "DiffID": "sha256:c0d228847b03ea2dfaa36771352f4f89b0b63c3c2b50b61a00a0ed1bc808e672"
           },
           "Digest": "sha1:f3d992e32ae5e44954dd2ac8bca95e75dcd9eaa7",
           "InstalledFiles": [
@@ -1136,8 +1133,8 @@
           ],
           "Maintainer": "Natanael Copa \u003cncopa@alpinelinux.org\u003e",
           "Layer": {
-            "Digest": "sha256:a1d21b5a07db9c709f7d4edf164b61a6b24dbb0ffa5b9b28852c0b1d22ab1f53",
-            "DiffID": "sha256:79a1b01420722cb0ec1fd251f54005522bc4c8037546bedddabee90b800bd6b0"
+            "Digest": "sha256:215a1f740952bc6df0406115afbf54933aeccade267c3446aff929371eec22d9",
+            "DiffID": "sha256:c0d228847b03ea2dfaa36771352f4f89b0b63c3c2b50b61a00a0ed1bc808e672"
           },
           "Digest": "sha1:57bd1d8124ec957eefea2314bdf45b0ed1068cee",
           "InstalledFiles": [
@@ -1207,8 +1204,8 @@
             "zlib@1.3.1-r2"
           ],
           "Layer": {
-            "Digest": "sha256:a1d21b5a07db9c709f7d4edf164b61a6b24dbb0ffa5b9b28852c0b1d22ab1f53",
-            "DiffID": "sha256:79a1b01420722cb0ec1fd251f54005522bc4c8037546bedddabee90b800bd6b0"
+            "Digest": "sha256:215a1f740952bc6df0406115afbf54933aeccade267c3446aff929371eec22d9",
+            "DiffID": "sha256:c0d228847b03ea2dfaa36771352f4f89b0b63c3c2b50b61a00a0ed1bc808e672"
           },
           "Digest": "sha1:d230db2549047126d4b595f0dea0237186ea2b79",
           "InstalledFiles": [
@@ -1548,8 +1545,8 @@
             "musl@1.2.5-r21"
           ],
           "Layer": {
-            "Digest": "sha256:a1d21b5a07db9c709f7d4edf164b61a6b24dbb0ffa5b9b28852c0b1d22ab1f53",
-            "DiffID": "sha256:79a1b01420722cb0ec1fd251f54005522bc4c8037546bedddabee90b800bd6b0"
+            "Digest": "sha256:215a1f740952bc6df0406115afbf54933aeccade267c3446aff929371eec22d9",
+            "DiffID": "sha256:c0d228847b03ea2dfaa36771352f4f89b0b63c3c2b50b61a00a0ed1bc808e672"
           },
           "Digest": "sha1:b03c9c498fc8b875d694659827c39e791b0dce51",
           "InstalledFiles": [
@@ -1583,8 +1580,8 @@
             "p11-kit@0.25.5-r2"
           ],
           "Layer": {
-            "Digest": "sha256:a1d21b5a07db9c709f7d4edf164b61a6b24dbb0ffa5b9b28852c0b1d22ab1f53",
-            "DiffID": "sha256:79a1b01420722cb0ec1fd251f54005522bc4c8037546bedddabee90b800bd6b0"
+            "Digest": "sha256:215a1f740952bc6df0406115afbf54933aeccade267c3446aff929371eec22d9",
+            "DiffID": "sha256:c0d228847b03ea2dfaa36771352f4f89b0b63c3c2b50b61a00a0ed1bc808e672"
           },
           "Digest": "sha1:566b28378ea154f29cc0c26050403949573a7cd1",
           "InstalledFiles": [
@@ -1614,8 +1611,8 @@
             "musl@1.2.5-r21"
           ],
           "Layer": {
-            "Digest": "sha256:a1d21b5a07db9c709f7d4edf164b61a6b24dbb0ffa5b9b28852c0b1d22ab1f53",
-            "DiffID": "sha256:79a1b01420722cb0ec1fd251f54005522bc4c8037546bedddabee90b800bd6b0"
+            "Digest": "sha256:215a1f740952bc6df0406115afbf54933aeccade267c3446aff929371eec22d9",
+            "DiffID": "sha256:c0d228847b03ea2dfaa36771352f4f89b0b63c3c2b50b61a00a0ed1bc808e672"
           },
           "Digest": "sha1:8aeb81b3a477f922b9b6a533381114c63dd928fe",
           "InstalledFiles": [
@@ -1735,7 +1732,7 @@
             "Name": "Alpine Secdb",
             "URL": "https://secdb.alpinelinux.org/"
           },
-          "Fingerprint": "sha256:5829b9ee2d541aafcb1b8217da1945773d4dc71748624af27b62f71358fef5a6",
+          "Fingerprint": "sha256:7efbdb04413833ecb1973ad8e116014133af471ee5b653562a1e710a6bf95d75",
           "Title": "openssl: OpenSSL: Denial of Service due to NULL pointer dereference in CMS EnvelopedData processing",
           "Description": "Issue summary: During processing of a crafted CMS EnvelopedData message\nwith KeyTransportRecipientInfo a NULL pointer dereference can happen.\n\nImpact summary: Applications that process attacker-controlled CMS data may\ncrash before authentication or cryptographic operations occur resulting in\nDenial of Service.\n\nWhen a CMS EnvelopedData message that uses KeyTransportRecipientInfo with\nRSA-OAEP encryption is processed, the optional parameters field of\nRSA-OAEP SourceFunc algorithm identifier is examined without checking\nfor its presence. This results in a NULL pointer dereference if the field\nis missing.\n\nApplications and services that call CMS_decrypt() on untrusted input\n(e.g., S/MIME processing or CMS-based protocols) are vulnerable.\n\nThe FIPS modules in 3.6, 3.5, 3.4, 3.3 and 3.0 are not affected by this\nissue, as the affected code is outside the OpenSSL FIPS module boundary.",
           "Severity": "HIGH",
@@ -1743,6 +1740,8 @@
             "CWE-476"
           ],
           "VendorSeverity": {
+            "amazon": 3,
+            "azure": 2,
             "photon": 3,
             "redhat": 2,
             "ubuntu": 1
@@ -1791,7 +1790,7 @@
             "Name": "Alpine Secdb",
             "URL": "https://secdb.alpinelinux.org/"
           },
-          "Fingerprint": "sha256:da1b4082baab69172c633ef8f341a6ab35096a799c047f2177048d1645442bee",
+          "Fingerprint": "sha256:326f7b79206b866394ec410c18d3e80fdfefc7cdac1f5686b3010420616dfcf2",
           "Title": "openssl: OpenSSL: Denial of Service due to NULL pointer dereference in CMS EnvelopedData processing",
           "Description": "Issue summary: During processing of a crafted CMS EnvelopedData message\nwith KeyTransportRecipientInfo a NULL pointer dereference can happen.\n\nImpact summary: Applications that process attacker-controlled CMS data may\ncrash before authentication or cryptographic operations occur resulting in\nDenial of Service.\n\nWhen a CMS EnvelopedData message that uses KeyTransportRecipientInfo with\nRSA-OAEP encryption is processed, the optional parameters field of\nRSA-OAEP SourceFunc algorithm identifier is examined without checking\nfor its presence. This results in a NULL pointer dereference if the field\nis missing.\n\nApplications and services that call CMS_decrypt() on untrusted input\n(e.g., S/MIME processing or CMS-based protocols) are vulnerable.\n\nThe FIPS modules in 3.6, 3.5, 3.4, 3.3 and 3.0 are not affected by this\nissue, as the affected code is outside the OpenSSL FIPS module boundary.",
           "Severity": "HIGH",
@@ -1799,6 +1798,8 @@
             "CWE-476"
           ],
           "VendorSeverity": {
+            "amazon": 3,
+            "azure": 2,
             "photon": 3,
             "redhat": 2,
             "ubuntu": 1
@@ -1827,6 +1828,102 @@
           "LastModifiedDate": "2026-04-10T21:16:23.67Z"
         },
         {
+          "VulnerabilityID": "CVE-2026-40200",
+          "PkgID": "musl@1.2.5-r21",
+          "PkgName": "musl",
+          "PkgIdentifier": {
+            "PURL": "pkg:apk/alpine/musl@1.2.5-r21?arch=x86_64\u0026distro=3.23.3",
+            "UID": "750ab06f52f2bfe9"
+          },
+          "InstalledVersion": "1.2.5-r21",
+          "FixedVersion": "1.2.5-r23",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:589002ba0eaed121a1dbf42f6648f29e5be55d5c8a6ee0f8eaa0285cc21ac153",
+            "DiffID": "sha256:989e799e634906e94dc9a5ee2ee26fc92ad260522990f26e707861a5f52bf64e"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-40200",
+          "DataSource": {
+            "ID": "alpine",
+            "Name": "Alpine Secdb",
+            "URL": "https://secdb.alpinelinux.org/"
+          },
+          "Fingerprint": "sha256:a2167c4f12efbaa9158fc3013757d1ca67cdb329bf1cc2e542e19d38af015cec",
+          "Title": "musl: musl libc: Arbitrary code execution and denial of service via stack-based memory corruption in qsort",
+          "Description": "An issue was discovered in musl libc 0.7.10 through 1.2.6. Stack-based memory corruption can occur during qsort of very large arrays, due to incorrectly implemented double-word primitives. The number of elements must exceed about seven million, i.e., the 32nd Leonardo number on 32-bit platforms (or the 64th Leonardo number on 64-bit platforms, which is not practical).",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-670"
+          ],
+          "VendorSeverity": {
+            "redhat": 3
+          },
+          "CVSS": {
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:C/C:H/I:H/A:H",
+              "V3Score": 7.8
+            }
+          },
+          "References": [
+            "http://www.openwall.com/lists/oss-security/2026/04/10/13",
+            "https://access.redhat.com/security/cve/CVE-2026-40200",
+            "https://musl.libc.org/releases.html",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-40200",
+            "https://www.cve.org/CVERecord?id=CVE-2026-40200",
+            "https://www.openwall.com/lists/oss-security/2026/04/10/13"
+          ],
+          "PublishedDate": "2026-04-10T17:17:14.107Z",
+          "LastModifiedDate": "2026-04-13T15:02:06.187Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-40200",
+          "PkgID": "musl-utils@1.2.5-r21",
+          "PkgName": "musl-utils",
+          "PkgIdentifier": {
+            "PURL": "pkg:apk/alpine/musl-utils@1.2.5-r21?arch=x86_64\u0026distro=3.23.3",
+            "UID": "9dadd6d4093981ad"
+          },
+          "InstalledVersion": "1.2.5-r21",
+          "FixedVersion": "1.2.5-r23",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:589002ba0eaed121a1dbf42f6648f29e5be55d5c8a6ee0f8eaa0285cc21ac153",
+            "DiffID": "sha256:989e799e634906e94dc9a5ee2ee26fc92ad260522990f26e707861a5f52bf64e"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-40200",
+          "DataSource": {
+            "ID": "alpine",
+            "Name": "Alpine Secdb",
+            "URL": "https://secdb.alpinelinux.org/"
+          },
+          "Fingerprint": "sha256:94149eea13a52dcc59cfd481e62243cbe041032226997880f2c95bf8bc733bf3",
+          "Title": "musl: musl libc: Arbitrary code execution and denial of service via stack-based memory corruption in qsort",
+          "Description": "An issue was discovered in musl libc 0.7.10 through 1.2.6. Stack-based memory corruption can occur during qsort of very large arrays, due to incorrectly implemented double-word primitives. The number of elements must exceed about seven million, i.e., the 32nd Leonardo number on 32-bit platforms (or the 64th Leonardo number on 64-bit platforms, which is not practical).",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-670"
+          ],
+          "VendorSeverity": {
+            "redhat": 3
+          },
+          "CVSS": {
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:C/C:H/I:H/A:H",
+              "V3Score": 7.8
+            }
+          },
+          "References": [
+            "http://www.openwall.com/lists/oss-security/2026/04/10/13",
+            "https://access.redhat.com/security/cve/CVE-2026-40200",
+            "https://musl.libc.org/releases.html",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-40200",
+            "https://www.cve.org/CVERecord?id=CVE-2026-40200",
+            "https://www.openwall.com/lists/oss-security/2026/04/10/13"
+          ],
+          "PublishedDate": "2026-04-10T17:17:14.107Z",
+          "LastModifiedDate": "2026-04-13T15:02:06.187Z"
+        },
+        {
           "VulnerabilityID": "CVE-2026-22184",
           "PkgID": "zlib@1.3.1-r2",
           "PkgName": "zlib",
@@ -1848,7 +1945,7 @@
             "Name": "Alpine Secdb",
             "URL": "https://secdb.alpinelinux.org/"
           },
-          "Fingerprint": "sha256:2cce7fb98c3ab3e75716337371272f9e97bd5eef93f4ffac980f8396c3e39412",
+          "Fingerprint": "sha256:9e7f2f571f31f579650c8dc2b3540cf7338677f5f8d24f95cda0291395f04877",
           "Title": "zlib: zlib: Arbitrary code execution via buffer overflow in untgz utility",
           "Description": "zlib versions up to and including 1.3.1.2 include a global buffer overflow in the untgz utility located under contrib/untgz. The vulnerability is limited to the standalone demonstration utility and does not affect the core zlib compression library. The flaw occurs when a user executes the untgz command with an excessively long archive name supplied via the command line, leading to an out-of-bounds write in a fixed-size global buffer.",
           "Severity": "HIGH",
@@ -1890,7 +1987,6 @@
       "Type": "jar",
       "Packages": [
         {
-          "ID": "com.h2database:h2@2.4.240",
           "Name": "com.h2database:h2",
           "Identifier": {
             "PURL": "pkg:maven/com.h2database/h2@2.4.240",
@@ -1898,14 +1994,13 @@
           },
           "Version": "2.4.240",
           "Layer": {
-            "Digest": "sha256:639789f59b0e8cb0de62c3ca594b06bd1077fe062bc7b0503d3e84f814ef9ab7",
-            "DiffID": "sha256:987abf34d2221a3d579ea3574682c6d51264544c7c641822f82c925cc059542f"
+            "Digest": "sha256:2eee4180491184f557884f1a93cc8334e629cedc3750fc0a3bdef7ff4eaca085",
+            "DiffID": "sha256:9b4163715939dfa8895e4a68ee8d780796945a63a4c8ee61bd7ee0d2acd4fdee"
           },
           "FilePath": "liquibase/internal/lib/h2.jar",
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.opencsv:opencsv@5.12.0",
           "Name": "com.opencsv:opencsv",
           "Identifier": {
             "PURL": "pkg:maven/com.opencsv/opencsv@5.12.0",
@@ -1913,14 +2008,13 @@
           },
           "Version": "5.12.0",
           "Layer": {
-            "Digest": "sha256:639789f59b0e8cb0de62c3ca594b06bd1077fe062bc7b0503d3e84f814ef9ab7",
-            "DiffID": "sha256:987abf34d2221a3d579ea3574682c6d51264544c7c641822f82c925cc059542f"
+            "Digest": "sha256:2eee4180491184f557884f1a93cc8334e629cedc3750fc0a3bdef7ff4eaca085",
+            "DiffID": "sha256:9b4163715939dfa8895e4a68ee8d780796945a63a4c8ee61bd7ee0d2acd4fdee"
           },
           "FilePath": "liquibase/internal/lib/opencsv.jar",
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "commons-io:commons-io@2.21.0",
           "Name": "commons-io:commons-io",
           "Identifier": {
             "PURL": "pkg:maven/commons-io/commons-io@2.21.0",
@@ -1928,14 +2022,13 @@
           },
           "Version": "2.21.0",
           "Layer": {
-            "Digest": "sha256:639789f59b0e8cb0de62c3ca594b06bd1077fe062bc7b0503d3e84f814ef9ab7",
-            "DiffID": "sha256:987abf34d2221a3d579ea3574682c6d51264544c7c641822f82c925cc059542f"
+            "Digest": "sha256:2eee4180491184f557884f1a93cc8334e629cedc3750fc0a3bdef7ff4eaca085",
+            "DiffID": "sha256:9b4163715939dfa8895e4a68ee8d780796945a63a4c8ee61bd7ee0d2acd4fdee"
           },
           "FilePath": "liquibase/internal/lib/commons-io.jar",
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "info.picocli:picocli@4.7.7",
           "Name": "info.picocli:picocli",
           "Identifier": {
             "PURL": "pkg:maven/info.picocli/picocli@4.7.7",
@@ -1943,14 +2036,13 @@
           },
           "Version": "4.7.7",
           "Layer": {
-            "Digest": "sha256:639789f59b0e8cb0de62c3ca594b06bd1077fe062bc7b0503d3e84f814ef9ab7",
-            "DiffID": "sha256:987abf34d2221a3d579ea3574682c6d51264544c7c641822f82c925cc059542f"
+            "Digest": "sha256:2eee4180491184f557884f1a93cc8334e629cedc3750fc0a3bdef7ff4eaca085",
+            "DiffID": "sha256:9b4163715939dfa8895e4a68ee8d780796945a63a4c8ee61bd7ee0d2acd4fdee"
           },
           "FilePath": "liquibase/internal/lib/picocli.jar",
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.apache.commons:commons-collections4@4.5.0",
           "Name": "org.apache.commons:commons-collections4",
           "Identifier": {
             "PURL": "pkg:maven/org.apache.commons/commons-collections4@4.5.0",
@@ -1958,14 +2050,13 @@
           },
           "Version": "4.5.0",
           "Layer": {
-            "Digest": "sha256:639789f59b0e8cb0de62c3ca594b06bd1077fe062bc7b0503d3e84f814ef9ab7",
-            "DiffID": "sha256:987abf34d2221a3d579ea3574682c6d51264544c7c641822f82c925cc059542f"
+            "Digest": "sha256:2eee4180491184f557884f1a93cc8334e629cedc3750fc0a3bdef7ff4eaca085",
+            "DiffID": "sha256:9b4163715939dfa8895e4a68ee8d780796945a63a4c8ee61bd7ee0d2acd4fdee"
           },
           "FilePath": "liquibase/internal/lib/commons-collections4.jar",
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.apache.commons:commons-lang3@3.20.0",
           "Name": "org.apache.commons:commons-lang3",
           "Identifier": {
             "PURL": "pkg:maven/org.apache.commons/commons-lang3@3.20.0",
@@ -1973,14 +2064,13 @@
           },
           "Version": "3.20.0",
           "Layer": {
-            "Digest": "sha256:639789f59b0e8cb0de62c3ca594b06bd1077fe062bc7b0503d3e84f814ef9ab7",
-            "DiffID": "sha256:987abf34d2221a3d579ea3574682c6d51264544c7c641822f82c925cc059542f"
+            "Digest": "sha256:2eee4180491184f557884f1a93cc8334e629cedc3750fc0a3bdef7ff4eaca085",
+            "DiffID": "sha256:9b4163715939dfa8895e4a68ee8d780796945a63a4c8ee61bd7ee0d2acd4fdee"
           },
           "FilePath": "liquibase/internal/lib/commons-lang3.jar",
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.apache.commons:commons-text@1.15.0",
           "Name": "org.apache.commons:commons-text",
           "Identifier": {
             "PURL": "pkg:maven/org.apache.commons/commons-text@1.15.0",
@@ -1988,14 +2078,13 @@
           },
           "Version": "1.15.0",
           "Layer": {
-            "Digest": "sha256:639789f59b0e8cb0de62c3ca594b06bd1077fe062bc7b0503d3e84f814ef9ab7",
-            "DiffID": "sha256:987abf34d2221a3d579ea3574682c6d51264544c7c641822f82c925cc059542f"
+            "Digest": "sha256:2eee4180491184f557884f1a93cc8334e629cedc3750fc0a3bdef7ff4eaca085",
+            "DiffID": "sha256:9b4163715939dfa8895e4a68ee8d780796945a63a4c8ee61bd7ee0d2acd4fdee"
           },
           "FilePath": "liquibase/internal/lib/commons-text.jar",
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.liquibase:liquibase-core@5.0.2",
           "Name": "org.liquibase:liquibase-core",
           "Identifier": {
             "PURL": "pkg:maven/org.liquibase/liquibase-core@5.0.2",
@@ -2003,14 +2092,13 @@
           },
           "Version": "5.0.2",
           "Layer": {
-            "Digest": "sha256:639789f59b0e8cb0de62c3ca594b06bd1077fe062bc7b0503d3e84f814ef9ab7",
-            "DiffID": "sha256:987abf34d2221a3d579ea3574682c6d51264544c7c641822f82c925cc059542f"
+            "Digest": "sha256:2eee4180491184f557884f1a93cc8334e629cedc3750fc0a3bdef7ff4eaca085",
+            "DiffID": "sha256:9b4163715939dfa8895e4a68ee8d780796945a63a4c8ee61bd7ee0d2acd4fdee"
           },
           "FilePath": "liquibase/internal/lib/liquibase-core.jar",
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.yaml:snakeyaml@2.5",
           "Name": "org.yaml:snakeyaml",
           "Identifier": {
             "PURL": "pkg:maven/org.yaml/snakeyaml@2.5",
@@ -2018,8 +2106,8 @@
           },
           "Version": "2.5",
           "Layer": {
-            "Digest": "sha256:639789f59b0e8cb0de62c3ca594b06bd1077fe062bc7b0503d3e84f814ef9ab7",
-            "DiffID": "sha256:987abf34d2221a3d579ea3574682c6d51264544c7c641822f82c925cc059542f"
+            "Digest": "sha256:2eee4180491184f557884f1a93cc8334e629cedc3750fc0a3bdef7ff4eaca085",
+            "DiffID": "sha256:9b4163715939dfa8895e4a68ee8d780796945a63a4c8ee61bd7ee0d2acd4fdee"
           },
           "FilePath": "liquibase/internal/lib/snakeyaml.jar",
           "AnalyzedBy": "jar"
@@ -2041,8 +2129,8 @@
           "Version": "v1.25.8",
           "Relationship": "direct",
           "Layer": {
-            "Digest": "sha256:cf9f252df71f309ab0f1c5f07685ee95dfe0972b24023e96ebf2982c7d3adc1d",
-            "DiffID": "sha256:7eaf407e709c87cd4b08090fa87025b0a15179b04cda13d89bc78ec0736d649a"
+            "Digest": "sha256:498456daf690265836dabdc9bc4a6520701de5ab65b0c268cfba7d669909002a",
+            "DiffID": "sha256:c845abb214f58e185128aad871e902efc06b2f162d8feb91b9b7281a34c6f021"
           },
           "AnalyzedBy": "gobinary"
         },
@@ -2055,8 +2143,8 @@
           },
           "Version": "v1.8.0",
           "Layer": {
-            "Digest": "sha256:cf9f252df71f309ab0f1c5f07685ee95dfe0972b24023e96ebf2982c7d3adc1d",
-            "DiffID": "sha256:7eaf407e709c87cd4b08090fa87025b0a15179b04cda13d89bc78ec0736d649a"
+            "Digest": "sha256:498456daf690265836dabdc9bc4a6520701de5ab65b0c268cfba7d669909002a",
+            "DiffID": "sha256:c845abb214f58e185128aad871e902efc06b2f162d8feb91b9b7281a34c6f021"
           },
           "AnalyzedBy": "gobinary"
         },
@@ -2069,8 +2157,8 @@
           },
           "Version": "v1.10.2",
           "Layer": {
-            "Digest": "sha256:cf9f252df71f309ab0f1c5f07685ee95dfe0972b24023e96ebf2982c7d3adc1d",
-            "DiffID": "sha256:7eaf407e709c87cd4b08090fa87025b0a15179b04cda13d89bc78ec0736d649a"
+            "Digest": "sha256:498456daf690265836dabdc9bc4a6520701de5ab65b0c268cfba7d669909002a",
+            "DiffID": "sha256:c845abb214f58e185128aad871e902efc06b2f162d8feb91b9b7281a34c6f021"
           },
           "AnalyzedBy": "gobinary"
         },
@@ -2083,8 +2171,8 @@
           },
           "Version": "v1.0.9",
           "Layer": {
-            "Digest": "sha256:cf9f252df71f309ab0f1c5f07685ee95dfe0972b24023e96ebf2982c7d3adc1d",
-            "DiffID": "sha256:7eaf407e709c87cd4b08090fa87025b0a15179b04cda13d89bc78ec0736d649a"
+            "Digest": "sha256:498456daf690265836dabdc9bc4a6520701de5ab65b0c268cfba7d669909002a",
+            "DiffID": "sha256:c845abb214f58e185128aad871e902efc06b2f162d8feb91b9b7281a34c6f021"
           },
           "AnalyzedBy": "gobinary"
         },
@@ -2096,8 +2184,8 @@
             "UID": "13ea817821fe4afd"
           },
           "Layer": {
-            "Digest": "sha256:cf9f252df71f309ab0f1c5f07685ee95dfe0972b24023e96ebf2982c7d3adc1d",
-            "DiffID": "sha256:7eaf407e709c87cd4b08090fa87025b0a15179b04cda13d89bc78ec0736d649a"
+            "Digest": "sha256:498456daf690265836dabdc9bc4a6520701de5ab65b0c268cfba7d669909002a",
+            "DiffID": "sha256:c845abb214f58e185128aad871e902efc06b2f162d8feb91b9b7281a34c6f021"
           },
           "AnalyzedBy": "gobinary"
         }
@@ -2118,8 +2206,8 @@
           "FixedVersion": "1.25.9, 1.26.2",
           "Status": "fixed",
           "Layer": {
-            "Digest": "sha256:cf9f252df71f309ab0f1c5f07685ee95dfe0972b24023e96ebf2982c7d3adc1d",
-            "DiffID": "sha256:7eaf407e709c87cd4b08090fa87025b0a15179b04cda13d89bc78ec0736d649a"
+            "Digest": "sha256:498456daf690265836dabdc9bc4a6520701de5ab65b0c268cfba7d669909002a",
+            "DiffID": "sha256:c845abb214f58e185128aad871e902efc06b2f162d8feb91b9b7281a34c6f021"
           },
           "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-32280",
           "DataSource": {
@@ -2127,7 +2215,7 @@
             "Name": "The Go Vulnerability Database",
             "URL": "https://pkg.go.dev/vuln/"
           },
-          "Fingerprint": "sha256:1150cfca0bce948c1701ad6dbd9d77fd9613e74e01c27465992292cc0709c953",
+          "Fingerprint": "sha256:40c153f4cfd30db86d8cfde9a12730192679cd38fad6249e9ab092e00f38d79b",
           "Title": "During chain building, the amount of work that is done is not correctl ...",
           "Description": "During chain building, the amount of work that is done is not correctly limited when a large number of intermediate certificates are passed in VerifyOptions.Intermediates, which can lead to a denial of service. This affects both direct users of crypto/x509 and users of crypto/tls.",
           "Severity": "HIGH",
@@ -2168,8 +2256,8 @@
           "FixedVersion": "1.25.9, 1.26.2",
           "Status": "fixed",
           "Layer": {
-            "Digest": "sha256:cf9f252df71f309ab0f1c5f07685ee95dfe0972b24023e96ebf2982c7d3adc1d",
-            "DiffID": "sha256:7eaf407e709c87cd4b08090fa87025b0a15179b04cda13d89bc78ec0736d649a"
+            "Digest": "sha256:498456daf690265836dabdc9bc4a6520701de5ab65b0c268cfba7d669909002a",
+            "DiffID": "sha256:c845abb214f58e185128aad871e902efc06b2f162d8feb91b9b7281a34c6f021"
           },
           "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-32282",
           "DataSource": {
@@ -2177,7 +2265,7 @@
             "Name": "The Go Vulnerability Database",
             "URL": "https://pkg.go.dev/vuln/"
           },
-          "Fingerprint": "sha256:ca7242a75d2b01c1d56c139031369e5923855de0407a485f48beccf910be12f8",
+          "Fingerprint": "sha256:6a2140a09dc7edd9040640db9b05d954918e4a939f0fedf3ae3d540ce82c0db2",
           "Title": "golang: internal/syscall/unix: Root.Chmod can follow symlinks out of the root",
           "Description": "On Linux, if the target of Root.Chmod is replaced with a symlink while the chmod operation is in progress, Chmod can operate on the target of the symlink, even when the target lies outside the root. The Linux fchmodat syscall silently ignores the AT_SYMLINK_NOFOLLOW flag, which Root.Chmod uses to avoid symlink traversal. Root.Chmod checks its target before acting and returns an error if the target is a symlink lying outside the root, so the impact is limited to cases where the target is replaced with a symlink between the check and operation.",
           "Severity": "HIGH",
