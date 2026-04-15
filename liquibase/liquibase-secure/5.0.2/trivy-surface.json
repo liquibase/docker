@@ -3,8 +3,8 @@
   "Trivy": {
     "Version": "0.69.3"
   },
-  "ReportID": "019d8b87-ea98-7521-8dc6-45a547cd31a3",
-  "CreatedAt": "2026-04-14T10:27:13.688337539Z",
+  "ReportID": "019d90ae-4601-7cf2-a5b9-2fda014903bc",
+  "CreatedAt": "2026-04-15T10:27:13.537850118Z",
   "ArtifactID": "sha256:4c9817177682acb2ff0fcb29560a006aca70baed193db031a39082b52db7fc03",
   "ArtifactName": "liquibase/liquibase-secure:5.0.2",
   "ArtifactType": "container_image",
@@ -11412,7 +11412,6 @@
       "Type": "jar",
       "Packages": [
         {
-          "ID": "com.amazonaws:aws-java-sdk-core@1.12.791",
           "Name": "com.amazonaws:aws-java-sdk-core",
           "Identifier": {
             "PURL": "pkg:maven/com.amazonaws/aws-java-sdk-core@1.12.791",
@@ -11427,7 +11426,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.azure:azure-core@1.52.0",
           "Name": "com.azure:azure-core",
           "Identifier": {
             "PURL": "pkg:maven/com.azure/azure-core@1.52.0",
@@ -11442,7 +11440,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.azure:azure-core@1.56.1",
           "Name": "com.azure:azure-core",
           "Identifier": {
             "PURL": "pkg:maven/com.azure/azure-core@1.56.1",
@@ -11457,7 +11454,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.azure:azure-core-http-netty@1.15.4",
           "Name": "com.azure:azure-core-http-netty",
           "Identifier": {
             "PURL": "pkg:maven/com.azure/azure-core-http-netty@1.15.4",
@@ -11472,7 +11468,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.azure:azure-core-http-netty@1.16.1",
           "Name": "com.azure:azure-core-http-netty",
           "Identifier": {
             "PURL": "pkg:maven/com.azure/azure-core-http-netty@1.16.1",
@@ -11487,7 +11482,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.azure:azure-identity@1.18.0",
           "Name": "com.azure:azure-identity",
           "Identifier": {
             "PURL": "pkg:maven/com.azure/azure-identity@1.18.0",
@@ -11502,7 +11496,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.azure:azure-identity@1.18.0",
           "Name": "com.azure:azure-identity",
           "Identifier": {
             "PURL": "pkg:maven/com.azure/azure-identity@1.18.0",
@@ -11517,7 +11510,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.azure:azure-json@1.3.0",
           "Name": "com.azure:azure-json",
           "Identifier": {
             "PURL": "pkg:maven/com.azure/azure-json@1.3.0",
@@ -11532,7 +11524,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.azure:azure-json@1.5.0",
           "Name": "com.azure:azure-json",
           "Identifier": {
             "PURL": "pkg:maven/com.azure/azure-json@1.5.0",
@@ -11547,7 +11538,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.azure:azure-storage-blob@12.31.3",
           "Name": "com.azure:azure-storage-blob",
           "Identifier": {
             "PURL": "pkg:maven/com.azure/azure-storage-blob@12.31.3",
@@ -11562,7 +11552,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.azure:azure-storage-common@12.30.3",
           "Name": "com.azure:azure-storage-common",
           "Identifier": {
             "PURL": "pkg:maven/com.azure/azure-storage-common@12.30.3",
@@ -11577,7 +11566,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.azure:azure-storage-file-datalake@12.24.3",
           "Name": "com.azure:azure-storage-file-datalake",
           "Identifier": {
             "PURL": "pkg:maven/com.azure/azure-storage-file-datalake@12.24.3",
@@ -11592,7 +11580,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.azure:azure-storage-internal-avro@12.16.3",
           "Name": "com.azure:azure-storage-internal-avro",
           "Identifier": {
             "PURL": "pkg:maven/com.azure/azure-storage-internal-avro@12.16.3",
@@ -11607,7 +11594,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.azure:azure-xml@1.1.0",
           "Name": "com.azure:azure-xml",
           "Identifier": {
             "PURL": "pkg:maven/com.azure/azure-xml@1.1.0",
@@ -11622,7 +11608,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.azure:azure-xml@1.2.0",
           "Name": "com.azure:azure-xml",
           "Identifier": {
             "PURL": "pkg:maven/com.azure/azure-xml@1.2.0",
@@ -11637,7 +11622,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.datastax.astra:astra-sdk-devops@1.2.9",
           "Name": "com.datastax.astra:astra-sdk-devops",
           "Identifier": {
             "PURL": "pkg:maven/com.datastax.astra/astra-sdk-devops@1.2.9",
@@ -11652,7 +11636,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.datastax.oss:java-driver-core@4.13.0",
           "Name": "com.datastax.oss:java-driver-core",
           "Identifier": {
             "PURL": "pkg:maven/com.datastax.oss/java-driver-core@4.13.0",
@@ -11667,7 +11650,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.datastax.oss:java-driver-shaded-guava@25.1-jre-graal-sub-1",
           "Name": "com.datastax.oss:java-driver-shaded-guava",
           "Identifier": {
             "PURL": "pkg:maven/com.datastax.oss/java-driver-shaded-guava@25.1-jre-graal-sub-1",
@@ -11682,7 +11664,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.datastax.oss:native-protocol@1.5.1",
           "Name": "com.datastax.oss:native-protocol",
           "Identifier": {
             "PURL": "pkg:maven/com.datastax.oss/native-protocol@1.5.1",
@@ -11697,7 +11678,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.esri.geometry:esri-geometry-api@1.2.1",
           "Name": "com.esri.geometry:esri-geometry-api",
           "Identifier": {
             "PURL": "pkg:maven/com.esri.geometry/esri-geometry-api@1.2.1",
@@ -11712,7 +11692,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.fasterxml.jackson.core:jackson-annotations@2.17.2",
           "Name": "com.fasterxml.jackson.core:jackson-annotations",
           "Identifier": {
             "PURL": "pkg:maven/com.fasterxml.jackson.core/jackson-annotations@2.17.2",
@@ -11727,7 +11706,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.fasterxml.jackson.core:jackson-annotations@2.20",
           "Name": "com.fasterxml.jackson.core:jackson-annotations",
           "Identifier": {
             "PURL": "pkg:maven/com.fasterxml.jackson.core/jackson-annotations@2.20",
@@ -11742,7 +11720,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.fasterxml.jackson.core:jackson-annotations@2.20",
           "Name": "com.fasterxml.jackson.core:jackson-annotations",
           "Identifier": {
             "PURL": "pkg:maven/com.fasterxml.jackson.core/jackson-annotations@2.20",
@@ -11757,7 +11734,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.fasterxml.jackson.core:jackson-annotations@2.20",
           "Name": "com.fasterxml.jackson.core:jackson-annotations",
           "Identifier": {
             "PURL": "pkg:maven/com.fasterxml.jackson.core/jackson-annotations@2.20",
@@ -11772,7 +11748,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.fasterxml.jackson.core:jackson-core@2.17.2",
           "Name": "com.fasterxml.jackson.core:jackson-core",
           "Identifier": {
             "PURL": "pkg:maven/com.fasterxml.jackson.core/jackson-core@2.17.2",
@@ -11787,7 +11762,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.fasterxml.jackson.core:jackson-core@2.19.2",
           "Name": "com.fasterxml.jackson.core:jackson-core",
           "Identifier": {
             "PURL": "pkg:maven/com.fasterxml.jackson.core/jackson-core@2.19.2",
@@ -11802,7 +11776,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.fasterxml.jackson.core:jackson-core@2.20.0",
           "Name": "com.fasterxml.jackson.core:jackson-core",
           "Identifier": {
             "PURL": "pkg:maven/com.fasterxml.jackson.core/jackson-core@2.20.0",
@@ -11817,7 +11790,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.fasterxml.jackson.core:jackson-core@2.20.0",
           "Name": "com.fasterxml.jackson.core:jackson-core",
           "Identifier": {
             "PURL": "pkg:maven/com.fasterxml.jackson.core/jackson-core@2.20.0",
@@ -11832,7 +11804,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.fasterxml.jackson.core:jackson-databind@2.17.2",
           "Name": "com.fasterxml.jackson.core:jackson-databind",
           "Identifier": {
             "PURL": "pkg:maven/com.fasterxml.jackson.core/jackson-databind@2.17.2",
@@ -11847,7 +11818,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.fasterxml.jackson.core:jackson-databind@2.19.2",
           "Name": "com.fasterxml.jackson.core:jackson-databind",
           "Identifier": {
             "PURL": "pkg:maven/com.fasterxml.jackson.core/jackson-databind@2.19.2",
@@ -11862,7 +11832,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.fasterxml.jackson.core:jackson-databind@2.20.0",
           "Name": "com.fasterxml.jackson.core:jackson-databind",
           "Identifier": {
             "PURL": "pkg:maven/com.fasterxml.jackson.core/jackson-databind@2.20.0",
@@ -11877,7 +11846,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.fasterxml.jackson.core:jackson-databind@2.20.0",
           "Name": "com.fasterxml.jackson.core:jackson-databind",
           "Identifier": {
             "PURL": "pkg:maven/com.fasterxml.jackson.core/jackson-databind@2.20.0",
@@ -11892,7 +11860,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor@2.17.2",
           "Name": "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
           "Identifier": {
             "PURL": "pkg:maven/com.fasterxml.jackson.dataformat/jackson-dataformat-cbor@2.17.2",
@@ -11907,7 +11874,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.fasterxml.jackson.datatype:jackson-datatype-jsr310@2.17.2",
           "Name": "com.fasterxml.jackson.datatype:jackson-datatype-jsr310",
           "Identifier": {
             "PURL": "pkg:maven/com.fasterxml.jackson.datatype/jackson-datatype-jsr310@2.17.2",
@@ -11922,7 +11888,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.fasterxml.jackson.datatype:jackson-datatype-jsr310@2.18.4",
           "Name": "com.fasterxml.jackson.datatype:jackson-datatype-jsr310",
           "Identifier": {
             "PURL": "pkg:maven/com.fasterxml.jackson.datatype/jackson-datatype-jsr310@2.18.4",
@@ -11937,7 +11902,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.fasterxml.jackson.datatype:jackson-datatype-jsr310@2.19.2",
           "Name": "com.fasterxml.jackson.datatype:jackson-datatype-jsr310",
           "Identifier": {
             "PURL": "pkg:maven/com.fasterxml.jackson.datatype/jackson-datatype-jsr310@2.19.2",
@@ -11952,7 +11916,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.github.jnr:jffi@1.3.9",
           "Name": "com.github.jnr:jffi",
           "Identifier": {
             "PURL": "pkg:maven/com.github.jnr/jffi@1.3.9",
@@ -11967,7 +11930,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.github.jnr:jnr-a64asm@1.0.0",
           "Name": "com.github.jnr:jnr-a64asm",
           "Identifier": {
             "PURL": "pkg:maven/com.github.jnr/jnr-a64asm@1.0.0",
@@ -11982,7 +11944,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.github.jnr:jnr-constants@0.10.3",
           "Name": "com.github.jnr:jnr-constants",
           "Identifier": {
             "PURL": "pkg:maven/com.github.jnr/jnr-constants@0.10.3",
@@ -11997,7 +11958,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.github.jnr:jnr-ffi@2.2.11",
           "Name": "com.github.jnr:jnr-ffi",
           "Identifier": {
             "PURL": "pkg:maven/com.github.jnr/jnr-ffi@2.2.11",
@@ -12012,7 +11972,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.github.jnr:jnr-posix@3.1.15",
           "Name": "com.github.jnr:jnr-posix",
           "Identifier": {
             "PURL": "pkg:maven/com.github.jnr/jnr-posix@3.1.15",
@@ -12027,7 +11986,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.github.jnr:jnr-x86asm@1.0.2",
           "Name": "com.github.jnr:jnr-x86asm",
           "Identifier": {
             "PURL": "pkg:maven/com.github.jnr/jnr-x86asm@1.0.2",
@@ -12042,7 +12000,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.github.jsqlparser:jsqlparser@5.3",
           "Name": "com.github.jsqlparser:jsqlparser",
           "Identifier": {
             "PURL": "pkg:maven/com.github.jsqlparser/jsqlparser@5.3",
@@ -12057,7 +12014,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.github.spullara.mustache.java:compiler@0.9.14",
           "Name": "com.github.spullara.mustache.java:compiler",
           "Identifier": {
             "PURL": "pkg:maven/com.github.spullara.mustache.java/compiler@0.9.14",
@@ -12072,7 +12028,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.github.stephenc.jcip:jcip-annotations@1.0-1",
           "Name": "com.github.stephenc.jcip:jcip-annotations",
           "Identifier": {
             "PURL": "pkg:maven/com.github.stephenc.jcip/jcip-annotations@1.0-1",
@@ -12087,7 +12042,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.github.stephenc.jcip:jcip-annotations@1.0-1",
           "Name": "com.github.stephenc.jcip:jcip-annotations",
           "Identifier": {
             "PURL": "pkg:maven/com.github.stephenc.jcip/jcip-annotations@1.0-1",
@@ -12102,7 +12056,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.github.vertical-blank:sql-formatter@2.0.5",
           "Name": "com.github.vertical-blank:sql-formatter",
           "Identifier": {
             "PURL": "pkg:maven/com.github.vertical-blank/sql-formatter@2.0.5",
@@ -12117,7 +12070,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.google.code.findbugs:jsr305@3.0.2",
           "Name": "com.google.code.findbugs:jsr305",
           "Identifier": {
             "PURL": "pkg:maven/com.google.code.findbugs/jsr305@3.0.2",
@@ -12132,7 +12084,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.google.code.gson:gson@2.13.1",
           "Name": "com.google.code.gson:gson",
           "Identifier": {
             "PURL": "pkg:maven/com.google.code.gson/gson@2.13.1",
@@ -12147,7 +12098,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.google.code.gson:gson@2.13.1",
           "Name": "com.google.code.gson:gson",
           "Identifier": {
             "PURL": "pkg:maven/com.google.code.gson/gson@2.13.1",
@@ -12162,7 +12112,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.google.errorprone:error_prone_annotations@2.10.0",
           "Name": "com.google.errorprone:error_prone_annotations",
           "Identifier": {
             "PURL": "pkg:maven/com.google.errorprone/error_prone_annotations@2.10.0",
@@ -12177,7 +12126,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.google.errorprone:error_prone_annotations@2.38.0",
           "Name": "com.google.errorprone:error_prone_annotations",
           "Identifier": {
             "PURL": "pkg:maven/com.google.errorprone/error_prone_annotations@2.38.0",
@@ -12192,7 +12140,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.google.j2objc:j2objc-annotations@3.0.0",
           "Name": "com.google.j2objc:j2objc-annotations",
           "Identifier": {
             "PURL": "pkg:maven/com.google.j2objc/j2objc-annotations@3.0.0",
@@ -12207,7 +12154,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.h2database:h2@2.2.224",
           "Name": "com.h2database:h2",
           "Identifier": {
             "PURL": "pkg:maven/com.h2database/h2@2.2.224",
@@ -12222,7 +12168,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.ibm.db2:jcc@11.5.9.0",
           "Name": "com.ibm.db2:jcc",
           "Identifier": {
             "PURL": "pkg:maven/com.ibm.db2/jcc@11.5.9.0",
@@ -12237,7 +12182,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.ing.data:cassandra-jdbc-wrapper@4.16.0",
           "Name": "com.ing.data:cassandra-jdbc-wrapper",
           "Identifier": {
             "PURL": "pkg:maven/com.ing.data/cassandra-jdbc-wrapper@4.16.0",
@@ -12252,7 +12196,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.instaclustr:cassandra-driver-kerberos@3.0.0",
           "Name": "com.instaclustr:cassandra-driver-kerberos",
           "Identifier": {
             "PURL": "pkg:maven/com.instaclustr/cassandra-driver-kerberos@3.0.0",
@@ -12267,7 +12210,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.liquibase.ext.vaults:liquibase-hashicorp-vault@5.0.2",
           "Name": "com.liquibase.ext.vaults:liquibase-hashicorp-vault",
           "Identifier": {
             "PURL": "pkg:maven/com.liquibase.ext.vaults/liquibase-hashicorp-vault@5.0.2",
@@ -12282,7 +12224,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.liquibase.ext:liquibase-aws-extension@5.0.2",
           "Name": "com.liquibase.ext:liquibase-aws-extension",
           "Identifier": {
             "PURL": "pkg:maven/com.liquibase.ext/liquibase-aws-extension@5.0.2",
@@ -12297,7 +12238,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.liquibase.ext:liquibase-azure@5.0.2",
           "Name": "com.liquibase.ext:liquibase-azure",
           "Identifier": {
             "PURL": "pkg:maven/com.liquibase.ext/liquibase-azure@5.0.2",
@@ -12312,7 +12252,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.liquibase.ext:liquibase-checks@5.0.2",
           "Name": "com.liquibase.ext:liquibase-checks",
           "Identifier": {
             "PURL": "pkg:maven/com.liquibase.ext/liquibase-checks@5.0.2",
@@ -12327,7 +12266,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.liquibase.ext:liquibase-commercial-cassandra@5.0.2",
           "Name": "com.liquibase.ext:liquibase-commercial-cassandra",
           "Identifier": {
             "PURL": "pkg:maven/com.liquibase.ext/liquibase-commercial-cassandra@5.0.2",
@@ -12342,7 +12280,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.liquibase:liquibase-azure-deps@5.0.2",
           "Name": "com.liquibase:liquibase-azure-deps",
           "Identifier": {
             "PURL": "pkg:maven/com.liquibase/liquibase-azure-deps@5.0.2",
@@ -12357,7 +12294,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.liquibase:liquibase-commercial@5.0.2",
           "Name": "com.liquibase:liquibase-commercial",
           "Identifier": {
             "PURL": "pkg:maven/com.liquibase/liquibase-commercial@5.0.2",
@@ -12372,7 +12308,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.microsoft.azure:msal4j@1.23.1",
           "Name": "com.microsoft.azure:msal4j",
           "Identifier": {
             "PURL": "pkg:maven/com.microsoft.azure/msal4j@1.23.1",
@@ -12387,7 +12322,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.microsoft.azure:msal4j@1.23.1",
           "Name": "com.microsoft.azure:msal4j",
           "Identifier": {
             "PURL": "pkg:maven/com.microsoft.azure/msal4j@1.23.1",
@@ -12402,7 +12336,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.microsoft.azure:msal4j-persistence-extension@1.3.0",
           "Name": "com.microsoft.azure:msal4j-persistence-extension",
           "Identifier": {
             "PURL": "pkg:maven/com.microsoft.azure/msal4j-persistence-extension@1.3.0",
@@ -12417,7 +12350,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.microsoft.azure:msal4j-persistence-extension@1.3.0",
           "Name": "com.microsoft.azure:msal4j-persistence-extension",
           "Identifier": {
             "PURL": "pkg:maven/com.microsoft.azure/msal4j-persistence-extension@1.3.0",
@@ -12432,7 +12364,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.microsoft.sqlserver:mssql-jdbc@12.10.2",
           "Name": "com.microsoft.sqlserver:mssql-jdbc",
           "Identifier": {
             "PURL": "pkg:maven/com.microsoft.sqlserver/mssql-jdbc@12.10.2",
@@ -12447,7 +12378,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.microsoft.sqlserver:mssql-jdbc@12.10.2.jre8",
           "Name": "com.microsoft.sqlserver:mssql-jdbc",
           "Identifier": {
             "PURL": "pkg:maven/com.microsoft.sqlserver/mssql-jdbc@12.10.2.jre8",
@@ -12462,7 +12392,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.nimbusds:content-type@2.3",
           "Name": "com.nimbusds:content-type",
           "Identifier": {
             "PURL": "pkg:maven/com.nimbusds/content-type@2.3",
@@ -12477,7 +12406,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.nimbusds:lang-tag@1.7",
           "Name": "com.nimbusds:lang-tag",
           "Identifier": {
             "PURL": "pkg:maven/com.nimbusds/lang-tag@1.7",
@@ -12492,7 +12420,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.nimbusds:nimbus-jose-jwt@10.4.2",
           "Name": "com.nimbusds:nimbus-jose-jwt",
           "Identifier": {
             "PURL": "pkg:maven/com.nimbusds/nimbus-jose-jwt@10.4.2",
@@ -12507,7 +12434,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.nimbusds:oauth2-oidc-sdk@11.29.2",
           "Name": "com.nimbusds:oauth2-oidc-sdk",
           "Identifier": {
             "PURL": "pkg:maven/com.nimbusds/oauth2-oidc-sdk@11.29.2",
@@ -12522,7 +12448,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.opencsv:opencsv@5.12.0",
           "Name": "com.opencsv:opencsv",
           "Identifier": {
             "PURL": "pkg:maven/com.opencsv/opencsv@5.12.0",
@@ -12537,7 +12462,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.opencsv:opencsv@5.12.0",
           "Name": "com.opencsv:opencsv",
           "Identifier": {
             "PURL": "pkg:maven/com.opencsv/opencsv@5.12.0",
@@ -12552,7 +12476,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.oracle.database.jdbc:ojdbc8@19.28.0.0",
           "Name": "com.oracle.database.jdbc:ojdbc8",
           "Identifier": {
             "PURL": "pkg:maven/com.oracle.database.jdbc/ojdbc8@19.28.0.0",
@@ -12567,7 +12490,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "commons-beanutils:commons-beanutils@1.11.0",
           "Name": "commons-beanutils:commons-beanutils",
           "Identifier": {
             "PURL": "pkg:maven/commons-beanutils/commons-beanutils@1.11.0",
@@ -12582,7 +12504,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "commons-codec:commons-codec@1.11",
           "Name": "commons-codec:commons-codec",
           "Identifier": {
             "PURL": "pkg:maven/commons-codec/commons-codec@1.11",
@@ -12597,7 +12518,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "commons-codec:commons-codec@1.19.0",
           "Name": "commons-codec:commons-codec",
           "Identifier": {
             "PURL": "pkg:maven/commons-codec/commons-codec@1.19.0",
@@ -12612,7 +12532,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "commons-collections:commons-collections@3.2.2",
           "Name": "commons-collections:commons-collections",
           "Identifier": {
             "PURL": "pkg:maven/commons-collections/commons-collections@3.2.2",
@@ -12627,7 +12546,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "commons-io:commons-io@2.20.0",
           "Name": "commons-io:commons-io",
           "Identifier": {
             "PURL": "pkg:maven/commons-io/commons-io@2.20.0",
@@ -12642,7 +12560,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "commons-io:commons-io@2.20.0",
           "Name": "commons-io:commons-io",
           "Identifier": {
             "PURL": "pkg:maven/commons-io/commons-io@2.20.0",
@@ -12657,7 +12574,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "commons-logging:commons-logging@1.1.3",
           "Name": "commons-logging:commons-logging",
           "Identifier": {
             "PURL": "pkg:maven/commons-logging/commons-logging@1.1.3",
@@ -12672,7 +12588,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "commons-logging:commons-logging@1.2",
           "Name": "commons-logging:commons-logging",
           "Identifier": {
             "PURL": "pkg:maven/commons-logging/commons-logging@1.2",
@@ -12687,7 +12602,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "commons-logging:commons-logging@1.3.5",
           "Name": "commons-logging:commons-logging",
           "Identifier": {
             "PURL": "pkg:maven/commons-logging/commons-logging@1.3.5",
@@ -12702,7 +12616,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "info.picocli:picocli@4.7.7",
           "Name": "info.picocli:picocli",
           "Identifier": {
             "PURL": "pkg:maven/info.picocli/picocli@4.7.7",
@@ -12717,7 +12630,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.dropwizard.metrics:metrics-core@4.1.18",
           "Name": "io.dropwizard.metrics:metrics-core",
           "Identifier": {
             "PURL": "pkg:maven/io.dropwizard.metrics/metrics-core@4.1.18",
@@ -12732,7 +12644,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.github.java-diff-utils:java-diff-utils@4.16",
           "Name": "io.github.java-diff-utils:java-diff-utils",
           "Identifier": {
             "PURL": "pkg:maven/io.github.java-diff-utils/java-diff-utils@4.16",
@@ -12747,7 +12658,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-buffer@4.1.125.Final",
           "Name": "io.netty:netty-buffer",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-buffer@4.1.125.Final",
@@ -12762,7 +12672,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-buffer@4.1.125.Final",
           "Name": "io.netty:netty-buffer",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-buffer@4.1.125.Final",
@@ -12777,7 +12686,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-buffer@4.1.126.Final",
           "Name": "io.netty:netty-buffer",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-buffer@4.1.126.Final",
@@ -12792,7 +12700,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-buffer@4.2.6.Final",
           "Name": "io.netty:netty-buffer",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-buffer@4.2.6.Final",
@@ -12807,7 +12714,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-codec@4.1.125.Final",
           "Name": "io.netty:netty-codec",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-codec@4.1.125.Final",
@@ -12822,7 +12728,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-codec@4.1.125.Final",
           "Name": "io.netty:netty-codec",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-codec@4.1.125.Final",
@@ -12837,7 +12742,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-codec@4.1.125.Final",
           "Name": "io.netty:netty-codec",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-codec@4.1.125.Final",
@@ -12852,7 +12756,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-codec@4.1.126.Final",
           "Name": "io.netty:netty-codec",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-codec@4.1.126.Final",
@@ -12867,7 +12770,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-codec-base@4.2.6.Final",
           "Name": "io.netty:netty-codec-base",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-codec-base@4.2.6.Final",
@@ -12882,7 +12784,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-codec-compression@4.2.6.Final",
           "Name": "io.netty:netty-codec-compression",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-codec-compression@4.2.6.Final",
@@ -12897,7 +12798,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-codec-dns@4.1.125.Final",
           "Name": "io.netty:netty-codec-dns",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-codec-dns@4.1.125.Final",
@@ -12912,7 +12812,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-codec-http@4.1.125.Final",
           "Name": "io.netty:netty-codec-http",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-codec-http@4.1.125.Final",
@@ -12927,7 +12826,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-codec-http@4.1.126.Final",
           "Name": "io.netty:netty-codec-http",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-codec-http@4.1.126.Final",
@@ -12942,7 +12840,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-codec-http@4.1.126.Final",
           "Name": "io.netty:netty-codec-http",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-codec-http@4.1.126.Final",
@@ -12957,7 +12854,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-codec-http@4.2.6.Final",
           "Name": "io.netty:netty-codec-http",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-codec-http@4.2.6.Final",
@@ -12972,7 +12868,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-codec-http2@4.1.125.Final",
           "Name": "io.netty:netty-codec-http2",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-codec-http2@4.1.125.Final",
@@ -12987,7 +12882,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-codec-http2@4.1.126.Final",
           "Name": "io.netty:netty-codec-http2",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-codec-http2@4.1.126.Final",
@@ -13002,7 +12896,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-codec-http2@4.1.126.Final",
           "Name": "io.netty:netty-codec-http2",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-codec-http2@4.1.126.Final",
@@ -13017,7 +12910,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-codec-http2@4.2.6.Final",
           "Name": "io.netty:netty-codec-http2",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-codec-http2@4.2.6.Final",
@@ -13032,7 +12924,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-codec-socks@4.1.125.Final",
           "Name": "io.netty:netty-codec-socks",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-codec-socks@4.1.125.Final",
@@ -13047,7 +12938,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-codec-socks@4.1.126.Final",
           "Name": "io.netty:netty-codec-socks",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-codec-socks@4.1.126.Final",
@@ -13062,7 +12952,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-common@4.1.125.Final",
           "Name": "io.netty:netty-common",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-common@4.1.125.Final",
@@ -13077,7 +12966,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-common@4.1.125.Final",
           "Name": "io.netty:netty-common",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-common@4.1.125.Final",
@@ -13092,7 +12980,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-common@4.1.126.Final",
           "Name": "io.netty:netty-common",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-common@4.1.126.Final",
@@ -13107,7 +12994,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-common@4.2.6.Final",
           "Name": "io.netty:netty-common",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-common@4.2.6.Final",
@@ -13122,7 +13008,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-handler@4.1.125.Final",
           "Name": "io.netty:netty-handler",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-handler@4.1.125.Final",
@@ -13137,7 +13022,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-handler@4.1.125.Final",
           "Name": "io.netty:netty-handler",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-handler@4.1.125.Final",
@@ -13152,7 +13036,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-handler@4.1.126.Final",
           "Name": "io.netty:netty-handler",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-handler@4.1.126.Final",
@@ -13167,7 +13050,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-handler@4.2.6.Final",
           "Name": "io.netty:netty-handler",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-handler@4.2.6.Final",
@@ -13182,7 +13064,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-handler-proxy@4.1.125.Final",
           "Name": "io.netty:netty-handler-proxy",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-handler-proxy@4.1.125.Final",
@@ -13197,7 +13078,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-handler-proxy@4.1.126.Final",
           "Name": "io.netty:netty-handler-proxy",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-handler-proxy@4.1.126.Final",
@@ -13212,7 +13092,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-resolver@4.1.125.Final",
           "Name": "io.netty:netty-resolver",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-resolver@4.1.125.Final",
@@ -13227,7 +13106,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-resolver@4.1.125.Final",
           "Name": "io.netty:netty-resolver",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-resolver@4.1.125.Final",
@@ -13242,7 +13120,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-resolver@4.1.126.Final",
           "Name": "io.netty:netty-resolver",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-resolver@4.1.126.Final",
@@ -13257,7 +13134,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-resolver@4.2.6.Final",
           "Name": "io.netty:netty-resolver",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-resolver@4.2.6.Final",
@@ -13272,7 +13148,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-resolver-dns@4.1.125.Final",
           "Name": "io.netty:netty-resolver-dns",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-resolver-dns@4.1.125.Final",
@@ -13287,7 +13162,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-resolver-dns-classes-macos@4.1.125.Final",
           "Name": "io.netty:netty-resolver-dns-classes-macos",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-resolver-dns-classes-macos@4.1.125.Final",
@@ -13302,7 +13176,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-resolver-dns-native-macos@4.1.125.Final",
           "Name": "io.netty:netty-resolver-dns-native-macos",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-resolver-dns-native-macos@4.1.125.Final",
@@ -13317,7 +13190,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-tcnative-boringssl-static@2.0.73.Final",
           "Name": "io.netty:netty-tcnative-boringssl-static",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-tcnative-boringssl-static@2.0.73.Final",
@@ -13332,7 +13204,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-tcnative-classes@2.0.73.Final",
           "Name": "io.netty:netty-tcnative-classes",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-tcnative-classes@2.0.73.Final",
@@ -13347,7 +13218,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-transport@4.1.125.Final",
           "Name": "io.netty:netty-transport",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-transport@4.1.125.Final",
@@ -13362,7 +13232,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-transport@4.1.125.Final",
           "Name": "io.netty:netty-transport",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-transport@4.1.125.Final",
@@ -13377,7 +13246,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-transport@4.1.126.Final",
           "Name": "io.netty:netty-transport",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-transport@4.1.126.Final",
@@ -13392,7 +13260,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-transport@4.2.6.Final",
           "Name": "io.netty:netty-transport",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-transport@4.2.6.Final",
@@ -13407,7 +13274,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-transport-classes-epoll@4.1.125.Final",
           "Name": "io.netty:netty-transport-classes-epoll",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-transport-classes-epoll@4.1.125.Final",
@@ -13422,7 +13288,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-transport-classes-epoll@4.1.125.Final",
           "Name": "io.netty:netty-transport-classes-epoll",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-transport-classes-epoll@4.1.125.Final",
@@ -13437,7 +13302,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-transport-classes-epoll@4.1.126.Final",
           "Name": "io.netty:netty-transport-classes-epoll",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-transport-classes-epoll@4.1.126.Final",
@@ -13452,7 +13316,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-transport-classes-epoll@4.1.126.Final",
           "Name": "io.netty:netty-transport-classes-epoll",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-transport-classes-epoll@4.1.126.Final",
@@ -13467,7 +13330,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-transport-classes-kqueue@4.1.125.Final",
           "Name": "io.netty:netty-transport-classes-kqueue",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-transport-classes-kqueue@4.1.125.Final",
@@ -13482,7 +13344,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-transport-classes-kqueue@4.1.126.Final",
           "Name": "io.netty:netty-transport-classes-kqueue",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-transport-classes-kqueue@4.1.126.Final",
@@ -13497,7 +13358,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-transport-native-epoll@4.1.125.Final",
           "Name": "io.netty:netty-transport-native-epoll",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-transport-native-epoll@4.1.125.Final",
@@ -13512,7 +13372,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-transport-native-epoll@4.1.126.Final",
           "Name": "io.netty:netty-transport-native-epoll",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-transport-native-epoll@4.1.126.Final",
@@ -13527,7 +13386,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-transport-native-kqueue@4.1.125.Final",
           "Name": "io.netty:netty-transport-native-kqueue",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-transport-native-kqueue@4.1.125.Final",
@@ -13542,7 +13400,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-transport-native-kqueue@4.1.126.Final",
           "Name": "io.netty:netty-transport-native-kqueue",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-transport-native-kqueue@4.1.126.Final",
@@ -13557,7 +13414,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-transport-native-unix-common@4.1.125.Final",
           "Name": "io.netty:netty-transport-native-unix-common",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-transport-native-unix-common@4.1.125.Final",
@@ -13572,7 +13428,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-transport-native-unix-common@4.1.126.Final",
           "Name": "io.netty:netty-transport-native-unix-common",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-transport-native-unix-common@4.1.126.Final",
@@ -13587,7 +13442,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-transport-native-unix-common@4.1.126.Final",
           "Name": "io.netty:netty-transport-native-unix-common",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-transport-native-unix-common@4.1.126.Final",
@@ -13602,7 +13456,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "io.netty:netty-transport-native-unix-common@4.2.6.Final",
           "Name": "io.netty:netty-transport-native-unix-common",
           "Identifier": {
             "PURL": "pkg:maven/io.netty/netty-transport-native-unix-common@4.2.6.Final",
@@ -13617,7 +13470,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "javax.validation:validation-api@2.0.0.Final",
           "Name": "javax.validation:validation-api",
           "Identifier": {
             "PURL": "pkg:maven/javax.validation/validation-api@2.0.0.Final",
@@ -13632,7 +13484,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "javax.xml.bind:jaxb-api@2.3.1",
           "Name": "javax.xml.bind:jaxb-api",
           "Identifier": {
             "PURL": "pkg:maven/javax.xml.bind/jaxb-api@2.3.1",
@@ -13647,7 +13498,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "javax.xml.bind:jaxb-api@2.3.1",
           "Name": "javax.xml.bind:jaxb-api",
           "Identifier": {
             "PURL": "pkg:maven/javax.xml.bind/jaxb-api@2.3.1",
@@ -13662,7 +13512,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "joda-time:joda-time@2.12.7",
           "Name": "joda-time:joda-time",
           "Identifier": {
             "PURL": "pkg:maven/joda-time/joda-time@2.12.7",
@@ -13677,7 +13526,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "net.minidev:accessors-smart@2.5.2",
           "Name": "net.minidev:accessors-smart",
           "Identifier": {
             "PURL": "pkg:maven/net.minidev/accessors-smart@2.5.2",
@@ -13692,7 +13540,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "net.minidev:json-smart@2.5.2",
           "Name": "net.minidev:json-smart",
           "Identifier": {
             "PURL": "pkg:maven/net.minidev/json-smart@2.5.2",
@@ -13707,7 +13554,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "net.snowflake:snowflake-jdbc@3.26.1",
           "Name": "net.snowflake:snowflake-jdbc",
           "Identifier": {
             "PURL": "pkg:maven/net.snowflake/snowflake-jdbc@3.26.1",
@@ -13722,7 +13568,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "one.gfw:jaxb-api@2.3.1",
           "Name": "one.gfw:jaxb-api",
           "Identifier": {
             "PURL": "pkg:maven/one.gfw/jaxb-api@2.3.1",
@@ -13737,7 +13582,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.apache.cassandra:java-driver-core@4.19.0",
           "Name": "org.apache.cassandra:java-driver-core",
           "Identifier": {
             "PURL": "pkg:maven/org.apache.cassandra/java-driver-core@4.19.0",
@@ -13752,7 +13596,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.apache.cassandra:java-driver-guava-shaded@4.19.0",
           "Name": "org.apache.cassandra:java-driver-guava-shaded",
           "Identifier": {
             "PURL": "pkg:maven/org.apache.cassandra/java-driver-guava-shaded@4.19.0",
@@ -13767,7 +13610,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.apache.commons:commons-collections4@4.5.0",
           "Name": "org.apache.commons:commons-collections4",
           "Identifier": {
             "PURL": "pkg:maven/org.apache.commons/commons-collections4@4.5.0",
@@ -13782,7 +13624,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.apache.commons:commons-collections4@4.5.0",
           "Name": "org.apache.commons:commons-collections4",
           "Identifier": {
             "PURL": "pkg:maven/org.apache.commons/commons-collections4@4.5.0",
@@ -13797,7 +13638,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.apache.commons:commons-lang3@3.18.0",
           "Name": "org.apache.commons:commons-lang3",
           "Identifier": {
             "PURL": "pkg:maven/org.apache.commons/commons-lang3@3.18.0",
@@ -13812,7 +13652,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.apache.commons:commons-lang3@3.19.0",
           "Name": "org.apache.commons:commons-lang3",
           "Identifier": {
             "PURL": "pkg:maven/org.apache.commons/commons-lang3@3.19.0",
@@ -13827,7 +13666,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.apache.commons:commons-text@1.13.1",
           "Name": "org.apache.commons:commons-text",
           "Identifier": {
             "PURL": "pkg:maven/org.apache.commons/commons-text@1.13.1",
@@ -13842,7 +13680,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.apache.commons:commons-text@1.14.0",
           "Name": "org.apache.commons:commons-text",
           "Identifier": {
             "PURL": "pkg:maven/org.apache.commons/commons-text@1.14.0",
@@ -13857,7 +13694,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.apache.httpcomponents.client5:httpclient5@5.3",
           "Name": "org.apache.httpcomponents.client5:httpclient5",
           "Identifier": {
             "PURL": "pkg:maven/org.apache.httpcomponents.client5/httpclient5@5.3",
@@ -13872,7 +13708,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.apache.httpcomponents.core5:httpcore5@5.2.4",
           "Name": "org.apache.httpcomponents.core5:httpcore5",
           "Identifier": {
             "PURL": "pkg:maven/org.apache.httpcomponents.core5/httpcore5@5.2.4",
@@ -13887,7 +13722,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.apache.httpcomponents.core5:httpcore5-h2@5.2.4",
           "Name": "org.apache.httpcomponents.core5:httpcore5-h2",
           "Identifier": {
             "PURL": "pkg:maven/org.apache.httpcomponents.core5/httpcore5-h2@5.2.4",
@@ -13902,7 +13736,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.apache.httpcomponents:httpclient@4.5.13",
           "Name": "org.apache.httpcomponents:httpclient",
           "Identifier": {
             "PURL": "pkg:maven/org.apache.httpcomponents/httpclient@4.5.13",
@@ -13917,7 +13750,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.apache.httpcomponents:httpclient@4.5.13",
           "Name": "org.apache.httpcomponents:httpclient",
           "Identifier": {
             "PURL": "pkg:maven/org.apache.httpcomponents/httpclient@4.5.13",
@@ -13932,7 +13764,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.apache.httpcomponents:httpclient@4.5.14",
           "Name": "org.apache.httpcomponents:httpclient",
           "Identifier": {
             "PURL": "pkg:maven/org.apache.httpcomponents/httpclient@4.5.14",
@@ -13947,7 +13778,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.apache.httpcomponents:httpcore@4.4.16",
           "Name": "org.apache.httpcomponents:httpcore",
           "Identifier": {
             "PURL": "pkg:maven/org.apache.httpcomponents/httpcore@4.4.16",
@@ -13962,7 +13792,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.apache.httpcomponents:httpcore@4.4.16",
           "Name": "org.apache.httpcomponents:httpcore",
           "Identifier": {
             "PURL": "pkg:maven/org.apache.httpcomponents/httpcore@4.4.16",
@@ -13977,7 +13806,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.apache.httpcomponents:httpcore@4.4.16",
           "Name": "org.apache.httpcomponents:httpcore",
           "Identifier": {
             "PURL": "pkg:maven/org.apache.httpcomponents/httpcore@4.4.16",
@@ -13992,7 +13820,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.firebirdsql.jdbc:jaybird@5.0.10.java8",
           "Name": "org.firebirdsql.jdbc:jaybird",
           "Identifier": {
             "PURL": "pkg:maven/org.firebirdsql.jdbc/jaybird@5.0.10.java8",
@@ -14007,7 +13834,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.glassfish.jaxb:jaxb-core@4.0.6",
           "Name": "org.glassfish.jaxb:jaxb-core",
           "Identifier": {
             "PURL": "pkg:maven/org.glassfish.jaxb/jaxb-core@4.0.6",
@@ -14022,7 +13848,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.glassfish.jaxb:jaxb-runtime@4.0.6",
           "Name": "org.glassfish.jaxb:jaxb-runtime",
           "Identifier": {
             "PURL": "pkg:maven/org.glassfish.jaxb/jaxb-runtime@4.0.6",
@@ -14037,7 +13862,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.hdrhistogram:HdrHistogram@2.1.12",
           "Name": "org.hdrhistogram:HdrHistogram",
           "Identifier": {
             "PURL": "pkg:maven/org.hdrhistogram/HdrHistogram@2.1.12",
@@ -14052,7 +13876,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.hsqldb:hsqldb@2.7.4",
           "Name": "org.hsqldb:hsqldb",
           "Identifier": {
             "PURL": "pkg:maven/org.hsqldb/hsqldb@2.7.4",
@@ -14067,7 +13890,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.jctools:jctools-core@4.0.5",
           "Name": "org.jctools:jctools-core",
           "Identifier": {
             "PURL": "pkg:maven/org.jctools/jctools-core@4.0.5",
@@ -14082,7 +13904,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.jctools:jctools-core@4.0.5",
           "Name": "org.jctools:jctools-core",
           "Identifier": {
             "PURL": "pkg:maven/org.jctools/jctools-core@4.0.5",
@@ -14097,7 +13918,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.jctools:jctools-core@4.0.5",
           "Name": "org.jctools:jctools-core",
           "Identifier": {
             "PURL": "pkg:maven/org.jctools/jctools-core@4.0.5",
@@ -14112,7 +13932,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.jctools:jctools-core@4.0.5",
           "Name": "org.jctools:jctools-core",
           "Identifier": {
             "PURL": "pkg:maven/org.jctools/jctools-core@4.0.5",
@@ -14127,7 +13946,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.liquibase.ext:liquibase-redshift@5.0.0",
           "Name": "org.liquibase.ext:liquibase-redshift",
           "Identifier": {
             "PURL": "pkg:maven/org.liquibase.ext/liquibase-redshift@5.0.0",
@@ -14142,7 +13960,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.mariadb.jdbc:mariadb-java-client@3.5.6",
           "Name": "org.mariadb.jdbc:mariadb-java-client",
           "Identifier": {
             "PURL": "pkg:maven/org.mariadb.jdbc/mariadb-java-client@3.5.6",
@@ -14157,7 +13974,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.mvel:mvel2@2.5.2.Final",
           "Name": "org.mvel:mvel2",
           "Identifier": {
             "PURL": "pkg:maven/org.mvel/mvel2@2.5.2.Final",
@@ -14172,7 +13988,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.postgresql:postgresql@42.7.8",
           "Name": "org.postgresql:postgresql",
           "Identifier": {
             "PURL": "pkg:maven/org.postgresql/postgresql@42.7.8",
@@ -14187,7 +14002,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.semver4j:semver4j@5.6.0",
           "Name": "org.semver4j:semver4j",
           "Identifier": {
             "PURL": "pkg:maven/org.semver4j/semver4j@5.6.0",
@@ -14202,7 +14016,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.slf4j:slf4j-api@1.7.26",
           "Name": "org.slf4j:slf4j-api",
           "Identifier": {
             "PURL": "pkg:maven/org.slf4j/slf4j-api@1.7.26",
@@ -14217,7 +14030,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.slf4j:slf4j-api@1.7.36",
           "Name": "org.slf4j:slf4j-api",
           "Identifier": {
             "PURL": "pkg:maven/org.slf4j/slf4j-api@1.7.36",
@@ -14232,7 +14044,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.slf4j:slf4j-api@1.7.36",
           "Name": "org.slf4j:slf4j-api",
           "Identifier": {
             "PURL": "pkg:maven/org.slf4j/slf4j-api@1.7.36",
@@ -14247,7 +14058,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.slf4j:slf4j-api@2.0.17",
           "Name": "org.slf4j:slf4j-api",
           "Identifier": {
             "PURL": "pkg:maven/org.slf4j/slf4j-api@2.0.17",
@@ -14262,7 +14072,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.slf4j:slf4j-api@2.0.17",
           "Name": "org.slf4j:slf4j-api",
           "Identifier": {
             "PURL": "pkg:maven/org.slf4j/slf4j-api@2.0.17",
@@ -14277,7 +14086,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.slf4j:slf4j-nop@1.7.36",
           "Name": "org.slf4j:slf4j-nop",
           "Identifier": {
             "PURL": "pkg:maven/org.slf4j/slf4j-nop@1.7.36",
@@ -14292,7 +14100,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.slf4j:slf4j-nop@2.0.17",
           "Name": "org.slf4j:slf4j-nop",
           "Identifier": {
             "PURL": "pkg:maven/org.slf4j/slf4j-nop@2.0.17",
@@ -14307,7 +14114,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.xerial:sqlite-jdbc@3.50.3.0",
           "Name": "org.xerial:sqlite-jdbc",
           "Identifier": {
             "PURL": "pkg:maven/org.xerial/sqlite-jdbc@3.50.3.0",
@@ -14322,7 +14128,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.yaml:snakeyaml@2.5",
           "Name": "org.yaml:snakeyaml",
           "Identifier": {
             "PURL": "pkg:maven/org.yaml/snakeyaml@2.5",
@@ -14337,7 +14142,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk.crt:aws-crt@0.39.0",
           "Name": "software.amazon.awssdk.crt:aws-crt",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk.crt/aws-crt@0.39.0",
@@ -14352,7 +14156,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:annotations@2.32.18",
           "Name": "software.amazon.awssdk:annotations",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/annotations@2.32.18",
@@ -14367,7 +14170,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:annotations@2.34.8",
           "Name": "software.amazon.awssdk:annotations",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/annotations@2.34.8",
@@ -14382,7 +14184,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:apache-client@2.32.18",
           "Name": "software.amazon.awssdk:apache-client",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/apache-client@2.32.18",
@@ -14397,7 +14198,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:apache-client@2.34.8",
           "Name": "software.amazon.awssdk:apache-client",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/apache-client@2.34.8",
@@ -14412,7 +14212,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:arns@2.34.8",
           "Name": "software.amazon.awssdk:arns",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/arns@2.34.8",
@@ -14427,7 +14226,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:auth@2.32.18",
           "Name": "software.amazon.awssdk:auth",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/auth@2.32.18",
@@ -14442,7 +14240,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:auth@2.34.8",
           "Name": "software.amazon.awssdk:auth",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/auth@2.34.8",
@@ -14457,7 +14254,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:aws-core@2.32.18",
           "Name": "software.amazon.awssdk:aws-core",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/aws-core@2.32.18",
@@ -14472,7 +14268,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:aws-core@2.34.8",
           "Name": "software.amazon.awssdk:aws-core",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/aws-core@2.34.8",
@@ -14487,7 +14282,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:aws-json-protocol@2.32.18",
           "Name": "software.amazon.awssdk:aws-json-protocol",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/aws-json-protocol@2.32.18",
@@ -14502,7 +14296,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:aws-json-protocol@2.34.8",
           "Name": "software.amazon.awssdk:aws-json-protocol",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/aws-json-protocol@2.34.8",
@@ -14517,7 +14310,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:aws-query-protocol@2.34.8",
           "Name": "software.amazon.awssdk:aws-query-protocol",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/aws-query-protocol@2.34.8",
@@ -14532,7 +14324,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:aws-xml-protocol@2.34.8",
           "Name": "software.amazon.awssdk:aws-xml-protocol",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/aws-xml-protocol@2.34.8",
@@ -14547,7 +14338,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:checksums@2.32.18",
           "Name": "software.amazon.awssdk:checksums",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/checksums@2.32.18",
@@ -14562,7 +14352,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:checksums@2.34.8",
           "Name": "software.amazon.awssdk:checksums",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/checksums@2.34.8",
@@ -14577,7 +14366,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:checksums-spi@2.32.18",
           "Name": "software.amazon.awssdk:checksums-spi",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/checksums-spi@2.32.18",
@@ -14592,7 +14380,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:checksums-spi@2.34.8",
           "Name": "software.amazon.awssdk:checksums-spi",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/checksums-spi@2.34.8",
@@ -14607,7 +14394,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:crt-core@2.34.8",
           "Name": "software.amazon.awssdk:crt-core",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/crt-core@2.34.8",
@@ -14622,7 +14408,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:dynamodb@2.34.8",
           "Name": "software.amazon.awssdk:dynamodb",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/dynamodb@2.34.8",
@@ -14637,7 +14422,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:dynamodb-enhanced@2.34.8",
           "Name": "software.amazon.awssdk:dynamodb-enhanced",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/dynamodb-enhanced@2.34.8",
@@ -14652,7 +14436,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:endpoints-spi@2.32.18",
           "Name": "software.amazon.awssdk:endpoints-spi",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/endpoints-spi@2.32.18",
@@ -14667,7 +14450,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:endpoints-spi@2.34.8",
           "Name": "software.amazon.awssdk:endpoints-spi",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/endpoints-spi@2.34.8",
@@ -14682,7 +14464,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:http-auth@2.32.18",
           "Name": "software.amazon.awssdk:http-auth",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/http-auth@2.32.18",
@@ -14697,7 +14478,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:http-auth@2.34.8",
           "Name": "software.amazon.awssdk:http-auth",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/http-auth@2.34.8",
@@ -14712,7 +14492,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:http-auth-aws@2.32.18",
           "Name": "software.amazon.awssdk:http-auth-aws",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/http-auth-aws@2.32.18",
@@ -14727,7 +14506,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:http-auth-aws@2.34.8",
           "Name": "software.amazon.awssdk:http-auth-aws",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/http-auth-aws@2.34.8",
@@ -14742,7 +14520,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:http-auth-aws-eventstream@2.32.18",
           "Name": "software.amazon.awssdk:http-auth-aws-eventstream",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/http-auth-aws-eventstream@2.32.18",
@@ -14757,7 +14534,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:http-auth-aws-eventstream@2.34.8",
           "Name": "software.amazon.awssdk:http-auth-aws-eventstream",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/http-auth-aws-eventstream@2.34.8",
@@ -14772,7 +14548,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:http-auth-spi@2.32.18",
           "Name": "software.amazon.awssdk:http-auth-spi",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/http-auth-spi@2.32.18",
@@ -14787,7 +14562,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:http-auth-spi@2.34.8",
           "Name": "software.amazon.awssdk:http-auth-spi",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/http-auth-spi@2.34.8",
@@ -14802,7 +14576,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:http-client-spi@2.32.18",
           "Name": "software.amazon.awssdk:http-client-spi",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/http-client-spi@2.32.18",
@@ -14817,7 +14590,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:http-client-spi@2.34.8",
           "Name": "software.amazon.awssdk:http-client-spi",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/http-client-spi@2.34.8",
@@ -14832,7 +14604,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:identity-spi@2.32.18",
           "Name": "software.amazon.awssdk:identity-spi",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/identity-spi@2.32.18",
@@ -14847,7 +14618,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:identity-spi@2.34.8",
           "Name": "software.amazon.awssdk:identity-spi",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/identity-spi@2.34.8",
@@ -14862,7 +14632,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:json-utils@2.32.18",
           "Name": "software.amazon.awssdk:json-utils",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/json-utils@2.32.18",
@@ -14877,7 +14646,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:json-utils@2.34.8",
           "Name": "software.amazon.awssdk:json-utils",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/json-utils@2.34.8",
@@ -14892,7 +14660,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:metrics-spi@2.32.18",
           "Name": "software.amazon.awssdk:metrics-spi",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/metrics-spi@2.32.18",
@@ -14907,7 +14674,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:metrics-spi@2.34.8",
           "Name": "software.amazon.awssdk:metrics-spi",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/metrics-spi@2.34.8",
@@ -14922,7 +14688,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:netty-nio-client@2.32.18",
           "Name": "software.amazon.awssdk:netty-nio-client",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/netty-nio-client@2.32.18",
@@ -14937,7 +14702,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:netty-nio-client@2.34.8",
           "Name": "software.amazon.awssdk:netty-nio-client",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/netty-nio-client@2.34.8",
@@ -14952,7 +14716,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:profiles@2.32.18",
           "Name": "software.amazon.awssdk:profiles",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/profiles@2.32.18",
@@ -14967,7 +14730,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:profiles@2.34.8",
           "Name": "software.amazon.awssdk:profiles",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/profiles@2.34.8",
@@ -14982,7 +14744,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:protocol-core@2.32.18",
           "Name": "software.amazon.awssdk:protocol-core",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/protocol-core@2.32.18",
@@ -14997,7 +14758,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:protocol-core@2.34.8",
           "Name": "software.amazon.awssdk:protocol-core",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/protocol-core@2.34.8",
@@ -15012,7 +14772,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:regions@2.32.18",
           "Name": "software.amazon.awssdk:regions",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/regions@2.32.18",
@@ -15027,7 +14786,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:regions@2.34.8",
           "Name": "software.amazon.awssdk:regions",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/regions@2.34.8",
@@ -15042,7 +14800,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:retries@2.32.18",
           "Name": "software.amazon.awssdk:retries",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/retries@2.32.18",
@@ -15057,7 +14814,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:retries@2.34.8",
           "Name": "software.amazon.awssdk:retries",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/retries@2.34.8",
@@ -15072,7 +14828,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:retries-spi@2.32.18",
           "Name": "software.amazon.awssdk:retries-spi",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/retries-spi@2.32.18",
@@ -15087,7 +14842,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:retries-spi@2.34.8",
           "Name": "software.amazon.awssdk:retries-spi",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/retries-spi@2.34.8",
@@ -15102,7 +14856,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:s3@2.34.8",
           "Name": "software.amazon.awssdk:s3",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/s3@2.34.8",
@@ -15117,7 +14870,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:s3-transfer-manager@2.34.8",
           "Name": "software.amazon.awssdk:s3-transfer-manager",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/s3-transfer-manager@2.34.8",
@@ -15132,7 +14884,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:sdk-core@2.32.18",
           "Name": "software.amazon.awssdk:sdk-core",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/sdk-core@2.32.18",
@@ -15147,7 +14898,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:sdk-core@2.34.8",
           "Name": "software.amazon.awssdk:sdk-core",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/sdk-core@2.34.8",
@@ -15162,7 +14912,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:secretsmanager@2.32.18",
           "Name": "software.amazon.awssdk:secretsmanager",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/secretsmanager@2.32.18",
@@ -15177,7 +14926,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:secretsmanager@2.34.8",
           "Name": "software.amazon.awssdk:secretsmanager",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/secretsmanager@2.34.8",
@@ -15192,7 +14940,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:ssm@2.34.8",
           "Name": "software.amazon.awssdk:ssm",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/ssm@2.34.8",
@@ -15207,7 +14954,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:sts@2.34.8",
           "Name": "software.amazon.awssdk:sts",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/sts@2.34.8",
@@ -15222,7 +14968,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:url-connection-client@2.34.8",
           "Name": "software.amazon.awssdk:url-connection-client",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/url-connection-client@2.34.8",
@@ -15237,7 +14982,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:utils@2.32.18",
           "Name": "software.amazon.awssdk:utils",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/utils@2.32.18",
@@ -15252,7 +14996,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:utils@2.34.8",
           "Name": "software.amazon.awssdk:utils",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/utils@2.34.8",
@@ -15267,7 +15010,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.awssdk:utils-lite@2.34.8",
           "Name": "software.amazon.awssdk:utils-lite",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.awssdk/utils-lite@2.34.8",
@@ -15282,7 +15024,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.eventstream:eventstream@1.0.1",
           "Name": "software.amazon.eventstream:eventstream",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.eventstream/eventstream@1.0.1",
@@ -15297,7 +15038,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.amazon.eventstream:eventstream@1.0.1",
           "Name": "software.amazon.eventstream:eventstream",
           "Identifier": {
             "PURL": "pkg:maven/software.amazon.eventstream/eventstream@1.0.1",
@@ -15312,7 +15052,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "software.aws.mcs:aws-sigv4-auth-cassandra-java-driver-plugin@4.0.9",
           "Name": "software.aws.mcs:aws-sigv4-auth-cassandra-java-driver-plugin",
           "Identifier": {
             "PURL": "pkg:maven/software.aws.mcs/aws-sigv4-auth-cassandra-java-driver-plugin@4.0.9",
@@ -15325,6 +15064,614 @@
           },
           "FilePath": "liquibase/internal/extensions/liquibase-commercial-cassandra.jar",
           "AnalyzedBy": "jar"
+        }
+      ],
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2025-59250",
+          "VendorIDs": [
+            "GHSA-m494-w24q-6f7w"
+          ],
+          "PkgName": "com.microsoft.sqlserver:mssql-jdbc",
+          "PkgPath": "liquibase/internal/lib/mssql-jdbc.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/com.microsoft.sqlserver/mssql-jdbc@12.10.2",
+            "UID": "ed962b4ff5981b83"
+          },
+          "InstalledVersion": "12.10.2",
+          "FixedVersion": "10.2.4.jre11, 11.2.4.jre11, 12.2.1.jre11, 12.6.5.jre11, 12.8.2.jre11, 12.10.2.jre11, 13.2.1.jre11",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:6899517c60a5b1ee7434f95fd3a38bfe52e4b387b92bf1b5309e2085f4b76e55",
+            "DiffID": "sha256:9d560d698db28fddb19982d7ead8e849baec110bc95778bb86d53d43ddcde5bb"
+          },
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2025-59250",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:e21e4aa2c0566d46d1ab1258020d1088de5c79c193bfd4061481302553938f31",
+          "Title": "JDBC Driver for SQL Server has improper input validation issue",
+          "Description": "Improper input validation in JDBC Driver for SQL Server allows an unauthorized attacker to perform spoofing over a network.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-20"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "nvd": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:N",
+              "V3Score": 8.1
+            },
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:N",
+              "V3Score": 8.1
+            }
+          },
+          "References": [
+            "https://github.com/microsoft/mssql-jdbc",
+            "https://github.com/microsoft/mssql-jdbc/blob/main/CHANGELOG.md",
+            "https://github.com/microsoft/mssql-jdbc/commit/9732e1bbc6ec44166fda2cddab31ce1c86c873dd#diff-45367b99a1951943bfecfc7765e80df687967aa56286a5b2e039f77cd9a0e118",
+            "https://github.com/microsoft/mssql-jdbc/pull/2798",
+            "https://github.com/microsoft/mssql-jdbc/pull/2800",
+            "https://github.com/microsoft/mssql-jdbc/pull/2801",
+            "https://github.com/microsoft/mssql-jdbc/pull/2802",
+            "https://github.com/microsoft/mssql-jdbc/pull/2803",
+            "https://github.com/microsoft/mssql-jdbc/pull/2807",
+            "https://learn.microsoft.com/en-us/sql/connect/jdbc/microsoft-jdbc-driver-for-sql-server-support-matrix",
+            "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-59250",
+            "https://nvd.nist.gov/vuln/detail/CVE-2025-59250"
+          ],
+          "PublishedDate": "2025-10-14T17:16:07.24Z",
+          "LastModifiedDate": "2025-10-30T16:35:42.213Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2025-59250",
+          "VendorIDs": [
+            "GHSA-m494-w24q-6f7w"
+          ],
+          "PkgName": "com.microsoft.sqlserver:mssql-jdbc",
+          "PkgPath": "liquibase/internal/lib/mssql-jdbc.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/com.microsoft.sqlserver/mssql-jdbc@12.10.2.jre8",
+            "UID": "c625bceb982b9f07"
+          },
+          "InstalledVersion": "12.10.2.jre8",
+          "FixedVersion": "10.2.4.jre11, 11.2.4.jre11, 12.2.1.jre11, 12.6.5.jre11, 12.8.2.jre11, 12.10.2.jre11, 13.2.1.jre11",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:6899517c60a5b1ee7434f95fd3a38bfe52e4b387b92bf1b5309e2085f4b76e55",
+            "DiffID": "sha256:9d560d698db28fddb19982d7ead8e849baec110bc95778bb86d53d43ddcde5bb"
+          },
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2025-59250",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:e21e4aa2c0566d46d1ab1258020d1088de5c79c193bfd4061481302553938f31",
+          "Title": "JDBC Driver for SQL Server has improper input validation issue",
+          "Description": "Improper input validation in JDBC Driver for SQL Server allows an unauthorized attacker to perform spoofing over a network.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-20"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "nvd": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:N",
+              "V3Score": 8.1
+            },
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:N",
+              "V3Score": 8.1
+            }
+          },
+          "References": [
+            "https://github.com/microsoft/mssql-jdbc",
+            "https://github.com/microsoft/mssql-jdbc/blob/main/CHANGELOG.md",
+            "https://github.com/microsoft/mssql-jdbc/commit/9732e1bbc6ec44166fda2cddab31ce1c86c873dd#diff-45367b99a1951943bfecfc7765e80df687967aa56286a5b2e039f77cd9a0e118",
+            "https://github.com/microsoft/mssql-jdbc/pull/2798",
+            "https://github.com/microsoft/mssql-jdbc/pull/2800",
+            "https://github.com/microsoft/mssql-jdbc/pull/2801",
+            "https://github.com/microsoft/mssql-jdbc/pull/2802",
+            "https://github.com/microsoft/mssql-jdbc/pull/2803",
+            "https://github.com/microsoft/mssql-jdbc/pull/2807",
+            "https://learn.microsoft.com/en-us/sql/connect/jdbc/microsoft-jdbc-driver-for-sql-server-support-matrix",
+            "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-59250",
+            "https://nvd.nist.gov/vuln/detail/CVE-2025-59250"
+          ],
+          "PublishedDate": "2025-10-14T17:16:07.24Z",
+          "LastModifiedDate": "2025-10-30T16:35:42.213Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-33870",
+          "VendorIDs": [
+            "GHSA-pwqr-wmgm-9rr8"
+          ],
+          "PkgName": "io.netty:netty-codec-http",
+          "PkgPath": "liquibase/internal/lib/liquibase-azure-deps.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/io.netty/netty-codec-http@4.1.125.Final",
+            "UID": "9ccdd9f146f7daa1"
+          },
+          "InstalledVersion": "4.1.125.Final",
+          "FixedVersion": "4.1.132.Final, 4.2.10.Final",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:6899517c60a5b1ee7434f95fd3a38bfe52e4b387b92bf1b5309e2085f4b76e55",
+            "DiffID": "sha256:9d560d698db28fddb19982d7ead8e849baec110bc95778bb86d53d43ddcde5bb"
+          },
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-33870",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:7be9d2a63456104e3d949e8204c02405d032f4b95eb95501adee18d47ed74daf",
+          "Title": "io.netty/netty-codec-http: Netty: Request smuggling via incorrect parsing of HTTP/1.1 chunked transfer encoding extension values",
+          "Description": "Netty is an asynchronous, event-driven network application framework. In versions prior to 4.1.132.Final and 4.2.10.Final, Netty incorrectly parses quoted strings in HTTP/1.1 chunked transfer encoding extension values, enabling request smuggling attacks. Versions 4.1.132.Final and 4.2.10.Final fix the issue.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-444"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "redhat": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2026-33870",
+            "https://github.com/netty/netty",
+            "https://github.com/netty/netty/security/advisories/GHSA-pwqr-wmgm-9rr8",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-33870",
+            "https://w4ke.info/2025/06/18/funky-chunks.html",
+            "https://w4ke.info/2025/10/29/funky-chunks-2.html",
+            "https://www.cve.org/CVERecord?id=CVE-2026-33870",
+            "https://www.rfc-editor.org/rfc/rfc9110"
+          ],
+          "PublishedDate": "2026-03-27T20:16:34.663Z",
+          "LastModifiedDate": "2026-03-30T20:12:16.33Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-33870",
+          "VendorIDs": [
+            "GHSA-pwqr-wmgm-9rr8"
+          ],
+          "PkgName": "io.netty:netty-codec-http",
+          "PkgPath": "liquibase/internal/extensions/liquibase-aws-extension.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/io.netty/netty-codec-http@4.1.126.Final",
+            "UID": "e7e0e089899e2039"
+          },
+          "InstalledVersion": "4.1.126.Final",
+          "FixedVersion": "4.1.132.Final, 4.2.10.Final",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:6899517c60a5b1ee7434f95fd3a38bfe52e4b387b92bf1b5309e2085f4b76e55",
+            "DiffID": "sha256:9d560d698db28fddb19982d7ead8e849baec110bc95778bb86d53d43ddcde5bb"
+          },
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-33870",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:7be9d2a63456104e3d949e8204c02405d032f4b95eb95501adee18d47ed74daf",
+          "Title": "io.netty/netty-codec-http: Netty: Request smuggling via incorrect parsing of HTTP/1.1 chunked transfer encoding extension values",
+          "Description": "Netty is an asynchronous, event-driven network application framework. In versions prior to 4.1.132.Final and 4.2.10.Final, Netty incorrectly parses quoted strings in HTTP/1.1 chunked transfer encoding extension values, enabling request smuggling attacks. Versions 4.1.132.Final and 4.2.10.Final fix the issue.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-444"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "redhat": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2026-33870",
+            "https://github.com/netty/netty",
+            "https://github.com/netty/netty/security/advisories/GHSA-pwqr-wmgm-9rr8",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-33870",
+            "https://w4ke.info/2025/06/18/funky-chunks.html",
+            "https://w4ke.info/2025/10/29/funky-chunks-2.html",
+            "https://www.cve.org/CVERecord?id=CVE-2026-33870",
+            "https://www.rfc-editor.org/rfc/rfc9110"
+          ],
+          "PublishedDate": "2026-03-27T20:16:34.663Z",
+          "LastModifiedDate": "2026-03-30T20:12:16.33Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-33870",
+          "VendorIDs": [
+            "GHSA-pwqr-wmgm-9rr8"
+          ],
+          "PkgName": "io.netty:netty-codec-http",
+          "PkgPath": "liquibase/internal/extensions/liquibase-azure.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/io.netty/netty-codec-http@4.1.126.Final",
+            "UID": "a2eefef2e7246d36"
+          },
+          "InstalledVersion": "4.1.126.Final",
+          "FixedVersion": "4.1.132.Final, 4.2.10.Final",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:6899517c60a5b1ee7434f95fd3a38bfe52e4b387b92bf1b5309e2085f4b76e55",
+            "DiffID": "sha256:9d560d698db28fddb19982d7ead8e849baec110bc95778bb86d53d43ddcde5bb"
+          },
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-33870",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:7be9d2a63456104e3d949e8204c02405d032f4b95eb95501adee18d47ed74daf",
+          "Title": "io.netty/netty-codec-http: Netty: Request smuggling via incorrect parsing of HTTP/1.1 chunked transfer encoding extension values",
+          "Description": "Netty is an asynchronous, event-driven network application framework. In versions prior to 4.1.132.Final and 4.2.10.Final, Netty incorrectly parses quoted strings in HTTP/1.1 chunked transfer encoding extension values, enabling request smuggling attacks. Versions 4.1.132.Final and 4.2.10.Final fix the issue.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-444"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "redhat": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2026-33870",
+            "https://github.com/netty/netty",
+            "https://github.com/netty/netty/security/advisories/GHSA-pwqr-wmgm-9rr8",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-33870",
+            "https://w4ke.info/2025/06/18/funky-chunks.html",
+            "https://w4ke.info/2025/10/29/funky-chunks-2.html",
+            "https://www.cve.org/CVERecord?id=CVE-2026-33870",
+            "https://www.rfc-editor.org/rfc/rfc9110"
+          ],
+          "PublishedDate": "2026-03-27T20:16:34.663Z",
+          "LastModifiedDate": "2026-03-30T20:12:16.33Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-33870",
+          "VendorIDs": [
+            "GHSA-pwqr-wmgm-9rr8"
+          ],
+          "PkgName": "io.netty:netty-codec-http",
+          "PkgPath": "liquibase/internal/extensions/liquibase-commercial-cassandra.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/io.netty/netty-codec-http@4.2.6.Final",
+            "UID": "8e4e2f0d38b3f53e"
+          },
+          "InstalledVersion": "4.2.6.Final",
+          "FixedVersion": "4.1.132.Final, 4.2.10.Final",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:6899517c60a5b1ee7434f95fd3a38bfe52e4b387b92bf1b5309e2085f4b76e55",
+            "DiffID": "sha256:9d560d698db28fddb19982d7ead8e849baec110bc95778bb86d53d43ddcde5bb"
+          },
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-33870",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:7be9d2a63456104e3d949e8204c02405d032f4b95eb95501adee18d47ed74daf",
+          "Title": "io.netty/netty-codec-http: Netty: Request smuggling via incorrect parsing of HTTP/1.1 chunked transfer encoding extension values",
+          "Description": "Netty is an asynchronous, event-driven network application framework. In versions prior to 4.1.132.Final and 4.2.10.Final, Netty incorrectly parses quoted strings in HTTP/1.1 chunked transfer encoding extension values, enabling request smuggling attacks. Versions 4.1.132.Final and 4.2.10.Final fix the issue.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-444"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "redhat": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2026-33870",
+            "https://github.com/netty/netty",
+            "https://github.com/netty/netty/security/advisories/GHSA-pwqr-wmgm-9rr8",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-33870",
+            "https://w4ke.info/2025/06/18/funky-chunks.html",
+            "https://w4ke.info/2025/10/29/funky-chunks-2.html",
+            "https://www.cve.org/CVERecord?id=CVE-2026-33870",
+            "https://www.rfc-editor.org/rfc/rfc9110"
+          ],
+          "PublishedDate": "2026-03-27T20:16:34.663Z",
+          "LastModifiedDate": "2026-03-30T20:12:16.33Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-33871",
+          "VendorIDs": [
+            "GHSA-w9fj-cfpg-grvv"
+          ],
+          "PkgName": "io.netty:netty-codec-http2",
+          "PkgPath": "liquibase/internal/lib/liquibase-azure-deps.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/io.netty/netty-codec-http2@4.1.125.Final",
+            "UID": "2564442e2b040add"
+          },
+          "InstalledVersion": "4.1.125.Final",
+          "FixedVersion": "4.1.132.Final, 4.2.11.Final",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:6899517c60a5b1ee7434f95fd3a38bfe52e4b387b92bf1b5309e2085f4b76e55",
+            "DiffID": "sha256:9d560d698db28fddb19982d7ead8e849baec110bc95778bb86d53d43ddcde5bb"
+          },
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-33871",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:5f8ab40baa4893eb9beb33fd0c3719eb492997def0cda152a68991417f90500a",
+          "Title": "netty: Netty: Denial of Service via HTTP/2 CONTINUATION frame flood",
+          "Description": "Netty is an asynchronous, event-driven network application framework. In versions prior to 4.1.132.Final and 4.2.10.Final, a remote user can trigger a Denial of Service (DoS) against a Netty HTTP/2 server by sending a flood of `CONTINUATION` frames. The server's lack of a limit on the number of `CONTINUATION` frames, combined with a bypass of existing size-based mitigations using zero-byte frames, allows an user to cause excessive CPU consumption with minimal bandwidth, rendering the server unresponsive. Versions 4.1.132.Final and 4.2.10.Final fix the issue.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-770"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "nvd": 3,
+            "redhat": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N",
+              "V40Score": 8.7
+            },
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2026-33871",
+            "https://github.com/netty/netty",
+            "https://github.com/netty/netty/security/advisories/GHSA-w9fj-cfpg-grvv",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-33871",
+            "https://www.cve.org/CVERecord?id=CVE-2026-33871"
+          ],
+          "PublishedDate": "2026-03-27T20:16:34.833Z",
+          "LastModifiedDate": "2026-03-30T20:10:17.62Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-33871",
+          "VendorIDs": [
+            "GHSA-w9fj-cfpg-grvv"
+          ],
+          "PkgName": "io.netty:netty-codec-http2",
+          "PkgPath": "liquibase/internal/extensions/liquibase-aws-extension.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/io.netty/netty-codec-http2@4.1.126.Final",
+            "UID": "4f7949f2d6252cc5"
+          },
+          "InstalledVersion": "4.1.126.Final",
+          "FixedVersion": "4.1.132.Final, 4.2.11.Final",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:6899517c60a5b1ee7434f95fd3a38bfe52e4b387b92bf1b5309e2085f4b76e55",
+            "DiffID": "sha256:9d560d698db28fddb19982d7ead8e849baec110bc95778bb86d53d43ddcde5bb"
+          },
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-33871",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:5f8ab40baa4893eb9beb33fd0c3719eb492997def0cda152a68991417f90500a",
+          "Title": "netty: Netty: Denial of Service via HTTP/2 CONTINUATION frame flood",
+          "Description": "Netty is an asynchronous, event-driven network application framework. In versions prior to 4.1.132.Final and 4.2.10.Final, a remote user can trigger a Denial of Service (DoS) against a Netty HTTP/2 server by sending a flood of `CONTINUATION` frames. The server's lack of a limit on the number of `CONTINUATION` frames, combined with a bypass of existing size-based mitigations using zero-byte frames, allows an user to cause excessive CPU consumption with minimal bandwidth, rendering the server unresponsive. Versions 4.1.132.Final and 4.2.10.Final fix the issue.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-770"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "nvd": 3,
+            "redhat": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N",
+              "V40Score": 8.7
+            },
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2026-33871",
+            "https://github.com/netty/netty",
+            "https://github.com/netty/netty/security/advisories/GHSA-w9fj-cfpg-grvv",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-33871",
+            "https://www.cve.org/CVERecord?id=CVE-2026-33871"
+          ],
+          "PublishedDate": "2026-03-27T20:16:34.833Z",
+          "LastModifiedDate": "2026-03-30T20:10:17.62Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-33871",
+          "VendorIDs": [
+            "GHSA-w9fj-cfpg-grvv"
+          ],
+          "PkgName": "io.netty:netty-codec-http2",
+          "PkgPath": "liquibase/internal/extensions/liquibase-azure.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/io.netty/netty-codec-http2@4.1.126.Final",
+            "UID": "d3505ef1afb39b2b"
+          },
+          "InstalledVersion": "4.1.126.Final",
+          "FixedVersion": "4.1.132.Final, 4.2.11.Final",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:6899517c60a5b1ee7434f95fd3a38bfe52e4b387b92bf1b5309e2085f4b76e55",
+            "DiffID": "sha256:9d560d698db28fddb19982d7ead8e849baec110bc95778bb86d53d43ddcde5bb"
+          },
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-33871",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:5f8ab40baa4893eb9beb33fd0c3719eb492997def0cda152a68991417f90500a",
+          "Title": "netty: Netty: Denial of Service via HTTP/2 CONTINUATION frame flood",
+          "Description": "Netty is an asynchronous, event-driven network application framework. In versions prior to 4.1.132.Final and 4.2.10.Final, a remote user can trigger a Denial of Service (DoS) against a Netty HTTP/2 server by sending a flood of `CONTINUATION` frames. The server's lack of a limit on the number of `CONTINUATION` frames, combined with a bypass of existing size-based mitigations using zero-byte frames, allows an user to cause excessive CPU consumption with minimal bandwidth, rendering the server unresponsive. Versions 4.1.132.Final and 4.2.10.Final fix the issue.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-770"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "nvd": 3,
+            "redhat": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N",
+              "V40Score": 8.7
+            },
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2026-33871",
+            "https://github.com/netty/netty",
+            "https://github.com/netty/netty/security/advisories/GHSA-w9fj-cfpg-grvv",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-33871",
+            "https://www.cve.org/CVERecord?id=CVE-2026-33871"
+          ],
+          "PublishedDate": "2026-03-27T20:16:34.833Z",
+          "LastModifiedDate": "2026-03-30T20:10:17.62Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-33871",
+          "VendorIDs": [
+            "GHSA-w9fj-cfpg-grvv"
+          ],
+          "PkgName": "io.netty:netty-codec-http2",
+          "PkgPath": "liquibase/internal/extensions/liquibase-commercial-cassandra.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/io.netty/netty-codec-http2@4.2.6.Final",
+            "UID": "a1f7cb63006a6f0c"
+          },
+          "InstalledVersion": "4.2.6.Final",
+          "FixedVersion": "4.1.132.Final, 4.2.11.Final",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:6899517c60a5b1ee7434f95fd3a38bfe52e4b387b92bf1b5309e2085f4b76e55",
+            "DiffID": "sha256:9d560d698db28fddb19982d7ead8e849baec110bc95778bb86d53d43ddcde5bb"
+          },
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-33871",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:5f8ab40baa4893eb9beb33fd0c3719eb492997def0cda152a68991417f90500a",
+          "Title": "netty: Netty: Denial of Service via HTTP/2 CONTINUATION frame flood",
+          "Description": "Netty is an asynchronous, event-driven network application framework. In versions prior to 4.1.132.Final and 4.2.10.Final, a remote user can trigger a Denial of Service (DoS) against a Netty HTTP/2 server by sending a flood of `CONTINUATION` frames. The server's lack of a limit on the number of `CONTINUATION` frames, combined with a bypass of existing size-based mitigations using zero-byte frames, allows an user to cause excessive CPU consumption with minimal bandwidth, rendering the server unresponsive. Versions 4.1.132.Final and 4.2.10.Final fix the issue.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-770"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "nvd": 3,
+            "redhat": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N",
+              "V40Score": 8.7
+            },
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2026-33871",
+            "https://github.com/netty/netty",
+            "https://github.com/netty/netty/security/advisories/GHSA-w9fj-cfpg-grvv",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-33871",
+            "https://www.cve.org/CVERecord?id=CVE-2026-33871"
+          ],
+          "PublishedDate": "2026-03-27T20:16:34.833Z",
+          "LastModifiedDate": "2026-03-30T20:10:17.62Z"
         }
       ]
     },
@@ -15749,11 +16096,12 @@
           "Severity": "HIGH",
           "VendorSeverity": {
             "alma": 3,
-            "amazon": 2,
+            "amazon": 3,
             "azure": 3,
             "bitnami": 3,
             "oracle-oval": 3,
-            "redhat": 3
+            "redhat": 3,
+            "rocky": 3
           },
           "CVSS": {
             "bitnami": {
@@ -15769,12 +16117,15 @@
             "https://access.redhat.com/errata/RHSA-2026:6383",
             "https://access.redhat.com/security/cve/CVE-2026-25679",
             "https://bugzilla.redhat.com/2445356",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2445356",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2026-25679",
             "https://errata.almalinux.org/9/ALSA-2026-6383.html",
+            "https://errata.rockylinux.org/RLSA-2026:7259",
             "https://go.dev/cl/752180",
             "https://go.dev/issue/77578",
             "https://groups.google.com/g/golang-announce/c/EdhZqrQ98hk",
             "https://linux.oracle.com/cve/CVE-2026-25679.html",
-            "https://linux.oracle.com/errata/ELSA-2026-7259.html",
+            "https://linux.oracle.com/errata/ELSA-2026-7992.html",
             "https://nvd.nist.gov/vuln/detail/CVE-2026-25679",
             "https://pkg.go.dev/vuln/GO-2026-4601",
             "https://www.cve.org/CVERecord?id=CVE-2026-25679"
