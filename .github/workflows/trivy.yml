@@ -129,6 +129,7 @@ jobs:
       upload_sarif: true
       sarif_category: ${{ matrix.image.name }}${{ matrix.image.suffix }}
       generate_sbom: true
+      vex_enabled: ${{ matrix.image.name == 'liquibase/liquibase-secure' }}
       build_logic_ref: main
     secrets: inherit
 
@@ -441,13 +442,15 @@ jobs:
           password: ${{ env.DOCKERHUB_TOKEN }}
 
       - name: Download VEX files for Scout
+        if: matrix.image.name == 'liquibase/liquibase-secure'
         run: |
           mkdir -p ./vex
           curl -sSfL "https://raw.githubusercontent.com/liquibase/vex-repo/main/pkg/maven/org.liquibase/liquibase-core/vex.openvex.json" \
             -o ./vex/liquibase-core.vex.json
           echo "VEX file downloaded: $(jq '.statements | length' ./vex/liquibase-core.vex.json) statements"
 
-      - name: Docker Scout
+      - name: Docker Scout (with VEX)
+        if: matrix.image.name == 'liquibase/liquibase-secure'
         uses: docker/scout-action@8910519cee8ac046f3ee99686b0dc6654d5ba1a7 # v1.20.3
         with:
           command: cves
@@ -462,16 +465,31 @@ jobs:
           only-vex-affected: true
           vex-author: "Liquibase Security Team"
 
+      - name: Docker Scout (without VEX)
+        if: matrix.image.name != 'liquibase/liquibase-secure'
+        uses: docker/scout-action@8910519cee8ac046f3ee99686b0dc6654d5ba1a7 # v1.20.3
+        with:
+          command: cves
+          image: "${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          write-comment: true
+          sarif-file: "scout-results.sarif"
+          summary: true
+          exit-code: true
+          only-severities: "critical,high"
+
       - name: Docker Scout JSON output
         if: always()
         run: |
-          docker scout cves \
-            --format json \
-            --output scout-results.json \
-            --only-severities critical,high \
-            --vex-location ./vex \
-            --only-vex-affected \
-            --vex-author "Liquibase Security Team" \
+          SCOUT_ARGS=(
+            --format json
+            --output scout-results.json
+            --only-severities critical,high
+          )
+          if [[ "${{ matrix.image.name }}" == "liquibase/liquibase-secure" ]]; then
+            SCOUT_ARGS+=(--vex-location ./vex --only-vex-affected --vex-author "Liquibase Security Team")
+          fi
+          docker scout cves "${SCOUT_ARGS[@]}" \
             "${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}" || true
 
       - name: Upload Scout JSON results
