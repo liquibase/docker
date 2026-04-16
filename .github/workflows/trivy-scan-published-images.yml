@@ -56,7 +56,9 @@ jobs:
       fail_on_vulnerabilities: false
       upload_sarif: false
       generate_sbom: true
+      vex_enabled: ${{ contains(matrix.image, 'liquibase-secure') }}
       build_logic_ref: main
+    secrets: inherit
 
   persist-results:
     name: Persist Scan Results
