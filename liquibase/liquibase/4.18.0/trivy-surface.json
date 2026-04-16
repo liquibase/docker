@@ -3,8 +3,8 @@
   "Trivy": {
     "Version": "0.69.3"
   },
-  "ReportID": "019d6cc1-82bc-70f6-ad64-52a0308eaad1",
-  "CreatedAt": "2026-04-08T11:01:54.492065326Z",
+  "ReportID": "019d949a-fd80-7e60-883b-bc0b7abfdaf9",
+  "CreatedAt": "2026-04-16T04:44:38.656943387Z",
   "ArtifactID": "sha256:0a920cf9fa3141f7133fb9e7f55d111c14a01d6674cbadbd6086bb8d27c82ea5",
   "ArtifactName": "liquibase/liquibase:4.18.0",
   "ArtifactType": "container_image",
@@ -14207,7 +14207,6 @@
       "Type": "jar",
       "Packages": [
         {
-          "ID": "com.github.jsqlparser:jsqlparser@4.5",
           "Name": "com.github.jsqlparser:jsqlparser",
           "Identifier": {
             "PURL": "pkg:maven/com.github.jsqlparser/jsqlparser@4.5",
@@ -14222,7 +14221,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.h2database:h2@2.1.214",
           "Name": "com.h2database:h2",
           "Identifier": {
             "PURL": "pkg:maven/com.h2database/h2@2.1.214",
@@ -14237,7 +14235,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.ibm.db2:jcc@11.5.8.0",
           "Name": "com.ibm.db2:jcc",
           "Identifier": {
             "PURL": "pkg:maven/com.ibm.db2/jcc@11.5.8.0",
@@ -14252,7 +14249,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.microsoft.sqlserver:mssql-jdbc@11.2.1",
           "Name": "com.microsoft.sqlserver:mssql-jdbc",
           "Identifier": {
             "PURL": "pkg:maven/com.microsoft.sqlserver/mssql-jdbc@11.2.1",
@@ -14267,7 +14263,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.microsoft.sqlserver:mssql-jdbc@11.2.1.jre8",
           "Name": "com.microsoft.sqlserver:mssql-jdbc",
           "Identifier": {
             "PURL": "pkg:maven/com.microsoft.sqlserver/mssql-jdbc@11.2.1.jre8",
@@ -14282,7 +14277,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.opencsv:opencsv@5.7.1",
           "Name": "com.opencsv:opencsv",
           "Identifier": {
             "PURL": "pkg:maven/com.opencsv/opencsv@5.7.1",
@@ -14297,7 +14291,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "com.oracle.database.jdbc:ojdbc8@21.7.0.0",
           "Name": "com.oracle.database.jdbc:ojdbc8",
           "Identifier": {
             "PURL": "pkg:maven/com.oracle.database.jdbc/ojdbc8@21.7.0.0",
@@ -14312,7 +14305,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "info.picocli:picocli@4.7.0",
           "Name": "info.picocli:picocli",
           "Identifier": {
             "PURL": "pkg:maven/info.picocli/picocli@4.7.0",
@@ -14327,7 +14319,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "javax.resource:connector-api@1.5",
           "Name": "javax.resource:connector-api",
           "Identifier": {
             "PURL": "pkg:maven/javax.resource/connector-api@1.5",
@@ -14342,7 +14333,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "javax.xml.bind:jaxb-api@2.3.1",
           "Name": "javax.xml.bind:jaxb-api",
           "Identifier": {
             "PURL": "pkg:maven/javax.xml.bind/jaxb-api@2.3.1",
@@ -14357,7 +14347,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "net.snowflake:snowflake-jdbc@3.13.22",
           "Name": "net.snowflake:snowflake-jdbc",
           "Identifier": {
             "PURL": "pkg:maven/net.snowflake/snowflake-jdbc@3.13.22",
@@ -14372,7 +14361,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "one.gfw:jaxb-api@2.3.1",
           "Name": "one.gfw:jaxb-api",
           "Identifier": {
             "PURL": "pkg:maven/one.gfw/jaxb-api@2.3.1",
@@ -14387,7 +14375,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.apache.commons:commons-collections4@4.4",
           "Name": "org.apache.commons:commons-collections4",
           "Identifier": {
             "PURL": "pkg:maven/org.apache.commons/commons-collections4@4.4",
@@ -14402,7 +14389,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.apache.commons:commons-lang3@3.12.0",
           "Name": "org.apache.commons:commons-lang3",
           "Identifier": {
             "PURL": "pkg:maven/org.apache.commons/commons-lang3@3.12.0",
@@ -14417,7 +14403,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.apache.commons:commons-text@1.10.0",
           "Name": "org.apache.commons:commons-text",
           "Identifier": {
             "PURL": "pkg:maven/org.apache.commons/commons-text@1.10.0",
@@ -14432,7 +14417,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.firebirdsql.jdbc:jaybird@4.0.6.java8",
           "Name": "org.firebirdsql.jdbc:jaybird",
           "Identifier": {
             "PURL": "pkg:maven/org.firebirdsql.jdbc/jaybird@4.0.6.java8",
@@ -14447,7 +14431,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.glassfish.jaxb:jaxb-core@4.0.1",
           "Name": "org.glassfish.jaxb:jaxb-core",
           "Identifier": {
             "PURL": "pkg:maven/org.glassfish.jaxb/jaxb-core@4.0.1",
@@ -14462,7 +14445,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.glassfish.jaxb:jaxb-runtime@4.0.1",
           "Name": "org.glassfish.jaxb:jaxb-runtime",
           "Identifier": {
             "PURL": "pkg:maven/org.glassfish.jaxb/jaxb-runtime@4.0.1",
@@ -14477,7 +14459,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.hsqldb:hsqldb@2.7.1",
           "Name": "org.hsqldb:hsqldb",
           "Identifier": {
             "PURL": "pkg:maven/org.hsqldb/hsqldb@2.7.1",
@@ -14492,7 +14473,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.liquibase:liquibase-commercial@4.18.0",
           "Name": "org.liquibase:liquibase-commercial",
           "Identifier": {
             "PURL": "pkg:maven/org.liquibase/liquibase-commercial@4.18.0",
@@ -14507,7 +14487,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.liquibase:liquibase-core@4.18.0",
           "Name": "org.liquibase:liquibase-core",
           "Identifier": {
             "PURL": "pkg:maven/org.liquibase/liquibase-core@4.18.0",
@@ -14522,7 +14501,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.mariadb.jdbc:mariadb-java-client@3.0.8",
           "Name": "org.mariadb.jdbc:mariadb-java-client",
           "Identifier": {
             "PURL": "pkg:maven/org.mariadb.jdbc/mariadb-java-client@3.0.8",
@@ -14537,7 +14515,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.postgresql:postgresql@42.5.1",
           "Name": "org.postgresql:postgresql",
           "Identifier": {
             "PURL": "pkg:maven/org.postgresql/postgresql@42.5.1",
@@ -14552,7 +14529,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.xerial:sqlite-jdbc@3.39.4.0",
           "Name": "org.xerial:sqlite-jdbc",
           "Identifier": {
             "PURL": "pkg:maven/org.xerial/sqlite-jdbc@3.39.4.0",
@@ -14567,7 +14543,6 @@
           "AnalyzedBy": "jar"
         },
         {
-          "ID": "org.yaml:snakeyaml@1.33",
           "Name": "org.yaml:snakeyaml",
           "Identifier": {
             "PURL": "pkg:maven/org.yaml/snakeyaml@1.33",
@@ -14642,6 +14617,132 @@
           ],
           "PublishedDate": "2022-11-23T21:15:11.36Z",
           "LastModifiedDate": "2024-11-21T07:29:52.05Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2025-59250",
+          "VendorIDs": [
+            "GHSA-m494-w24q-6f7w"
+          ],
+          "PkgName": "com.microsoft.sqlserver:mssql-jdbc",
+          "PkgPath": "liquibase/internal/lib/mssql-jdbc.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/com.microsoft.sqlserver/mssql-jdbc@11.2.1",
+            "UID": "8a9bdd73ddbbd124"
+          },
+          "InstalledVersion": "11.2.1",
+          "FixedVersion": "10.2.4.jre11, 11.2.4.jre11, 12.2.1.jre11, 12.6.5.jre11, 12.8.2.jre11, 12.10.2.jre11, 13.2.1.jre11",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:77ad58fcda23495ea7464cdf7fa93a8598cdc83c9508c0da95cf0ae9a9389055",
+            "DiffID": "sha256:24499535a39d9db1ad7043ce672ae88173e4ebaadf5ea3e671a4d6938b9401d1"
+          },
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2025-59250",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:0005d248e0e7efed85d795bde68c46f5172b89f88b1d916b5520bb40d18a8005",
+          "Title": "JDBC Driver for SQL Server has improper input validation issue",
+          "Description": "Improper input validation in JDBC Driver for SQL Server allows an unauthorized attacker to perform spoofing over a network.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-20"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "nvd": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:N",
+              "V3Score": 8.1
+            },
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:N",
+              "V3Score": 8.1
+            }
+          },
+          "References": [
+            "https://github.com/microsoft/mssql-jdbc",
+            "https://github.com/microsoft/mssql-jdbc/blob/main/CHANGELOG.md",
+            "https://github.com/microsoft/mssql-jdbc/commit/9732e1bbc6ec44166fda2cddab31ce1c86c873dd#diff-45367b99a1951943bfecfc7765e80df687967aa56286a5b2e039f77cd9a0e118",
+            "https://github.com/microsoft/mssql-jdbc/pull/2798",
+            "https://github.com/microsoft/mssql-jdbc/pull/2800",
+            "https://github.com/microsoft/mssql-jdbc/pull/2801",
+            "https://github.com/microsoft/mssql-jdbc/pull/2802",
+            "https://github.com/microsoft/mssql-jdbc/pull/2803",
+            "https://github.com/microsoft/mssql-jdbc/pull/2807",
+            "https://learn.microsoft.com/en-us/sql/connect/jdbc/microsoft-jdbc-driver-for-sql-server-support-matrix",
+            "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-59250",
+            "https://nvd.nist.gov/vuln/detail/CVE-2025-59250"
+          ],
+          "PublishedDate": "2025-10-14T17:16:07.24Z",
+          "LastModifiedDate": "2025-10-30T16:35:42.213Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2025-59250",
+          "VendorIDs": [
+            "GHSA-m494-w24q-6f7w"
+          ],
+          "PkgName": "com.microsoft.sqlserver:mssql-jdbc",
+          "PkgPath": "liquibase/internal/lib/mssql-jdbc.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/com.microsoft.sqlserver/mssql-jdbc@11.2.1.jre8",
+            "UID": "3c95dc43f8228d22"
+          },
+          "InstalledVersion": "11.2.1.jre8",
+          "FixedVersion": "10.2.4.jre11, 11.2.4.jre11, 12.2.1.jre11, 12.6.5.jre11, 12.8.2.jre11, 12.10.2.jre11, 13.2.1.jre11",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:77ad58fcda23495ea7464cdf7fa93a8598cdc83c9508c0da95cf0ae9a9389055",
+            "DiffID": "sha256:24499535a39d9db1ad7043ce672ae88173e4ebaadf5ea3e671a4d6938b9401d1"
+          },
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2025-59250",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:0005d248e0e7efed85d795bde68c46f5172b89f88b1d916b5520bb40d18a8005",
+          "Title": "JDBC Driver for SQL Server has improper input validation issue",
+          "Description": "Improper input validation in JDBC Driver for SQL Server allows an unauthorized attacker to perform spoofing over a network.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-20"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "nvd": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:N",
+              "V3Score": 8.1
+            },
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:N",
+              "V3Score": 8.1
+            }
+          },
+          "References": [
+            "https://github.com/microsoft/mssql-jdbc",
+            "https://github.com/microsoft/mssql-jdbc/blob/main/CHANGELOG.md",
+            "https://github.com/microsoft/mssql-jdbc/commit/9732e1bbc6ec44166fda2cddab31ce1c86c873dd#diff-45367b99a1951943bfecfc7765e80df687967aa56286a5b2e039f77cd9a0e118",
+            "https://github.com/microsoft/mssql-jdbc/pull/2798",
+            "https://github.com/microsoft/mssql-jdbc/pull/2800",
+            "https://github.com/microsoft/mssql-jdbc/pull/2801",
+            "https://github.com/microsoft/mssql-jdbc/pull/2802",
+            "https://github.com/microsoft/mssql-jdbc/pull/2803",
+            "https://github.com/microsoft/mssql-jdbc/pull/2807",
+            "https://learn.microsoft.com/en-us/sql/connect/jdbc/microsoft-jdbc-driver-for-sql-server-support-matrix",
+            "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2025-59250",
+            "https://nvd.nist.gov/vuln/detail/CVE-2025-59250"
+          ],
+          "PublishedDate": "2025-10-14T17:16:07.24Z",
+          "LastModifiedDate": "2025-10-30T16:35:42.213Z"
         },
         {
           "VulnerabilityID": "CVE-2023-30535",
@@ -15358,7 +15459,7 @@
           "Severity": "CRITICAL",
           "VendorSeverity": {
             "alma": 2,
-            "amazon": 2,
+            "amazon": 3,
             "bitnami": 4,
             "cbl-mariner": 4,
             "nvd": 4,
@@ -15783,6 +15884,7 @@
             "https://ubuntu.com/security/notices/USN-7111-1",
             "https://ubuntu.com/security/notices/USN-8089-1",
             "https://ubuntu.com/security/notices/USN-8089-2",
+            "https://ubuntu.com/security/notices/USN-8089-3",
             "https://vuln.go.dev/ID/GO-2023-1571.json",
             "https://www.couchbase.com/alerts",
             "https://www.couchbase.com/alerts/",
@@ -16340,7 +16442,7 @@
           ],
           "VendorSeverity": {
             "alma": 2,
-            "amazon": 3,
+            "amazon": 2,
             "azure": 3,
             "bitnami": 3,
             "cbl-mariner": 3,
@@ -17720,11 +17822,12 @@
           "Severity": "HIGH",
           "VendorSeverity": {
             "alma": 3,
-            "amazon": 2,
+            "amazon": 3,
             "azure": 3,
             "bitnami": 3,
             "oracle-oval": 3,
-            "redhat": 3
+            "redhat": 3,
+            "rocky": 3
           },
           "CVSS": {
             "bitnami": {
@@ -17740,18 +17843,120 @@
             "https://access.redhat.com/errata/RHSA-2026:6383",
             "https://access.redhat.com/security/cve/CVE-2026-25679",
             "https://bugzilla.redhat.com/2445356",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2445356",
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2026-25679",
             "https://errata.almalinux.org/9/ALSA-2026-6383.html",
+            "https://errata.rockylinux.org/RLSA-2026:7259",
             "https://go.dev/cl/752180",
             "https://go.dev/issue/77578",
             "https://groups.google.com/g/golang-announce/c/EdhZqrQ98hk",
             "https://linux.oracle.com/cve/CVE-2026-25679.html",
-            "https://linux.oracle.com/errata/ELSA-2026-6388.html",
+            "https://linux.oracle.com/errata/ELSA-2026-7992.html",
             "https://nvd.nist.gov/vuln/detail/CVE-2026-25679",
             "https://pkg.go.dev/vuln/GO-2026-4601",
             "https://www.cve.org/CVERecord?id=CVE-2026-25679"
           ],
           "PublishedDate": "2026-03-06T22:16:00.72Z",
           "LastModifiedDate": "2026-03-10T18:18:37.74Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-32280",
+          "VendorIDs": [
+            "GO-2026-4947"
+          ],
+          "PkgID": "stdlib@v1.19.3",
+          "PkgName": "stdlib",
+          "PkgIdentifier": {
+            "PURL": "pkg:golang/stdlib@v1.19.3",
+            "UID": "b4048a3de0a85a57"
+          },
+          "InstalledVersion": "v1.19.3",
+          "FixedVersion": "1.25.9, 1.26.2",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:6c3617ce295136d2dfe38e28580ed901a25cead9b99457bb3b8578b1dbd5cf96",
+            "DiffID": "sha256:5cbdd2acf1dd65c4c8fa89778dbce88f30c7270a38cb4de543954bf1827c3c17"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-32280",
+          "DataSource": {
+            "ID": "govulndb",
+            "Name": "The Go Vulnerability Database",
+            "URL": "https://pkg.go.dev/vuln/"
+          },
+          "Fingerprint": "sha256:c3f3c153c8695c3eb2bf6d8baef13aad61ba525eb31a8ef49683e0b0d9b97d60",
+          "Title": "During chain building, the amount of work that is done is not correctl ...",
+          "Description": "During chain building, the amount of work that is done is not correctly limited when a large number of intermediate certificates are passed in VerifyOptions.Intermediates, which can lead to a denial of service. This affects both direct users of crypto/x509 and users of crypto/tls.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-770"
+          ],
+          "VendorSeverity": {
+            "bitnami": 3
+          },
+          "CVSS": {
+            "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://go.dev/cl/758320",
+            "https://go.dev/issue/78282",
+            "https://groups.google.com/g/golang-announce/c/0uYbvbPZRWU",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-32280",
+            "https://pkg.go.dev/vuln/GO-2026-4947"
+          ],
+          "PublishedDate": "2026-04-08T02:16:03.247Z",
+          "LastModifiedDate": "2026-04-08T21:26:35.91Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-32282",
+          "VendorIDs": [
+            "GO-2026-4864"
+          ],
+          "PkgID": "stdlib@v1.19.3",
+          "PkgName": "stdlib",
+          "PkgIdentifier": {
+            "PURL": "pkg:golang/stdlib@v1.19.3",
+            "UID": "b4048a3de0a85a57"
+          },
+          "InstalledVersion": "v1.19.3",
+          "FixedVersion": "1.25.9, 1.26.2",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:6c3617ce295136d2dfe38e28580ed901a25cead9b99457bb3b8578b1dbd5cf96",
+            "DiffID": "sha256:5cbdd2acf1dd65c4c8fa89778dbce88f30c7270a38cb4de543954bf1827c3c17"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-32282",
+          "DataSource": {
+            "ID": "govulndb",
+            "Name": "The Go Vulnerability Database",
+            "URL": "https://pkg.go.dev/vuln/"
+          },
+          "Fingerprint": "sha256:168177e28867b7807ffcc96309f32d52deb188f0a5f42be9b9be5f3e0412497b",
+          "Title": "golang: internal/syscall/unix: Root.Chmod can follow symlinks out of the root",
+          "Description": "On Linux, if the target of Root.Chmod is replaced with a symlink while the chmod operation is in progress, Chmod can operate on the target of the symlink, even when the target lies outside the root. The Linux fchmodat syscall silently ignores the AT_SYMLINK_NOFOLLOW flag, which Root.Chmod uses to avoid symlink traversal. Root.Chmod checks its target before acting and returns an error if the target is a symlink lying outside the root, so the impact is limited to cases where the target is replaced with a symlink between the check and operation.",
+          "Severity": "HIGH",
+          "VendorSeverity": {
+            "redhat": 2
+          },
+          "CVSS": {
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:C/C:H/I:H/A:H",
+              "V3Score": 7.8
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2026-32282",
+            "https://go.dev/cl/763761",
+            "https://go.dev/issue/78293",
+            "https://groups.google.com/g/golang-announce/c/0uYbvbPZRWU",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-32282",
+            "https://pkg.go.dev/vuln/GO-2026-4864",
+            "https://www.cve.org/CVERecord?id=CVE-2026-32282"
+          ],
+          "PublishedDate": "2026-04-08T02:16:03.467Z",
+          "LastModifiedDate": "2026-04-13T19:16:39.807Z"
         }
       ]
     }
