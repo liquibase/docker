@@ -3,8 +3,8 @@
   "Trivy": {
     "Version": "0.69.3"
   },
-  "ReportID": "019d94e5-0362-7bd3-ace3-436b24302f96",
-  "CreatedAt": "2026-04-16T06:05:29.826776205Z",
+  "ReportID": "019d94f8-e004-7501-95ce-23e881a93df4",
+  "CreatedAt": "2026-04-16T06:27:11.492329089Z",
   "ArtifactID": "sha256:176b2facc69b5d6abc2ce362a642d232d93f5e82c6a7756b17a0e7a722591a3b",
   "ArtifactName": "liquibase/liquibase-secure:5.1.0",
   "ArtifactType": "container_image",
@@ -15709,107 +15709,6 @@
             "DiffID": "sha256:f0a3ef111c423edf26b7e94aa7809247c58b9df4fac058b31320b7762f0b55b9"
           },
           "AnalyzedBy": "gobinary"
-        }
-      ],
-      "Vulnerabilities": [
-        {
-          "VulnerabilityID": "CVE-2026-32280",
-          "VendorIDs": [
-            "GO-2026-4947"
-          ],
-          "PkgID": "stdlib@v1.25.7",
-          "PkgName": "stdlib",
-          "PkgIdentifier": {
-            "PURL": "pkg:golang/stdlib@v1.25.7",
-            "UID": "4083889a23f61dd5"
-          },
-          "InstalledVersion": "v1.25.7",
-          "FixedVersion": "1.25.9, 1.26.2",
-          "Status": "fixed",
-          "Layer": {
-            "Digest": "sha256:04cd10a590865fd9e88b8e0eb00f117adfba9b7db6ab09328d3687b20aa281a7",
-            "DiffID": "sha256:f0a3ef111c423edf26b7e94aa7809247c58b9df4fac058b31320b7762f0b55b9"
-          },
-          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-32280",
-          "DataSource": {
-            "ID": "govulndb",
-            "Name": "The Go Vulnerability Database",
-            "URL": "https://pkg.go.dev/vuln/"
-          },
-          "Fingerprint": "sha256:6a43b6934a42cc4aeb5b8d2a70754ffcca1fa0b158c3b7a505a89a16b30aa583",
-          "Title": "During chain building, the amount of work that is done is not correctl ...",
-          "Description": "During chain building, the amount of work that is done is not correctly limited when a large number of intermediate certificates are passed in VerifyOptions.Intermediates, which can lead to a denial of service. This affects both direct users of crypto/x509 and users of crypto/tls.",
-          "Severity": "HIGH",
-          "CweIDs": [
-            "CWE-770"
-          ],
-          "VendorSeverity": {
-            "bitnami": 3
-          },
-          "CVSS": {
-            "bitnami": {
-              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
-              "V3Score": 7.5
-            }
-          },
-          "References": [
-            "https://go.dev/cl/758320",
-            "https://go.dev/issue/78282",
-            "https://groups.google.com/g/golang-announce/c/0uYbvbPZRWU",
-            "https://nvd.nist.gov/vuln/detail/CVE-2026-32280",
-            "https://pkg.go.dev/vuln/GO-2026-4947"
-          ],
-          "PublishedDate": "2026-04-08T02:16:03.247Z",
-          "LastModifiedDate": "2026-04-08T21:26:35.91Z"
-        },
-        {
-          "VulnerabilityID": "CVE-2026-32282",
-          "VendorIDs": [
-            "GO-2026-4864"
-          ],
-          "PkgID": "stdlib@v1.25.7",
-          "PkgName": "stdlib",
-          "PkgIdentifier": {
-            "PURL": "pkg:golang/stdlib@v1.25.7",
-            "UID": "4083889a23f61dd5"
-          },
-          "InstalledVersion": "v1.25.7",
-          "FixedVersion": "1.25.9, 1.26.2",
-          "Status": "fixed",
-          "Layer": {
-            "Digest": "sha256:04cd10a590865fd9e88b8e0eb00f117adfba9b7db6ab09328d3687b20aa281a7",
-            "DiffID": "sha256:f0a3ef111c423edf26b7e94aa7809247c58b9df4fac058b31320b7762f0b55b9"
-          },
-          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-32282",
-          "DataSource": {
-            "ID": "govulndb",
-            "Name": "The Go Vulnerability Database",
-            "URL": "https://pkg.go.dev/vuln/"
-          },
-          "Fingerprint": "sha256:ddce3e1ebb442bc9f2728ba49cc1ef1afa807375ccc927a55d15c694ebc313ba",
-          "Title": "golang: internal/syscall/unix: Root.Chmod can follow symlinks out of the root",
-          "Description": "On Linux, if the target of Root.Chmod is replaced with a symlink while the chmod operation is in progress, Chmod can operate on the target of the symlink, even when the target lies outside the root. The Linux fchmodat syscall silently ignores the AT_SYMLINK_NOFOLLOW flag, which Root.Chmod uses to avoid symlink traversal. Root.Chmod checks its target before acting and returns an error if the target is a symlink lying outside the root, so the impact is limited to cases where the target is replaced with a symlink between the check and operation.",
-          "Severity": "HIGH",
-          "VendorSeverity": {
-            "redhat": 2
-          },
-          "CVSS": {
-            "redhat": {
-              "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:C/C:H/I:H/A:H",
-              "V3Score": 7.8
-            }
-          },
-          "References": [
-            "https://access.redhat.com/security/cve/CVE-2026-32282",
-            "https://go.dev/cl/763761",
-            "https://go.dev/issue/78293",
-            "https://groups.google.com/g/golang-announce/c/0uYbvbPZRWU",
-            "https://nvd.nist.gov/vuln/detail/CVE-2026-32282",
-            "https://pkg.go.dev/vuln/GO-2026-4864",
-            "https://www.cve.org/CVERecord?id=CVE-2026-32282"
-          ],
-          "PublishedDate": "2026-04-08T02:16:03.467Z",
-          "LastModifiedDate": "2026-04-13T19:16:39.807Z"
         }
       ]
     }
