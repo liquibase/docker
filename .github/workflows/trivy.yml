@@ -36,512 +36,63 @@ permissions:
 
 jobs:
   # ============================================
-  # BUILD AND PUSH TO GHCR
+  # SCAN: community (Dockerfile)
   # ============================================
-  build:
-    strategy:
-      fail-fast: false
-      matrix:
-        image:
-          [
-            {
-              dockerfile: Dockerfile,
-              name: liquibase/liquibase,
-              suffix: "",
-              ghcr_name: community,
-            },
-            {
-              dockerfile: Dockerfile.alpine,
-              name: liquibase/liquibase,
-              suffix: "-alpine",
-              ghcr_name: alpine,
-            },
-            {
-              dockerfile: DockerfileSecure,
-              name: liquibase/liquibase-secure,
-              suffix: "",
-              ghcr_name: secure,
-            },
-          ]
-    name: Build ${{ matrix.image.name }}${{ matrix.image.suffix }}
-    runs-on: "ubuntu-22.04"
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
-
-      - name: Login to GHCR
-        uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2 # v4.0.0
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push to GHCR
-        uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294 # v7.0.0
-        with:
-          context: .
-          file: ${{ matrix.image.dockerfile }}
-          push: true
-          tags: ghcr.io/${{ github.repository }}/liquibase-${{ matrix.image.ghcr_name }}:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-  # ============================================
-  # VULNERABILITY SCAN (REUSABLE WORKFLOW)
-  # ============================================
-  vulnerability-scan:
-    needs: build
-    strategy:
-      fail-fast: false
-      matrix:
-        image:
-          [
-            {
-              dockerfile: Dockerfile,
-              name: liquibase/liquibase,
-              suffix: "",
-              ghcr_name: community,
-            },
-            {
-              dockerfile: Dockerfile.alpine,
-              name: liquibase/liquibase,
-              suffix: "-alpine",
-              ghcr_name: alpine,
-            },
-            {
-              dockerfile: DockerfileSecure,
-              name: liquibase/liquibase-secure,
-              suffix: "",
-              ghcr_name: secure,
-            },
-          ]
-    name: Scan ${{ matrix.image.name }}${{ matrix.image.suffix }}
-    uses: liquibase/build-logic/.github/workflows/reusable-vulnerability-scan.yml@main
+  scan-community:
+    name: Scan liquibase/liquibase
+    uses: liquibase/build-logic/.github/workflows/reusable-docker-scan.yml@dat-22876-reusables
     with:
-      mode: docker
-      source: ghcr.io/${{ github.repository }}/liquibase-${{ matrix.image.ghcr_name }}:${{ github.sha }}
-      image_name: ${{ matrix.image.name }}
-      image_tag: ${{ matrix.image.suffix != '' && matrix.image.suffix || 'latest' }}
-      fail_on_vulnerabilities: true
+      dockerfile_path: Dockerfile
+      image_name: liquibase/liquibase
+      suffix: ""
+      vex_enabled: false
       upload_sarif: true
-      sarif_category: ${{ matrix.image.name }}${{ matrix.image.suffix }}
-      generate_sbom: true
-      vex_enabled: ${{ matrix.image.name == 'liquibase/liquibase-secure' }}
-      build_logic_ref: main
+      dispatch_new_cves: true
+      scout_enabled: true
+      build_logic_ref: dat-22876-reusables
     secrets: inherit
 
   # ============================================
-  # DISPATCH NEW CVEs FOR INVESTIGATION
+  # SCAN: alpine (Dockerfile.alpine)
   # ============================================
-  dispatch-new-cves:
-    needs: [vulnerability-scan]
-    if: always() && github.event_name != 'pull_request' && needs.vulnerability-scan.result != 'cancelled'
-    continue-on-error: true
-    strategy:
-      fail-fast: false
-      matrix:
-        image:
-          [
-            {
-              dockerfile: Dockerfile,
-              name: liquibase/liquibase,
-              suffix: "",
-              ghcr_name: community,
-            },
-            {
-              dockerfile: Dockerfile.alpine,
-              name: liquibase/liquibase,
-              suffix: "-alpine",
-              ghcr_name: alpine,
-            },
-            {
-              dockerfile: DockerfileSecure,
-              name: liquibase/liquibase-secure,
-              suffix: "",
-              ghcr_name: secure,
-            },
-          ]
-    name: Dispatch CVEs ${{ matrix.image.name }}${{ matrix.image.suffix }}
-    runs-on: ubuntu-22.04
-    permissions:
-      actions: read
-      contents: read
-      id-token: write
-    steps:
-      - name: Checkout build-logic
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          repository: liquibase/build-logic
-          path: build-logic
-
-      - name: Resolve artifact name
-        id: artifact-name
-        env:
-          IMAGE_NAME: ${{ matrix.image.name }}
-          IMAGE_SUFFIX: ${{ matrix.image.suffix }}
-        run: |
-          # image_tag for display/dispatch (stripped of leading dash)
-          IMAGE_TAG="${IMAGE_SUFFIX#-}"
-          IMAGE_TAG="${IMAGE_TAG:-latest}"
-          # Artifact name must match what the reusable workflow uploads.
-          # The reusable workflow receives image_tag = suffix || 'latest' (raw, with leading dash for alpine),
-          # so use the raw suffix for artifact lookup to avoid single-dash vs double-dash mismatch.
-          RAW_IMAGE_TAG="${IMAGE_SUFFIX:-latest}"
-          SAFE_NAME=$(echo "$IMAGE_NAME" | tr '/' '-')
-          SAFE_TAG=$(echo "$RAW_IMAGE_TAG" | tr '/' '-')
-          echo "artifact=vulnerability-report-${SAFE_NAME}-${SAFE_TAG}" >> "$GITHUB_OUTPUT"
-          echo "image_tag=${IMAGE_TAG}" >> "$GITHUB_OUTPUT"
-
-      - name: Download scan artifact
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
-        with:
-          name: ${{ steps.artifact-name.outputs.artifact }}
-          path: scan-artifacts
-        continue-on-error: true
-
-      - name: Configure AWS credentials for vault access
-        uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7 # v6.0.0
-        with:
-          role-to-assume: ${{ secrets.LIQUIBASE_VAULT_OIDC_ROLE_ARN }}
-          aws-region: us-east-1
-        continue-on-error: true
-
-      - name: Get secrets from vault
-        id: vault-secrets
-        uses: aws-actions/aws-secretsmanager-get-secrets@a9a7eb4e2f2871d30dc5b892576fde60a2ecc802 # v2.0.10
-        with:
-          secret-ids: |
-            ,/vault/liquibase
-          parse-json-secrets: true
-        continue-on-error: true
-
-      - name: Get GitHub App token for liquibase-pro
-        id: get-token
-        uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349 # v2.2.2
-        with:
-          app-id: ${{ env.LIQUIBASE_GITHUB_APP_ID }}
-          private-key: ${{ env.LIQUIBASE_GITHUB_APP_PRIVATE_KEY }}
-          owner: liquibase
-          repositories: liquibase-pro
-          permission-actions: write
-          permission-contents: read
-        continue-on-error: true
-
-      - name: Dispatch new CVEs for investigation
-        continue-on-error: true
-        env:
-          GH_TOKEN: ${{ steps.get-token.outputs.token }}
-          SCAN_DIR: ${{ github.workspace }}/scan-artifacts
-          IMAGE_NAME: ${{ matrix.image.name }}
-          IMAGE_TAG: ${{ steps.artifact-name.outputs.image_tag }}
-          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        run: |
-          set +e  # Never fail the parent workflow
-
-          IMAGE_OR_VERSION="${IMAGE_NAME}:${IMAGE_TAG}"
-          DISPATCH_LABEL="${IMAGE_NAME}:${IMAGE_TAG}"
-
-          if [ -z "$GH_TOKEN" ]; then
-            echo "::warning::CVE dispatch skipped -- GitHub App token unavailable (vault step may have failed)"
-            echo "## CVE Investigation Dispatch (${DISPATCH_LABEL})" >> "$GITHUB_STEP_SUMMARY"
-            echo "Skipped -- GitHub App token unavailable." >> "$GITHUB_STEP_SUMMARY"
-            exit 0
-          fi
-
-          if [ ! -d "$SCAN_DIR" ] || [ -z "$(ls -A "$SCAN_DIR" 2>/dev/null)" ]; then
-            echo "::warning::CVE dispatch skipped -- no scan artifacts found"
-            echo "## CVE Investigation Dispatch (${DISPATCH_LABEL})" >> "$GITHUB_STEP_SUMMARY"
-            echo "Skipped -- scan artifacts not available." >> "$GITHUB_STEP_SUMMARY"
-            exit 0
-          fi
-
-          chmod +x build-logic/scripts/vulnerability-scanning/diff-new-cves.sh
-
-          BATCHES=$(build-logic/scripts/vulnerability-scanning/diff-new-cves.sh \
-            --scan-dir   "$SCAN_DIR" \
-            --source     docker \
-            --image-or-version "$IMAGE_OR_VERSION" \
-            --run-url    "$RUN_URL" \
-            2>/tmp/diff-err-$$.txt) || {
-            ERR=$(cat /tmp/diff-err-$$.txt 2>/dev/null || echo "unknown error")
-            echo "::warning::diff-new-cves.sh failed -- CVE dispatch skipped: $ERR"
-            echo "## CVE Investigation Dispatch (${DISPATCH_LABEL})" >> "$GITHUB_STEP_SUMMARY"
-            echo "Skipped -- diff-new-cves.sh exited with error: $ERR" >> "$GITHUB_STEP_SUMMARY"
-            rm -f "/tmp/diff-err-$$.txt"
-            exit 0
-          }
-          rm -f "/tmp/diff-err-$$.txt"
-
-          if [ -z "$BATCHES" ]; then
-            echo "No unassessed HIGH/CRITICAL CVEs found -- dispatch not needed."
-            echo "## CVE Investigation Dispatch (${DISPATCH_LABEL})" >> "$GITHUB_STEP_SUMMARY"
-            echo "No unassessed CVEs found -- nothing dispatched." >> "$GITHUB_STEP_SUMMARY"
-            exit 0
-          fi
-
-          BATCH_NUM=0
-          FAILED=0
-
-          echo "## CVE Investigation Dispatch (${DISPATCH_LABEL})" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-
-          while IFS= read -r batch_json; do
-            [ -z "$batch_json" ] && continue
-            BATCH_NUM=$((BATCH_NUM + 1))
-            CVE_COUNT=$(echo "$batch_json" | jq '.cves | length' 2>/dev/null || echo "?")
-
-            echo "Dispatching batch $BATCH_NUM ($CVE_COUNT CVEs) to investigate-cve workflow..."
-
-            if gh workflow run investigate-cve.lock.yml \
-                -R liquibase/liquibase-pro \
-                -f "cve_json=$batch_json" 2>/tmp/dispatch-err-$$.txt; then
-              echo "- Batch $BATCH_NUM: dispatched $CVE_COUNT CVEs" >> "$GITHUB_STEP_SUMMARY"
-              echo "  Batch $BATCH_NUM: OK ($CVE_COUNT CVEs)"
-            else
-              ERR=$(cat /tmp/dispatch-err-$$.txt 2>/dev/null || echo "unknown error")
-              echo "::warning::CVE dispatch batch $BATCH_NUM failed: $ERR"
-              echo "- Batch $BATCH_NUM: FAILED -- $ERR" >> "$GITHUB_STEP_SUMMARY"
-              FAILED=$((FAILED + 1))
-            fi
-            rm -f "/tmp/dispatch-err-$$.txt"
-          done <<< "$BATCHES"
-
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "**Total batches dispatched**: $BATCH_NUM ($FAILED failed)" >> "$GITHUB_STEP_SUMMARY"
-          echo "Dispatch complete: $BATCH_NUM batch(es), $FAILED failure(s)"
-          exit 0  # Never fail the parent workflow
+  scan-alpine:
+    name: Scan liquibase/liquibase-alpine
+    uses: liquibase/build-logic/.github/workflows/reusable-docker-scan.yml@dat-22876-reusables
+    with:
+      dockerfile_path: Dockerfile.alpine
+      image_name: liquibase/liquibase
+      suffix: "-alpine"
+      vex_enabled: false
+      upload_sarif: true
+      dispatch_new_cves: true
+      scout_enabled: true
+      build_logic_ref: dat-22876-reusables
+    secrets: inherit
 
   # ============================================
-  # CLEANUP GHCR IMAGES
+  # SCAN: secure (DockerfileSecure) — VEX enabled
   # ============================================
-  cleanup-ghcr:
-    needs: [vulnerability-scan]
-    if: always()
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        image:
-          [
-            { ghcr_name: community },
-            { ghcr_name: alpine },
-            { ghcr_name: secure },
-          ]
-    name: Cleanup ${{ matrix.image.ghcr_name }}
-    permissions:
-      packages: write
-    steps:
-      - name: Delete GHCR image
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          REPO_NAME="${{ github.event.repository.name }}"
-          PACKAGE_NAME="${REPO_NAME}/liquibase-${{ matrix.image.ghcr_name }}"
-          ENCODED_PACKAGE_NAME="${REPO_NAME}%2Fliquibase-${{ matrix.image.ghcr_name }}"
-          TAG="${{ github.sha }}"
-          VERSION_ID=$(gh api \
-            "/orgs/${{ github.repository_owner }}/packages/container/${ENCODED_PACKAGE_NAME}/versions" \
-            --jq ".[] | select(.metadata.container.tags[] == \"${TAG}\") | .id" 2>/dev/null || echo "")
-          if [ -n "$VERSION_ID" ]; then
-            gh api --method DELETE \
-              "/orgs/${{ github.repository_owner }}/packages/container/${ENCODED_PACKAGE_NAME}/versions/${VERSION_ID}"
-            echo "Deleted ${PACKAGE_NAME}:${TAG}"
-          else
-            echo "No version found for ${PACKAGE_NAME}:${TAG}, skipping"
-          fi
-
-  # ============================================
-  # SLACK NOTIFICATION ON FAILURE
-  # ============================================
-  notify-failure:
-    needs: [build, vulnerability-scan, cleanup-ghcr]
-    if: failure()
-    runs-on: "ubuntu-22.04"
-    steps:
-      - name: Configure AWS credentials for vault access
-        uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7 # v6.0.0
-        with:
-          role-to-assume: ${{ secrets.LIQUIBASE_VAULT_OIDC_ROLE_ARN }}
-          aws-region: us-east-1
-
-      - name: Get secrets from vault
-        uses: aws-actions/aws-secretsmanager-get-secrets@a9a7eb4e2f2871d30dc5b892576fde60a2ecc802 # v2.0.10
-        with:
-          secret-ids: |
-            ,/vault/liquibase
-          parse-json-secrets: true
-
-      - name: Notify Slack on Build Failure
-        uses: rtCamp/action-slack-notify@e31e87e03dd19038e411e38ae27cbad084a90661 # v2.3.3
-        env:
-          SLACK_COLOR: "failure"
-          SLACK_MESSAGE: "View details on GitHub Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Triggered by repository: ${{ github.repository }}"
-          SLACK_TITLE: "❌ ${{ github.repository }} ❌ Trivy failed on branch ${{ github.ref_name }} for commit ${{ github.sha }} in repository ${{ github.repository }}"
-          SLACK_USERNAME: liquibot
-          SLACK_WEBHOOK: ${{ env.DOCKER_SLACK_WEBHOOK_URL }}
-          SLACK_ICON_EMOJI: ":whale:"
-          SLACK_FOOTER: "${{ github.repository }}"
-          SLACK_LINK_NAMES: true
-
-  scout:
-    strategy:
-      fail-fast: false
-      matrix:
-        image:
-          [
-            { dockerfile: Dockerfile, name: liquibase/liquibase, suffix: "" },
-            {
-              dockerfile: Dockerfile.alpine,
-              name: liquibase/liquibase,
-              suffix: "-alpine",
-            },
-            {
-              dockerfile: DockerfileSecure,
-              name: liquibase/liquibase-secure,
-              suffix: "",
-            },
-          ]
-    name: Scout
-    runs-on: "ubuntu-22.04"
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
-
-      - name: Build ${{ matrix.image.name }}${{ matrix.image.suffix }} from Dockerfile
-        run: |
-          docker build -f ${{ matrix.image.dockerfile }} -t ${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }} .
-
-      - name: Configure AWS credentials for vault access
-        uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7 # v6.0.0
-        with:
-          role-to-assume: ${{ secrets.LIQUIBASE_VAULT_OIDC_ROLE_ARN }}
-          aws-region: us-east-1
-
-      - name: Get secrets from vault
-        id: vault-secrets
-        uses: aws-actions/aws-secretsmanager-get-secrets@a9a7eb4e2f2871d30dc5b892576fde60a2ecc802 # v2.0.10
-        with:
-          secret-ids: |
-            ,/vault/liquibase
-          parse-json-secrets: true
-
-      - name: Decode DOCKERHUB_USERNAME
-        run: |
-          decoded_username=$(echo "${{ env.DOCKERHUB_USERNAME }}" | base64 -d)
-          echo "DOCKERHUB_USERNAME_DECODED=$decoded_username" >> $GITHUB_ENV
-
-      - uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2 # v4.0.0
-        with:
-          username: ${{ env.DOCKERHUB_USERNAME_DECODED }}
-          password: ${{ env.DOCKERHUB_TOKEN }}
-
-      - name: Download VEX files for Scout
-        if: matrix.image.name == 'liquibase/liquibase-secure'
-        run: |
-          mkdir -p ./vex
-          curl -sSfL "https://raw.githubusercontent.com/liquibase/vex-repo/main/pkg/maven/org.liquibase/liquibase-core/vex.openvex.json" \
-            -o ./vex/liquibase-core.vex.json
-          echo "VEX file downloaded: $(jq '.statements | length' ./vex/liquibase-core.vex.json) statements"
-
-      - name: Docker Scout (with VEX)
-        if: matrix.image.name == 'liquibase/liquibase-secure'
-        uses: docker/scout-action@8910519cee8ac046f3ee99686b0dc6654d5ba1a7 # v1.20.3
-        with:
-          command: cves
-          image: "${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}"
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          write-comment: true
-          sarif-file: "scout-results.sarif"
-          summary: true
-          exit-code: true
-          only-severities: "critical,high"
-          vex-location: ./vex
-          only-vex-affected: true
-          vex-author: "Liquibase Security Team"
-
-      - name: Docker Scout (without VEX)
-        if: matrix.image.name != 'liquibase/liquibase-secure'
-        uses: docker/scout-action@8910519cee8ac046f3ee99686b0dc6654d5ba1a7 # v1.20.3
-        with:
-          command: cves
-          image: "${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}"
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          write-comment: true
-          sarif-file: "scout-results.sarif"
-          summary: true
-          exit-code: true
-          only-severities: "critical,high"
-
-      - name: Docker Scout JSON output
-        if: always()
-        run: |
-          SCOUT_ARGS=(
-            --format json
-            --output scout-results.json
-            --only-severities critical,high
-          )
-          if [[ "${{ matrix.image.name }}" == "liquibase/liquibase-secure" ]]; then
-            SCOUT_ARGS+=(--vex-location ./vex --only-vex-affected --vex-author "Liquibase Security Team")
-          fi
-          docker scout cves "${SCOUT_ARGS[@]}" \
-            "${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}" || true
-
-      - name: Upload Scout JSON results
-        if: always()
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
-        with:
-          name: scout-results${{ matrix.image.dockerfile == 'DockerfileSecure' && '-secure' || matrix.image.suffix }}
-          path: scout-results.json
-          if-no-files-found: warn
-
-      - name: Notify Slack on Build Failure
-        if: failure()
-        uses: rtCamp/action-slack-notify@e31e87e03dd19038e411e38ae27cbad084a90661 # v2.3.3
-        env:
-          SLACK_COLOR: "failure"
-          SLACK_MESSAGE: "View details on GitHub Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Triggered by repository: ${{ github.repository }} and job: ${{ github.job }}"
-          SLACK_TITLE: "❌ ${{ github.repository }} ❌ Docker Scout failed on branch ${{ github.ref_name }} for commit ${{ github.sha }} in repository ${{ github.repository }}"
-          SLACK_USERNAME: liquibot
-          SLACK_WEBHOOK: ${{ env.DOCKER_SLACK_WEBHOOK_URL }}
-          SLACK_ICON_EMOJI: ":whale:"
-          SLACK_FOOTER: "${{ github.repository }} - ${{ matrix.image.name }}${{ matrix.image.suffix }}:${{ github.sha }}"
-          SLACK_LINK_NAMES: true
-
-      - name: Upload Scout scan results to GitHub Security tab
-        if: always()
-        uses: github/codeql-action/upload-sarif@b1bff81932f5cdfc8695c7752dcee935dcd061c8 # v4.33.0
-        with:
-          sarif_file: "scout-results.sarif"
-          category: "${{ matrix.image.name }}${{ matrix.image.suffix }}"
-
-      - name: Generate Security Report
-        if: always()
-        uses: rsdmike/github-security-report-action@a149b24539044c92786ec39af8ba38c93496495d # v3.0.4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          outputDir: ./reports/scout${{ matrix.image.dockerfile == 'DockerfileSecure' && '-secure' || matrix.image.suffix }}/
-          sarifReportDir: .
-
-      - name: Upload Security Report
-        if: always()
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
-        with:
-          name: security-report-scout${{ matrix.image.dockerfile == 'DockerfileSecure' && '-secure' || matrix.image.suffix }}
-          path: ./reports/scout${{ matrix.image.dockerfile == 'DockerfileSecure' && '-secure' || matrix.image.suffix }}/summary.pdf
+  scan-secure:
+    name: Scan liquibase/liquibase-secure
+    uses: liquibase/build-logic/.github/workflows/reusable-docker-scan.yml@dat-22876-reusables
+    with:
+      dockerfile_path: DockerfileSecure
+      image_name: liquibase/liquibase-secure
+      suffix: ""
+      vex_enabled: true
+      upload_sarif: true
+      dispatch_new_cves: true
+      scout_enabled: true
+      build_logic_ref: dat-22876-reusables
+    secrets: inherit
 
   # ============================================
   # PERSIST SCAN RESULTS TO scan-results BRANCH
   # ============================================
   persist-results:
     name: Persist Scan Results
-    needs: [vulnerability-scan, scout]
-    if: always() && github.event_name != 'pull_request' && needs.vulnerability-scan.result != 'cancelled'
+    needs: [scan-community, scan-alpine, scan-secure]
+    if: always() && github.event_name != 'pull_request' && needs.scan-community.result != 'cancelled'
     runs-on: ubuntu-22.04
     permissions:
       actions: read
@@ -600,3 +151,36 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           scripts/persist-scan-results.sh scan-artifacts
+
+  # ============================================
+  # SLACK NOTIFICATION ON FAILURE
+  # ============================================
+  notify-failure:
+    needs: [scan-community, scan-alpine, scan-secure]
+    if: failure()
+    runs-on: "ubuntu-22.04"
+    steps:
+      - name: Configure AWS credentials for vault access
+        uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7 # v6.0.0
+        with:
+          role-to-assume: ${{ secrets.LIQUIBASE_VAULT_OIDC_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Get secrets from vault
+        uses: aws-actions/aws-secretsmanager-get-secrets@a9a7eb4e2f2871d30dc5b892576fde60a2ecc802 # v2.0.10
+        with:
+          secret-ids: |
+            ,/vault/liquibase
+          parse-json-secrets: true
+
+      - name: Notify Slack on Build Failure
+        uses: rtCamp/action-slack-notify@e31e87e03dd19038e411e38ae27cbad084a90661 # v2.3.3
+        env:
+          SLACK_COLOR: "failure"
+          SLACK_MESSAGE: "View details on GitHub Actions: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Triggered by repository: ${{ github.repository }}"
+          SLACK_TITLE: "❌ ${{ github.repository }} ❌ Trivy failed on branch ${{ github.ref_name }} for commit ${{ github.sha }} in repository ${{ github.repository }}"
+          SLACK_USERNAME: liquibot
+          SLACK_WEBHOOK: ${{ env.DOCKER_SLACK_WEBHOOK_URL }}
+          SLACK_ICON_EMOJI: ":whale:"
+          SLACK_FOOTER: "${{ github.repository }}"
+          SLACK_LINK_NAMES: true
