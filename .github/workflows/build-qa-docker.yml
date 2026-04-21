@@ -172,13 +172,13 @@ jobs:
   # ============================================
   vuln-scan-secure:
     name: Scan Secure QA
-    needs: [set-matrix, build-qa-secure]
+    needs: [build-qa-secure]
     if: ${{ !cancelled() && needs.build-qa-secure.result == 'success' }}
     uses: liquibase/build-logic/.github/workflows/reusable-vulnerability-scan.yml@main
     with:
       mode: docker
       source: ghcr.io/${{ github.repository }}/liquibase-secure:${{ github.sha }}
-      image_name: ${{ needs.set-matrix.outputs.secure_image_name }}
+      image_name: liquibase-secure-qa
       image_tag: qa
       fail_on_vulnerabilities: true
       upload_sarif: false
