@@ -134,20 +134,17 @@ jobs:
       build_logic_ref: dat-22876-reusables
     secrets: inherit
 
-  build-qa-community-2:
-    name: Build Community QA 2
+  vuln-scan-community:
+    name: Scan Community QA
     needs: [build-qa-community]
-    uses: liquibase/build-logic/.github/workflows/reusable-docker-build-qa.yml@dat-22876-reusables
+    uses: liquibase/build-logic/.github/workflows/reusable-vulnerability-scan.yml@main
     with:
-      image_name: liquibase-qa-2
-      dockerfile_path: Dockerfile
-      suffix: ""
-      ghcr_name: community
-      branch_name: ${{ inputs.liquibaseBranch }}
-      secure_version: ${{ inputs.secure-version }}
-      build_type: Community
-      is_rc: "false"
-      push_nexus: true
-      push_ghcr: true
-      build_logic_ref: dat-22876-reusables
+      mode: docker
+      source: ghcr.io/${{ github.repository }}/liquibase-community:${{ github.sha }}
+      image_name: liquibase-qa
+      image_tag: qa
+      fail_on_vulnerabilities: true
+      upload_sarif: false
+      generate_sbom: true
+      build_logic_ref: main
     secrets: inherit
