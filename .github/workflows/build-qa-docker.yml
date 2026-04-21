@@ -32,7 +32,7 @@ on:
 
 jobs:
   # ============================================
-  # DETECT RC BUILD
+  # DETECT RC BUILD AND COMPUTE BUILD FLAGS
   # ============================================
   set-matrix:
     name: "Detect RC Build"
@@ -58,7 +58,7 @@ jobs:
           echo "Is RC build: $IS_RC_BUILD"
           echo "is_rc_build=${IS_RC_BUILD}" >> "$GITHUB_OUTPUT"
 
-          # Compute secure image name here to avoid ternary expressions in reusable with: blocks
+          # Compute secure image name
           if [[ "$IS_RC_BUILD" == "true" ]]; then
             SECURE_IMAGE_NAME="liquibase-secure-rc"
           else
@@ -66,7 +66,7 @@ jobs:
           fi
           echo "secure_image_name=${SECURE_IMAGE_NAME}" >> "$GITHUB_OUTPUT"
 
-          # Compute per-target build flags for use in if: conditions (avoids inputs.* on reusable callers)
+          # Compute per-target build flags
           BUILD_TARGETS="${{ inputs.buildTargets }}"
           case "$BUILD_TARGETS" in
             "All (Community + Alpine + Secure)")
@@ -101,8 +101,8 @@ jobs:
   # ============================================
   build-qa-community:
     name: Build Community QA
-    needs: set-matrix
-    if: ${{ needs.set-matrix.outputs.build_community == 'true' }}
+    needs: [set-matrix]
+    if: needs.set-matrix.outputs.build_community == 'true'
     uses: liquibase/build-logic/.github/workflows/reusable-docker-build-qa.yml@dat-22876-reusables
     with:
       image_name: liquibase-qa
@@ -123,8 +123,8 @@ jobs:
   # ============================================
   build-qa-alpine:
     name: Build Alpine QA
-    needs: set-matrix
-    if: ${{ needs.set-matrix.outputs.build_alpine == 'true' }}
+    needs: [set-matrix]
+    if: needs.set-matrix.outputs.build_alpine == 'true'
     uses: liquibase/build-logic/.github/workflows/reusable-docker-build-qa.yml@dat-22876-reusables
     with:
       image_name: liquibase-qa-alpine
@@ -145,8 +145,8 @@ jobs:
   # ============================================
   build-qa-secure:
     name: Build Secure QA
-    needs: set-matrix
-    if: ${{ needs.set-matrix.outputs.build_secure == 'true' }}
+    needs: [set-matrix]
+    if: needs.set-matrix.outputs.build_secure == 'true'
     uses: liquibase/build-logic/.github/workflows/reusable-docker-build-qa.yml@dat-22876-reusables
     with:
       image_name: ${{ needs.set-matrix.outputs.secure_image_name }}
