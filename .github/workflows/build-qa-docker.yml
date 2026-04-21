@@ -85,8 +85,6 @@ jobs:
 
   build-qa-community:
     name: Build Community QA
-    needs: [set-matrix]
-    if: needs.set-matrix.outputs.build_community == 'true'
     uses: liquibase/build-logic/.github/workflows/reusable-docker-build-qa.yml@dat-22876-reusables
     with:
       image_name: liquibase-qa
@@ -104,8 +102,6 @@ jobs:
 
   build-qa-alpine:
     name: Build Alpine QA
-    needs: [set-matrix]
-    if: needs.set-matrix.outputs.build_alpine == 'true'
     uses: liquibase/build-logic/.github/workflows/reusable-docker-build-qa.yml@dat-22876-reusables
     with:
       image_name: liquibase-qa-alpine
@@ -123,18 +119,16 @@ jobs:
 
   build-qa-secure:
     name: Build Secure QA
-    needs: [set-matrix]
-    if: needs.set-matrix.outputs.build_secure == 'true'
     uses: liquibase/build-logic/.github/workflows/reusable-docker-build-qa.yml@dat-22876-reusables
     with:
-      image_name: ${{ needs.set-matrix.outputs.secure_image_name }}
+      image_name: liquibase-secure-qa
       dockerfile_path: DockerfileSecure
       suffix: "-secure"
       ghcr_name: secure
       branch_name: ${{ inputs.liquibaseBranch }}
       secure_version: ${{ inputs.secure-version }}
       build_type: secure
-      is_rc: ${{ needs.set-matrix.outputs.is_rc_build }}
+      is_rc: "false"
       push_nexus: true
       push_ghcr: true
       build_logic_ref: dat-22876-reusables
