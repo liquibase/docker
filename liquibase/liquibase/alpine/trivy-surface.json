@@ -3,8 +3,8 @@
   "Trivy": {
     "Version": "0.69.3"
   },
-  "ReportID": "019daee2-2a86-78d3-aa94-00f9f763712f",
-  "CreatedAt": "2026-04-21T07:12:30.854579052Z",
+  "ReportID": "019daef4-3167-73b1-9b82-3d0476cf5f9d",
+  "CreatedAt": "2026-04-21T07:32:12.26324308Z",
   "ArtifactID": "sha256:ba1359c90c3c91e46e9d095313d695cbe62b0347a1aba7680cb288038291c092",
   "ArtifactName": "ghcr.io/liquibase/docker/liquibase-alpine:0bab6e74339b9916b2c133dd41cb946faa2d0479",
   "ArtifactType": "container_image",
@@ -29,7 +29,7 @@
       "ghcr.io/liquibase/docker/liquibase-alpine:0bab6e74339b9916b2c133dd41cb946faa2d0479"
     ],
     "RepoDigests": [
-      "ghcr.io/liquibase/docker/liquibase-alpine@sha256:4b1e43e6e248a5edeb427a2a6cb38ebf98d107117399bc56a343500d4726260b"
+      "ghcr.io/liquibase/docker/liquibase-alpine@sha256:91f174ea2b562841871436d05b02ca98fc0921f525d0e20c6a552aea97d78e18"
     ],
     "Reference": "ghcr.io/liquibase/docker/liquibase-alpine:0bab6e74339b9916b2c133dd41cb946faa2d0479",
     "ImageConfig": {
