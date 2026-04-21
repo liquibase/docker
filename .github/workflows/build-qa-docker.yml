@@ -31,8 +31,29 @@ on:
         type: string
 
 jobs:
+  set-matrix:
+    name: "Detect RC Build"
+    runs-on: ubuntu-latest
+    outputs:
+      build_community: ${{ steps.set-matrix.outputs.build_community }}
+    steps:
+      - name: Detect build targets
+        id: set-matrix
+        run: |
+          BUILD_TARGETS="${{ inputs.buildTargets }}"
+          case "$BUILD_TARGETS" in
+            "All (Community + Alpine + Secure)"|"Community Only (Standard + Alpine)"|"Standard Community Only")
+              echo "build_community=true" >> "$GITHUB_OUTPUT"
+              ;;
+            *)
+              echo "build_community=false" >> "$GITHUB_OUTPUT"
+              ;;
+          esac
+
   build-qa-community:
     name: Build Community QA
+    needs: [set-matrix]
+    if: needs.set-matrix.outputs.build_community == 'true'
     uses: liquibase/build-logic/.github/workflows/reusable-docker-build-qa.yml@dat-22876-reusables
     with:
       image_name: liquibase-qa
