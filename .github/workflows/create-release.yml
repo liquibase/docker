@@ -234,7 +234,7 @@ jobs:
     name: "Build liquibase/liquibase"
     needs: update-dockerfiles
     if: ${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' }}
-    uses: liquibase/build-logic/.github/workflows/reusable-docker-build.yml@dat-22876-reusables
+    uses: liquibase/build-logic/.github/workflows/reusable-docker-build.yml@main
     with:
       dockerfile_path: Dockerfile
       image_name: liquibase/liquibase
@@ -256,7 +256,7 @@ jobs:
       image_source_url: https://github.com/${{ github.repository }}
       image_description: "Liquibase Container Image"
       image_licenses: FSL-1.1-ALv2
-      build_logic_ref: dat-22876-reusables
+      build_logic_ref: main
     secrets: inherit
 
   # ============================================
@@ -266,7 +266,7 @@ jobs:
     name: "Build liquibase/liquibase-alpine"
     needs: update-dockerfiles
     if: ${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' }}
-    uses: liquibase/build-logic/.github/workflows/reusable-docker-build.yml@dat-22876-reusables
+    uses: liquibase/build-logic/.github/workflows/reusable-docker-build.yml@main
     with:
       dockerfile_path: Dockerfile.alpine
       image_name: liquibase/liquibase
@@ -288,7 +288,7 @@ jobs:
       image_source_url: https://github.com/${{ github.repository }}
       image_description: "Liquibase Container Image (Alpine)"
       image_licenses: FSL-1.1-ALv2
-      build_logic_ref: dat-22876-reusables
+      build_logic_ref: main
     secrets: inherit
 
   # ============================================
@@ -298,7 +298,7 @@ jobs:
     name: "Build liquibase/liquibase-secure"
     needs: update-dockerfiles
     if: ${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-secure-release' }}
-    uses: liquibase/build-logic/.github/workflows/reusable-docker-build.yml@dat-22876-reusables
+    uses: liquibase/build-logic/.github/workflows/reusable-docker-build.yml@main
     with:
       dockerfile_path: DockerfileSecure
       image_name: liquibase/liquibase-secure
@@ -321,7 +321,7 @@ jobs:
       image_description: "Liquibase Secure Container Image"
       image_licenses: LicenseRef-Liquibase-EULA
       image_licenses_url: https://www.liquibase.com/eula
-      build_logic_ref: dat-22876-reusables
+      build_logic_ref: main
     secrets: inherit
 
   # ============================================
@@ -338,11 +338,11 @@ jobs:
         (needs.update-dockerfiles.outputs.releaseType == 'liquibase-release' && needs.build-community.result == 'success' && needs.build-alpine.result == 'success') ||
         (needs.update-dockerfiles.outputs.releaseType == 'liquibase-secure-release' && needs.build-secure.result == 'success')
       )
-    uses: liquibase/build-logic/.github/workflows/reusable-docker-publish.yml@dat-22876-reusables
+    uses: liquibase/build-logic/.github/workflows/reusable-docker-publish.yml@main
     with:
       release_type: ${{ needs.update-dockerfiles.outputs.releaseType }}
       version: ${{ needs.update-dockerfiles.outputs.extensionVersion }}
       tag_suffix: ${{ needs.update-dockerfiles.outputs.releaseType == 'liquibase-secure-release' && '-SECURE' || '' }}
       dry_run: false
-      build_logic_ref: dat-22876-reusables
+      build_logic_ref: main
     secrets: inherit

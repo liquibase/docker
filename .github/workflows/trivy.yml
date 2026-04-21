@@ -40,7 +40,7 @@ jobs:
   # ============================================
   scan-community:
     name: Scan liquibase/liquibase
-    uses: liquibase/build-logic/.github/workflows/reusable-docker-scan.yml@dat-22876-reusables
+    uses: liquibase/build-logic/.github/workflows/reusable-docker-scan.yml@main
     with:
       dockerfile_path: Dockerfile
       image_name: liquibase/liquibase
@@ -49,7 +49,7 @@ jobs:
       upload_sarif: true
       dispatch_new_cves: true
       scout_enabled: true
-      build_logic_ref: dat-22876-reusables
+      build_logic_ref: main
     secrets: inherit
 
   # ============================================
@@ -57,7 +57,7 @@ jobs:
   # ============================================
   scan-alpine:
     name: Scan liquibase/liquibase-alpine
-    uses: liquibase/build-logic/.github/workflows/reusable-docker-scan.yml@dat-22876-reusables
+    uses: liquibase/build-logic/.github/workflows/reusable-docker-scan.yml@main
     with:
       dockerfile_path: Dockerfile.alpine
       image_name: liquibase/liquibase
@@ -66,7 +66,7 @@ jobs:
       upload_sarif: true
       dispatch_new_cves: true
       scout_enabled: true
-      build_logic_ref: dat-22876-reusables
+      build_logic_ref: main
     secrets: inherit
 
   # ============================================
@@ -74,7 +74,7 @@ jobs:
   # ============================================
   scan-secure:
     name: Scan liquibase/liquibase-secure
-    uses: liquibase/build-logic/.github/workflows/reusable-docker-scan.yml@dat-22876-reusables
+    uses: liquibase/build-logic/.github/workflows/reusable-docker-scan.yml@main
     with:
       dockerfile_path: DockerfileSecure
       image_name: liquibase/liquibase-secure
@@ -83,7 +83,7 @@ jobs:
       upload_sarif: true
       dispatch_new_cves: true
       scout_enabled: true
-      build_logic_ref: dat-22876-reusables
+      build_logic_ref: main
     secrets: inherit
 
   # ============================================

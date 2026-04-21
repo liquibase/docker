@@ -20,7 +20,7 @@ permissions:
 
 jobs:
   update-readme:
-    uses: liquibase/build-logic/.github/workflows/reusable-docker-readme.yml@dat-22876-reusables
+    uses: liquibase/build-logic/.github/workflows/reusable-docker-readme.yml@main
     with:
       target_image: liquibase/liquibase-secure
       readme_path: README-secure.md

@@ -37,9 +37,9 @@ jobs:
       matrix:
         dockerfile: [Dockerfile, Dockerfile.alpine, DockerfileSecure]
         os: [ubuntu-latest, macos-15-intel]
-    uses: liquibase/build-logic/.github/workflows/reusable-docker-test.yml@dat-22876-reusables
+    uses: liquibase/build-logic/.github/workflows/reusable-docker-test.yml@main
     with:
       dockerfile_path: ${{ matrix.dockerfile }}
       runs_on: ${{ matrix.os }}
-      build_logic_ref: dat-22876-reusables
+      build_logic_ref: main
     secrets: inherit
