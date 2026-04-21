@@ -22,7 +22,9 @@ on:
 permissions:
   contents: read
   actions: read
-  id-token: write # Required for AWS OIDC authentication in reusable vulnerability scan
+  id-token: write       # Required for AWS OIDC authentication in reusable vulnerability scan
+  packages: read        # Required: reusable vulnerability-scan pulls images from GHCR
+  security-events: write # Required: reusable declares this at job level unconditionally
 
 jobs:
   generate-matrix:
