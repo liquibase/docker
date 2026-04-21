@@ -143,7 +143,7 @@ jobs:
   vuln-scan-community:
     name: Scan Community QA
     needs: [build-qa-community]
-    if: ${{ !cancelled() && needs.build-qa-community.result == 'success' }}
+    if: "!cancelled() && needs.build-qa-community.result == 'success'"
     uses: liquibase/build-logic/.github/workflows/reusable-vulnerability-scan.yml@dat-22876-reusables
     with:
       mode: docker
@@ -159,7 +159,7 @@ jobs:
   vuln-scan-alpine:
     name: Scan Alpine QA
     needs: [build-qa-alpine]
-    if: ${{ !cancelled() && needs.build-qa-alpine.result == 'success' }}
+    if: "!cancelled() && needs.build-qa-alpine.result == 'success'"
     uses: liquibase/build-logic/.github/workflows/reusable-vulnerability-scan.yml@dat-22876-reusables
     with:
       mode: docker
@@ -175,7 +175,7 @@ jobs:
   vuln-scan-secure:
     name: Scan Secure QA
     needs: [build-qa-secure]
-    if: ${{ !cancelled() && needs.build-qa-secure.result == 'success' }}
+    if: "!cancelled() && needs.build-qa-secure.result == 'success'"
     uses: liquibase/build-logic/.github/workflows/reusable-vulnerability-scan.yml@dat-22876-reusables
     with:
       mode: docker
