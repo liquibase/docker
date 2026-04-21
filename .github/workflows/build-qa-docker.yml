@@ -32,6 +32,9 @@ on:
         type: string
 
 jobs:
+  # ============================================
+  # DETECT RC BUILD AND COMPUTE BUILD FLAGS
+  # ============================================
   set-matrix:
     name: "Detect RC Build"
     runs-on: ubuntu-latest
@@ -45,16 +48,25 @@ jobs:
       - name: Detect RC build and log selected targets
         id: set-matrix
         run: |
+          # Determine if this is an RC build (secure-version contains "-RC")
           IS_RC_BUILD="false"
           if [[ -n "${{ inputs.secure-version }}" && "${{ inputs.secure-version }}" =~ -RC[0-9]+$ ]]; then
             IS_RC_BUILD="true"
+            echo "Detected RC build with version: ${{ inputs.secure-version }}"
           fi
+
+          echo "Selected build targets: ${{ inputs.buildTargets }}"
+          echo "Is RC build: $IS_RC_BUILD"
           echo "is_rc_build=${IS_RC_BUILD}" >> "$GITHUB_OUTPUT"
+
+          # Compute secure image name to avoid ternary expressions in reusable with: blocks
           if [[ "$IS_RC_BUILD" == "true" ]]; then
             echo "secure_image_name=liquibase-secure-rc" >> "$GITHUB_OUTPUT"
           else
             echo "secure_image_name=liquibase-secure-qa" >> "$GITHUB_OUTPUT"
           fi
+
+          # Compute per-target build flags for use in if: conditions
           BUILD_TARGETS="${{ inputs.buildTargets }}"
           case "$BUILD_TARGETS" in
             "All (Community + Alpine + Secure)")
@@ -84,8 +96,13 @@ jobs:
               ;;
           esac
 
+  # ============================================
+  # BUILD: community (Dockerfile)
+  # ============================================
   build-qa-community:
     name: Build Community QA
+    needs: [set-matrix]
+    if: needs.set-matrix.outputs.build_community == 'true'
     uses: liquibase/build-logic/.github/workflows/reusable-docker-build-qa.yml@dat-22876-reusables
     with:
       image_name: liquibase-qa
@@ -101,8 +118,13 @@ jobs:
       build_logic_ref: dat-22876-reusables
     secrets: inherit
 
+  # ============================================
+  # BUILD: alpine (Dockerfile.alpine)
+  # ============================================
   build-qa-alpine:
     name: Build Alpine QA
+    needs: [set-matrix]
+    if: needs.set-matrix.outputs.build_alpine == 'true'
     uses: liquibase/build-logic/.github/workflows/reusable-docker-build-qa.yml@dat-22876-reusables
     with:
       image_name: liquibase-qa-alpine
@@ -118,26 +140,35 @@ jobs:
       build_logic_ref: dat-22876-reusables
     secrets: inherit
 
+  # ============================================
+  # BUILD: secure (DockerfileSecure)
+  # ============================================
   build-qa-secure:
     name: Build Secure QA
+    needs: [set-matrix]
+    if: needs.set-matrix.outputs.build_secure == 'true'
     uses: liquibase/build-logic/.github/workflows/reusable-docker-build-qa.yml@dat-22876-reusables
     with:
-      image_name: liquibase-secure-qa
+      image_name: ${{ needs.set-matrix.outputs.secure_image_name }}
       dockerfile_path: DockerfileSecure
       suffix: "-secure"
       ghcr_name: secure
       branch_name: ${{ inputs.liquibaseBranch }}
       secure_version: ${{ inputs.secure-version }}
       build_type: secure
-      is_rc: "false"
+      is_rc: ${{ needs.set-matrix.outputs.is_rc_build }}
       push_nexus: true
       push_ghcr: true
       build_logic_ref: dat-22876-reusables
     secrets: inherit
 
+  # ============================================
+  # SCAN: community
+  # ============================================
   vuln-scan-community:
     name: Scan Community QA
     needs: [build-qa-community]
+    if: ${{ !cancelled() && needs.build-qa-community.result == 'success' }}
     uses: liquibase/build-logic/.github/workflows/reusable-vulnerability-scan.yml@main
     with:
       mode: docker
@@ -149,3 +180,131 @@ jobs:
       generate_sbom: true
       build_logic_ref: main
     secrets: inherit
+
+  # ============================================
+  # SCAN: alpine
+  # ============================================
+  vuln-scan-alpine:
+    name: Scan Alpine QA
+    needs: [build-qa-alpine]
+    if: ${{ !cancelled() && needs.build-qa-alpine.result == 'success' }}
+    uses: liquibase/build-logic/.github/workflows/reusable-vulnerability-scan.yml@main
+    with:
+      mode: docker
+      source: ghcr.io/${{ github.repository }}/liquibase-alpine:${{ github.sha }}
+      image_name: liquibase-qa-alpine
+      image_tag: qa
+      fail_on_vulnerabilities: true
+      upload_sarif: false
+      generate_sbom: true
+      build_logic_ref: main
+    secrets: inherit
+
+  # ============================================
+  # SCAN: secure
+  # ============================================
+  vuln-scan-secure:
+    name: Scan Secure QA
+    needs: [build-qa-secure]
+    if: ${{ !cancelled() && needs.build-qa-secure.result == 'success' }}
+    uses: liquibase/build-logic/.github/workflows/reusable-vulnerability-scan.yml@main
+    with:
+      mode: docker
+      source: ghcr.io/${{ github.repository }}/liquibase-secure:${{ github.sha }}
+      image_name: liquibase-secure-qa
+      image_tag: qa
+      fail_on_vulnerabilities: true
+      upload_sarif: false
+      generate_sbom: true
+      build_logic_ref: main
+    secrets: inherit
+
+  # ============================================
+  # CLEANUP: community
+  # ============================================
+  cleanup-ghcr-community:
+    name: Cleanup Community GHCR
+    needs: [vuln-scan-community]
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+      - name: Delete GHCR image
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          REPO_NAME="${{ github.event.repository.name }}"
+          PACKAGE_NAME="${REPO_NAME}/liquibase-community"
+          ENCODED_PACKAGE_NAME="${REPO_NAME}%2Fliquibase-community"
+          TAG="${{ github.sha }}"
+          VERSION_ID=$(gh api \
+            "/orgs/${{ github.repository_owner }}/packages/container/${ENCODED_PACKAGE_NAME}/versions" \
+            --jq ".[] | select(.metadata.container.tags[] == \"${TAG}\") | .id" 2>/dev/null || echo "")
+          if [ -n "$VERSION_ID" ]; then
+            gh api --method DELETE \
+              "/orgs/${{ github.repository_owner }}/packages/container/${ENCODED_PACKAGE_NAME}/versions/${VERSION_ID}"
+            echo "Deleted ${PACKAGE_NAME}:${TAG}"
+          else
+            echo "No version found for ${PACKAGE_NAME}:${TAG}, skipping"
+          fi
+
+  # ============================================
+  # CLEANUP: alpine
+  # ============================================
+  cleanup-ghcr-alpine:
+    name: Cleanup Alpine GHCR
+    needs: [vuln-scan-alpine]
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+      - name: Delete GHCR image
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          REPO_NAME="${{ github.event.repository.name }}"
+          PACKAGE_NAME="${REPO_NAME}/liquibase-alpine"
+          ENCODED_PACKAGE_NAME="${REPO_NAME}%2Fliquibase-alpine"
+          TAG="${{ github.sha }}"
+          VERSION_ID=$(gh api \
+            "/orgs/${{ github.repository_owner }}/packages/container/${ENCODED_PACKAGE_NAME}/versions" \
+            --jq ".[] | select(.metadata.container.tags[] == \"${TAG}\") | .id" 2>/dev/null || echo "")
+          if [ -n "$VERSION_ID" ]; then
+            gh api --method DELETE \
+              "/orgs/${{ github.repository_owner }}/packages/container/${ENCODED_PACKAGE_NAME}/versions/${VERSION_ID}"
+            echo "Deleted ${PACKAGE_NAME}:${TAG}"
+          else
+            echo "No version found for ${PACKAGE_NAME}:${TAG}, skipping"
+          fi
+
+  # ============================================
+  # CLEANUP: secure
+  # ============================================
+  cleanup-ghcr-secure:
+    name: Cleanup Secure GHCR
+    needs: [vuln-scan-secure]
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+      - name: Delete GHCR image
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          REPO_NAME="${{ github.event.repository.name }}"
+          PACKAGE_NAME="${REPO_NAME}/liquibase-secure"
+          ENCODED_PACKAGE_NAME="${REPO_NAME}%2Fliquibase-secure"
+          TAG="${{ github.sha }}"
+          VERSION_ID=$(gh api \
+            "/orgs/${{ github.repository_owner }}/packages/container/${ENCODED_PACKAGE_NAME}/versions" \
+            --jq ".[] | select(.metadata.container.tags[] == \"${TAG}\") | .id" 2>/dev/null || echo "")
+          if [ -n "$VERSION_ID" ]; then
+            gh api --method DELETE \
+              "/orgs/${{ github.repository_owner }}/packages/container/${ENCODED_PACKAGE_NAME}/versions/${VERSION_ID}"
+            echo "Deleted ${PACKAGE_NAME}:${TAG}"
+          else
+            echo "No version found for ${PACKAGE_NAME}:${TAG}, skipping"
+          fi
