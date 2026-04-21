@@ -7,6 +7,12 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Preview README push without updating Docker Hub (for validation runs)'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -19,4 +25,5 @@ jobs:
       target_image: liquibase/liquibase-secure
       readme_path: README-secure.md
       short_description: "Liquibase Secure"
+      dry_run: ${{ inputs.dry_run || false }}
     secrets: inherit
