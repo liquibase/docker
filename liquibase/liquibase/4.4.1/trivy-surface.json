@@ -3,8 +3,8 @@
   "Trivy": {
     "Version": "0.69.3"
   },
-  "ReportID": "019d9504-4188-7ef2-b394-09add9794291",
-  "CreatedAt": "2026-04-16T06:39:37.352981571Z",
+  "ReportID": "019dae7d-f93b-7cc1-a944-b4b80e942cd5",
+  "CreatedAt": "2026-04-21T05:23:04.635837187Z",
   "ArtifactID": "sha256:8f534e665875322d13ea835c2af24feb1dc5ec4070e31588608d24ba78d7ff8b",
   "ArtifactName": "liquibase/liquibase:4.4.1",
   "ArtifactType": "container_image",
@@ -10930,7 +10930,7 @@
           ],
           "VendorSeverity": {
             "alma": 2,
-            "amazon": 2,
+            "amazon": 3,
             "cbl-mariner": 3,
             "nvd": 3,
             "oracle-oval": 2,
@@ -12228,7 +12228,7 @@
           ],
           "VendorSeverity": {
             "alma": 2,
-            "amazon": 2,
+            "amazon": 3,
             "cbl-mariner": 3,
             "nvd": 3,
             "oracle-oval": 2,
@@ -14772,7 +14772,7 @@
           ],
           "VendorSeverity": {
             "alma": 2,
-            "amazon": 2,
+            "amazon": 3,
             "cbl-mariner": 3,
             "nvd": 3,
             "oracle-oval": 2,
@@ -16386,7 +16386,7 @@
           ],
           "VendorSeverity": {
             "alma": 2,
-            "amazon": 2,
+            "amazon": 3,
             "cbl-mariner": 3,
             "nvd": 3,
             "oracle-oval": 2,
@@ -17023,7 +17023,7 @@
           ],
           "VendorSeverity": {
             "alma": 2,
-            "amazon": 2,
+            "amazon": 3,
             "cbl-mariner": 3,
             "nvd": 3,
             "oracle-oval": 2,
@@ -17660,7 +17660,7 @@
           ],
           "VendorSeverity": {
             "alma": 2,
-            "amazon": 2,
+            "amazon": 3,
             "cbl-mariner": 3,
             "nvd": 3,
             "oracle-oval": 2,
@@ -19736,7 +19736,7 @@
           ],
           "VendorSeverity": {
             "alma": 2,
-            "amazon": 2,
+            "amazon": 3,
             "cbl-mariner": 3,
             "nvd": 3,
             "oracle-oval": 2,
@@ -21754,7 +21754,7 @@
             "https://www.tenable.com/security/tns-2022-02"
           ],
           "PublishedDate": "2021-08-24T15:15:09.533Z",
-          "LastModifiedDate": "2026-04-14T10:16:19.577Z"
+          "LastModifiedDate": "2026-04-16T15:16:45.5Z"
         },
         {
           "VulnerabilityID": "CVE-2022-0778",
@@ -21790,7 +21790,7 @@
           ],
           "VendorSeverity": {
             "alma": 1,
-            "amazon": 2,
+            "amazon": 3,
             "azure": 3,
             "bitnami": 3,
             "cbl-mariner": 3,
@@ -21923,7 +21923,7 @@
           ],
           "VendorSeverity": {
             "alma": 2,
-            "amazon": 2,
+            "amazon": 3,
             "azure": 3,
             "cbl-mariner": 3,
             "nvd": 3,
@@ -22028,7 +22028,7 @@
           ],
           "VendorSeverity": {
             "alma": 2,
-            "amazon": 2,
+            "amazon": 3,
             "cbl-mariner": 3,
             "nvd": 3,
             "oracle-oval": 2,
@@ -22478,7 +22478,7 @@
           ],
           "VendorSeverity": {
             "alma": 2,
-            "amazon": 3,
+            "amazon": 2,
             "azure": 3,
             "cbl-mariner": 3,
             "nvd": 3,
@@ -23972,7 +23972,7 @@
           ],
           "VendorSeverity": {
             "alma": 2,
-            "amazon": 2,
+            "amazon": 3,
             "cbl-mariner": 3,
             "ghsa": 2,
             "nvd": 3,
@@ -25026,7 +25026,7 @@
             "https://www.tenable.com/security/tns-2022-02"
           ],
           "PublishedDate": "2021-08-24T15:15:09.533Z",
-          "LastModifiedDate": "2026-04-14T10:16:19.577Z"
+          "LastModifiedDate": "2026-04-16T15:16:45.5Z"
         },
         {
           "VulnerabilityID": "CVE-2022-0778",
@@ -25062,7 +25062,7 @@
           ],
           "VendorSeverity": {
             "alma": 1,
-            "amazon": 2,
+            "amazon": 3,
             "azure": 3,
             "bitnami": 3,
             "cbl-mariner": 3,
@@ -25195,7 +25195,7 @@
           ],
           "VendorSeverity": {
             "alma": 2,
-            "amazon": 2,
+            "amazon": 3,
             "azure": 3,
             "cbl-mariner": 3,
             "nvd": 3,
@@ -25300,7 +25300,7 @@
           ],
           "VendorSeverity": {
             "alma": 2,
-            "amazon": 2,
+            "amazon": 3,
             "cbl-mariner": 3,
             "nvd": 3,
             "oracle-oval": 2,
@@ -25750,7 +25750,7 @@
           ],
           "VendorSeverity": {
             "alma": 2,
-            "amazon": 3,
+            "amazon": 2,
             "azure": 3,
             "cbl-mariner": 3,
             "nvd": 3,
@@ -26057,7 +26057,7 @@
           ],
           "VendorSeverity": {
             "alma": 2,
-            "amazon": 2,
+            "amazon": 3,
             "azure": 4,
             "cbl-mariner": 4,
             "nvd": 4,
