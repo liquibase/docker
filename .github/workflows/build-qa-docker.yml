@@ -40,6 +40,9 @@ jobs:
     outputs:
       is_rc_build: ${{ steps.set-matrix.outputs.is_rc_build }}
       secure_image_name: ${{ steps.set-matrix.outputs.secure_image_name }}
+      build_community: ${{ steps.set-matrix.outputs.build_community }}
+      build_alpine: ${{ steps.set-matrix.outputs.build_alpine }}
+      build_secure: ${{ steps.set-matrix.outputs.build_secure }}
     steps:
       - name: Detect RC build and log selected targets
         id: set-matrix
@@ -63,13 +66,43 @@ jobs:
           fi
           echo "secure_image_name=${SECURE_IMAGE_NAME}" >> "$GITHUB_OUTPUT"
 
+          # Compute per-target build flags for use in if: conditions (avoids inputs.* on reusable callers)
+          BUILD_TARGETS="${{ inputs.buildTargets }}"
+          case "$BUILD_TARGETS" in
+            "All (Community + Alpine + Secure)")
+              echo "build_community=true" >> "$GITHUB_OUTPUT"
+              echo "build_alpine=true" >> "$GITHUB_OUTPUT"
+              echo "build_secure=true" >> "$GITHUB_OUTPUT"
+              ;;
+            "Community Only (Standard + Alpine)")
+              echo "build_community=true" >> "$GITHUB_OUTPUT"
+              echo "build_alpine=true" >> "$GITHUB_OUTPUT"
+              echo "build_secure=false" >> "$GITHUB_OUTPUT"
+              ;;
+            "Secure Only")
+              echo "build_community=false" >> "$GITHUB_OUTPUT"
+              echo "build_alpine=false" >> "$GITHUB_OUTPUT"
+              echo "build_secure=true" >> "$GITHUB_OUTPUT"
+              ;;
+            "Standard Community Only")
+              echo "build_community=true" >> "$GITHUB_OUTPUT"
+              echo "build_alpine=false" >> "$GITHUB_OUTPUT"
+              echo "build_secure=false" >> "$GITHUB_OUTPUT"
+              ;;
+            "Alpine Community Only")
+              echo "build_community=false" >> "$GITHUB_OUTPUT"
+              echo "build_alpine=true" >> "$GITHUB_OUTPUT"
+              echo "build_secure=false" >> "$GITHUB_OUTPUT"
+              ;;
+          esac
+
   # ============================================
   # BUILD: community (Dockerfile)
   # ============================================
   build-qa-community:
     name: Build Community QA
     needs: set-matrix
-    if: ${{ inputs.buildTargets == 'All (Community + Alpine + Secure)' || inputs.buildTargets == 'Community Only (Standard + Alpine)' || inputs.buildTargets == 'Standard Community Only' }}
+    if: ${{ needs.set-matrix.outputs.build_community == 'true' }}
     uses: liquibase/build-logic/.github/workflows/reusable-docker-build-qa.yml@dat-22876-reusables
     with:
       image_name: liquibase-qa
@@ -91,7 +124,7 @@ jobs:
   build-qa-alpine:
     name: Build Alpine QA
     needs: set-matrix
-    if: ${{ inputs.buildTargets == 'All (Community + Alpine + Secure)' || inputs.buildTargets == 'Community Only (Standard + Alpine)' || inputs.buildTargets == 'Alpine Community Only' }}
+    if: ${{ needs.set-matrix.outputs.build_alpine == 'true' }}
     uses: liquibase/build-logic/.github/workflows/reusable-docker-build-qa.yml@dat-22876-reusables
     with:
       image_name: liquibase-qa-alpine
@@ -113,7 +146,7 @@ jobs:
   build-qa-secure:
     name: Build Secure QA
     needs: set-matrix
-    if: ${{ inputs.buildTargets == 'All (Community + Alpine + Secure)' || inputs.buildTargets == 'Secure Only' }}
+    if: ${{ needs.set-matrix.outputs.build_secure == 'true' }}
     uses: liquibase/build-logic/.github/workflows/reusable-docker-build-qa.yml@dat-22876-reusables
     with:
       image_name: ${{ needs.set-matrix.outputs.secure_image_name }}
