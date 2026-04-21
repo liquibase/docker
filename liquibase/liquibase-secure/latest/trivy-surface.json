@@ -3,10 +3,10 @@
   "Trivy": {
     "Version": "0.69.3"
   },
-  "ReportID": "019dae99-8c04-76c6-83e1-b2d37c97388d",
-  "CreatedAt": "2026-04-21T05:53:11.684445149Z",
+  "ReportID": "019daee2-73ca-77be-b736-3c1157b7ac39",
+  "CreatedAt": "2026-04-21T07:12:49.610508807Z",
   "ArtifactID": "sha256:c7400a4ef71f131d7425d01e1b646fb3aa1d1be7e8c169c6105bec1f5aa47d2c",
-  "ArtifactName": "ghcr.io/liquibase/docker/liquibase-liquibase-secure:acaace5c3a83aeee3405d3a99247ba4c633d7158",
+  "ArtifactName": "ghcr.io/liquibase/docker/liquibase-liquibase-secure:0bab6e74339b9916b2c133dd41cb946faa2d0479",
   "ArtifactType": "container_image",
   "Metadata": {
     "Size": 1082963968,
@@ -30,12 +30,12 @@
       "sha256:d7b175b6ed0090eb8a45ca457d1c56c7d8c169831c92d6d9c4c89ee97a7e88ee"
     ],
     "RepoTags": [
-      "ghcr.io/liquibase/docker/liquibase-liquibase-secure:acaace5c3a83aeee3405d3a99247ba4c633d7158"
+      "ghcr.io/liquibase/docker/liquibase-liquibase-secure:0bab6e74339b9916b2c133dd41cb946faa2d0479"
     ],
     "RepoDigests": [
-      "ghcr.io/liquibase/docker/liquibase-liquibase-secure@sha256:bbe0fa6a5bfb741113d54369375fb918a73b8b6e49ff838c7d46d3c9555e3690"
+      "ghcr.io/liquibase/docker/liquibase-liquibase-secure@sha256:1f473139695d09d72bdc0c08bec6dd6208cba76cff5fdfe689abd0d0ba02a822"
     ],
-    "Reference": "ghcr.io/liquibase/docker/liquibase-liquibase-secure:acaace5c3a83aeee3405d3a99247ba4c633d7158",
+    "Reference": "ghcr.io/liquibase/docker/liquibase-liquibase-secure:0bab6e74339b9916b2c133dd41cb946faa2d0479",
     "ImageConfig": {
       "architecture": "amd64",
       "created": "2026-04-21T05:22:22.585895721Z",
@@ -359,7 +359,7 @@
   },
   "Results": [
     {
-      "Target": "ghcr.io/liquibase/docker/liquibase-liquibase-secure:acaace5c3a83aeee3405d3a99247ba4c633d7158 (ubuntu 24.04)",
+      "Target": "ghcr.io/liquibase/docker/liquibase-liquibase-secure:0bab6e74339b9916b2c133dd41cb946faa2d0479 (ubuntu 24.04)",
       "Class": "os-pkgs",
       "Type": "ubuntu",
       "Packages": [
