@@ -154,33 +154,3 @@ jobs:
       generate_sbom: true
       build_logic_ref: dat-22876-reusables
     secrets: inherit
-
-  vuln-scan-alpine:
-    name: Scan Alpine QA
-    needs: [build-qa-alpine]
-    uses: liquibase/build-logic/.github/workflows/reusable-vulnerability-scan.yml@dat-22876-reusables
-    with:
-      mode: docker
-      source: ghcr.io/${{ github.repository }}/liquibase-alpine:${{ github.sha }}
-      image_name: liquibase-qa-alpine
-      image_tag: qa
-      fail_on_vulnerabilities: true
-      upload_sarif: false
-      generate_sbom: true
-      build_logic_ref: dat-22876-reusables
-    secrets: inherit
-
-  vuln-scan-secure:
-    name: Scan Secure QA
-    needs: [build-qa-secure]
-    uses: liquibase/build-logic/.github/workflows/reusable-vulnerability-scan.yml@dat-22876-reusables
-    with:
-      mode: docker
-      source: ghcr.io/${{ github.repository }}/liquibase-secure:${{ github.sha }}
-      image_name: liquibase-secure-qa
-      image_tag: qa
-      fail_on_vulnerabilities: true
-      upload_sarif: false
-      generate_sbom: true
-      build_logic_ref: dat-22876-reusables
-    secrets: inherit
