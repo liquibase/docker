@@ -3,10 +3,10 @@
   "Trivy": {
     "Version": "0.69.3"
   },
-  "ReportID": "019da9d0-71c2-7e32-b396-8a8649e91c67",
-  "CreatedAt": "2026-04-20T07:35:03.362931271Z",
+  "ReportID": "019dae7e-dc59-7605-b9a4-87019c4e1916",
+  "CreatedAt": "2026-04-21T05:24:02.777395529Z",
   "ArtifactID": "sha256:8c243d3b38e3e00d989f5306d5020b69a7cde3312938aeb5d83a0822d4907b7e",
-  "ArtifactName": "ghcr.io/liquibase/docker/liquibase-alpine:6ed1af4302859ed3245e7a052d342fbbf947c980",
+  "ArtifactName": "ghcr.io/liquibase/docker/liquibase-alpine:b7738c6b0be64ad8f1a15376f54467cba7cf4c51",
   "ArtifactType": "container_image",
   "Metadata": {
     "Size": 230617088,
@@ -26,12 +26,12 @@
       "sha256:9902bfff2ab0f5683a50d7a75c64f6c13ae7f57b5d8c05f33b1d00f057cf193a"
     ],
     "RepoTags": [
-      "ghcr.io/liquibase/docker/liquibase-alpine:6ed1af4302859ed3245e7a052d342fbbf947c980"
+      "ghcr.io/liquibase/docker/liquibase-alpine:b7738c6b0be64ad8f1a15376f54467cba7cf4c51"
     ],
     "RepoDigests": [
-      "ghcr.io/liquibase/docker/liquibase-alpine@sha256:c2ae36a87315794ac4b5c04669b77ce6f891f766cab5448c75148c10bcf7fac8"
+      "ghcr.io/liquibase/docker/liquibase-alpine@sha256:1a926d77bfdbcf50c8c2b977cc3461c8f80c6751447bd71c836ada3a14357baf"
     ],
-    "Reference": "ghcr.io/liquibase/docker/liquibase-alpine:6ed1af4302859ed3245e7a052d342fbbf947c980",
+    "Reference": "ghcr.io/liquibase/docker/liquibase-alpine:b7738c6b0be64ad8f1a15376f54467cba7cf4c51",
     "ImageConfig": {
       "architecture": "amd64",
       "created": "2026-04-20T07:33:54.348737376Z",
@@ -256,7 +256,7 @@
   },
   "Results": [
     {
-      "Target": "ghcr.io/liquibase/docker/liquibase-alpine:6ed1af4302859ed3245e7a052d342fbbf947c980 (alpine 3.23.4)",
+      "Target": "ghcr.io/liquibase/docker/liquibase-alpine:b7738c6b0be64ad8f1a15376f54467cba7cf4c51 (alpine 3.23.4)",
       "Class": "os-pkgs",
       "Type": "alpine",
       "Packages": [
