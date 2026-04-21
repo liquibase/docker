@@ -69,7 +69,7 @@ jobs:
   build-qa-community:
     name: Build Community QA
     needs: set-matrix
-    if: ${{ contains(fromJSON('["All (Community + Alpine + Secure)","Community Only (Standard + Alpine)","Standard Community Only"]'), inputs.buildTargets) }}
+    if: ${{ inputs.buildTargets == 'All (Community + Alpine + Secure)' || inputs.buildTargets == 'Community Only (Standard + Alpine)' || inputs.buildTargets == 'Standard Community Only' }}
     uses: liquibase/build-logic/.github/workflows/reusable-docker-build-qa.yml@dat-22876-reusables
     with:
       image_name: liquibase-qa
@@ -91,7 +91,7 @@ jobs:
   build-qa-alpine:
     name: Build Alpine QA
     needs: set-matrix
-    if: ${{ contains(fromJSON('["All (Community + Alpine + Secure)","Community Only (Standard + Alpine)","Alpine Community Only"]'), inputs.buildTargets) }}
+    if: ${{ inputs.buildTargets == 'All (Community + Alpine + Secure)' || inputs.buildTargets == 'Community Only (Standard + Alpine)' || inputs.buildTargets == 'Alpine Community Only' }}
     uses: liquibase/build-logic/.github/workflows/reusable-docker-build-qa.yml@dat-22876-reusables
     with:
       image_name: liquibase-qa-alpine
@@ -113,7 +113,7 @@ jobs:
   build-qa-secure:
     name: Build Secure QA
     needs: set-matrix
-    if: ${{ contains(fromJSON('["All (Community + Alpine + Secure)","Secure Only"]'), inputs.buildTargets) }}
+    if: ${{ inputs.buildTargets == 'All (Community + Alpine + Secure)' || inputs.buildTargets == 'Secure Only' }}
     uses: liquibase/build-logic/.github/workflows/reusable-docker-build-qa.yml@dat-22876-reusables
     with:
       image_name: ${{ needs.set-matrix.outputs.secure_image_name }}
