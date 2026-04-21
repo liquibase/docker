@@ -35,18 +35,51 @@ jobs:
     name: "Detect RC Build"
     runs-on: ubuntu-latest
     outputs:
+      is_rc_build: ${{ steps.set-matrix.outputs.is_rc_build }}
+      secure_image_name: ${{ steps.set-matrix.outputs.secure_image_name }}
       build_community: ${{ steps.set-matrix.outputs.build_community }}
+      build_alpine: ${{ steps.set-matrix.outputs.build_alpine }}
+      build_secure: ${{ steps.set-matrix.outputs.build_secure }}
     steps:
-      - name: Detect build targets
+      - name: Detect RC build and log selected targets
         id: set-matrix
         run: |
+          IS_RC_BUILD="false"
+          if [[ -n "${{ inputs.secure-version }}" && "${{ inputs.secure-version }}" =~ -RC[0-9]+$ ]]; then
+            IS_RC_BUILD="true"
+          fi
+          echo "is_rc_build=${IS_RC_BUILD}" >> "$GITHUB_OUTPUT"
+          if [[ "$IS_RC_BUILD" == "true" ]]; then
+            echo "secure_image_name=liquibase-secure-rc" >> "$GITHUB_OUTPUT"
+          else
+            echo "secure_image_name=liquibase-secure-qa" >> "$GITHUB_OUTPUT"
+          fi
           BUILD_TARGETS="${{ inputs.buildTargets }}"
           case "$BUILD_TARGETS" in
-            "All (Community + Alpine + Secure)"|"Community Only (Standard + Alpine)"|"Standard Community Only")
+            "All (Community + Alpine + Secure)")
               echo "build_community=true" >> "$GITHUB_OUTPUT"
+              echo "build_alpine=true" >> "$GITHUB_OUTPUT"
+              echo "build_secure=true" >> "$GITHUB_OUTPUT"
               ;;
-            *)
+            "Community Only (Standard + Alpine)")
+              echo "build_community=true" >> "$GITHUB_OUTPUT"
+              echo "build_alpine=true" >> "$GITHUB_OUTPUT"
+              echo "build_secure=false" >> "$GITHUB_OUTPUT"
+              ;;
+            "Secure Only")
               echo "build_community=false" >> "$GITHUB_OUTPUT"
+              echo "build_alpine=false" >> "$GITHUB_OUTPUT"
+              echo "build_secure=true" >> "$GITHUB_OUTPUT"
+              ;;
+            "Standard Community Only")
+              echo "build_community=true" >> "$GITHUB_OUTPUT"
+              echo "build_alpine=false" >> "$GITHUB_OUTPUT"
+              echo "build_secure=false" >> "$GITHUB_OUTPUT"
+              ;;
+            "Alpine Community Only")
+              echo "build_community=false" >> "$GITHUB_OUTPUT"
+              echo "build_alpine=true" >> "$GITHUB_OUTPUT"
+              echo "build_secure=false" >> "$GITHUB_OUTPUT"
               ;;
           esac
 
@@ -64,6 +97,44 @@ jobs:
       secure_version: ${{ inputs.secure-version }}
       build_type: Community
       is_rc: "false"
+      push_nexus: true
+      push_ghcr: true
+      build_logic_ref: dat-22876-reusables
+    secrets: inherit
+
+  build-qa-alpine:
+    name: Build Alpine QA
+    needs: [set-matrix]
+    if: needs.set-matrix.outputs.build_alpine == 'true'
+    uses: liquibase/build-logic/.github/workflows/reusable-docker-build-qa.yml@dat-22876-reusables
+    with:
+      image_name: liquibase-qa-alpine
+      dockerfile_path: Dockerfile.alpine
+      suffix: "-alpine"
+      ghcr_name: alpine
+      branch_name: ${{ inputs.liquibaseBranch }}
+      secure_version: ${{ inputs.secure-version }}
+      build_type: Community
+      is_rc: "false"
+      push_nexus: true
+      push_ghcr: true
+      build_logic_ref: dat-22876-reusables
+    secrets: inherit
+
+  build-qa-secure:
+    name: Build Secure QA
+    needs: [set-matrix]
+    if: needs.set-matrix.outputs.build_secure == 'true'
+    uses: liquibase/build-logic/.github/workflows/reusable-docker-build-qa.yml@dat-22876-reusables
+    with:
+      image_name: ${{ needs.set-matrix.outputs.secure_image_name }}
+      dockerfile_path: DockerfileSecure
+      suffix: "-secure"
+      ghcr_name: secure
+      branch_name: ${{ inputs.liquibaseBranch }}
+      secure_version: ${{ inputs.secure-version }}
+      build_type: secure
+      is_rc: ${{ needs.set-matrix.outputs.is_rc_build }}
       push_nexus: true
       push_ghcr: true
       build_logic_ref: dat-22876-reusables
