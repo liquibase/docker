@@ -7,43 +7,23 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Preview README push without updating Docker Hub (for validation runs)'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
   id-token: write
-  
+
 jobs:
-  update-liquibase-secure-readme:
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-
-      - name: Configure AWS credentials for vault access
-        uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7 # v6.0.0
-        with:
-          role-to-assume: ${{ secrets.LIQUIBASE_VAULT_OIDC_ROLE_ARN }}
-          aws-region: us-east-1
-
-      - name: Get secrets from vault
-        id: vault-secrets
-        uses: aws-actions/aws-secretsmanager-get-secrets@a9a7eb4e2f2871d30dc5b892576fde60a2ecc802 # v2.0.10
-        with:
-          secret-ids: |
-            ,/vault/liquibase
-          parse-json-secrets: true
-
-      - name: Decode DOCKERHUB_USERNAME
-        run: |
-          decoded_username=$(echo "${{ env.DOCKERHUB_USERNAME }}" | base64 -d)
-          echo "DOCKERHUB_USERNAME_DECODED=$decoded_username" >> $GITHUB_ENV
-
-      - name: Update Liquibase Secure README on Docker Hub
-        uses: peter-evans/dockerhub-description@1b9a80c056b620d92cedb9d9b5a223409c68ddfa # v5.0.0
-        with:
-          username: ${{ env.DOCKERHUB_USERNAME_DECODED}}
-          password: ${{ env.DOCKERHUB_UPDATE_README }}
-          repository: liquibase/liquibase-secure
-          readme-filepath: ./README-secure.md
-          short-description: "Liquibase Secure"
+  update-readme:
+    uses: liquibase/build-logic/.github/workflows/reusable-docker-readme.yml@main
+    with:
+      target_image: liquibase/liquibase-secure
+      readme_path: README-secure.md
+      short_description: "Liquibase Secure"
+      dry_run: ${{ inputs.dry_run || false }}
+    secrets: inherit
