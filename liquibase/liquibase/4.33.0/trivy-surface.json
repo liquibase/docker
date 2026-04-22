@@ -3,8 +3,8 @@
   "Trivy": {
     "Version": "0.69.3"
   },
-  "ReportID": "019daf95-0ce6-73ce-8725-5e13733809a7",
-  "CreatedAt": "2026-04-21T10:27:54.214250538Z",
+  "ReportID": "019db4bb-2eb6-7b7e-b607-7abc02ba27d9",
+  "CreatedAt": "2026-04-22T10:27:39.318754678Z",
   "ArtifactID": "sha256:d2ad381244ad087ec0c44faacfed4eef39240c2965f37afa23519688cb8ad01e",
   "ArtifactName": "liquibase/liquibase:4.33.0",
   "ArtifactType": "container_image",
@@ -13677,6 +13677,9 @@
           "Title": "net/url: Incorrect parsing of IPv6 host literals in net/url",
           "Description": "url.Parse insufficiently validated the host/authority component and accepted some invalid URLs.",
           "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-425"
+          ],
           "VendorSeverity": {
             "alma": 3,
             "amazon": 3,
@@ -13714,7 +13717,7 @@
             "https://www.cve.org/CVERecord?id=CVE-2026-25679"
           ],
           "PublishedDate": "2026-03-06T22:16:00.72Z",
-          "LastModifiedDate": "2026-03-10T18:18:37.74Z"
+          "LastModifiedDate": "2026-04-21T14:43:03.8Z"
         },
         {
           "VulnerabilityID": "CVE-2026-32280",
