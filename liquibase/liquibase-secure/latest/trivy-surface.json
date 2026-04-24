@@ -3,9 +3,9 @@
   "Trivy": {
     "Version": "0.69.3"
   },
-  "ReportID": "019db945-23e8-7c32-bc07-8e0620aeaca4",
-  "CreatedAt": "2026-04-23T07:36:49.384800404Z",
-  "ArtifactID": "sha256:ddedb81e3432cb92244260791cd64ed6db164aaab560ceacf569aff27a691b1a",
+  "ReportID": "019dbe6a-15a2-7093-bd72-fe3aed16e65d",
+  "CreatedAt": "2026-04-24T07:35:16.642038915Z",
+  "ArtifactID": "sha256:5fe35e09b492e03e4b934942e10e4c62a9975d76fb629d8bdd0b672c32aee075",
   "ArtifactName": "ghcr.io/liquibase/docker/liquibase-liquibase-secure:0bab6e74339b9916b2c133dd41cb946faa2d0479",
   "ArtifactType": "container_image",
   "Metadata": {
@@ -14,7 +14,7 @@
       "Family": "ubuntu",
       "Name": "24.04"
     },
-    "ImageID": "sha256:c9c9bed38edbe159aba3249a5fc7506f59f2aca971434b3b3fb7ae6aa679d76d",
+    "ImageID": "sha256:5ae025e8f752182fdc7852b27674a7beca58673020fb1a45c0cbf5dfd9cae9a8",
     "DiffIDs": [
       "sha256:538812a4b9bd45adaac2b5e5b967daa6999aa44eb110aa32ae7c69702b906475",
       "sha256:fc9116e853d51daeb05510d7ec1299ce2bc826d0c78b0defaac785f774a61c3f",
@@ -33,7 +33,7 @@
       "ghcr.io/liquibase/docker/liquibase-liquibase-secure:0bab6e74339b9916b2c133dd41cb946faa2d0479"
     ],
     "RepoDigests": [
-      "ghcr.io/liquibase/docker/liquibase-liquibase-secure@sha256:7d97209d8f6e9d73790e2c2674bdd48b2e6c2c1a065ea40dd03104da2366e23b"
+      "ghcr.io/liquibase/docker/liquibase-liquibase-secure@sha256:730084e712e089a418fb0b667aae99fe0fe8aa4ad43ff91e6d9e5e5b02424a71"
     ],
     "Reference": "ghcr.io/liquibase/docker/liquibase-liquibase-secure:0bab6e74339b9916b2c133dd41cb946faa2d0479",
     "ImageConfig": {
@@ -120,7 +120,7 @@
           "comment": "buildkit.dockerfile.v0"
         },
         {
-          "created": "2026-04-23T07:32:10.819626521Z",
+          "created": "2026-04-23T07:32:10.82809856Z",
           "created_by": "WORKDIR /liquibase",
           "comment": "buildkit.dockerfile.v0"
         },
