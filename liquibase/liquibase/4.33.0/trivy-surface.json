@@ -3,8 +3,8 @@
   "Trivy": {
     "Version": "0.69.3"
   },
-  "ReportID": "019dddf3-20d5-77a3-b04b-5b8e4e291c8a",
-  "CreatedAt": "2026-04-30T10:33:11.637501534Z",
+  "ReportID": "019de315-9aad-7565-a081-993f2b6f6dc1",
+  "CreatedAt": "2026-05-01T10:28:57.133354922Z",
   "ArtifactID": "sha256:d2ad381244ad087ec0c44faacfed4eef39240c2965f37afa23519688cb8ad01e",
   "ArtifactName": "liquibase/liquibase:4.33.0",
   "ArtifactType": "container_image",
@@ -13682,7 +13682,7 @@
           ],
           "VendorSeverity": {
             "alma": 3,
-            "amazon": 2,
+            "amazon": 3,
             "azure": 3,
             "bitnami": 3,
             "oracle-oval": 3,
