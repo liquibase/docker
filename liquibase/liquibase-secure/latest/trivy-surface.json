@@ -3,9 +3,9 @@
   "Trivy": {
     "Version": "0.69.3"
   },
-  "ReportID": "019df71d-3c19-773f-a8ea-0ef46a4e12d8",
-  "CreatedAt": "2026-05-05T07:49:41.529476491Z",
-  "ArtifactID": "sha256:65eb0ea5406b2e22c5da8947a9dd889522523a07f70c6b5e1463bf942fbd5686",
+  "ReportID": "019dfc42-52f1-787e-aaa9-81da15fe3f7f",
+  "CreatedAt": "2026-05-06T07:48:18.289558299Z",
+  "ArtifactID": "sha256:c4bf7b2b17fc22d3be57776dad1537ca605d1d6ff5dbbc29fd8a162d057d2b6c",
   "ArtifactName": "ghcr.io/liquibase/docker/liquibase-liquibase-secure:0bab6e74339b9916b2c133dd41cb946faa2d0479",
   "ArtifactType": "container_image",
   "Metadata": {
@@ -14,7 +14,7 @@
       "Family": "ubuntu",
       "Name": "24.04"
     },
-    "ImageID": "sha256:34cf52fde089326104d6468d0c7259ad72016954c06f9427b59bd9e8297af521",
+    "ImageID": "sha256:7e48e224373b5629763704e0b0ad8a7b012737dce91c84e724b25e795624b04d",
     "DiffIDs": [
       "sha256:538812a4b9bd45adaac2b5e5b967daa6999aa44eb110aa32ae7c69702b906475",
       "sha256:fc9116e853d51daeb05510d7ec1299ce2bc826d0c78b0defaac785f774a61c3f",
@@ -33,7 +33,7 @@
       "ghcr.io/liquibase/docker/liquibase-liquibase-secure:0bab6e74339b9916b2c133dd41cb946faa2d0479"
     ],
     "RepoDigests": [
-      "ghcr.io/liquibase/docker/liquibase-liquibase-secure@sha256:c7fc09382617a35c3436869520bfae842cee6bf78ef0ffe8db8306c96eb702d5"
+      "ghcr.io/liquibase/docker/liquibase-liquibase-secure@sha256:d733b951e8fc8c500a2973c85e424eab69a090b3689d7525e8461096043413fc"
     ],
     "Reference": "ghcr.io/liquibase/docker/liquibase-liquibase-secure:0bab6e74339b9916b2c133dd41cb946faa2d0479",
     "ImageConfig": {
@@ -120,7 +120,7 @@
           "comment": "buildkit.dockerfile.v0"
         },
         {
-          "created": "2026-05-01T07:44:07.217468339Z",
+          "created": "2026-05-05T07:36:32.156174061Z",
           "created_by": "WORKDIR /liquibase",
           "comment": "buildkit.dockerfile.v0"
         },
@@ -15595,6 +15595,63 @@
           },
           "FilePath": "liquibase/internal/extensions/liquibase-commercial-cassandra.jar",
           "AnalyzedBy": "jar"
+        }
+      ],
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2026-42198",
+          "VendorIDs": [
+            "GHSA-98qh-xjc8-98pq"
+          ],
+          "PkgName": "org.postgresql:postgresql",
+          "PkgPath": "liquibase/internal/lib/postgresql.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/org.postgresql/postgresql@42.7.9",
+            "UID": "9415a953375739a6"
+          },
+          "InstalledVersion": "42.7.9",
+          "FixedVersion": "42.7.11",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:f9bab1a1735f19cfe901a5966674569001c7788a958d9a2b6c321c83dbee1f37",
+            "DiffID": "sha256:fbd4f219164d77e5ff70e63562d72aaf835c0d4c497f490cb1413fa57f7a5f89"
+          },
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-42198",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:0608befa79e9d2cf04380daaa3093fc3ee894f8c512c3aa2009a393c5219f764",
+          "Title": "pgjdbc is an open source postgresql JDBC Driver. From version 42.2.0 t ...",
+          "Description": "pgjdbc is an open source postgresql JDBC Driver. From version 42.2.0 to before version 42.7.11, pgjdbc is vulnerable to a client-side denial of service during SCRAM-SHA-256 authentication. A malicious server can instruct the driver to perform SCRAM authentication with a very large iteration count. With a large enough value, the client spends an unbounded amount of CPU time inside PBKDF2 before authentication can fail. A single attempt ties up a CPU core. Repeated or concurrent attempts exhaust client CPU and can wedge connection pools. In affected versions, loginTimeout did not fully mitigate this problem. When loginTimeout expired, the caller could stop waiting, but the worker thread performing the connection attempt could continue running and burning CPU inside the SCRAM PBKDF2 computation. This issue has been patched in version 42.7.11.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-770"
+          ],
+          "VendorSeverity": {
+            "bitnami": 3,
+            "ghsa": 3
+          },
+          "CVSS": {
+            "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://github.com/pgjdbc/pgjdbc",
+            "https://github.com/pgjdbc/pgjdbc/releases/tag/REL42.7.11",
+            "https://github.com/pgjdbc/pgjdbc/security/advisories/GHSA-98qh-xjc8-98pq",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-42198"
+          ],
+          "PublishedDate": "2026-04-29T16:16:25.427Z",
+          "LastModifiedDate": "2026-05-01T12:51:20.853Z"
         }
       ]
     },
