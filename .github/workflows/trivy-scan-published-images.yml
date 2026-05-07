@@ -59,6 +59,7 @@ jobs:
       upload_sarif: false
       generate_sbom: true
       vex_enabled: ${{ contains(matrix.image, 'liquibase-secure') }}
+      dispatch_new_cves: ${{ contains(matrix.image, 'liquibase-secure') }}
       build_logic_ref: main
     secrets: inherit
 
@@ -164,6 +165,14 @@ jobs:
             IMAGE_NAME=$(echo "$EXPECTED_MATRIX" | jq -r ".include[$idx].image")
             IMAGE_TAG=$(echo "$EXPECTED_MATRIX" | jq -r ".include[$idx].tag")
             IMAGE_OR_VERSION="${IMAGE_NAME}:${IMAGE_TAG}"
+
+            # Only dispatch CVEs for liquibase-secure images. Community/alpine
+            # OSS findings are tracked in their own repos and must not flood
+            # investigate-cve.lock.yml in liquibase-pro.
+            if [[ "$IMAGE_NAME" != *liquibase-secure* ]]; then
+              echo "- **${IMAGE_OR_VERSION}**: skipped CVE dispatch (non-secure image)" >> "$GITHUB_STEP_SUMMARY"
+              continue
+            fi
 
             # Reconstruct artifact directory name (same convention as the reusable workflow)
             SAFE_NAME=$(echo "$IMAGE_NAME" | tr '/' '-')
