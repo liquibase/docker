@@ -178,6 +178,7 @@ jobs:
       fail_on_vulnerabilities: true
       upload_sarif: false
       generate_sbom: true
+      dispatch_new_cves: false
       build_logic_ref: main
     secrets: inherit
 
@@ -197,6 +198,7 @@ jobs:
       fail_on_vulnerabilities: true
       upload_sarif: false
       generate_sbom: true
+      dispatch_new_cves: false
       build_logic_ref: main
     secrets: inherit
 
@@ -216,6 +218,7 @@ jobs:
       fail_on_vulnerabilities: true
       upload_sarif: false
       generate_sbom: true
+      dispatch_new_cves: true
       build_logic_ref: main
     secrets: inherit
 
