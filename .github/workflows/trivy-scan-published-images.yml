@@ -150,9 +150,12 @@ jobs:
           TOTAL_FAILED=0
           TOTAL_DEDUPED=0
 
-          # Track CVE IDs already dispatched across all tags to avoid flooding
-          # the investigate-cve workflow with duplicate CVEs from different tags
-          DISPATCHED_CVES_FILE=$(mktemp)
+          # Per-image dedup state. Same CVE id appearing across multiple tags of the
+          # same image is deduplicated (avoids flooding investigate-cve with one batch
+          # per tag). Different images (e.g., liquibase vs liquibase-secure) keep
+          # independent state so the same CVE is investigated separately for each —
+          # they are distinct artifacts with potentially different reachability.
+          DISPATCHED_CVES_DIR=$(mktemp -d)
 
           # Derive image:tag from the matrix JSON directly (avoids fragile artifact-name parsing)
           ENTRY_COUNT=$(echo "$EXPECTED_MATRIX" | jq '.include | length')
@@ -166,6 +169,9 @@ jobs:
             SAFE_NAME=$(echo "$IMAGE_NAME" | tr '/' '-')
             SAFE_TAG=$(echo "$IMAGE_TAG" | tr '/' '-')
             ARTIFACT_DIR="scan-artifacts/vulnerability-report-${SAFE_NAME}-${SAFE_TAG}"
+
+            # Per-image dedup files (one .json + one .ids per IMAGE_NAME).
+            DISPATCHED_CVES_FILE="${DISPATCHED_CVES_DIR}/${SAFE_NAME}.json"
 
             if [ ! -d "$ARTIFACT_DIR" ] || [ -z "$(ls -A "$ARTIFACT_DIR" 2>/dev/null)" ]; then
               echo "::warning::No scan artifacts for ${IMAGE_OR_VERSION} -- skipping CVE dispatch"
@@ -201,11 +207,16 @@ jobs:
             while IFS= read -r batch_json; do
               [ -z "$batch_json" ] && continue
 
-              # Deduplicate: remove CVEs already dispatched from a previous tag
-              NEW_CVES=$(echo "$batch_json" | jq -c --slurpfile seen "$DISPATCHED_CVES_FILE" '
-                ($seen | if length > 0 then .[0] else [] end) as $already |
-                .cves |= [.[] | select(.id as $id | $already | index($id) | not)]
-              ' 2>/dev/null || echo "$batch_json")
+              # Deduplicate: remove CVEs already dispatched from a previous tag of
+              # this same image. (Cross-image state is intentionally separate.)
+              if [ -f "$DISPATCHED_CVES_FILE" ]; then
+                NEW_CVES=$(echo "$batch_json" | jq -c --slurpfile seen "$DISPATCHED_CVES_FILE" '
+                  ($seen | if length > 0 then .[0] else [] end) as $already |
+                  .cves |= [.[] | select(.id as $id | $already | index($id) | not)]
+                ' 2>/dev/null || echo "$batch_json")
+              else
+                NEW_CVES="$batch_json"
+              fi
 
               NEW_COUNT=$(echo "$NEW_CVES" | jq '.cves | length' 2>/dev/null || echo 0)
               ORIG_COUNT=$(echo "$batch_json" | jq '.cves | length' 2>/dev/null || echo 0)
@@ -213,11 +224,11 @@ jobs:
 
               if [ "$SKIPPED" -gt 0 ]; then
                 TOTAL_DEDUPED=$((TOTAL_DEDUPED + SKIPPED))
-                echo "  Deduped $SKIPPED CVE(s) already dispatched from previous tag"
+                echo "  Deduped $SKIPPED CVE(s) already dispatched from a previous tag of ${IMAGE_NAME}"
               fi
 
               if [ "$NEW_COUNT" -eq 0 ]; then
-                echo "- **${IMAGE_OR_VERSION}**: all CVEs already dispatched from previous tag" >> "$GITHUB_STEP_SUMMARY"
+                echo "- **${IMAGE_OR_VERSION}**: all CVEs already dispatched from a previous tag of ${IMAGE_NAME}" >> "$GITHUB_STEP_SUMMARY"
                 continue
               fi
 
@@ -246,7 +257,7 @@ jobs:
             TOTAL_FAILED=$((TOTAL_FAILED + FAILED))
           done
 
-          rm -f "$DISPATCHED_CVES_FILE" "$DISPATCHED_CVES_FILE.ids"
+          rm -rf "$DISPATCHED_CVES_DIR"
 
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "**Total dispatched**: $TOTAL_BATCHES batch(es), $TOTAL_FAILED failure(s)" >> "$GITHUB_STEP_SUMMARY"
