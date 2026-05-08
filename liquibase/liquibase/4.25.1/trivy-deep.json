@@ -3,8 +3,8 @@
   "Trivy": {
     "Version": "0.69.3"
   },
-  "ReportID": "019dae7e-0288-7d58-9a6e-f3039a7376cb",
-  "CreatedAt": "2026-04-21T05:23:07.016875785Z",
+  "ReportID": "019e0817-8dd4-7a1b-9a64-3672a4f990a9",
+  "CreatedAt": "2026-05-08T14:57:01.908663118Z",
   "ArtifactName": "/tmp/extracted-deps",
   "ArtifactType": "filesystem",
   "Results": [
@@ -423,6 +423,64 @@
           ],
           "PublishedDate": "2024-02-19T13:15:07.74Z",
           "LastModifiedDate": "2025-11-03T22:16:40.287Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-42198",
+          "VendorIDs": [
+            "GHSA-98qh-xjc8-98pq"
+          ],
+          "PkgName": "org.postgresql:postgresql",
+          "PkgPath": "internal-jars/lib/postgresql.jar",
+          "PkgIdentifier": {
+            "PURL": "pkg:maven/org.postgresql/postgresql@42.7.1",
+            "UID": "ed1781815507b968"
+          },
+          "InstalledVersion": "42.7.1",
+          "FixedVersion": "42.7.11",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-42198",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory Maven",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
+          },
+          "Fingerprint": "sha256:0d74d523df9f4de1a2f809b617be2f69ba2f77b51e58d3c8280b0f4250be98ad",
+          "Title": "jdbc.postgresql.org: pgjdbc: Client-side Denial of Service via malicious SCRAM-SHA-256 authentication",
+          "Description": "pgjdbc is an open source postgresql JDBC Driver. From version 42.2.0 to before version 42.7.11, pgjdbc is vulnerable to a client-side denial of service during SCRAM-SHA-256 authentication. A malicious server can instruct the driver to perform SCRAM authentication with a very large iteration count. With a large enough value, the client spends an unbounded amount of CPU time inside PBKDF2 before authentication can fail. A single attempt ties up a CPU core. Repeated or concurrent attempts exhaust client CPU and can wedge connection pools. In affected versions, loginTimeout did not fully mitigate this problem. When loginTimeout expired, the caller could stop waiting, but the worker thread performing the connection attempt could continue running and burning CPU inside the SCRAM PBKDF2 computation. This issue has been patched in version 42.7.11.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-770"
+          ],
+          "VendorSeverity": {
+            "bitnami": 3,
+            "ghsa": 3,
+            "redhat": 3
+          },
+          "CVSS": {
+            "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2026-42198",
+            "https://github.com/pgjdbc/pgjdbc",
+            "https://github.com/pgjdbc/pgjdbc/releases/tag/REL42.7.11",
+            "https://github.com/pgjdbc/pgjdbc/security/advisories/GHSA-98qh-xjc8-98pq",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-42198",
+            "https://www.cve.org/CVERecord?id=CVE-2026-42198"
+          ],
+          "PublishedDate": "2026-04-29T16:16:25.427Z",
+          "LastModifiedDate": "2026-05-01T12:51:20.853Z"
         }
       ]
     }
