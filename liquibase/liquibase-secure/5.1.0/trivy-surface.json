@@ -3,8 +3,8 @@
   "Trivy": {
     "Version": "0.69.3"
   },
-  "ReportID": "019e0817-1917-71f8-957b-69a57c8bcbd4",
-  "CreatedAt": "2026-05-08T14:56:32.023130433Z",
+  "ReportID": "019e0859-5c52-7210-8d88-aaaf39eb0c46",
+  "CreatedAt": "2026-05-08T16:08:54.610136326Z",
   "ArtifactID": "sha256:176b2facc69b5d6abc2ce362a642d232d93f5e82c6a7756b17a0e7a722591a3b",
   "ArtifactName": "liquibase/liquibase-secure:5.1.0",
   "ArtifactType": "container_image",
@@ -15632,70 +15632,6 @@
           },
           "FilePath": "liquibase/internal/extensions/liquibase-commercial-cassandra.jar",
           "AnalyzedBy": "jar"
-        }
-      ],
-      "Vulnerabilities": [
-        {
-          "VulnerabilityID": "CVE-2026-42198",
-          "VendorIDs": [
-            "GHSA-98qh-xjc8-98pq"
-          ],
-          "PkgName": "org.postgresql:postgresql",
-          "PkgPath": "liquibase/internal/lib/postgresql.jar",
-          "PkgIdentifier": {
-            "PURL": "pkg:maven/org.postgresql/postgresql@42.7.9",
-            "UID": "9415a953375739a6"
-          },
-          "InstalledVersion": "42.7.9",
-          "FixedVersion": "42.7.11",
-          "Status": "fixed",
-          "Layer": {
-            "Digest": "sha256:2dce4ba2c160154b16d707c7d44e11db456541cca7f03277276c813e5a66b125",
-            "DiffID": "sha256:3913693ae7084d654c1a7e3184f805ac5efd660ee596b0661f4eff319580f6cf"
-          },
-          "SeveritySource": "ghsa",
-          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-42198",
-          "DataSource": {
-            "ID": "ghsa",
-            "Name": "GitHub Security Advisory Maven",
-            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Amaven"
-          },
-          "Fingerprint": "sha256:55c3b23e6d1e27613d24fd050db2fd44f8f20987f58ff5b7a9d53d0aa75d9965",
-          "Title": "jdbc.postgresql.org: pgjdbc: Client-side Denial of Service via malicious SCRAM-SHA-256 authentication",
-          "Description": "pgjdbc is an open source postgresql JDBC Driver. From version 42.2.0 to before version 42.7.11, pgjdbc is vulnerable to a client-side denial of service during SCRAM-SHA-256 authentication. A malicious server can instruct the driver to perform SCRAM authentication with a very large iteration count. With a large enough value, the client spends an unbounded amount of CPU time inside PBKDF2 before authentication can fail. A single attempt ties up a CPU core. Repeated or concurrent attempts exhaust client CPU and can wedge connection pools. In affected versions, loginTimeout did not fully mitigate this problem. When loginTimeout expired, the caller could stop waiting, but the worker thread performing the connection attempt could continue running and burning CPU inside the SCRAM PBKDF2 computation. This issue has been patched in version 42.7.11.",
-          "Severity": "HIGH",
-          "CweIDs": [
-            "CWE-770"
-          ],
-          "VendorSeverity": {
-            "bitnami": 3,
-            "ghsa": 3,
-            "redhat": 3
-          },
-          "CVSS": {
-            "bitnami": {
-              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
-              "V3Score": 7.5
-            },
-            "ghsa": {
-              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
-              "V3Score": 7.5
-            },
-            "redhat": {
-              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
-              "V3Score": 7.5
-            }
-          },
-          "References": [
-            "https://access.redhat.com/security/cve/CVE-2026-42198",
-            "https://github.com/pgjdbc/pgjdbc",
-            "https://github.com/pgjdbc/pgjdbc/releases/tag/REL42.7.11",
-            "https://github.com/pgjdbc/pgjdbc/security/advisories/GHSA-98qh-xjc8-98pq",
-            "https://nvd.nist.gov/vuln/detail/CVE-2026-42198",
-            "https://www.cve.org/CVERecord?id=CVE-2026-42198"
-          ],
-          "PublishedDate": "2026-04-29T16:16:25.427Z",
-          "LastModifiedDate": "2026-05-01T12:51:20.853Z"
         }
       ]
     },
