@@ -3,8 +3,8 @@
   "Trivy": {
     "Version": "0.69.3"
   },
-  "ReportID": "019e16b8-3067-7f19-bd95-52d93e83d492",
-  "CreatedAt": "2026-05-11T11:07:10.311991042Z",
+  "ReportID": "019e1bd0-1dc1-73ad-a76e-4eba88d9831e",
+  "CreatedAt": "2026-05-12T10:51:24.481242701Z",
   "ArtifactName": "/tmp/extracted-deps",
   "ArtifactType": "filesystem",
   "Results": [
@@ -6355,6 +6355,242 @@
           ],
           "FilePath": "python-packages/urllib3-2.6.3.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
+        }
+      ],
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2026-44431",
+          "VendorIDs": [
+            "GHSA-qccp-gfcp-xxvc"
+          ],
+          "PkgName": "urllib3",
+          "PkgPath": "extension-scan/liquibase-checks/org.graalvm.python.vfs/venv/Lib/site-packages/urllib3-2.6.3.dist-info/METADATA",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/urllib3@2.6.3",
+            "UID": "53e1b5f44d9c13ab"
+          },
+          "InstalledVersion": "2.6.3",
+          "FixedVersion": "2.7.0",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-44431",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Fingerprint": "sha256:9af9b3854aac6ac185e28c2845afcbd65be116b3693829524764b27e5f1dafbc",
+          "Title": "urllib3: Sensitive headers forwarded across origins in proxied low-level redirects",
+          "Description": "### Impact\n\nWhen following cross-origin redirects for requests made using urllib3’s high-level APIs, such as `urllib3.request()`, `PoolManager.request()`, and `ProxyManager.request()`, sensitive headers — `Authorization`, `Cookie`, and `Proxy-Authorization` (defined in `Retry.DEFAULT_REMOVE_HEADERS_ON_REDIRECT`) — are stripped by default, as expected.\n\nHowever, cross-origin redirects followed from the low-level API via `ProxyManager.connection_from_url().urlopen(..., assert_same_host=False)` still forward these sensitive headers.\n\n### Affected usage\n\nApplications and libraries using urllib3 versions earlier than 2.7.0 may be affected if they allow cross-origin redirects while making requests through `HTTPConnection.urlopen()` instances created via `ProxyManager.connection_from_url()`.\n\n### Remediation\n\nUpgrade to urllib3 version 2.7.0 or later, in which sensitive headers are stripped from redirects followed by `HTTPConnection`.\n\nIf upgrading is not immediately possible, avoid using this low-level redirect flow for cross-origin redirects. If appropriate for your use case, switch to `ProxyManager.request()`.",
+          "Severity": "HIGH",
+          "VendorSeverity": {
+            "ghsa": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V40Vector": "CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N",
+              "V40Score": 8.2
+            }
+          },
+          "References": [
+            "https://github.com/urllib3/urllib3",
+            "https://github.com/urllib3/urllib3/security/advisories/GHSA-qccp-gfcp-xxvc"
+          ]
+        },
+        {
+          "VulnerabilityID": "CVE-2026-44431",
+          "VendorIDs": [
+            "GHSA-qccp-gfcp-xxvc"
+          ],
+          "PkgName": "urllib3",
+          "PkgPath": "extension-scan/liquibase-checks/org.graalvm.python.vfs/venv/lib/python3.11/site-packages/urllib3-2.6.3.dist-info/METADATA",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/urllib3@2.6.3",
+            "UID": "384773a2ba2ccad9"
+          },
+          "InstalledVersion": "2.6.3",
+          "FixedVersion": "2.7.0",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-44431",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Fingerprint": "sha256:9af9b3854aac6ac185e28c2845afcbd65be116b3693829524764b27e5f1dafbc",
+          "Title": "urllib3: Sensitive headers forwarded across origins in proxied low-level redirects",
+          "Description": "### Impact\n\nWhen following cross-origin redirects for requests made using urllib3’s high-level APIs, such as `urllib3.request()`, `PoolManager.request()`, and `ProxyManager.request()`, sensitive headers — `Authorization`, `Cookie`, and `Proxy-Authorization` (defined in `Retry.DEFAULT_REMOVE_HEADERS_ON_REDIRECT`) — are stripped by default, as expected.\n\nHowever, cross-origin redirects followed from the low-level API via `ProxyManager.connection_from_url().urlopen(..., assert_same_host=False)` still forward these sensitive headers.\n\n### Affected usage\n\nApplications and libraries using urllib3 versions earlier than 2.7.0 may be affected if they allow cross-origin redirects while making requests through `HTTPConnection.urlopen()` instances created via `ProxyManager.connection_from_url()`.\n\n### Remediation\n\nUpgrade to urllib3 version 2.7.0 or later, in which sensitive headers are stripped from redirects followed by `HTTPConnection`.\n\nIf upgrading is not immediately possible, avoid using this low-level redirect flow for cross-origin redirects. If appropriate for your use case, switch to `ProxyManager.request()`.",
+          "Severity": "HIGH",
+          "VendorSeverity": {
+            "ghsa": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V40Vector": "CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N",
+              "V40Score": 8.2
+            }
+          },
+          "References": [
+            "https://github.com/urllib3/urllib3",
+            "https://github.com/urllib3/urllib3/security/advisories/GHSA-qccp-gfcp-xxvc"
+          ]
+        },
+        {
+          "VulnerabilityID": "CVE-2026-44431",
+          "VendorIDs": [
+            "GHSA-qccp-gfcp-xxvc"
+          ],
+          "PkgName": "urllib3",
+          "PkgPath": "python-packages/urllib3-2.6.3.dist-info/METADATA",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/urllib3@2.6.3",
+            "UID": "2d1ce8aa2f9d7fdd"
+          },
+          "InstalledVersion": "2.6.3",
+          "FixedVersion": "2.7.0",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-44431",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Fingerprint": "sha256:9af9b3854aac6ac185e28c2845afcbd65be116b3693829524764b27e5f1dafbc",
+          "Title": "urllib3: Sensitive headers forwarded across origins in proxied low-level redirects",
+          "Description": "### Impact\n\nWhen following cross-origin redirects for requests made using urllib3’s high-level APIs, such as `urllib3.request()`, `PoolManager.request()`, and `ProxyManager.request()`, sensitive headers — `Authorization`, `Cookie`, and `Proxy-Authorization` (defined in `Retry.DEFAULT_REMOVE_HEADERS_ON_REDIRECT`) — are stripped by default, as expected.\n\nHowever, cross-origin redirects followed from the low-level API via `ProxyManager.connection_from_url().urlopen(..., assert_same_host=False)` still forward these sensitive headers.\n\n### Affected usage\n\nApplications and libraries using urllib3 versions earlier than 2.7.0 may be affected if they allow cross-origin redirects while making requests through `HTTPConnection.urlopen()` instances created via `ProxyManager.connection_from_url()`.\n\n### Remediation\n\nUpgrade to urllib3 version 2.7.0 or later, in which sensitive headers are stripped from redirects followed by `HTTPConnection`.\n\nIf upgrading is not immediately possible, avoid using this low-level redirect flow for cross-origin redirects. If appropriate for your use case, switch to `ProxyManager.request()`.",
+          "Severity": "HIGH",
+          "VendorSeverity": {
+            "ghsa": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V40Vector": "CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N",
+              "V40Score": 8.2
+            }
+          },
+          "References": [
+            "https://github.com/urllib3/urllib3",
+            "https://github.com/urllib3/urllib3/security/advisories/GHSA-qccp-gfcp-xxvc"
+          ]
+        },
+        {
+          "VulnerabilityID": "CVE-2026-44432",
+          "VendorIDs": [
+            "GHSA-mf9v-mfxr-j63j"
+          ],
+          "PkgName": "urllib3",
+          "PkgPath": "extension-scan/liquibase-checks/org.graalvm.python.vfs/venv/Lib/site-packages/urllib3-2.6.3.dist-info/METADATA",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/urllib3@2.6.3",
+            "UID": "53e1b5f44d9c13ab"
+          },
+          "InstalledVersion": "2.6.3",
+          "FixedVersion": "2.7.0",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-44432",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Fingerprint": "sha256:ef88957c4dd0aa8c5daeb9655ccc50ce6702d732fcd157afd5cf262d25de893a",
+          "Title": "urllib3: Decompression-bomb safeguards bypassed in parts of the streaming API",
+          "Description": "### Impact\n\nurllib3's [streaming API](https://urllib3.readthedocs.io/en/2.7.0/advanced-usage.html#streaming-and-i-o) is designed for the efficient handling of large HTTP responses by reading the content in chunks, rather than loading the entire response body into memory at once.\n\nurllib3 can perform decompression based on the HTTP `Content-Encoding` header (e.g., `gzip`, `deflate`, `br`, or `zstd`). When using the streaming API since version 2.6.0, the library decompresses only the necessary bytes, enabling partial content consumption.\n\nHowever, urllib3 before version 2.7.0 could still decompress the whole response instead of the requested portion in two cases:\n1. During the second `HTTPResponse.read(amt=N)` call when the response was decompressed using the official [Brotli](https://pypi.org/project/brotli/) library.\n2. When `HTTPResponse.drain_conn()` was called after the response had been read and decompressed partially (compression algorithm did not matter here).\n\nThese issues could cause urllib3 to fully decode a small amount of highly compressed data in a single operation. This could result in excessive resource consumption (high CPU usage and massive memory allocation for the decompressed data; CWE-409) on the client side.\n\n\n### Affected usages\n\nApplications and libraries using urllib3 versions earlier than 2.7.0 may be affected when streaming compressed responses from untrusted sources in either of these cases, unless decompression is explicitly disabled:\n\n1. A response encoded with `br` is read incrementally with at least two `HTTPResponse.read(amt=N)` or `HTTPResponse.stream(amt=N)` calls while using the official [Brotli](https://pypi.org/project/brotli/) library.\n2. `HTTPResponse.drain_conn()` is called after response decompression has already started.\n\n\n### Remediation\n\nUpgrade to at least urllib3 version 2.7.0 in which the library:\n1. Is more efficient for reads with Brotli.\n2. Always skips decompression for `HTTPResponse.drain_conn()`.\n\nIf upgrading is not immediately possible, the following workarounds may reduce exposure in specific cases:\n1. For the Brotli-specific issue only, switch from [brotli](https://pypi.org/project/brotli/) to [brotlicffi](https://pypi.org/project/brotlicffi/) until you can upgrade urllib3; the official Brotli package is affected because of https://github.com/google/brotli/issues/1396.\n2. If your code explicitly calls `HTTPResponse.drain_conn()`, call `HTTPResponse.close()` instead when connection reuse is not important.\n\n\n### Credits\n\nThe Brotli-specific issue was reported by @kimkou2024.\n`HTTPResponse.drain_conn()` inefficiency was reported by @Cycloctane.",
+          "Severity": "HIGH",
+          "VendorSeverity": {
+            "ghsa": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:H",
+              "V40Score": 8.9
+            }
+          },
+          "References": [
+            "https://github.com/urllib3/urllib3",
+            "https://github.com/urllib3/urllib3/security/advisories/GHSA-mf9v-mfxr-j63j"
+          ]
+        },
+        {
+          "VulnerabilityID": "CVE-2026-44432",
+          "VendorIDs": [
+            "GHSA-mf9v-mfxr-j63j"
+          ],
+          "PkgName": "urllib3",
+          "PkgPath": "extension-scan/liquibase-checks/org.graalvm.python.vfs/venv/lib/python3.11/site-packages/urllib3-2.6.3.dist-info/METADATA",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/urllib3@2.6.3",
+            "UID": "384773a2ba2ccad9"
+          },
+          "InstalledVersion": "2.6.3",
+          "FixedVersion": "2.7.0",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-44432",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Fingerprint": "sha256:ef88957c4dd0aa8c5daeb9655ccc50ce6702d732fcd157afd5cf262d25de893a",
+          "Title": "urllib3: Decompression-bomb safeguards bypassed in parts of the streaming API",
+          "Description": "### Impact\n\nurllib3's [streaming API](https://urllib3.readthedocs.io/en/2.7.0/advanced-usage.html#streaming-and-i-o) is designed for the efficient handling of large HTTP responses by reading the content in chunks, rather than loading the entire response body into memory at once.\n\nurllib3 can perform decompression based on the HTTP `Content-Encoding` header (e.g., `gzip`, `deflate`, `br`, or `zstd`). When using the streaming API since version 2.6.0, the library decompresses only the necessary bytes, enabling partial content consumption.\n\nHowever, urllib3 before version 2.7.0 could still decompress the whole response instead of the requested portion in two cases:\n1. During the second `HTTPResponse.read(amt=N)` call when the response was decompressed using the official [Brotli](https://pypi.org/project/brotli/) library.\n2. When `HTTPResponse.drain_conn()` was called after the response had been read and decompressed partially (compression algorithm did not matter here).\n\nThese issues could cause urllib3 to fully decode a small amount of highly compressed data in a single operation. This could result in excessive resource consumption (high CPU usage and massive memory allocation for the decompressed data; CWE-409) on the client side.\n\n\n### Affected usages\n\nApplications and libraries using urllib3 versions earlier than 2.7.0 may be affected when streaming compressed responses from untrusted sources in either of these cases, unless decompression is explicitly disabled:\n\n1. A response encoded with `br` is read incrementally with at least two `HTTPResponse.read(amt=N)` or `HTTPResponse.stream(amt=N)` calls while using the official [Brotli](https://pypi.org/project/brotli/) library.\n2. `HTTPResponse.drain_conn()` is called after response decompression has already started.\n\n\n### Remediation\n\nUpgrade to at least urllib3 version 2.7.0 in which the library:\n1. Is more efficient for reads with Brotli.\n2. Always skips decompression for `HTTPResponse.drain_conn()`.\n\nIf upgrading is not immediately possible, the following workarounds may reduce exposure in specific cases:\n1. For the Brotli-specific issue only, switch from [brotli](https://pypi.org/project/brotli/) to [brotlicffi](https://pypi.org/project/brotlicffi/) until you can upgrade urllib3; the official Brotli package is affected because of https://github.com/google/brotli/issues/1396.\n2. If your code explicitly calls `HTTPResponse.drain_conn()`, call `HTTPResponse.close()` instead when connection reuse is not important.\n\n\n### Credits\n\nThe Brotli-specific issue was reported by @kimkou2024.\n`HTTPResponse.drain_conn()` inefficiency was reported by @Cycloctane.",
+          "Severity": "HIGH",
+          "VendorSeverity": {
+            "ghsa": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:H",
+              "V40Score": 8.9
+            }
+          },
+          "References": [
+            "https://github.com/urllib3/urllib3",
+            "https://github.com/urllib3/urllib3/security/advisories/GHSA-mf9v-mfxr-j63j"
+          ]
+        },
+        {
+          "VulnerabilityID": "CVE-2026-44432",
+          "VendorIDs": [
+            "GHSA-mf9v-mfxr-j63j"
+          ],
+          "PkgName": "urllib3",
+          "PkgPath": "python-packages/urllib3-2.6.3.dist-info/METADATA",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/urllib3@2.6.3",
+            "UID": "2d1ce8aa2f9d7fdd"
+          },
+          "InstalledVersion": "2.6.3",
+          "FixedVersion": "2.7.0",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-44432",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Fingerprint": "sha256:ef88957c4dd0aa8c5daeb9655ccc50ce6702d732fcd157afd5cf262d25de893a",
+          "Title": "urllib3: Decompression-bomb safeguards bypassed in parts of the streaming API",
+          "Description": "### Impact\n\nurllib3's [streaming API](https://urllib3.readthedocs.io/en/2.7.0/advanced-usage.html#streaming-and-i-o) is designed for the efficient handling of large HTTP responses by reading the content in chunks, rather than loading the entire response body into memory at once.\n\nurllib3 can perform decompression based on the HTTP `Content-Encoding` header (e.g., `gzip`, `deflate`, `br`, or `zstd`). When using the streaming API since version 2.6.0, the library decompresses only the necessary bytes, enabling partial content consumption.\n\nHowever, urllib3 before version 2.7.0 could still decompress the whole response instead of the requested portion in two cases:\n1. During the second `HTTPResponse.read(amt=N)` call when the response was decompressed using the official [Brotli](https://pypi.org/project/brotli/) library.\n2. When `HTTPResponse.drain_conn()` was called after the response had been read and decompressed partially (compression algorithm did not matter here).\n\nThese issues could cause urllib3 to fully decode a small amount of highly compressed data in a single operation. This could result in excessive resource consumption (high CPU usage and massive memory allocation for the decompressed data; CWE-409) on the client side.\n\n\n### Affected usages\n\nApplications and libraries using urllib3 versions earlier than 2.7.0 may be affected when streaming compressed responses from untrusted sources in either of these cases, unless decompression is explicitly disabled:\n\n1. A response encoded with `br` is read incrementally with at least two `HTTPResponse.read(amt=N)` or `HTTPResponse.stream(amt=N)` calls while using the official [Brotli](https://pypi.org/project/brotli/) library.\n2. `HTTPResponse.drain_conn()` is called after response decompression has already started.\n\n\n### Remediation\n\nUpgrade to at least urllib3 version 2.7.0 in which the library:\n1. Is more efficient for reads with Brotli.\n2. Always skips decompression for `HTTPResponse.drain_conn()`.\n\nIf upgrading is not immediately possible, the following workarounds may reduce exposure in specific cases:\n1. For the Brotli-specific issue only, switch from [brotli](https://pypi.org/project/brotli/) to [brotlicffi](https://pypi.org/project/brotlicffi/) until you can upgrade urllib3; the official Brotli package is affected because of https://github.com/google/brotli/issues/1396.\n2. If your code explicitly calls `HTTPResponse.drain_conn()`, call `HTTPResponse.close()` instead when connection reuse is not important.\n\n\n### Credits\n\nThe Brotli-specific issue was reported by @kimkou2024.\n`HTTPResponse.drain_conn()` inefficiency was reported by @Cycloctane.",
+          "Severity": "HIGH",
+          "VendorSeverity": {
+            "ghsa": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:H",
+              "V40Score": 8.9
+            }
+          },
+          "References": [
+            "https://github.com/urllib3/urllib3",
+            "https://github.com/urllib3/urllib3/security/advisories/GHSA-mf9v-mfxr-j63j"
+          ]
         }
       ]
     }

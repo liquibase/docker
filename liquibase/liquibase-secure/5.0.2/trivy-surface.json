@@ -3,8 +3,8 @@
   "Trivy": {
     "Version": "0.69.3"
   },
-  "ReportID": "019e16b7-4ae0-7bea-8cf6-7a5700f13759",
-  "CreatedAt": "2026-05-11T11:06:11.552782208Z",
+  "ReportID": "019e1bcf-181a-7ae0-9f7a-ad2fef5fca1c",
+  "CreatedAt": "2026-05-12T10:50:17.498714207Z",
   "ArtifactID": "sha256:4c9817177682acb2ff0fcb29560a006aca70baed193db031a39082b52db7fc03",
   "ArtifactName": "liquibase/liquibase-secure:5.0.2",
   "ArtifactType": "container_image",
@@ -14774,12 +14774,10 @@
             "https://bugzilla.redhat.com/2456339",
             "https://bugzilla.redhat.com/show_bug.cgi?id=2456336",
             "https://bugzilla.redhat.com/show_bug.cgi?id=2456338",
-            "https://bugzilla.redhat.com/show_bug.cgi?id=2456339",
-            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2026-32280",
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2026-32282",
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2026-32283",
             "https://errata.almalinux.org/9/ALSA-2026-14200.html",
-            "https://errata.rockylinux.org/RLSA-2026:11514",
+            "https://errata.rockylinux.org/RLSA-2026:11711",
             "https://go.dev/cl/763767",
             "https://go.dev/issue/78334",
             "https://groups.google.com/g/golang-announce/c/0uYbvbPZRWU",
@@ -14791,6 +14789,242 @@
           ],
           "PublishedDate": "2026-04-08T02:16:03.58Z",
           "LastModifiedDate": "2026-04-16T19:12:10.54Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-33811",
+          "VendorIDs": [
+            "GO-2026-4981"
+          ],
+          "PkgID": "stdlib@v1.25.3",
+          "PkgName": "stdlib",
+          "PkgIdentifier": {
+            "PURL": "pkg:golang/stdlib@v1.25.3",
+            "UID": "410d43049e416eeb"
+          },
+          "InstalledVersion": "v1.25.3",
+          "FixedVersion": "1.25.10, 1.26.3",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:3e47267a3b48178aa699b42df6d43b7829aecbe10bfdbcf58ceb88a4ac36552d",
+            "DiffID": "sha256:9deca2b25490d635707fd2973eff07f4af923566682044a71525f2bba0f81eac"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-33811",
+          "DataSource": {
+            "ID": "govulndb",
+            "Name": "The Go Vulnerability Database",
+            "URL": "https://pkg.go.dev/vuln/"
+          },
+          "Fingerprint": "sha256:2d2b3f970b7fdb824a4c7d9b61d4902b144a848ab3a36b4b2436c336cc7ce3ad",
+          "Title": "When using LookupCNAME with the cgo DNS resolver, a very long CNAME re ...",
+          "Description": "When using LookupCNAME with the cgo DNS resolver, a very long CNAME response can trigger a double-free of C memory and a crash.",
+          "Severity": "HIGH",
+          "VendorSeverity": {
+            "bitnami": 3
+          },
+          "CVSS": {
+            "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://go.dev/cl/767860",
+            "https://go.dev/issue/78803",
+            "https://groups.google.com/g/golang-announce/c/qcCIEXso47M",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-33811",
+            "https://pkg.go.dev/vuln/GO-2026-4981"
+          ],
+          "PublishedDate": "2026-05-07T20:16:42.77Z",
+          "LastModifiedDate": "2026-05-08T15:16:36.64Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-33814",
+          "VendorIDs": [
+            "GO-2026-4918"
+          ],
+          "PkgID": "stdlib@v1.25.3",
+          "PkgName": "stdlib",
+          "PkgIdentifier": {
+            "PURL": "pkg:golang/stdlib@v1.25.3",
+            "UID": "410d43049e416eeb"
+          },
+          "InstalledVersion": "v1.25.3",
+          "FixedVersion": "1.25.10, 1.26.3",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:3e47267a3b48178aa699b42df6d43b7829aecbe10bfdbcf58ceb88a4ac36552d",
+            "DiffID": "sha256:9deca2b25490d635707fd2973eff07f4af923566682044a71525f2bba0f81eac"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-33814",
+          "DataSource": {
+            "ID": "govulndb",
+            "Name": "The Go Vulnerability Database",
+            "URL": "https://pkg.go.dev/vuln/"
+          },
+          "Fingerprint": "sha256:70746e31cfeade4b5aa2f388d39f6ba5602798304b7a869df07085a65edc56e2",
+          "Title": "When processing HTTP/2 SETTINGS frames, transport will enter an infini ...",
+          "Description": "When processing HTTP/2 SETTINGS frames, transport will enter an infinite loop of writing CONTINUATION frames if it receives a SETTINGS_MAX_FRAME_SIZE with a value of 0.",
+          "Severity": "HIGH",
+          "VendorSeverity": {
+            "bitnami": 3
+          },
+          "CVSS": {
+            "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://go.dev/cl/761581",
+            "https://go.dev/cl/761640",
+            "https://go.dev/issue/78476",
+            "https://groups.google.com/g/golang-announce/c/qcCIEXso47M",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-33814",
+            "https://pkg.go.dev/vuln/GO-2026-4918"
+          ],
+          "PublishedDate": "2026-05-07T20:16:42.88Z",
+          "LastModifiedDate": "2026-05-08T19:16:30.567Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-39820",
+          "VendorIDs": [
+            "GO-2026-4986"
+          ],
+          "PkgID": "stdlib@v1.25.3",
+          "PkgName": "stdlib",
+          "PkgIdentifier": {
+            "PURL": "pkg:golang/stdlib@v1.25.3",
+            "UID": "410d43049e416eeb"
+          },
+          "InstalledVersion": "v1.25.3",
+          "FixedVersion": "1.25.10, 1.26.3",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:3e47267a3b48178aa699b42df6d43b7829aecbe10bfdbcf58ceb88a4ac36552d",
+            "DiffID": "sha256:9deca2b25490d635707fd2973eff07f4af923566682044a71525f2bba0f81eac"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-39820",
+          "DataSource": {
+            "ID": "govulndb",
+            "Name": "The Go Vulnerability Database",
+            "URL": "https://pkg.go.dev/vuln/"
+          },
+          "Fingerprint": "sha256:e48642bd2ac0e048050139a88538ed33dc43599642675101a7fa86489c6ddf53",
+          "Title": "Well-crafted inputs reaching ParseAddress, ParseAddressList, and Parse ...",
+          "Description": "Well-crafted inputs reaching ParseAddress, ParseAddressList, and ParseDate were able to trigger excessive CPU exhaustion and memory allocations.",
+          "Severity": "HIGH",
+          "VendorSeverity": {
+            "bitnami": 3
+          },
+          "CVSS": {
+            "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://go.dev/cl/759940",
+            "https://go.dev/issue/78566",
+            "https://groups.google.com/g/golang-announce/c/qcCIEXso47M",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-39820",
+            "https://pkg.go.dev/vuln/GO-2026-4986"
+          ],
+          "PublishedDate": "2026-05-07T20:16:43.187Z",
+          "LastModifiedDate": "2026-05-08T15:16:37.323Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-39836",
+          "VendorIDs": [
+            "GO-2026-4971"
+          ],
+          "PkgID": "stdlib@v1.25.3",
+          "PkgName": "stdlib",
+          "PkgIdentifier": {
+            "PURL": "pkg:golang/stdlib@v1.25.3",
+            "UID": "410d43049e416eeb"
+          },
+          "InstalledVersion": "v1.25.3",
+          "FixedVersion": "1.25.10, 1.26.3",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:3e47267a3b48178aa699b42df6d43b7829aecbe10bfdbcf58ceb88a4ac36552d",
+            "DiffID": "sha256:9deca2b25490d635707fd2973eff07f4af923566682044a71525f2bba0f81eac"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-39836",
+          "DataSource": {
+            "ID": "govulndb",
+            "Name": "The Go Vulnerability Database",
+            "URL": "https://pkg.go.dev/vuln/"
+          },
+          "Fingerprint": "sha256:5137b8c1e3378be1d1f11034df053e886ab06b9d546923b1017f6528cc543ec4",
+          "Title": "Panic in Dial and LookupPort when handling NUL byte on Windows in net",
+          "Description": "The Dial and LookupPort functions panic on Windows when provided with an input containing a NUL (0).",
+          "Severity": "HIGH",
+          "VendorSeverity": {
+            "bitnami": 3
+          },
+          "CVSS": {
+            "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://go.dev/cl/775320",
+            "https://go.dev/issue/79006",
+            "https://groups.google.com/g/golang-announce/c/qcCIEXso47M",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-39836",
+            "https://pkg.go.dev/vuln/GO-2026-4971"
+          ],
+          "PublishedDate": "2026-05-07T20:16:43.593Z",
+          "LastModifiedDate": "2026-05-08T22:16:29.723Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-42499",
+          "VendorIDs": [
+            "GO-2026-4977"
+          ],
+          "PkgID": "stdlib@v1.25.3",
+          "PkgName": "stdlib",
+          "PkgIdentifier": {
+            "PURL": "pkg:golang/stdlib@v1.25.3",
+            "UID": "410d43049e416eeb"
+          },
+          "InstalledVersion": "v1.25.3",
+          "FixedVersion": "1.25.10, 1.26.3",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:3e47267a3b48178aa699b42df6d43b7829aecbe10bfdbcf58ceb88a4ac36552d",
+            "DiffID": "sha256:9deca2b25490d635707fd2973eff07f4af923566682044a71525f2bba0f81eac"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-42499",
+          "DataSource": {
+            "ID": "govulndb",
+            "Name": "The Go Vulnerability Database",
+            "URL": "https://pkg.go.dev/vuln/"
+          },
+          "Fingerprint": "sha256:942f2652c0df8b5285c0902d8a51c4eb444cc192f2765e33c95081395840ccab",
+          "Title": "Pathological inputs could cause DoS through consumePhrase when parsing ...",
+          "Description": "Pathological inputs could cause DoS through consumePhrase when parsing an email address according to RFC 5322.",
+          "Severity": "HIGH",
+          "VendorSeverity": {
+            "bitnami": 3
+          },
+          "CVSS": {
+            "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://go.dev/cl/771520",
+            "https://go.dev/issue/78987",
+            "https://groups.google.com/g/golang-announce/c/qcCIEXso47M",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-42499",
+            "https://pkg.go.dev/vuln/GO-2026-4977"
+          ],
+          "PublishedDate": "2026-05-07T20:16:44.54Z",
+          "LastModifiedDate": "2026-05-08T22:16:33.183Z"
         }
       ]
     }

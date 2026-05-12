@@ -3,8 +3,8 @@
   "Trivy": {
     "Version": "0.69.3"
   },
-  "ReportID": "019e16b8-280c-72a0-9f10-8ee8d92e300b",
-  "CreatedAt": "2026-05-11T11:07:08.17217335Z",
+  "ReportID": "019e1bcf-59c7-7ca7-a906-f27cbe6503e2",
+  "CreatedAt": "2026-05-12T10:50:34.311830919Z",
   "ArtifactName": "/tmp/extracted-deps",
   "ArtifactType": "filesystem",
   "Results": [
@@ -4943,6 +4943,125 @@
           ],
           "FilePath": "python-packages/urllib3-1.26.15.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
+        }
+      ],
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2026-44431",
+          "VendorIDs": [
+            "GHSA-qccp-gfcp-xxvc"
+          ],
+          "PkgName": "urllib3",
+          "PkgPath": "extension-scan/liquibase-checks/org.graalvm.python.vfs/venv/Lib/site-packages/urllib3-1.26.15.dist-info/METADATA",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/urllib3@1.26.15",
+            "UID": "a418be956c608109"
+          },
+          "InstalledVersion": "1.26.15",
+          "FixedVersion": "2.7.0",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-44431",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Fingerprint": "sha256:9af9b3854aac6ac185e28c2845afcbd65be116b3693829524764b27e5f1dafbc",
+          "Title": "urllib3: Sensitive headers forwarded across origins in proxied low-level redirects",
+          "Description": "### Impact\n\nWhen following cross-origin redirects for requests made using urllib3’s high-level APIs, such as `urllib3.request()`, `PoolManager.request()`, and `ProxyManager.request()`, sensitive headers — `Authorization`, `Cookie`, and `Proxy-Authorization` (defined in `Retry.DEFAULT_REMOVE_HEADERS_ON_REDIRECT`) — are stripped by default, as expected.\n\nHowever, cross-origin redirects followed from the low-level API via `ProxyManager.connection_from_url().urlopen(..., assert_same_host=False)` still forward these sensitive headers.\n\n### Affected usage\n\nApplications and libraries using urllib3 versions earlier than 2.7.0 may be affected if they allow cross-origin redirects while making requests through `HTTPConnection.urlopen()` instances created via `ProxyManager.connection_from_url()`.\n\n### Remediation\n\nUpgrade to urllib3 version 2.7.0 or later, in which sensitive headers are stripped from redirects followed by `HTTPConnection`.\n\nIf upgrading is not immediately possible, avoid using this low-level redirect flow for cross-origin redirects. If appropriate for your use case, switch to `ProxyManager.request()`.",
+          "Severity": "HIGH",
+          "VendorSeverity": {
+            "ghsa": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V40Vector": "CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N",
+              "V40Score": 8.2
+            }
+          },
+          "References": [
+            "https://github.com/urllib3/urllib3",
+            "https://github.com/urllib3/urllib3/security/advisories/GHSA-qccp-gfcp-xxvc"
+          ]
+        },
+        {
+          "VulnerabilityID": "CVE-2026-44431",
+          "VendorIDs": [
+            "GHSA-qccp-gfcp-xxvc"
+          ],
+          "PkgName": "urllib3",
+          "PkgPath": "extension-scan/liquibase-checks/org.graalvm.python.vfs/venv/lib/python3.11/site-packages/urllib3-1.26.15.dist-info/METADATA",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/urllib3@1.26.15",
+            "UID": "21278b04840de694"
+          },
+          "InstalledVersion": "1.26.15",
+          "FixedVersion": "2.7.0",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-44431",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Fingerprint": "sha256:9af9b3854aac6ac185e28c2845afcbd65be116b3693829524764b27e5f1dafbc",
+          "Title": "urllib3: Sensitive headers forwarded across origins in proxied low-level redirects",
+          "Description": "### Impact\n\nWhen following cross-origin redirects for requests made using urllib3’s high-level APIs, such as `urllib3.request()`, `PoolManager.request()`, and `ProxyManager.request()`, sensitive headers — `Authorization`, `Cookie`, and `Proxy-Authorization` (defined in `Retry.DEFAULT_REMOVE_HEADERS_ON_REDIRECT`) — are stripped by default, as expected.\n\nHowever, cross-origin redirects followed from the low-level API via `ProxyManager.connection_from_url().urlopen(..., assert_same_host=False)` still forward these sensitive headers.\n\n### Affected usage\n\nApplications and libraries using urllib3 versions earlier than 2.7.0 may be affected if they allow cross-origin redirects while making requests through `HTTPConnection.urlopen()` instances created via `ProxyManager.connection_from_url()`.\n\n### Remediation\n\nUpgrade to urllib3 version 2.7.0 or later, in which sensitive headers are stripped from redirects followed by `HTTPConnection`.\n\nIf upgrading is not immediately possible, avoid using this low-level redirect flow for cross-origin redirects. If appropriate for your use case, switch to `ProxyManager.request()`.",
+          "Severity": "HIGH",
+          "VendorSeverity": {
+            "ghsa": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V40Vector": "CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N",
+              "V40Score": 8.2
+            }
+          },
+          "References": [
+            "https://github.com/urllib3/urllib3",
+            "https://github.com/urllib3/urllib3/security/advisories/GHSA-qccp-gfcp-xxvc"
+          ]
+        },
+        {
+          "VulnerabilityID": "CVE-2026-44431",
+          "VendorIDs": [
+            "GHSA-qccp-gfcp-xxvc"
+          ],
+          "PkgName": "urllib3",
+          "PkgPath": "python-packages/urllib3-1.26.15.dist-info/METADATA",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/urllib3@1.26.15",
+            "UID": "b5bf8085478f735"
+          },
+          "InstalledVersion": "1.26.15",
+          "FixedVersion": "2.7.0",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-44431",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Fingerprint": "sha256:9af9b3854aac6ac185e28c2845afcbd65be116b3693829524764b27e5f1dafbc",
+          "Title": "urllib3: Sensitive headers forwarded across origins in proxied low-level redirects",
+          "Description": "### Impact\n\nWhen following cross-origin redirects for requests made using urllib3’s high-level APIs, such as `urllib3.request()`, `PoolManager.request()`, and `ProxyManager.request()`, sensitive headers — `Authorization`, `Cookie`, and `Proxy-Authorization` (defined in `Retry.DEFAULT_REMOVE_HEADERS_ON_REDIRECT`) — are stripped by default, as expected.\n\nHowever, cross-origin redirects followed from the low-level API via `ProxyManager.connection_from_url().urlopen(..., assert_same_host=False)` still forward these sensitive headers.\n\n### Affected usage\n\nApplications and libraries using urllib3 versions earlier than 2.7.0 may be affected if they allow cross-origin redirects while making requests through `HTTPConnection.urlopen()` instances created via `ProxyManager.connection_from_url()`.\n\n### Remediation\n\nUpgrade to urllib3 version 2.7.0 or later, in which sensitive headers are stripped from redirects followed by `HTTPConnection`.\n\nIf upgrading is not immediately possible, avoid using this low-level redirect flow for cross-origin redirects. If appropriate for your use case, switch to `ProxyManager.request()`.",
+          "Severity": "HIGH",
+          "VendorSeverity": {
+            "ghsa": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V40Vector": "CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N",
+              "V40Score": 8.2
+            }
+          },
+          "References": [
+            "https://github.com/urllib3/urllib3",
+            "https://github.com/urllib3/urllib3/security/advisories/GHSA-qccp-gfcp-xxvc"
+          ]
         }
       ]
     }

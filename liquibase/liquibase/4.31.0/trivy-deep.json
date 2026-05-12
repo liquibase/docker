@@ -3,8 +3,8 @@
   "Trivy": {
     "Version": "0.69.3"
   },
-  "ReportID": "019e16b7-fecd-787e-932a-4bdc300981ac",
-  "CreatedAt": "2026-05-11T11:06:57.613557741Z",
+  "ReportID": "019e1bce-fcfb-7b4c-b7d6-5ae71c81d2ce",
+  "CreatedAt": "2026-05-12T10:50:10.555741584Z",
   "ArtifactName": "/tmp/extracted-deps",
   "ArtifactType": "filesystem",
   "Results": [
@@ -941,7 +941,7 @@
             "https://bugzilla.redhat.com/show_bug.cgi?id=2158559",
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2022-40897",
             "https://errata.almalinux.org/9/ALSA-2023-0952.html",
-            "https://errata.rockylinux.org/RLSA-2023:0835",
+            "https://errata.rockylinux.org/RLSA-2023:0952",
             "https://github.com/pypa/advisory-database/tree/main/vulns/setuptools/PYSEC-2022-43012.yaml",
             "https://github.com/pypa/setuptools",
             "https://github.com/pypa/setuptools/blob/fe8a98e696241487ba6ac9f91faa38ade939ec5d/setuptools/package_index.py#L200",
@@ -1041,7 +1041,7 @@
             "https://bugzilla.redhat.com/show_bug.cgi?id=2158559",
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2022-40897",
             "https://errata.almalinux.org/9/ALSA-2023-0952.html",
-            "https://errata.rockylinux.org/RLSA-2023:0835",
+            "https://errata.rockylinux.org/RLSA-2023:0952",
             "https://github.com/pypa/advisory-database/tree/main/vulns/setuptools/PYSEC-2022-43012.yaml",
             "https://github.com/pypa/setuptools",
             "https://github.com/pypa/setuptools/blob/fe8a98e696241487ba6ac9f91faa38ade939ec5d/setuptools/package_index.py#L200",
@@ -1141,7 +1141,7 @@
             "https://bugzilla.redhat.com/show_bug.cgi?id=2158559",
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2022-40897",
             "https://errata.almalinux.org/9/ALSA-2023-0952.html",
-            "https://errata.rockylinux.org/RLSA-2023:0835",
+            "https://errata.rockylinux.org/RLSA-2023:0952",
             "https://github.com/pypa/advisory-database/tree/main/vulns/setuptools/PYSEC-2022-43012.yaml",
             "https://github.com/pypa/setuptools",
             "https://github.com/pypa/setuptools/blob/fe8a98e696241487ba6ac9f91faa38ade939ec5d/setuptools/package_index.py#L200",
@@ -1237,7 +1237,7 @@
             "https://bugzilla.redhat.com/show_bug.cgi?id=2297771",
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2024-6345",
             "https://errata.almalinux.org/9/ALSA-2024-6726.html",
-            "https://errata.rockylinux.org/RLSA-2024:5530",
+            "https://errata.rockylinux.org/RLSA-2024:6726",
             "https://github.com/advisories/GHSA-cx63-2mw6-8hw5",
             "https://github.com/pypa/setuptools",
             "https://github.com/pypa/setuptools/commit/88807c7062788254f654ea8c03427adc859321f0",
@@ -1317,7 +1317,7 @@
             "https://bugzilla.redhat.com/show_bug.cgi?id=2297771",
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2024-6345",
             "https://errata.almalinux.org/9/ALSA-2024-6726.html",
-            "https://errata.rockylinux.org/RLSA-2024:5530",
+            "https://errata.rockylinux.org/RLSA-2024:6726",
             "https://github.com/advisories/GHSA-cx63-2mw6-8hw5",
             "https://github.com/pypa/setuptools",
             "https://github.com/pypa/setuptools/commit/88807c7062788254f654ea8c03427adc859321f0",
@@ -1397,7 +1397,7 @@
             "https://bugzilla.redhat.com/show_bug.cgi?id=2297771",
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2024-6345",
             "https://errata.almalinux.org/9/ALSA-2024-6726.html",
-            "https://errata.rockylinux.org/RLSA-2024:5530",
+            "https://errata.rockylinux.org/RLSA-2024:6726",
             "https://github.com/advisories/GHSA-cx63-2mw6-8hw5",
             "https://github.com/pypa/setuptools",
             "https://github.com/pypa/setuptools/commit/88807c7062788254f654ea8c03427adc859321f0",
@@ -1479,7 +1479,7 @@
             "https://bugzilla.redhat.com/show_bug.cgi?id=2366982",
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-47273",
             "https://errata.almalinux.org/9/ALSA-2025-13578.html",
-            "https://errata.rockylinux.org/RLSA-2025:11036",
+            "https://errata.rockylinux.org/RLSA-2025:10407",
             "https://github.com/pypa/advisory-database/tree/main/vulns/setuptools/PYSEC-2025-49.yaml",
             "https://github.com/pypa/setuptools",
             "https://github.com/pypa/setuptools/blob/6ead555c5fb29bc57fe6105b1bffc163f56fd558/setuptools/package_index.py#L810C1-L825C88",
@@ -1563,7 +1563,7 @@
             "https://bugzilla.redhat.com/show_bug.cgi?id=2366982",
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-47273",
             "https://errata.almalinux.org/9/ALSA-2025-13578.html",
-            "https://errata.rockylinux.org/RLSA-2025:11036",
+            "https://errata.rockylinux.org/RLSA-2025:10407",
             "https://github.com/pypa/advisory-database/tree/main/vulns/setuptools/PYSEC-2025-49.yaml",
             "https://github.com/pypa/setuptools",
             "https://github.com/pypa/setuptools/blob/6ead555c5fb29bc57fe6105b1bffc163f56fd558/setuptools/package_index.py#L810C1-L825C88",
@@ -1647,7 +1647,7 @@
             "https://bugzilla.redhat.com/show_bug.cgi?id=2366982",
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-47273",
             "https://errata.almalinux.org/9/ALSA-2025-13578.html",
-            "https://errata.rockylinux.org/RLSA-2025:11036",
+            "https://errata.rockylinux.org/RLSA-2025:10407",
             "https://github.com/pypa/advisory-database/tree/main/vulns/setuptools/PYSEC-2025-49.yaml",
             "https://github.com/pypa/setuptools",
             "https://github.com/pypa/setuptools/blob/6ead555c5fb29bc57fe6105b1bffc163f56fd558/setuptools/package_index.py#L810C1-L825C88",
@@ -2169,7 +2169,7 @@
           ],
           "VendorSeverity": {
             "alma": 3,
-            "amazon": 2,
+            "amazon": 3,
             "azure": 3,
             "cbl-mariner": 3,
             "ghsa": 3,
@@ -2207,7 +2207,7 @@
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-66471",
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2026-21441",
             "https://errata.almalinux.org/9/ALSA-2026-1239.html",
-            "https://errata.rockylinux.org/RLSA-2026:1254",
+            "https://errata.rockylinux.org/RLSA-2026:1087",
             "https://github.com/urllib3/urllib3",
             "https://github.com/urllib3/urllib3/commit/24d7b67eac89f94e11003424bcf0d8f7b72222a8",
             "https://github.com/urllib3/urllib3/security/advisories/GHSA-gm62-xv2j-4w53",
@@ -2252,7 +2252,7 @@
           ],
           "VendorSeverity": {
             "alma": 3,
-            "amazon": 2,
+            "amazon": 3,
             "azure": 3,
             "cbl-mariner": 3,
             "ghsa": 3,
@@ -2290,7 +2290,7 @@
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-66471",
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2026-21441",
             "https://errata.almalinux.org/9/ALSA-2026-1239.html",
-            "https://errata.rockylinux.org/RLSA-2026:1254",
+            "https://errata.rockylinux.org/RLSA-2026:1087",
             "https://github.com/urllib3/urllib3",
             "https://github.com/urllib3/urllib3/commit/24d7b67eac89f94e11003424bcf0d8f7b72222a8",
             "https://github.com/urllib3/urllib3/security/advisories/GHSA-gm62-xv2j-4w53",
@@ -2335,7 +2335,7 @@
           ],
           "VendorSeverity": {
             "alma": 3,
-            "amazon": 2,
+            "amazon": 3,
             "azure": 3,
             "cbl-mariner": 3,
             "ghsa": 3,
@@ -2373,7 +2373,7 @@
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-66471",
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2026-21441",
             "https://errata.almalinux.org/9/ALSA-2026-1239.html",
-            "https://errata.rockylinux.org/RLSA-2026:1254",
+            "https://errata.rockylinux.org/RLSA-2026:1087",
             "https://github.com/urllib3/urllib3",
             "https://github.com/urllib3/urllib3/commit/24d7b67eac89f94e11003424bcf0d8f7b72222a8",
             "https://github.com/urllib3/urllib3/security/advisories/GHSA-gm62-xv2j-4w53",
@@ -2418,7 +2418,7 @@
           ],
           "VendorSeverity": {
             "alma": 3,
-            "amazon": 2,
+            "amazon": 3,
             "azure": 3,
             "cbl-mariner": 3,
             "ghsa": 3,
@@ -2456,7 +2456,7 @@
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-66471",
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2026-21441",
             "https://errata.almalinux.org/9/ALSA-2026-1239.html",
-            "https://errata.rockylinux.org/RLSA-2026:1254",
+            "https://errata.rockylinux.org/RLSA-2026:1087",
             "https://github.com/urllib3/urllib3",
             "https://github.com/urllib3/urllib3/commit/c19571de34c47de3a766541b041637ba5f716ed7",
             "https://github.com/urllib3/urllib3/security/advisories/GHSA-2xpw-w6gg-jr37",
@@ -2502,7 +2502,7 @@
           ],
           "VendorSeverity": {
             "alma": 3,
-            "amazon": 2,
+            "amazon": 3,
             "azure": 3,
             "cbl-mariner": 3,
             "ghsa": 3,
@@ -2540,7 +2540,7 @@
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-66471",
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2026-21441",
             "https://errata.almalinux.org/9/ALSA-2026-1239.html",
-            "https://errata.rockylinux.org/RLSA-2026:1254",
+            "https://errata.rockylinux.org/RLSA-2026:1087",
             "https://github.com/urllib3/urllib3",
             "https://github.com/urllib3/urllib3/commit/c19571de34c47de3a766541b041637ba5f716ed7",
             "https://github.com/urllib3/urllib3/security/advisories/GHSA-2xpw-w6gg-jr37",
@@ -2586,7 +2586,7 @@
           ],
           "VendorSeverity": {
             "alma": 3,
-            "amazon": 2,
+            "amazon": 3,
             "azure": 3,
             "cbl-mariner": 3,
             "ghsa": 3,
@@ -2624,7 +2624,7 @@
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-66471",
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2026-21441",
             "https://errata.almalinux.org/9/ALSA-2026-1239.html",
-            "https://errata.rockylinux.org/RLSA-2026:1254",
+            "https://errata.rockylinux.org/RLSA-2026:1087",
             "https://github.com/urllib3/urllib3",
             "https://github.com/urllib3/urllib3/commit/c19571de34c47de3a766541b041637ba5f716ed7",
             "https://github.com/urllib3/urllib3/security/advisories/GHSA-2xpw-w6gg-jr37",
@@ -2710,7 +2710,7 @@
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-66471",
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2026-21441",
             "https://errata.almalinux.org/9/ALSA-2026-1239.html",
-            "https://errata.rockylinux.org/RLSA-2026:1254",
+            "https://errata.rockylinux.org/RLSA-2026:1087",
             "https://github.com/urllib3/urllib3",
             "https://github.com/urllib3/urllib3/commit/8864ac407bba8607950025e0979c4c69bc7abc7b",
             "https://github.com/urllib3/urllib3/security/advisories/GHSA-38jv-5279-wg99",
@@ -2796,7 +2796,7 @@
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-66471",
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2026-21441",
             "https://errata.almalinux.org/9/ALSA-2026-1239.html",
-            "https://errata.rockylinux.org/RLSA-2026:1254",
+            "https://errata.rockylinux.org/RLSA-2026:1087",
             "https://github.com/urllib3/urllib3",
             "https://github.com/urllib3/urllib3/commit/8864ac407bba8607950025e0979c4c69bc7abc7b",
             "https://github.com/urllib3/urllib3/security/advisories/GHSA-38jv-5279-wg99",
@@ -2882,7 +2882,7 @@
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-66471",
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2026-21441",
             "https://errata.almalinux.org/9/ALSA-2026-1239.html",
-            "https://errata.rockylinux.org/RLSA-2026:1254",
+            "https://errata.rockylinux.org/RLSA-2026:1087",
             "https://github.com/urllib3/urllib3",
             "https://github.com/urllib3/urllib3/commit/8864ac407bba8607950025e0979c4c69bc7abc7b",
             "https://github.com/urllib3/urllib3/security/advisories/GHSA-38jv-5279-wg99",
@@ -2897,6 +2897,123 @@
           ],
           "PublishedDate": "2026-01-07T22:15:44.04Z",
           "LastModifiedDate": "2026-01-23T09:15:47.823Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-44431",
+          "VendorIDs": [
+            "GHSA-qccp-gfcp-xxvc"
+          ],
+          "PkgName": "urllib3",
+          "PkgPath": "extension-scan/liquibase-checks/org.graalvm.python.vfs/venv/Lib/site-packages/urllib3-1.26.15.dist-info/METADATA",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/urllib3@1.26.15",
+            "UID": "a418be956c608109"
+          },
+          "InstalledVersion": "1.26.15",
+          "FixedVersion": "2.7.0",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-44431",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Fingerprint": "sha256:9af9b3854aac6ac185e28c2845afcbd65be116b3693829524764b27e5f1dafbc",
+          "Title": "urllib3: Sensitive headers forwarded across origins in proxied low-level redirects",
+          "Description": "### Impact\n\nWhen following cross-origin redirects for requests made using urllib3’s high-level APIs, such as `urllib3.request()`, `PoolManager.request()`, and `ProxyManager.request()`, sensitive headers — `Authorization`, `Cookie`, and `Proxy-Authorization` (defined in `Retry.DEFAULT_REMOVE_HEADERS_ON_REDIRECT`) — are stripped by default, as expected.\n\nHowever, cross-origin redirects followed from the low-level API via `ProxyManager.connection_from_url().urlopen(..., assert_same_host=False)` still forward these sensitive headers.\n\n### Affected usage\n\nApplications and libraries using urllib3 versions earlier than 2.7.0 may be affected if they allow cross-origin redirects while making requests through `HTTPConnection.urlopen()` instances created via `ProxyManager.connection_from_url()`.\n\n### Remediation\n\nUpgrade to urllib3 version 2.7.0 or later, in which sensitive headers are stripped from redirects followed by `HTTPConnection`.\n\nIf upgrading is not immediately possible, avoid using this low-level redirect flow for cross-origin redirects. If appropriate for your use case, switch to `ProxyManager.request()`.",
+          "Severity": "HIGH",
+          "VendorSeverity": {
+            "ghsa": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V40Vector": "CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N",
+              "V40Score": 8.2
+            }
+          },
+          "References": [
+            "https://github.com/urllib3/urllib3",
+            "https://github.com/urllib3/urllib3/security/advisories/GHSA-qccp-gfcp-xxvc"
+          ]
+        },
+        {
+          "VulnerabilityID": "CVE-2026-44431",
+          "VendorIDs": [
+            "GHSA-qccp-gfcp-xxvc"
+          ],
+          "PkgName": "urllib3",
+          "PkgPath": "extension-scan/liquibase-checks/org.graalvm.python.vfs/venv/lib/python3.11/site-packages/urllib3-1.26.15.dist-info/METADATA",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/urllib3@1.26.15",
+            "UID": "21278b04840de694"
+          },
+          "InstalledVersion": "1.26.15",
+          "FixedVersion": "2.7.0",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-44431",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Fingerprint": "sha256:9af9b3854aac6ac185e28c2845afcbd65be116b3693829524764b27e5f1dafbc",
+          "Title": "urllib3: Sensitive headers forwarded across origins in proxied low-level redirects",
+          "Description": "### Impact\n\nWhen following cross-origin redirects for requests made using urllib3’s high-level APIs, such as `urllib3.request()`, `PoolManager.request()`, and `ProxyManager.request()`, sensitive headers — `Authorization`, `Cookie`, and `Proxy-Authorization` (defined in `Retry.DEFAULT_REMOVE_HEADERS_ON_REDIRECT`) — are stripped by default, as expected.\n\nHowever, cross-origin redirects followed from the low-level API via `ProxyManager.connection_from_url().urlopen(..., assert_same_host=False)` still forward these sensitive headers.\n\n### Affected usage\n\nApplications and libraries using urllib3 versions earlier than 2.7.0 may be affected if they allow cross-origin redirects while making requests through `HTTPConnection.urlopen()` instances created via `ProxyManager.connection_from_url()`.\n\n### Remediation\n\nUpgrade to urllib3 version 2.7.0 or later, in which sensitive headers are stripped from redirects followed by `HTTPConnection`.\n\nIf upgrading is not immediately possible, avoid using this low-level redirect flow for cross-origin redirects. If appropriate for your use case, switch to `ProxyManager.request()`.",
+          "Severity": "HIGH",
+          "VendorSeverity": {
+            "ghsa": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V40Vector": "CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N",
+              "V40Score": 8.2
+            }
+          },
+          "References": [
+            "https://github.com/urllib3/urllib3",
+            "https://github.com/urllib3/urllib3/security/advisories/GHSA-qccp-gfcp-xxvc"
+          ]
+        },
+        {
+          "VulnerabilityID": "CVE-2026-44431",
+          "VendorIDs": [
+            "GHSA-qccp-gfcp-xxvc"
+          ],
+          "PkgName": "urllib3",
+          "PkgPath": "python-packages/urllib3-1.26.15.dist-info/METADATA",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/urllib3@1.26.15",
+            "UID": "b5bf8085478f735"
+          },
+          "InstalledVersion": "1.26.15",
+          "FixedVersion": "2.7.0",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-44431",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Fingerprint": "sha256:9af9b3854aac6ac185e28c2845afcbd65be116b3693829524764b27e5f1dafbc",
+          "Title": "urllib3: Sensitive headers forwarded across origins in proxied low-level redirects",
+          "Description": "### Impact\n\nWhen following cross-origin redirects for requests made using urllib3’s high-level APIs, such as `urllib3.request()`, `PoolManager.request()`, and `ProxyManager.request()`, sensitive headers — `Authorization`, `Cookie`, and `Proxy-Authorization` (defined in `Retry.DEFAULT_REMOVE_HEADERS_ON_REDIRECT`) — are stripped by default, as expected.\n\nHowever, cross-origin redirects followed from the low-level API via `ProxyManager.connection_from_url().urlopen(..., assert_same_host=False)` still forward these sensitive headers.\n\n### Affected usage\n\nApplications and libraries using urllib3 versions earlier than 2.7.0 may be affected if they allow cross-origin redirects while making requests through `HTTPConnection.urlopen()` instances created via `ProxyManager.connection_from_url()`.\n\n### Remediation\n\nUpgrade to urllib3 version 2.7.0 or later, in which sensitive headers are stripped from redirects followed by `HTTPConnection`.\n\nIf upgrading is not immediately possible, avoid using this low-level redirect flow for cross-origin redirects. If appropriate for your use case, switch to `ProxyManager.request()`.",
+          "Severity": "HIGH",
+          "VendorSeverity": {
+            "ghsa": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V40Vector": "CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N",
+              "V40Score": 8.2
+            }
+          },
+          "References": [
+            "https://github.com/urllib3/urllib3",
+            "https://github.com/urllib3/urllib3/security/advisories/GHSA-qccp-gfcp-xxvc"
+          ]
         }
       ]
     }
