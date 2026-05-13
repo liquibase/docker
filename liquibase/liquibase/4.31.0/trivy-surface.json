@@ -3,8 +3,8 @@
   "Trivy": {
     "Version": "0.69.3"
   },
-  "ReportID": "019e1bce-77e8-7384-b834-989d01590112",
-  "CreatedAt": "2026-05-12T10:49:36.488232627Z",
+  "ReportID": "019e20f7-c48b-7e7a-82f7-1b1cd25e5385",
+  "CreatedAt": "2026-05-13T10:52:49.163950572Z",
   "ArtifactID": "sha256:45cd99a77061ed807234f73daa43180a8f551e65d291b299ab5297637d4761b5",
   "ArtifactName": "liquibase/liquibase:4.31.0",
   "ArtifactType": "container_image",
@@ -13747,7 +13747,7 @@
           ],
           "VendorSeverity": {
             "alma": 3,
-            "amazon": 2,
+            "amazon": 3,
             "azure": 3,
             "bitnami": 3,
             "oracle-oval": 3,
@@ -14026,6 +14026,7 @@
             "Digest": "sha256:50089403db12ceb9b9ef26f724c99be6ae2c578ca30e723667db35bbe8343383",
             "DiffID": "sha256:b5f6bdd3d4f9cacdcc4ba3ce81a61b960ce73369e4b45b1b8aae4d69250cd688"
           },
+          "SeveritySource": "nvd",
           "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-33811",
           "DataSource": {
             "ID": "govulndb",
@@ -14036,11 +14037,19 @@
           "Title": "When using LookupCNAME with the cgo DNS resolver, a very long CNAME re ...",
           "Description": "When using LookupCNAME with the cgo DNS resolver, a very long CNAME response can trigger a double-free of C memory and a crash.",
           "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-415"
+          ],
           "VendorSeverity": {
-            "bitnami": 3
+            "bitnami": 3,
+            "nvd": 3
           },
           "CVSS": {
             "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "nvd": {
               "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
               "V3Score": 7.5
             }
@@ -14053,7 +14062,7 @@
             "https://pkg.go.dev/vuln/GO-2026-4981"
           ],
           "PublishedDate": "2026-05-07T20:16:42.77Z",
-          "LastModifiedDate": "2026-05-08T15:16:36.64Z"
+          "LastModifiedDate": "2026-05-12T20:23:02.333Z"
         },
         {
           "VulnerabilityID": "CVE-2026-33814",
