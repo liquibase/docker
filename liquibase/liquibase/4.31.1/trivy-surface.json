@@ -3,8 +3,8 @@
   "Trivy": {
     "Version": "0.69.3"
   },
-  "ReportID": "019e20f7-e6f1-7d82-97fa-30389a0287ad",
-  "CreatedAt": "2026-05-13T10:52:57.969886341Z",
+  "ReportID": "019e261a-f4f0-74d3-83d6-496e89462b81",
+  "CreatedAt": "2026-05-14T10:49:21.392317068Z",
   "ArtifactID": "sha256:6b698a25ab3d5dd7046a91ee26926d4e824175bd97dcb89c075c1b6148f7113d",
   "ArtifactName": "liquibase/liquibase:4.31.1",
   "ArtifactType": "container_image",
@@ -13694,7 +13694,7 @@
           ],
           "VendorSeverity": {
             "alma": 3,
-            "amazon": 3,
+            "amazon": 2,
             "azure": 3,
             "bitnami": 3,
             "oracle-oval": 3,
@@ -13804,7 +13804,7 @@
             "https://go.dev/issue/78282",
             "https://groups.google.com/g/golang-announce/c/0uYbvbPZRWU",
             "https://linux.oracle.com/cve/CVE-2026-32280.html",
-            "https://linux.oracle.com/errata/ELSA-2026-14200.html",
+            "https://linux.oracle.com/errata/ELSA-2026-16875.html",
             "https://nvd.nist.gov/vuln/detail/CVE-2026-32280",
             "https://pkg.go.dev/vuln/GO-2026-4947",
             "https://www.cve.org/CVERecord?id=CVE-2026-32280"
@@ -13947,7 +13947,7 @@
             "https://go.dev/issue/78334",
             "https://groups.google.com/g/golang-announce/c/0uYbvbPZRWU",
             "https://linux.oracle.com/cve/CVE-2026-32283.html",
-            "https://linux.oracle.com/errata/ELSA-2026-14200.html",
+            "https://linux.oracle.com/errata/ELSA-2026-17075.html",
             "https://nvd.nist.gov/vuln/detail/CVE-2026-32283",
             "https://pkg.go.dev/vuln/GO-2026-4870",
             "https://www.cve.org/CVERecord?id=CVE-2026-32283"
@@ -14029,6 +14029,7 @@
             "Digest": "sha256:fb36ff2a547557fdb3262cfb336911c39123ac5edebaf60bdec5d9976517d1a3",
             "DiffID": "sha256:66ba65bdc69c20247fdd2a936b2fbb0f9116b94828f20b65cf9c8864c44960fb"
           },
+          "SeveritySource": "nvd",
           "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-33814",
           "DataSource": {
             "ID": "govulndb",
@@ -14039,11 +14040,19 @@
           "Title": "When processing HTTP/2 SETTINGS frames, transport will enter an infini ...",
           "Description": "When processing HTTP/2 SETTINGS frames, transport will enter an infinite loop of writing CONTINUATION frames if it receives a SETTINGS_MAX_FRAME_SIZE with a value of 0.",
           "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-835"
+          ],
           "VendorSeverity": {
-            "bitnami": 3
+            "bitnami": 3,
+            "nvd": 3
           },
           "CVSS": {
             "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "nvd": {
               "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
               "V3Score": 7.5
             }
@@ -14057,7 +14066,7 @@
             "https://pkg.go.dev/vuln/GO-2026-4918"
           ],
           "PublishedDate": "2026-05-07T20:16:42.88Z",
-          "LastModifiedDate": "2026-05-08T19:16:30.567Z"
+          "LastModifiedDate": "2026-05-13T14:41:59.52Z"
         },
         {
           "VulnerabilityID": "CVE-2026-39820",
@@ -14077,6 +14086,7 @@
             "Digest": "sha256:fb36ff2a547557fdb3262cfb336911c39123ac5edebaf60bdec5d9976517d1a3",
             "DiffID": "sha256:66ba65bdc69c20247fdd2a936b2fbb0f9116b94828f20b65cf9c8864c44960fb"
           },
+          "SeveritySource": "nvd",
           "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-39820",
           "DataSource": {
             "ID": "govulndb",
@@ -14087,11 +14097,19 @@
           "Title": "Well-crafted inputs reaching ParseAddress, ParseAddressList, and Parse ...",
           "Description": "Well-crafted inputs reaching ParseAddress, ParseAddressList, and ParseDate were able to trigger excessive CPU exhaustion and memory allocations.",
           "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-770"
+          ],
           "VendorSeverity": {
-            "bitnami": 3
+            "bitnami": 3,
+            "nvd": 3
           },
           "CVSS": {
             "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "nvd": {
               "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
               "V3Score": 7.5
             }
@@ -14104,7 +14122,7 @@
             "https://pkg.go.dev/vuln/GO-2026-4986"
           ],
           "PublishedDate": "2026-05-07T20:16:43.187Z",
-          "LastModifiedDate": "2026-05-08T15:16:37.323Z"
+          "LastModifiedDate": "2026-05-13T15:10:58.65Z"
         },
         {
           "VulnerabilityID": "CVE-2026-39836",
@@ -14124,6 +14142,7 @@
             "Digest": "sha256:fb36ff2a547557fdb3262cfb336911c39123ac5edebaf60bdec5d9976517d1a3",
             "DiffID": "sha256:66ba65bdc69c20247fdd2a936b2fbb0f9116b94828f20b65cf9c8864c44960fb"
           },
+          "SeveritySource": "nvd",
           "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-39836",
           "DataSource": {
             "ID": "govulndb",
@@ -14134,11 +14153,19 @@
           "Title": "Panic in Dial and LookupPort when handling NUL byte on Windows in net",
           "Description": "The Dial and LookupPort functions panic on Windows when provided with an input containing a NUL (0).",
           "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-476"
+          ],
           "VendorSeverity": {
-            "bitnami": 3
+            "bitnami": 3,
+            "nvd": 3
           },
           "CVSS": {
             "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "nvd": {
               "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
               "V3Score": 7.5
             }
@@ -14151,7 +14178,7 @@
             "https://pkg.go.dev/vuln/GO-2026-4971"
           ],
           "PublishedDate": "2026-05-07T20:16:43.593Z",
-          "LastModifiedDate": "2026-05-08T22:16:29.723Z"
+          "LastModifiedDate": "2026-05-13T15:11:10.31Z"
         },
         {
           "VulnerabilityID": "CVE-2026-42499",
@@ -14198,7 +14225,7 @@
             "https://pkg.go.dev/vuln/GO-2026-4977"
           ],
           "PublishedDate": "2026-05-07T20:16:44.54Z",
-          "LastModifiedDate": "2026-05-08T22:16:33.183Z"
+          "LastModifiedDate": "2026-05-13T16:59:17.563Z"
         }
       ]
     }
