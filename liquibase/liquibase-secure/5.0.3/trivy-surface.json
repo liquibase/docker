@@ -3,8 +3,8 @@
   "Trivy": {
     "Version": "0.69.3"
   },
-  "ReportID": "019e5ee1-8761-78c7-b06c-4a30c759aecb",
-  "CreatedAt": "2026-05-25T11:24:59.105576847Z",
+  "ReportID": "019e6924-65bf-74f6-8391-0b910d954700",
+  "CreatedAt": "2026-05-27T11:14:13.567327312Z",
   "ArtifactID": "sha256:34b9677e9d46a576cbfc14751d2d02dfee02b72aca8158935734516cf646dc85",
   "ArtifactName": "liquibase/liquibase-secure:5.0.3",
   "ArtifactType": "container_image",
@@ -14644,6 +14644,158 @@
             "DiffID": "sha256:5884bfe990f5fa6570fdfb80449ab64f50e2b1eee3e7f846251123ec546fcba6"
           },
           "AnalyzedBy": "gobinary"
+        }
+      ],
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2026-39823",
+          "VendorIDs": [
+            "GO-2026-4982"
+          ],
+          "PkgID": "stdlib@v1.25.5",
+          "PkgName": "stdlib",
+          "PkgIdentifier": {
+            "PURL": "pkg:golang/stdlib@v1.25.5",
+            "UID": "67d8dee280b50991"
+          },
+          "InstalledVersion": "v1.25.5",
+          "FixedVersion": "1.25.10, 1.26.3",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:4e4f244c1234869d388d2ec62093a2bbc380672c4f98d22a1ebc06065579381a",
+            "DiffID": "sha256:5884bfe990f5fa6570fdfb80449ab64f50e2b1eee3e7f846251123ec546fcba6"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-39823",
+          "DataSource": {
+            "ID": "govulndb",
+            "Name": "The Go Vulnerability Database",
+            "URL": "https://pkg.go.dev/vuln/"
+          },
+          "Fingerprint": "sha256:2ed23020f29df185c9b6edb092adb38327a898733b51891695708fd90045be70",
+          "Title": "CVE-2026-27142 fixed a vulnerability in which URLs were not correctly  ...",
+          "Description": "CVE-2026-27142 fixed a vulnerability in which URLs were not correctly escaped inside of a \u003cmeta\u003e tag's \u003ccontent\u003e attribute. If the URL content were to insert ASCII whitespaces around the '=' rune inside of the \u003ccontent\u003e attribute, the escaper would fail to similarly escape it, leading to XSS.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-79"
+          ],
+          "VendorSeverity": {
+            "amazon": 3,
+            "bitnami": 2
+          },
+          "CVSS": {
+            "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N",
+              "V3Score": 6.1
+            }
+          },
+          "References": [
+            "https://go.dev/cl/769920",
+            "https://go.dev/issue/78913",
+            "https://groups.google.com/g/golang-announce/c/qcCIEXso47M",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-39823",
+            "https://pkg.go.dev/vuln/GO-2026-4982"
+          ],
+          "PublishedDate": "2026-05-07T20:16:43.29Z",
+          "LastModifiedDate": "2026-05-13T16:58:45.697Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-39825",
+          "VendorIDs": [
+            "GO-2026-4976"
+          ],
+          "PkgID": "stdlib@v1.25.5",
+          "PkgName": "stdlib",
+          "PkgIdentifier": {
+            "PURL": "pkg:golang/stdlib@v1.25.5",
+            "UID": "67d8dee280b50991"
+          },
+          "InstalledVersion": "v1.25.5",
+          "FixedVersion": "1.25.10, 1.26.3",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:4e4f244c1234869d388d2ec62093a2bbc380672c4f98d22a1ebc06065579381a",
+            "DiffID": "sha256:5884bfe990f5fa6570fdfb80449ab64f50e2b1eee3e7f846251123ec546fcba6"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-39825",
+          "DataSource": {
+            "ID": "govulndb",
+            "Name": "The Go Vulnerability Database",
+            "URL": "https://pkg.go.dev/vuln/"
+          },
+          "Fingerprint": "sha256:155edf0b558252e78448ad7d3d47550744d749dde1bd1ff5c62e8c22005f01c4",
+          "Title": "ReverseProxy can forward queries containing parameters not visible to  ...",
+          "Description": "ReverseProxy can forward queries containing parameters not visible to Rewrite functions. When used with a Rewrite function, or a Director function which parses query parameters, ReverseProxy sanitizes the forwarded request to remove query parameters which are not parsed by url.ParseQuery. ReverseProxy does not take ParseQuery's limit on the total number of query parameters (controlled by GODEBUG=urlmaxqueryparams=N) into account. This can permit ReverseProxy to forward a request containing a query parameter that is not visible to the Rewrite function. For example, the query \"a1=x\u0026a2=x\u0026...\u0026a10000=x\u0026hidden=y\" can forward the parameter \"hidden=y\" while hiding it from the proxy's Rewrite function.",
+          "Severity": "HIGH",
+          "VendorSeverity": {
+            "amazon": 3,
+            "bitnami": 2
+          },
+          "CVSS": {
+            "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+              "V3Score": 5.3
+            }
+          },
+          "References": [
+            "https://go.dev/cl/770541",
+            "https://go.dev/issue/78948",
+            "https://groups.google.com/g/golang-announce/c/qcCIEXso47M",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-39825",
+            "https://pkg.go.dev/vuln/GO-2026-4976"
+          ],
+          "PublishedDate": "2026-05-07T20:16:43.39Z",
+          "LastModifiedDate": "2026-05-13T16:58:56.39Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-39826",
+          "VendorIDs": [
+            "GO-2026-4980"
+          ],
+          "PkgID": "stdlib@v1.25.5",
+          "PkgName": "stdlib",
+          "PkgIdentifier": {
+            "PURL": "pkg:golang/stdlib@v1.25.5",
+            "UID": "67d8dee280b50991"
+          },
+          "InstalledVersion": "v1.25.5",
+          "FixedVersion": "1.25.10, 1.26.3",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:4e4f244c1234869d388d2ec62093a2bbc380672c4f98d22a1ebc06065579381a",
+            "DiffID": "sha256:5884bfe990f5fa6570fdfb80449ab64f50e2b1eee3e7f846251123ec546fcba6"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-39826",
+          "DataSource": {
+            "ID": "govulndb",
+            "Name": "The Go Vulnerability Database",
+            "URL": "https://pkg.go.dev/vuln/"
+          },
+          "Fingerprint": "sha256:15c98301eb3ce255ff9b62d54ca8b6f946f9b2a79e3bf34c7d9c0eea7192e93a",
+          "Title": "If a trusted template author were to write a \u003cscript\u003e tag containing a ...",
+          "Description": "If a trusted template author were to write a \u003cscript\u003e tag containing an empty 'type' attribute or a 'type' attribute with an ASCII whitespace, the execution of the template would incorrectly escape any data passed into the \u003cscript\u003e block.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-116"
+          ],
+          "VendorSeverity": {
+            "amazon": 3,
+            "bitnami": 2
+          },
+          "CVSS": {
+            "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N",
+              "V3Score": 6.1
+            }
+          },
+          "References": [
+            "https://go.dev/cl/771180",
+            "https://go.dev/issue/78981",
+            "https://groups.google.com/g/golang-announce/c/qcCIEXso47M",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-39826",
+            "https://pkg.go.dev/vuln/GO-2026-4980"
+          ],
+          "PublishedDate": "2026-05-07T20:16:43.49Z",
+          "LastModifiedDate": "2026-05-13T16:59:07.48Z"
         }
       ]
     }

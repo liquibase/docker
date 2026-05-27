@@ -3,8 +3,8 @@
   "Trivy": {
     "Version": "0.69.3"
   },
-  "ReportID": "019e5ee1-3ddf-70df-8e49-2b0c04173bea",
-  "CreatedAt": "2026-05-25T11:24:40.287058444Z",
+  "ReportID": "019e6924-388b-7f3b-96f4-4de36831a42a",
+  "CreatedAt": "2026-05-27T11:14:01.995999998Z",
   "ArtifactID": "sha256:cefb00b9db1134d6bed6d4edd9edd60da9f9cd695ca03b1387af80a317669d4d",
   "ArtifactName": "liquibase/liquibase-secure:5.0.0",
   "ArtifactType": "container_image",
@@ -15655,6 +15655,678 @@
             "DiffID": "sha256:0acdcbb8f07296f465500495d547d9d4a728d114fd5f678c225661c727eddce6"
           },
           "AnalyzedBy": "gobinary"
+        }
+      ],
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2025-47912",
+          "VendorIDs": [
+            "GO-2025-4010"
+          ],
+          "PkgID": "stdlib@v1.25.1",
+          "PkgName": "stdlib",
+          "PkgIdentifier": {
+            "PURL": "pkg:golang/stdlib@v1.25.1",
+            "UID": "161816bbdca1bbb8"
+          },
+          "InstalledVersion": "v1.25.1",
+          "FixedVersion": "1.24.8, 1.25.2",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:b87ca2584c40c4bb47c42914583ecb3b2ee35d1248622f985bccd28ac603b03e",
+            "DiffID": "sha256:0acdcbb8f07296f465500495d547d9d4a728d114fd5f678c225661c727eddce6"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2025-47912",
+          "DataSource": {
+            "ID": "govulndb",
+            "Name": "The Go Vulnerability Database",
+            "URL": "https://pkg.go.dev/vuln/"
+          },
+          "Fingerprint": "sha256:7d778d24b6a075498183268567f1e43d3e1e87cdd8ec270da54d03d500cc1d63",
+          "Title": "The Parse function permits values other than IPv6 addresses to be incl ...",
+          "Description": "The Parse function permits values other than IPv6 addresses to be included in square brackets within the host component of a URL. RFC 3986 permits IPv6 addresses to be included within the host component, enclosed within square brackets. For example: \"http://[::1]/\". IPv4 addresses and hostnames must not appear within square brackets. Parse did not enforce this requirement.",
+          "Severity": "HIGH",
+          "VendorSeverity": {
+            "amazon": 3,
+            "bitnami": 2,
+            "photon": 2
+          },
+          "CVSS": {
+            "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+              "V3Score": 5.3
+            }
+          },
+          "References": [
+            "http://www.openwall.com/lists/oss-security/2025/10/08/1",
+            "https://go.dev/cl/709857",
+            "https://go.dev/issue/75678",
+            "https://groups.google.com/g/golang-announce/c/4Emdl2iQ_bI",
+            "https://nvd.nist.gov/vuln/detail/CVE-2025-47912",
+            "https://pkg.go.dev/vuln/GO-2025-4010"
+          ],
+          "PublishedDate": "2025-10-29T23:16:18.187Z",
+          "LastModifiedDate": "2026-01-29T13:57:18.69Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2025-58185",
+          "VendorIDs": [
+            "GO-2025-4011"
+          ],
+          "PkgID": "stdlib@v1.25.1",
+          "PkgName": "stdlib",
+          "PkgIdentifier": {
+            "PURL": "pkg:golang/stdlib@v1.25.1",
+            "UID": "161816bbdca1bbb8"
+          },
+          "InstalledVersion": "v1.25.1",
+          "FixedVersion": "1.24.8, 1.25.2",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:b87ca2584c40c4bb47c42914583ecb3b2ee35d1248622f985bccd28ac603b03e",
+            "DiffID": "sha256:0acdcbb8f07296f465500495d547d9d4a728d114fd5f678c225661c727eddce6"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2025-58185",
+          "DataSource": {
+            "ID": "govulndb",
+            "Name": "The Go Vulnerability Database",
+            "URL": "https://pkg.go.dev/vuln/"
+          },
+          "Fingerprint": "sha256:de1b16e72ea6d4168ffb3b7e6778d98870dfbe5bf011d033fbbb2dcf0eed7409",
+          "Title": "Parsing a maliciously crafted DER payload could allocate large amounts ...",
+          "Description": "Parsing a maliciously crafted DER payload could allocate large amounts of memory, causing memory exhaustion.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-770"
+          ],
+          "VendorSeverity": {
+            "amazon": 3,
+            "bitnami": 2,
+            "photon": 2
+          },
+          "CVSS": {
+            "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L",
+              "V3Score": 5.3
+            }
+          },
+          "References": [
+            "http://www.openwall.com/lists/oss-security/2025/10/08/1",
+            "https://go.dev/cl/709856",
+            "https://go.dev/issue/75671",
+            "https://groups.google.com/g/golang-announce/c/4Emdl2iQ_bI",
+            "https://nvd.nist.gov/vuln/detail/CVE-2025-58185",
+            "https://pkg.go.dev/vuln/GO-2025-4011"
+          ],
+          "PublishedDate": "2025-10-29T23:16:19.45Z",
+          "LastModifiedDate": "2026-02-06T20:26:41.997Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2025-58186",
+          "VendorIDs": [
+            "GO-2025-4012"
+          ],
+          "PkgID": "stdlib@v1.25.1",
+          "PkgName": "stdlib",
+          "PkgIdentifier": {
+            "PURL": "pkg:golang/stdlib@v1.25.1",
+            "UID": "161816bbdca1bbb8"
+          },
+          "InstalledVersion": "v1.25.1",
+          "FixedVersion": "1.24.8, 1.25.2",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:b87ca2584c40c4bb47c42914583ecb3b2ee35d1248622f985bccd28ac603b03e",
+            "DiffID": "sha256:0acdcbb8f07296f465500495d547d9d4a728d114fd5f678c225661c727eddce6"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2025-58186",
+          "DataSource": {
+            "ID": "govulndb",
+            "Name": "The Go Vulnerability Database",
+            "URL": "https://pkg.go.dev/vuln/"
+          },
+          "Fingerprint": "sha256:167be752b66a4d8b5b44e2dedcbafaea086c50a0bd973a64c4f0a26f201b027d",
+          "Title": "Despite HTTP headers having a default limit of 1MB, the number of cook ...",
+          "Description": "Despite HTTP headers having a default limit of 1MB, the number of cookies that can be parsed does not have a limit. By sending a lot of very small cookies such as \"a=;\", an attacker can make an HTTP server allocate a large amount of structs, causing large memory consumption.",
+          "Severity": "HIGH",
+          "VendorSeverity": {
+            "amazon": 3,
+            "bitnami": 2,
+            "photon": 2
+          },
+          "CVSS": {
+            "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L",
+              "V3Score": 5.3
+            }
+          },
+          "References": [
+            "http://www.openwall.com/lists/oss-security/2025/10/08/1",
+            "https://go.dev/cl/709855",
+            "https://go.dev/issue/75672",
+            "https://groups.google.com/g/golang-announce/c/4Emdl2iQ_bI",
+            "https://nvd.nist.gov/vuln/detail/CVE-2025-58186",
+            "https://pkg.go.dev/vuln/GO-2025-4012"
+          ],
+          "PublishedDate": "2025-10-29T23:16:19.547Z",
+          "LastModifiedDate": "2026-04-15T00:35:42.02Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2025-58187",
+          "VendorIDs": [
+            "GO-2025-4007"
+          ],
+          "PkgID": "stdlib@v1.25.1",
+          "PkgName": "stdlib",
+          "PkgIdentifier": {
+            "PURL": "pkg:golang/stdlib@v1.25.1",
+            "UID": "161816bbdca1bbb8"
+          },
+          "InstalledVersion": "v1.25.1",
+          "FixedVersion": "1.24.9, 1.25.3",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:b87ca2584c40c4bb47c42914583ecb3b2ee35d1248622f985bccd28ac603b03e",
+            "DiffID": "sha256:0acdcbb8f07296f465500495d547d9d4a728d114fd5f678c225661c727eddce6"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2025-58187",
+          "DataSource": {
+            "ID": "govulndb",
+            "Name": "The Go Vulnerability Database",
+            "URL": "https://pkg.go.dev/vuln/"
+          },
+          "Fingerprint": "sha256:fb65f0d510f177a9f5c7155ea1f95c5eb0dd2d164f672a26fc8a5fd8e972a6b2",
+          "Title": "Due to the design of the name constraint checking algorithm, the proce ...",
+          "Description": "Due to the design of the name constraint checking algorithm, the processing time of some inputs scale non-linearly with respect to the size of the certificate. This affects programs which validate arbitrary certificate chains.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-407"
+          ],
+          "VendorSeverity": {
+            "amazon": 3,
+            "bitnami": 3,
+            "photon": 3
+          },
+          "CVSS": {
+            "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "http://www.openwall.com/lists/oss-security/2025/10/08/1",
+            "https://go.dev/cl/709854",
+            "https://go.dev/issue/75681",
+            "https://groups.google.com/g/golang-announce/c/4Emdl2iQ_bI",
+            "https://nvd.nist.gov/vuln/detail/CVE-2025-58187",
+            "https://pkg.go.dev/vuln/GO-2025-4007"
+          ],
+          "PublishedDate": "2025-10-29T23:16:19.643Z",
+          "LastModifiedDate": "2026-01-29T16:02:27.08Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2025-58188",
+          "VendorIDs": [
+            "GO-2025-4013"
+          ],
+          "PkgID": "stdlib@v1.25.1",
+          "PkgName": "stdlib",
+          "PkgIdentifier": {
+            "PURL": "pkg:golang/stdlib@v1.25.1",
+            "UID": "161816bbdca1bbb8"
+          },
+          "InstalledVersion": "v1.25.1",
+          "FixedVersion": "1.24.8, 1.25.2",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:b87ca2584c40c4bb47c42914583ecb3b2ee35d1248622f985bccd28ac603b03e",
+            "DiffID": "sha256:0acdcbb8f07296f465500495d547d9d4a728d114fd5f678c225661c727eddce6"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2025-58188",
+          "DataSource": {
+            "ID": "govulndb",
+            "Name": "The Go Vulnerability Database",
+            "URL": "https://pkg.go.dev/vuln/"
+          },
+          "Fingerprint": "sha256:79a3cfcebfdf07c08a92ef391d2b27bb263e057ca7c1b4890724743405cd9bb8",
+          "Title": "Validating certificate chains which contain DSA public keys can cause  ...",
+          "Description": "Validating certificate chains which contain DSA public keys can cause programs to panic, due to a interface cast that assumes they implement the Equal method. This affects programs which validate arbitrary certificate chains.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-295"
+          ],
+          "VendorSeverity": {
+            "amazon": 3,
+            "bitnami": 3,
+            "photon": 3
+          },
+          "CVSS": {
+            "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "http://www.openwall.com/lists/oss-security/2025/10/08/1",
+            "https://go.dev/cl/709853",
+            "https://go.dev/issue/75675",
+            "https://groups.google.com/g/golang-announce/c/4Emdl2iQ_bI",
+            "https://nvd.nist.gov/vuln/detail/CVE-2025-58188",
+            "https://pkg.go.dev/vuln/GO-2025-4013"
+          ],
+          "PublishedDate": "2025-10-29T23:16:19.74Z",
+          "LastModifiedDate": "2026-01-29T15:55:11.97Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2025-58189",
+          "VendorIDs": [
+            "GO-2025-4008"
+          ],
+          "PkgID": "stdlib@v1.25.1",
+          "PkgName": "stdlib",
+          "PkgIdentifier": {
+            "PURL": "pkg:golang/stdlib@v1.25.1",
+            "UID": "161816bbdca1bbb8"
+          },
+          "InstalledVersion": "v1.25.1",
+          "FixedVersion": "1.24.8, 1.25.2",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:b87ca2584c40c4bb47c42914583ecb3b2ee35d1248622f985bccd28ac603b03e",
+            "DiffID": "sha256:0acdcbb8f07296f465500495d547d9d4a728d114fd5f678c225661c727eddce6"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2025-58189",
+          "DataSource": {
+            "ID": "govulndb",
+            "Name": "The Go Vulnerability Database",
+            "URL": "https://pkg.go.dev/vuln/"
+          },
+          "Fingerprint": "sha256:365c4c2d78670b98f591715ad9229f9b2e7e1194f904af2bdc73e128de2cb771",
+          "Title": "When Conn.Handshake fails during ALPN negotiation the error contains a ...",
+          "Description": "When Conn.Handshake fails during ALPN negotiation the error contains attacker controlled information (the ALPN protocols sent by the client) which is not escaped.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-532"
+          ],
+          "VendorSeverity": {
+            "amazon": 3,
+            "bitnami": 2,
+            "photon": 2
+          },
+          "CVSS": {
+            "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+              "V3Score": 5.3
+            }
+          },
+          "References": [
+            "http://www.openwall.com/lists/oss-security/2025/10/08/1",
+            "https://go.dev/cl/707776",
+            "https://go.dev/issue/75652",
+            "https://groups.google.com/g/golang-announce/c/4Emdl2iQ_bI",
+            "https://nvd.nist.gov/vuln/detail/CVE-2025-58189",
+            "https://pkg.go.dev/vuln/GO-2025-4008"
+          ],
+          "PublishedDate": "2025-10-29T23:16:19.833Z",
+          "LastModifiedDate": "2026-01-29T15:49:24.543Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2025-61723",
+          "VendorIDs": [
+            "GO-2025-4009"
+          ],
+          "PkgID": "stdlib@v1.25.1",
+          "PkgName": "stdlib",
+          "PkgIdentifier": {
+            "PURL": "pkg:golang/stdlib@v1.25.1",
+            "UID": "161816bbdca1bbb8"
+          },
+          "InstalledVersion": "v1.25.1",
+          "FixedVersion": "1.24.8, 1.25.2",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:b87ca2584c40c4bb47c42914583ecb3b2ee35d1248622f985bccd28ac603b03e",
+            "DiffID": "sha256:0acdcbb8f07296f465500495d547d9d4a728d114fd5f678c225661c727eddce6"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2025-61723",
+          "DataSource": {
+            "ID": "govulndb",
+            "Name": "The Go Vulnerability Database",
+            "URL": "https://pkg.go.dev/vuln/"
+          },
+          "Fingerprint": "sha256:6998a948cd2784ebf3ba65d52be7be29b910e66f342f9348d926355e65870245",
+          "Title": "The processing time for parsing some invalid inputs scales non-linearl ...",
+          "Description": "The processing time for parsing some invalid inputs scales non-linearly with respect to the size of the input. This affects programs which parse untrusted PEM inputs.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-770"
+          ],
+          "VendorSeverity": {
+            "amazon": 3,
+            "bitnami": 3,
+            "photon": 3
+          },
+          "CVSS": {
+            "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "http://www.openwall.com/lists/oss-security/2025/10/08/1",
+            "https://go.dev/cl/709858",
+            "https://go.dev/issue/75676",
+            "https://groups.google.com/g/golang-announce/c/4Emdl2iQ_bI",
+            "https://nvd.nist.gov/vuln/detail/CVE-2025-61723",
+            "https://pkg.go.dev/vuln/GO-2025-4009"
+          ],
+          "PublishedDate": "2025-10-29T23:16:19.927Z",
+          "LastModifiedDate": "2026-01-29T15:49:05.343Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2025-61724",
+          "VendorIDs": [
+            "GO-2025-4015"
+          ],
+          "PkgID": "stdlib@v1.25.1",
+          "PkgName": "stdlib",
+          "PkgIdentifier": {
+            "PURL": "pkg:golang/stdlib@v1.25.1",
+            "UID": "161816bbdca1bbb8"
+          },
+          "InstalledVersion": "v1.25.1",
+          "FixedVersion": "1.24.8, 1.25.2",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:b87ca2584c40c4bb47c42914583ecb3b2ee35d1248622f985bccd28ac603b03e",
+            "DiffID": "sha256:0acdcbb8f07296f465500495d547d9d4a728d114fd5f678c225661c727eddce6"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2025-61724",
+          "DataSource": {
+            "ID": "govulndb",
+            "Name": "The Go Vulnerability Database",
+            "URL": "https://pkg.go.dev/vuln/"
+          },
+          "Fingerprint": "sha256:e73c3d805562c895a569c8f02db29bec7e695a078d4ef4a4c29e0996c4684a85",
+          "Title": "The Reader.ReadResponse function constructs a response string through  ...",
+          "Description": "The Reader.ReadResponse function constructs a response string through repeated string concatenation of lines. When the number of lines in a response is large, this can cause excessive CPU consumption.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-770"
+          ],
+          "VendorSeverity": {
+            "amazon": 3,
+            "bitnami": 2,
+            "photon": 2
+          },
+          "CVSS": {
+            "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L",
+              "V3Score": 5.3
+            }
+          },
+          "References": [
+            "http://www.openwall.com/lists/oss-security/2025/10/08/1",
+            "https://go.dev/cl/709859",
+            "https://go.dev/issue/75716",
+            "https://groups.google.com/g/golang-announce/c/4Emdl2iQ_bI",
+            "https://nvd.nist.gov/vuln/detail/CVE-2025-61724",
+            "https://pkg.go.dev/vuln/GO-2025-4015"
+          ],
+          "PublishedDate": "2025-10-29T23:16:20.02Z",
+          "LastModifiedDate": "2026-01-29T15:30:53.69Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2025-61725",
+          "VendorIDs": [
+            "GO-2025-4006"
+          ],
+          "PkgID": "stdlib@v1.25.1",
+          "PkgName": "stdlib",
+          "PkgIdentifier": {
+            "PURL": "pkg:golang/stdlib@v1.25.1",
+            "UID": "161816bbdca1bbb8"
+          },
+          "InstalledVersion": "v1.25.1",
+          "FixedVersion": "1.24.8, 1.25.2",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:b87ca2584c40c4bb47c42914583ecb3b2ee35d1248622f985bccd28ac603b03e",
+            "DiffID": "sha256:0acdcbb8f07296f465500495d547d9d4a728d114fd5f678c225661c727eddce6"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2025-61725",
+          "DataSource": {
+            "ID": "govulndb",
+            "Name": "The Go Vulnerability Database",
+            "URL": "https://pkg.go.dev/vuln/"
+          },
+          "Fingerprint": "sha256:55b36879aabfe5d502f651c97351564bb2cbf753d0ee5bbc3d40db5d08debc5a",
+          "Title": "The ParseAddress function constructs domain-literal address components ...",
+          "Description": "The ParseAddress function constructs domain-literal address components through repeated string concatenation. When parsing large domain-literal components, this can cause excessive CPU consumption.",
+          "Severity": "HIGH",
+          "VendorSeverity": {
+            "amazon": 3,
+            "bitnami": 3,
+            "photon": 3
+          },
+          "CVSS": {
+            "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "http://www.openwall.com/lists/oss-security/2025/10/08/1",
+            "https://go.dev/cl/709860",
+            "https://go.dev/issue/75680",
+            "https://groups.google.com/g/golang-announce/c/4Emdl2iQ_bI",
+            "https://nvd.nist.gov/vuln/detail/CVE-2025-61725",
+            "https://pkg.go.dev/vuln/GO-2025-4006"
+          ],
+          "PublishedDate": "2025-10-29T23:16:20.113Z",
+          "LastModifiedDate": "2026-04-15T00:35:42.02Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2025-61727",
+          "VendorIDs": [
+            "GO-2025-4175"
+          ],
+          "PkgID": "stdlib@v1.25.1",
+          "PkgName": "stdlib",
+          "PkgIdentifier": {
+            "PURL": "pkg:golang/stdlib@v1.25.1",
+            "UID": "161816bbdca1bbb8"
+          },
+          "InstalledVersion": "v1.25.1",
+          "FixedVersion": "1.24.11, 1.25.5",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:b87ca2584c40c4bb47c42914583ecb3b2ee35d1248622f985bccd28ac603b03e",
+            "DiffID": "sha256:0acdcbb8f07296f465500495d547d9d4a728d114fd5f678c225661c727eddce6"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2025-61727",
+          "DataSource": {
+            "ID": "govulndb",
+            "Name": "The Go Vulnerability Database",
+            "URL": "https://pkg.go.dev/vuln/"
+          },
+          "Fingerprint": "sha256:52e120e4b0af9ee23aa651741a100b09b9f0c879f5f5dfac088c15bd9a1e8dbf",
+          "Title": "An excluded subdomain constraint in a certificate chain does not restr ...",
+          "Description": "An excluded subdomain constraint in a certificate chain does not restrict the usage of wildcard SANs in the leaf certificate. For example a constraint that excludes the subdomain test.example.com does not prevent a leaf certificate from claiming the SAN *.example.com.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-295"
+          ],
+          "VendorSeverity": {
+            "amazon": 3,
+            "bitnami": 2,
+            "photon": 2
+          },
+          "CVSS": {
+            "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N",
+              "V3Score": 6.5
+            }
+          },
+          "References": [
+            "https://go.dev/cl/723900",
+            "https://go.dev/issue/76442",
+            "https://groups.google.com/g/golang-announce/c/8FJoBkPddm4",
+            "https://nvd.nist.gov/vuln/detail/CVE-2025-61727",
+            "https://pkg.go.dev/vuln/GO-2025-4175"
+          ],
+          "PublishedDate": "2025-12-03T20:16:25.607Z",
+          "LastModifiedDate": "2025-12-18T20:15:10.957Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-39823",
+          "VendorIDs": [
+            "GO-2026-4982"
+          ],
+          "PkgID": "stdlib@v1.25.1",
+          "PkgName": "stdlib",
+          "PkgIdentifier": {
+            "PURL": "pkg:golang/stdlib@v1.25.1",
+            "UID": "161816bbdca1bbb8"
+          },
+          "InstalledVersion": "v1.25.1",
+          "FixedVersion": "1.25.10, 1.26.3",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:b87ca2584c40c4bb47c42914583ecb3b2ee35d1248622f985bccd28ac603b03e",
+            "DiffID": "sha256:0acdcbb8f07296f465500495d547d9d4a728d114fd5f678c225661c727eddce6"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-39823",
+          "DataSource": {
+            "ID": "govulndb",
+            "Name": "The Go Vulnerability Database",
+            "URL": "https://pkg.go.dev/vuln/"
+          },
+          "Fingerprint": "sha256:5187c896c79113b5202949456014a16d963d8d9a947de2ab5c0e963b51eeaced",
+          "Title": "CVE-2026-27142 fixed a vulnerability in which URLs were not correctly  ...",
+          "Description": "CVE-2026-27142 fixed a vulnerability in which URLs were not correctly escaped inside of a \u003cmeta\u003e tag's \u003ccontent\u003e attribute. If the URL content were to insert ASCII whitespaces around the '=' rune inside of the \u003ccontent\u003e attribute, the escaper would fail to similarly escape it, leading to XSS.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-79"
+          ],
+          "VendorSeverity": {
+            "amazon": 3,
+            "bitnami": 2
+          },
+          "CVSS": {
+            "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N",
+              "V3Score": 6.1
+            }
+          },
+          "References": [
+            "https://go.dev/cl/769920",
+            "https://go.dev/issue/78913",
+            "https://groups.google.com/g/golang-announce/c/qcCIEXso47M",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-39823",
+            "https://pkg.go.dev/vuln/GO-2026-4982"
+          ],
+          "PublishedDate": "2026-05-07T20:16:43.29Z",
+          "LastModifiedDate": "2026-05-13T16:58:45.697Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-39825",
+          "VendorIDs": [
+            "GO-2026-4976"
+          ],
+          "PkgID": "stdlib@v1.25.1",
+          "PkgName": "stdlib",
+          "PkgIdentifier": {
+            "PURL": "pkg:golang/stdlib@v1.25.1",
+            "UID": "161816bbdca1bbb8"
+          },
+          "InstalledVersion": "v1.25.1",
+          "FixedVersion": "1.25.10, 1.26.3",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:b87ca2584c40c4bb47c42914583ecb3b2ee35d1248622f985bccd28ac603b03e",
+            "DiffID": "sha256:0acdcbb8f07296f465500495d547d9d4a728d114fd5f678c225661c727eddce6"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-39825",
+          "DataSource": {
+            "ID": "govulndb",
+            "Name": "The Go Vulnerability Database",
+            "URL": "https://pkg.go.dev/vuln/"
+          },
+          "Fingerprint": "sha256:3e6ffe3f5e2fbeda5f4f36c29922c5330cd4103a34b713ab68ec1d87ed536b8e",
+          "Title": "ReverseProxy can forward queries containing parameters not visible to  ...",
+          "Description": "ReverseProxy can forward queries containing parameters not visible to Rewrite functions. When used with a Rewrite function, or a Director function which parses query parameters, ReverseProxy sanitizes the forwarded request to remove query parameters which are not parsed by url.ParseQuery. ReverseProxy does not take ParseQuery's limit on the total number of query parameters (controlled by GODEBUG=urlmaxqueryparams=N) into account. This can permit ReverseProxy to forward a request containing a query parameter that is not visible to the Rewrite function. For example, the query \"a1=x\u0026a2=x\u0026...\u0026a10000=x\u0026hidden=y\" can forward the parameter \"hidden=y\" while hiding it from the proxy's Rewrite function.",
+          "Severity": "HIGH",
+          "VendorSeverity": {
+            "amazon": 3,
+            "bitnami": 2
+          },
+          "CVSS": {
+            "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+              "V3Score": 5.3
+            }
+          },
+          "References": [
+            "https://go.dev/cl/770541",
+            "https://go.dev/issue/78948",
+            "https://groups.google.com/g/golang-announce/c/qcCIEXso47M",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-39825",
+            "https://pkg.go.dev/vuln/GO-2026-4976"
+          ],
+          "PublishedDate": "2026-05-07T20:16:43.39Z",
+          "LastModifiedDate": "2026-05-13T16:58:56.39Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-39826",
+          "VendorIDs": [
+            "GO-2026-4980"
+          ],
+          "PkgID": "stdlib@v1.25.1",
+          "PkgName": "stdlib",
+          "PkgIdentifier": {
+            "PURL": "pkg:golang/stdlib@v1.25.1",
+            "UID": "161816bbdca1bbb8"
+          },
+          "InstalledVersion": "v1.25.1",
+          "FixedVersion": "1.25.10, 1.26.3",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:b87ca2584c40c4bb47c42914583ecb3b2ee35d1248622f985bccd28ac603b03e",
+            "DiffID": "sha256:0acdcbb8f07296f465500495d547d9d4a728d114fd5f678c225661c727eddce6"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-39826",
+          "DataSource": {
+            "ID": "govulndb",
+            "Name": "The Go Vulnerability Database",
+            "URL": "https://pkg.go.dev/vuln/"
+          },
+          "Fingerprint": "sha256:2c98eaac5cb7e9a217441e209b139038dd842adc5408ebcf57ae2f01bd996839",
+          "Title": "If a trusted template author were to write a \u003cscript\u003e tag containing a ...",
+          "Description": "If a trusted template author were to write a \u003cscript\u003e tag containing an empty 'type' attribute or a 'type' attribute with an ASCII whitespace, the execution of the template would incorrectly escape any data passed into the \u003cscript\u003e block.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-116"
+          ],
+          "VendorSeverity": {
+            "amazon": 3,
+            "bitnami": 2
+          },
+          "CVSS": {
+            "bitnami": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N",
+              "V3Score": 6.1
+            }
+          },
+          "References": [
+            "https://go.dev/cl/771180",
+            "https://go.dev/issue/78981",
+            "https://groups.google.com/g/golang-announce/c/qcCIEXso47M",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-39826",
+            "https://pkg.go.dev/vuln/GO-2026-4980"
+          ],
+          "PublishedDate": "2026-05-07T20:16:43.49Z",
+          "LastModifiedDate": "2026-05-13T16:59:07.48Z"
         }
       ]
     }
