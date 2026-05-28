@@ -3,8 +3,8 @@
   "Trivy": {
     "Version": "0.69.3"
   },
-  "ReportID": "019e6923-886b-73c9-b203-8c71a99a7cce",
-  "CreatedAt": "2026-05-27T11:13:16.907249188Z",
+  "ReportID": "019e6e4a-d411-72da-83b8-287f8b2a7dd9",
+  "CreatedAt": "2026-05-28T11:14:18.25718821Z",
   "ArtifactID": "sha256:fe59e17b8dd462f1d6802df374458762c85a3823a1fbd2353b56870492563c00",
   "ArtifactName": "liquibase/liquibase:4.29.2",
   "ArtifactType": "container_image",
@@ -10559,6 +10559,7 @@
             "amazon": 3,
             "azure": 3,
             "cbl-mariner": 3,
+            "julia": 3,
             "nvd": 3,
             "oracle-oval": 3,
             "photon": 3,
@@ -10566,6 +10567,10 @@
             "ubuntu": 3
           },
           "CVSS": {
+            "julia": {
+              "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:N/UI:N/S:C/C:H/I:H/A:N",
+              "V3Score": 7.8
+            },
             "nvd": {
               "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H",
               "V3Score": 7
@@ -10581,6 +10586,7 @@
             "https://dev.gnupg.org/T8001",
             "https://errata.almalinux.org/9/ALSA-2026-0719.html",
             "https://errata.rockylinux.org/RLSA-2026:0719",
+            "https://github.com/advisories/GHSA-pj23-86ww-f72p",
             "https://github.com/gpg/gnupg/blob/ff30683418695f5d2cc9e6cf8c9418e09378ebe4/g10/armor.c#L1305-L1306",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9 (gnupg-2.5.14)",
@@ -11773,7 +11779,7 @@
             "https://bugzilla.redhat.com/show_bug.cgi?id=2407258",
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-58183",
             "https://errata.almalinux.org/9/ALSA-2026-1381.html",
-            "https://errata.rockylinux.org/RLSA-2025:23326",
+            "https://errata.rockylinux.org/RLSA-2026:1381",
             "https://go.dev/cl/709861",
             "https://go.dev/issue/75677",
             "https://groups.google.com/g/golang-announce/c/4Emdl2iQ_bI",
@@ -12458,7 +12464,7 @@
             "https://bugzilla.redhat.com/show_bug.cgi?id=2445356",
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2026-25679",
             "https://errata.almalinux.org/9/ALSA-2026-9044.html",
-            "https://errata.rockylinux.org/RLSA-2026:8841",
+            "https://errata.rockylinux.org/RLSA-2026:9044",
             "https://go.dev/cl/752180",
             "https://go.dev/issue/77578",
             "https://groups.google.com/g/golang-announce/c/EdhZqrQ98hk",

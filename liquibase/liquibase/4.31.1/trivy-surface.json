@@ -3,8 +3,8 @@
   "Trivy": {
     "Version": "0.69.3"
   },
-  "ReportID": "019e6924-6ff3-73d0-bc39-57632ac4621e",
-  "CreatedAt": "2026-05-27T11:14:16.179251362Z",
+  "ReportID": "019e6e4b-14b7-7e25-9a07-dc05172bb63c",
+  "CreatedAt": "2026-05-28T11:14:34.80792824Z",
   "ArtifactID": "sha256:6b698a25ab3d5dd7046a91ee26926d4e824175bd97dcb89c075c1b6148f7113d",
   "ArtifactName": "liquibase/liquibase:4.31.1",
   "ArtifactType": "container_image",
@@ -11478,6 +11478,7 @@
             "amazon": 3,
             "azure": 3,
             "cbl-mariner": 3,
+            "julia": 3,
             "nvd": 3,
             "oracle-oval": 3,
             "photon": 3,
@@ -11485,6 +11486,10 @@
             "ubuntu": 3
           },
           "CVSS": {
+            "julia": {
+              "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:N/UI:N/S:C/C:H/I:H/A:N",
+              "V3Score": 7.8
+            },
             "nvd": {
               "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H",
               "V3Score": 7
@@ -11500,6 +11505,7 @@
             "https://dev.gnupg.org/T8001",
             "https://errata.almalinux.org/9/ALSA-2026-0719.html",
             "https://errata.rockylinux.org/RLSA-2026:0719",
+            "https://github.com/advisories/GHSA-pj23-86ww-f72p",
             "https://github.com/gpg/gnupg/blob/ff30683418695f5d2cc9e6cf8c9418e09378ebe4/g10/armor.c#L1305-L1306",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9 (gnupg-2.5.14)",
@@ -11556,6 +11562,7 @@
             "amazon": 3,
             "azure": 3,
             "cbl-mariner": 3,
+            "julia": 3,
             "nvd": 3,
             "oracle-oval": 3,
             "photon": 3,
@@ -11563,6 +11570,10 @@
             "ubuntu": 3
           },
           "CVSS": {
+            "julia": {
+              "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:N/UI:N/S:C/C:H/I:H/A:N",
+              "V3Score": 7.8
+            },
             "nvd": {
               "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H",
               "V3Score": 7
@@ -11578,6 +11589,7 @@
             "https://dev.gnupg.org/T8001",
             "https://errata.almalinux.org/9/ALSA-2026-0719.html",
             "https://errata.rockylinux.org/RLSA-2026:0719",
+            "https://github.com/advisories/GHSA-pj23-86ww-f72p",
             "https://github.com/gpg/gnupg/blob/ff30683418695f5d2cc9e6cf8c9418e09378ebe4/g10/armor.c#L1305-L1306",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9 (gnupg-2.5.14)",
@@ -11634,6 +11646,7 @@
             "amazon": 3,
             "azure": 3,
             "cbl-mariner": 3,
+            "julia": 3,
             "nvd": 3,
             "oracle-oval": 3,
             "photon": 3,
@@ -11641,6 +11654,10 @@
             "ubuntu": 3
           },
           "CVSS": {
+            "julia": {
+              "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:N/UI:N/S:C/C:H/I:H/A:N",
+              "V3Score": 7.8
+            },
             "nvd": {
               "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H",
               "V3Score": 7
@@ -11656,6 +11673,7 @@
             "https://dev.gnupg.org/T8001",
             "https://errata.almalinux.org/9/ALSA-2026-0719.html",
             "https://errata.rockylinux.org/RLSA-2026:0719",
+            "https://github.com/advisories/GHSA-pj23-86ww-f72p",
             "https://github.com/gpg/gnupg/blob/ff30683418695f5d2cc9e6cf8c9418e09378ebe4/g10/armor.c#L1305-L1306",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9 (gnupg-2.5.14)",
@@ -11712,6 +11730,7 @@
             "amazon": 3,
             "azure": 3,
             "cbl-mariner": 3,
+            "julia": 3,
             "nvd": 3,
             "oracle-oval": 3,
             "photon": 3,
@@ -11719,6 +11738,10 @@
             "ubuntu": 3
           },
           "CVSS": {
+            "julia": {
+              "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:N/UI:N/S:C/C:H/I:H/A:N",
+              "V3Score": 7.8
+            },
             "nvd": {
               "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H",
               "V3Score": 7
@@ -11734,6 +11757,7 @@
             "https://dev.gnupg.org/T8001",
             "https://errata.almalinux.org/9/ALSA-2026-0719.html",
             "https://errata.rockylinux.org/RLSA-2026:0719",
+            "https://github.com/advisories/GHSA-pj23-86ww-f72p",
             "https://github.com/gpg/gnupg/blob/ff30683418695f5d2cc9e6cf8c9418e09378ebe4/g10/armor.c#L1305-L1306",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9 (gnupg-2.5.14)",
@@ -11790,6 +11814,7 @@
             "amazon": 3,
             "azure": 3,
             "cbl-mariner": 3,
+            "julia": 3,
             "nvd": 3,
             "oracle-oval": 3,
             "photon": 3,
@@ -11797,6 +11822,10 @@
             "ubuntu": 3
           },
           "CVSS": {
+            "julia": {
+              "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:N/UI:N/S:C/C:H/I:H/A:N",
+              "V3Score": 7.8
+            },
             "nvd": {
               "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H",
               "V3Score": 7
@@ -11812,6 +11841,7 @@
             "https://dev.gnupg.org/T8001",
             "https://errata.almalinux.org/9/ALSA-2026-0719.html",
             "https://errata.rockylinux.org/RLSA-2026:0719",
+            "https://github.com/advisories/GHSA-pj23-86ww-f72p",
             "https://github.com/gpg/gnupg/blob/ff30683418695f5d2cc9e6cf8c9418e09378ebe4/g10/armor.c#L1305-L1306",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9 (gnupg-2.5.14)",
@@ -11868,6 +11898,7 @@
             "amazon": 3,
             "azure": 3,
             "cbl-mariner": 3,
+            "julia": 3,
             "nvd": 3,
             "oracle-oval": 3,
             "photon": 3,
@@ -11875,6 +11906,10 @@
             "ubuntu": 3
           },
           "CVSS": {
+            "julia": {
+              "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:N/UI:N/S:C/C:H/I:H/A:N",
+              "V3Score": 7.8
+            },
             "nvd": {
               "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H",
               "V3Score": 7
@@ -11890,6 +11925,7 @@
             "https://dev.gnupg.org/T8001",
             "https://errata.almalinux.org/9/ALSA-2026-0719.html",
             "https://errata.rockylinux.org/RLSA-2026:0719",
+            "https://github.com/advisories/GHSA-pj23-86ww-f72p",
             "https://github.com/gpg/gnupg/blob/ff30683418695f5d2cc9e6cf8c9418e09378ebe4/g10/armor.c#L1305-L1306",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9 (gnupg-2.5.14)",
@@ -11946,6 +11982,7 @@
             "amazon": 3,
             "azure": 3,
             "cbl-mariner": 3,
+            "julia": 3,
             "nvd": 3,
             "oracle-oval": 3,
             "photon": 3,
@@ -11953,6 +11990,10 @@
             "ubuntu": 3
           },
           "CVSS": {
+            "julia": {
+              "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:N/UI:N/S:C/C:H/I:H/A:N",
+              "V3Score": 7.8
+            },
             "nvd": {
               "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H",
               "V3Score": 7
@@ -11968,6 +12009,7 @@
             "https://dev.gnupg.org/T8001",
             "https://errata.almalinux.org/9/ALSA-2026-0719.html",
             "https://errata.rockylinux.org/RLSA-2026:0719",
+            "https://github.com/advisories/GHSA-pj23-86ww-f72p",
             "https://github.com/gpg/gnupg/blob/ff30683418695f5d2cc9e6cf8c9418e09378ebe4/g10/armor.c#L1305-L1306",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9 (gnupg-2.5.14)",
@@ -12024,6 +12066,7 @@
             "amazon": 3,
             "azure": 3,
             "cbl-mariner": 3,
+            "julia": 3,
             "nvd": 3,
             "oracle-oval": 3,
             "photon": 3,
@@ -12031,6 +12074,10 @@
             "ubuntu": 3
           },
           "CVSS": {
+            "julia": {
+              "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:N/UI:N/S:C/C:H/I:H/A:N",
+              "V3Score": 7.8
+            },
             "nvd": {
               "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H",
               "V3Score": 7
@@ -12046,6 +12093,7 @@
             "https://dev.gnupg.org/T8001",
             "https://errata.almalinux.org/9/ALSA-2026-0719.html",
             "https://errata.rockylinux.org/RLSA-2026:0719",
+            "https://github.com/advisories/GHSA-pj23-86ww-f72p",
             "https://github.com/gpg/gnupg/blob/ff30683418695f5d2cc9e6cf8c9418e09378ebe4/g10/armor.c#L1305-L1306",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9 (gnupg-2.5.14)",
@@ -12102,6 +12150,7 @@
             "amazon": 3,
             "azure": 3,
             "cbl-mariner": 3,
+            "julia": 3,
             "nvd": 3,
             "oracle-oval": 3,
             "photon": 3,
@@ -12109,6 +12158,10 @@
             "ubuntu": 3
           },
           "CVSS": {
+            "julia": {
+              "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:N/UI:N/S:C/C:H/I:H/A:N",
+              "V3Score": 7.8
+            },
             "nvd": {
               "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H",
               "V3Score": 7
@@ -12124,6 +12177,7 @@
             "https://dev.gnupg.org/T8001",
             "https://errata.almalinux.org/9/ALSA-2026-0719.html",
             "https://errata.rockylinux.org/RLSA-2026:0719",
+            "https://github.com/advisories/GHSA-pj23-86ww-f72p",
             "https://github.com/gpg/gnupg/blob/ff30683418695f5d2cc9e6cf8c9418e09378ebe4/g10/armor.c#L1305-L1306",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9 (gnupg-2.5.14)",
@@ -12180,6 +12234,7 @@
             "amazon": 3,
             "azure": 3,
             "cbl-mariner": 3,
+            "julia": 3,
             "nvd": 3,
             "oracle-oval": 3,
             "photon": 3,
@@ -12187,6 +12242,10 @@
             "ubuntu": 3
           },
           "CVSS": {
+            "julia": {
+              "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:N/UI:N/S:C/C:H/I:H/A:N",
+              "V3Score": 7.8
+            },
             "nvd": {
               "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H",
               "V3Score": 7
@@ -12202,6 +12261,7 @@
             "https://dev.gnupg.org/T8001",
             "https://errata.almalinux.org/9/ALSA-2026-0719.html",
             "https://errata.rockylinux.org/RLSA-2026:0719",
+            "https://github.com/advisories/GHSA-pj23-86ww-f72p",
             "https://github.com/gpg/gnupg/blob/ff30683418695f5d2cc9e6cf8c9418e09378ebe4/g10/armor.c#L1305-L1306",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9 (gnupg-2.5.14)",
@@ -12258,6 +12318,7 @@
             "amazon": 3,
             "azure": 3,
             "cbl-mariner": 3,
+            "julia": 3,
             "nvd": 3,
             "oracle-oval": 3,
             "photon": 3,
@@ -12265,6 +12326,10 @@
             "ubuntu": 3
           },
           "CVSS": {
+            "julia": {
+              "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:N/UI:N/S:C/C:H/I:H/A:N",
+              "V3Score": 7.8
+            },
             "nvd": {
               "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H",
               "V3Score": 7
@@ -12280,6 +12345,7 @@
             "https://dev.gnupg.org/T8001",
             "https://errata.almalinux.org/9/ALSA-2026-0719.html",
             "https://errata.rockylinux.org/RLSA-2026:0719",
+            "https://github.com/advisories/GHSA-pj23-86ww-f72p",
             "https://github.com/gpg/gnupg/blob/ff30683418695f5d2cc9e6cf8c9418e09378ebe4/g10/armor.c#L1305-L1306",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9",
             "https://github.com/gpg/gnupg/commit/115d138ba599328005c5321c0ef9f00355838ca9 (gnupg-2.5.14)",
@@ -13513,7 +13579,7 @@
             "https://bugzilla.redhat.com/show_bug.cgi?id=2407258",
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2025-58183",
             "https://errata.almalinux.org/9/ALSA-2026-1381.html",
-            "https://errata.rockylinux.org/RLSA-2025:23326",
+            "https://errata.rockylinux.org/RLSA-2026:1381",
             "https://go.dev/cl/709861",
             "https://go.dev/issue/75677",
             "https://groups.google.com/g/golang-announce/c/4Emdl2iQ_bI",
@@ -14198,7 +14264,7 @@
             "https://bugzilla.redhat.com/show_bug.cgi?id=2445356",
             "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2026-25679",
             "https://errata.almalinux.org/9/ALSA-2026-9044.html",
-            "https://errata.rockylinux.org/RLSA-2026:8841",
+            "https://errata.rockylinux.org/RLSA-2026:9044",
             "https://go.dev/cl/752180",
             "https://go.dev/issue/77578",
             "https://groups.google.com/g/golang-announce/c/EdhZqrQ98hk",
