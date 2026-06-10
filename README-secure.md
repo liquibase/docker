@@ -1,5 +1,16 @@
 # Official Liquibase-Secure Docker Images formerly called Liquibase-Pro
 
+> # ⚠️ This repository is DEPRECATED
+>
+> **`liquibase/docker` is no longer the source for the Liquibase Secure Docker image.** The `liquibase/liquibase-secure` image is now built and maintained internally by Liquibase.
+>
+> - **Issues / requests for the Secure image:** [Contact Liquibase Support](https://www.liquibase.com/contact-us)
+> - **Community Docker image:** see [`liquibase/liquibase`](https://github.com/liquibase/liquibase/tree/main/docker)
+>
+> **Docker Hub is unaffected** — continue pulling `liquibase/liquibase-secure` as before. Existing tags, image history, and signatures remain valid.
+>
+> ---
+
 **Liquibase Secure** is the enterprise edition of Liquibase that provides advanced database DevOps capabilities for teams requiring enhanced security, performance, and governance features.
 
 ## ⚠️ License Requirements

@@ -1,5 +1,20 @@
 # Official Liquibase Docker Images
 
+> # ⚠️ This repository is DEPRECATED
+>
+> **`liquibase/docker` is no longer the source for Liquibase Docker images.** As part of the Liquibase 5.0 split between Community and Secure editions, the Dockerfiles have moved to their respective product repositories.
+>
+> | Edition | New source for the Dockerfile | Where to file issues / PRs |
+> | --- | --- | --- |
+> | **Community** — `liquibase/liquibase` | [`liquibase/liquibase`](https://github.com/liquibase/liquibase) (see the [`docker/`](https://github.com/liquibase/liquibase/tree/main/docker) directory) | [liquibase/liquibase issues](https://github.com/liquibase/liquibase/issues) |
+> | **Secure** — `liquibase/liquibase-secure` | Maintained internally by Liquibase | [Contact Liquibase Support](https://www.liquibase.com/contact-us) |
+>
+> **Docker Hub images are unaffected.** Continue pulling `liquibase/liquibase` and `liquibase/liquibase-secure` as before — existing tags, image history, and signatures remain valid.
+>
+> This repository is preserved in read-only / archived state so historical issues, PRs, releases, and git tags (`v{version}`, `v{version}-SECURE`) stay discoverable.
+>
+> ---
+
 ## 🚨 Important: Liquibase 5.0 Changes 🚨
 
 ### Liquibase Community vs Liquibase Secure

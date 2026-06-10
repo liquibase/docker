@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 🟢 Liquibase Community Docker image issues
+    url: https://github.com/liquibase/liquibase/issues/new/choose
+    about: This repository is deprecated. File Community Docker image issues and PRs in liquibase/liquibase (see the docker/ directory).
+  - name: 🔒 Liquibase Secure Docker image support
+    url: https://www.liquibase.com/contact-us
+    about: The liquibase/liquibase-secure image is maintained internally. Contact Liquibase Support for Secure Docker image issues.
+  - name: 📦 Docker Hub images (unchanged)
+    url: https://hub.docker.com/r/liquibase/liquibase
+    about: Docker Hub images liquibase/liquibase and liquibase/liquibase-secure are unaffected by this deprecation.
