@@ -247,13 +247,24 @@ Liquibase Secure images include supply chain security features for compliance wi
 
 ### Verify Image Signature
 
-Liquibase Secure images are signed using [Cosign](https://docs.sigstore.dev/cosign/overview/) with keyless signing via GitHub OIDC. To verify a signature:
+Liquibase Secure images are signed using [Cosign](https://docs.sigstore.dev/cosign/overview/) with keyless signing via GitHub OIDC. The signing pipeline moved from the public repo `liquibase/docker` to a private internal repository starting with `5.2.0`, so the OIDC identity in each signature depends on the tag.
+
+> Install cosign: https://docs.sigstore.dev/cosign/installation/
+
+**Tags `5.1.1` and earlier** (signed by the legacy `liquibase/docker` pipeline):
 
 ```bash
-# Install cosign: https://docs.sigstore.dev/cosign/installation/
-cosign verify liquibase/liquibase-secure:latest \
+cosign verify liquibase/liquibase-secure:<tag> \
   --certificate-oidc-issuer=https://token.actions.githubusercontent.com \
   --certificate-identity-regexp="https://github.com/liquibase/docker/.*"
+```
+
+**Tags `5.2.0` and later** (signed by the new private internal pipeline):
+
+```bash
+cosign verify liquibase/liquibase-secure:<tag> \
+  --certificate-oidc-issuer=https://token.actions.githubusercontent.com \
+  --certificate-identity-regexp="https://github.com/liquibase/.*"
 ```
 
 ### View SBOM (Software Bill of Materials)
